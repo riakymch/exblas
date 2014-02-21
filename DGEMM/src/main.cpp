@@ -61,7 +61,7 @@ static void __parse_args(int argc, char **argv) {
     __usage(argc, argv);
     exit(-1);
   }
-  if (__alg > 4) {
+  if (__alg > 3) {
     __usage(argc, argv);
     exit(-1);
   }
@@ -87,8 +87,6 @@ int main(int argc, char **argv)
         runSuperaccumulator("../src/Superaccumulator.FPE.EX.cl");
     else if (__alg == 3)
         runReduction("../src/Reduction.cl");
-    else if (__alg == 4)
-        runSuperaccumulator("../src/Superaccumulator.Demmel.cl");
 }
 
 int runSuperaccumulator(const char* program_file){
