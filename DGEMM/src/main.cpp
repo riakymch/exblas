@@ -13,25 +13,26 @@
 #include "common.hpp"
 
 #define NUM_ITER  20
+#define BLOCK_SIZE 16
 ////////////////////////////////////////////////////////////////////////////////
 // Variables used in the program 
 ////////////////////////////////////////////////////////////////////////////////
-cl_platform_id    cpPlatform;            //OpenCL platform
-cl_device_id      cdDevice;              //OpenCL device list    
-cl_context        cxGPUContext;          //OpenCL context
-cl_command_queue  cqCommandQueue;        //OpenCL command que
-cl_mem            d_iData, d_oData, d_Histogram;      //OpenCL memory buffer objects
-void              *h_iData;
-double            h_oData;
-bintype           *h_HistogramGPU;
+cl_platform_id    cpPlatform;                   //OpenCL platform
+cl_device_id      cdDevice;                     //OpenCL device list    
+cl_context        cxGPUContext;                 //OpenCL context
+cl_command_queue  cqCommandQueue;               //OpenCL command que
+Matrix            d_A, d_B, d_C;                //OpenCL memory buffer objects
+Matrix            A, B, C;
 
-static uint __nbElements = 0;
-static uint __range      = 0;
-static uint __nbfpe      = 0;
-static uint __alg        = 0;
+static uint __mC    = 0;
+static uint __nB    = 0;
+static uint __kC    = 0;
+static uint __range = 0;
+static uint __nbfpe = 0;
+static uint __alg   = 0;
 
 static void __usage(int argc __attribute__((unused)), char **argv) {
-  fprintf(stderr, "Usage: %s [-n number of elements  -r range -e nbfpe -a alg (0-acc, 1-fpe, 2-fpeee, 3-red, 4-dem)] \n", argv[0]);
+  fprintf(stderr, "Usage: %s [-m number of rows in A -n number of columns in A -k number of columns in B -r range -e nbfpe -a alg (0-dgemm)] \n", argv[0]);
   printf("       -?, -h:    Display this help and exit\n");
 }
 
@@ -39,8 +40,12 @@ static void __parse_args(int argc, char **argv) {
   int i;
 
   for (i = 1; i < argc; i++) {
-    if ((strcmp(argv[i], "-n") == 0)) {
-      __nbElements = atoi(argv[++i]);
+    if ((strcmp(argv[i], "-m") == 0)) {
+      __mC = atoi(argv[++i]);
+    }if ((strcmp(argv[i], "-n") == 0)) {
+      __nB = atoi(argv[++i]);
+    }if ((strcmp(argv[i], "-k") == 0)) {
+      __kC = atoi(argv[++i]);
     } if ((strcmp(argv[i], "-r") == 0)) {
       __range = atoi(argv[++i]);
     } if ((strcmp(argv[i], "-e") == 0)) {
@@ -57,11 +62,11 @@ static void __parse_args(int argc, char **argv) {
     }
   }
 
-  if (__nbElements == 0) {
+  if ((__mC <= 0) || (__nB <= 0) || (__kC <= 0)) {
     __usage(argc, argv);
     exit(-1);
   }
-  if (__alg > 3) {
+  if (__alg > 1) {
     __usage(argc, argv);
     exit(-1);
   }
@@ -77,180 +82,10 @@ int cleanUp (
 int main(int argc, char **argv)
 {
     __parse_args(argc, argv);
-    printf("Starting with an array of %i double elements\n\n",  __nbElements); 
+    printf("Starting with a matrices of %ix%ix%i double elements\n\n", __mC, __nB, __kC); 
 
-    if (__alg == 0) 
-        runSuperaccumulator("../src/Superaccumulator.cl");
-    else if (__alg == 1)
-        runSuperaccumulator("../src/Superaccumulator.FPE.cl");
-    else if (__alg == 2)
-        runSuperaccumulator("../src/Superaccumulator.FPE.EX.cl");
-    else if (__alg == 3)
+    if (__alg == 0)
         runDGEMM("../src/DGEMM.cl");
-}
-
-int runSuperaccumulator(const char* program_file){
-    cl_int ciErrNum;
-    int    PassFailFlag = 1;
-
-    printf("Initializing data...\n");
-        //h_iData         = (void    *) malloc(__nbElements * sizeof(double));
-        PassFailFlag = posix_memalign(&h_iData, 64, __nbElements * sizeof(double));
-        if (PassFailFlag != 0) {
-            printf("ERROR: could not allocate memory with posix_memalign!\n");
-            exit(1);
-        }
-        h_HistogramGPU = (bintype *) malloc(BIN_COUNT  * sizeof(bintype));
-	// init data
-        int emax = E_BITS - log2(__nbElements);
-        init_fpuniform((double *) h_iData, __nbElements, __range, emax); // 2000
-
-    printf("Initializing OpenCL...\n");
-        char platform_name[64];
-	char device_name[32];
-#ifdef AMD
-        strcpy(platform_name, "AMD Accelerated Parallel Processing");
-	strcpy(device_name, "Tahiti");
-#else
-        strcpy(platform_name, "NVIDIA CUDA");
-        strcpy(device_name, "Tesla K20c");
-#endif
-        //setenv("CUDA_CACHE_DISABLE", "1", 1);
-        cpPlatform = GetOCLPlatform(platform_name);
-        if (cpPlatform == NULL) {
-            printf("ERROR: Failed to find the platform '%s' ...\n", platform_name);
-            return -1;
-        }
-
-        //Get a GPU device
-        cdDevice = GetOCLDevice(cpPlatform, device_name);
-        if (cdDevice == NULL) {
-            printf("ERROR: Failed to find the device '%s' ...\n", device_name);
-            return -1;
-        }
-
-        //Create the context
-        cxGPUContext = clCreateContext(0, 1, &cdDevice, NULL, NULL, &ciErrNum);
-        if (ciErrNum != CL_SUCCESS) {
-            printf("Error in clCreateContext, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
-            cleanUp(EXIT_FAILURE);
-        }
-
-        //Create a command-queue
-        cqCommandQueue = clCreateCommandQueue(cxGPUContext, cdDevice, CL_QUEUE_PROFILING_ENABLE, &ciErrNum);
-        if (ciErrNum != CL_SUCCESS) {
-            printf("Error in clCreateCommandQueue, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
-            cleanUp(EXIT_FAILURE);
-        }
-
-    printf("Allocating OpenCL memory...\n\n");
-        d_iData = clCreateBuffer(cxGPUContext, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, __nbElements * sizeof(cl_double), h_iData, &ciErrNum);
-        if (ciErrNum != CL_SUCCESS) {
-            printf("Error in clCreateBuffer for d_iData, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
-            cleanUp(EXIT_FAILURE);
-        }
-        d_Histogram = clCreateBuffer(cxGPUContext, CL_MEM_READ_WRITE, BIN_COUNT * sizeof(bintype), NULL, &ciErrNum);
-        if (ciErrNum != CL_SUCCESS) {
-            printf("Error in clCreateBuffer for d_Histogram, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
-            cleanUp(EXIT_FAILURE);
-        }
-    
-    {
-        printf("Initializing OpenCL superaccumulator...\n");
-            ciErrNum = initSuperaccumulator(cxGPUContext, cqCommandQueue, cdDevice, program_file, __nbfpe);
-            if (ciErrNum != CL_SUCCESS)
-                cleanUp(EXIT_FAILURE);
-
-        printf("Running OpenCL superaccumulator with %u elements...\n\n", __nbElements);
-            //Just a single launch or a warmup iteration
-            Superaccumulate(NULL, d_Histogram, d_iData, __nbElements, &ciErrNum);
-            if (ciErrNum != CL_SUCCESS)
-                cleanUp(EXIT_FAILURE);
-
-#ifdef GPU_PROFILING
-	double gpuTime[NUM_ITER];
-        cl_event startMark, endMark;
-        
-        for(uint iter = 0; iter < NUM_ITER; iter++) {
-            ciErrNum = clEnqueueMarker(cqCommandQueue, &startMark);
-            ciErrNum |= clFinish(cqCommandQueue);
-            if (ciErrNum != CL_SUCCESS) {
-                printf("Error in clEnqueueMarker, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
-                cleanUp(EXIT_FAILURE);
-            }
-
-            Superaccumulate(NULL, d_Histogram, d_iData, __nbElements, &ciErrNum);
-
-            ciErrNum  = clEnqueueMarker(cqCommandQueue, &endMark);
-            ciErrNum |= clFinish(cqCommandQueue);
-            if (ciErrNum != CL_SUCCESS) {
-                printf("Error in clEnqueueMarker, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
-                cleanUp(EXIT_FAILURE);
-            }
-            //Get OpenCL profiler time
-            cl_ulong startTime = 0, endTime = 0;
-            ciErrNum  = clGetEventProfilingInfo(startMark, CL_PROFILING_COMMAND_END, sizeof(cl_ulong), &startTime, NULL);
-            ciErrNum |= clGetEventProfilingInfo(endMark, CL_PROFILING_COMMAND_END, sizeof(cl_ulong), &endTime, NULL);
-            if (ciErrNum != CL_SUCCESS) {
-                printf("Error in clGetEventProfilingInfo Line %u in file %s !!!\n\n", __LINE__, __FILE__);
-                cleanUp(EXIT_FAILURE);
-            }
-            gpuTime[iter] = 1e-9 * ((unsigned long)endTime - (unsigned long)startTime); // / (double)NUM_ITER;
-        }
-    
-	double minTime = min(gpuTime, NUM_ITER);
-        //printf("\nOpenCL time: %.5f s\n\n", 1.0e-9 * ((double)endTime - (double)startTime)/(double)NUM_ITER);
-        printf("Alg = %u \t NbFPE = %u \t Range = %u \t NbElements = %u \t Size = %lu \t Time = %.8f s \t Throughput = %.4f GB/s\n\n", 
-          __alg, __nbfpe, __range, __nbElements, __nbElements * sizeof(double), minTime, ((1e-9 * __nbElements * sizeof(double)) / minTime));
-#endif
-
-        printf("Validating OpenCL results...\n");
-            printf(" ...reading back OpenCL results\n");
-                ciErrNum = clEnqueueReadBuffer(cqCommandQueue, d_Histogram, CL_TRUE, 0, BIN_COUNT * sizeof(bintype), h_HistogramGPU, 0, NULL, NULL);
-                if (ciErrNum != CL_SUCCESS) {
-                    printf("Error in clEnqueueReadBuffer Line %u in file %s !!!\n\n", __LINE__, __FILE__);
-                    cleanUp(EXIT_FAILURE);
-                }
-                Superaccumulator accumulatorGPU((int64_t *) h_HistogramGPU, E_BITS, F_BITS);
-
-            printf(" ...SuperaccumulatorCPU()\n");
-                // init accumulator
-                Superaccumulator accumulatorCPU(E_BITS, F_BITS);
-                // accumulate numbers
-                for (uint i = 0; i < __nbElements; i++) {
-                    accumulatorCPU.Accumulate(((double *) h_iData)[i]);
-                }
-
-            printf(" ...comparing the results\n");
-	       //accumulatorCPU.PrintAccumulator();
-	       //accumulatorGPU.PrintAccumulator();
-               //check the results using mpfr algorithm
-               printf("//--------------------------------------------------------\n");
-	       char *res_mpfr = sum_mpfr((double *) h_iData, __nbElements);
-               //accumulatorCPU.CompareSuperaccumulatorWithMPFR(res_mpfr);
-               accumulatorGPU.CompareSuperaccumulatorWithMPFR(res_mpfr);
-            
-  	       //print the final result of using superaccumulator
-               //printf("//--------------------------------------------------------\n");
-               //roundSuperaccumulator(h_HistogramGPU);
-
-  	       //check the results using the Kahan summation
-               //printf("//--------------------------------------------------------\n");
-               //roundKahan((double *) h_iData, __nbElements);
-               //printf("//--------------------------------------------------------\n");
-
-            //Release kernels and program
-         printf("Shutting down...\n\n");
-            closeSuperaccumulator();
-    }
-
-    // pass or fail
-    if (!PassFailFlag)
-	printf("[SuperaccumulatorFPE] test results...\nPASSED\n");
-    else
-	printf("[SuperaccumulatorFPE] test results...\nFAILED\n");
-
-    cleanUp(EXIT_SUCCESS);
 }
 
 int runDGEMM(const char* program_file){
@@ -258,14 +93,24 @@ int runDGEMM(const char* program_file){
     int    PassFailFlag = 1;
 
     printf("Initializing data...\n");
-        PassFailFlag = posix_memalign(&h_iData, 64, __nbElements * sizeof(double));
+	A.width = A.stride = __mC;
+	A.height = __nB;
+	B.width = B.stride = __nB;
+	B.height = __kC;
+	C.width = C.stride = __mC;
+	C.height = __kC;
+        PassFailFlag  = posix_memalign((void **)&A.elements, 64, A.width * A.height * sizeof(double));
+        PassFailFlag |= posix_memalign((void **)&B.elements, 64, B.width * B.height * sizeof(double));
+        PassFailFlag |= posix_memalign((void **)&C.elements, 64, C.width * C.height * sizeof(double));
         if (PassFailFlag != 0) {
             printf("ERROR: could not allocate memory with posix_memalign!\n");
             exit(1);
         }
 	// init data
-        int emax = E_BITS - log2(__nbElements);
-        init_fpuniform((double *) h_iData, __nbElements, __range, emax); // 2000
+        int emax = E_BITS - log2(A.width * A.height + B.width * B.height + C.width * C.height);// use log in order to stay within [emin, emax]
+        init_fpuniform((double *) A.elements, A.width * A.height, __range, emax);
+        init_fpuniform((double *) B.elements, B.width * B.height, __range, emax);
+        init_fpuniform((double *) C.elements, C.width * C.height, __range, emax);
 
     printf("Initializing OpenCL...\n");
         char platform_name[64];
@@ -306,14 +151,31 @@ int runDGEMM(const char* program_file){
         }
 
     printf("Allocating OpenCL memory...\n\n");
-        d_iData = clCreateBuffer(cxGPUContext, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, __nbElements * sizeof(cl_double), h_iData, &ciErrNum);
+	Matrix d_A;
+	d_A.width = d_A.stride = A.width;
+	d_A.height = A.height;
+	size_t size = d_A.width * d_A.height * sizeof(double);
+	d_A.elements = clCreateBuffer(cxGPUContext, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, size, A.elements, &ciErrNum);
         if (ciErrNum != CL_SUCCESS) {
-            printf("Error in clCreateBuffer for d_iData, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
+            printf("Error in clCreateBuffer for d_A, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
             cleanUp(EXIT_FAILURE);
         }
-        d_oData = clCreateBuffer(cxGPUContext, CL_MEM_READ_WRITE, sizeof(cl_double), NULL, &ciErrNum);
+	Matrix d_B;
+	d_B.width = d_B.stride = B.width;
+	d_B.height = B.height;
+	size = d_B.width * d_B.height * sizeof(double);
+	d_B.elements = clCreateBuffer(cxGPUContext, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, size, B.elements, &ciErrNum);
         if (ciErrNum != CL_SUCCESS) {
-            printf("Error in clCreateBuffer for d_iData, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
+            printf("Error in clCreateBuffer for d_B, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
+            cleanUp(EXIT_FAILURE);
+        }
+	Matrix d_C;
+	d_C.width = d_C.stride = C.width;
+	d_C.height = C.height;
+	size = d_C.width * d_C.height * sizeof(double);
+	d_C.elements = clCreateBuffer(cxGPUContext, CL_MEM_WRITE_ONLY, size, NULL, &ciErrNum);
+        if (ciErrNum != CL_SUCCESS) {
+            printf("Error in clCreateBuffer for d_C, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
             cleanUp(EXIT_FAILURE);
         }
     {
@@ -322,9 +184,9 @@ int runDGEMM(const char* program_file){
             if (ciErrNum != CL_SUCCESS)
                 cleanUp(EXIT_FAILURE);
 
-        printf("Running OpenCL DGEMM with %u elements...\n\n", __nbElements);
+        printf("Running OpenCL DGEMM with %u elements...\n\n", __mC * __nB + __nB * __kC + __mC * __kC);
             //Just a single launch or a warmup iteration
-            DGEMM(NULL, d_oData, d_iData, __nbElements, &ciErrNum);
+            DGEMM(NULL, d_C, d_A, d_B, __mC * __nB + __nB * __kC + __mC * __kC, &ciErrNum);
             if (ciErrNum != CL_SUCCESS)
                 cleanUp(EXIT_FAILURE);
 
@@ -340,7 +202,7 @@ int runDGEMM(const char* program_file){
                 cleanUp(EXIT_FAILURE);
             }
 
-            DGEMM(NULL, d_oData, d_iData, __nbElements, &ciErrNum);
+            DGEMM(NULL, d_C, d_A, d_B, __mC * __nB + __nB * __kC + __mC * __kC, &ciErrNum);
 
             ciErrNum  = clEnqueueMarker(cqCommandQueue, &endMark);
             ciErrNum |= clFinish(cqCommandQueue);
@@ -362,17 +224,16 @@ int runDGEMM(const char* program_file){
 
 	double minTime = min(gpuTime, NUM_ITER);
         printf("Alg = 2 \t Range = %u \t NbElements = %u \t Size = %lu \t Time = %.8f s \t Throughput = %.4f GB/s\n\n", 
-            __range, __nbElements, __nbElements * sizeof(double), minTime, ((1e-9 * __nbElements * sizeof(double)) / minTime));
+            __range, __mC * __nB + __nB * __kC + __mC * __kC, (__mC * __nB + __nB * __kC + __mC * __kC) * sizeof(double), minTime, ((1e-9 * (__mC * __nB + __nB * __kC + __mC * __kC) * sizeof(double)) / minTime));
 #endif
 
         printf("Validating DGEMM OpenCL results...\n");
             printf(" ...reading back OpenCL results\n");
-                ciErrNum = clEnqueueReadBuffer(cqCommandQueue, d_oData, CL_TRUE, 0, sizeof(double), &h_oData, 0, NULL, NULL);
+                ciErrNum = clEnqueueReadBuffer(cqCommandQueue, d_C.elements, CL_TRUE, 0, C.width * C.height * sizeof(double), C.elements, 0, NULL, NULL);
                 if (ciErrNum != CL_SUCCESS) {
                     printf("Error in clEnqueueReadBuffer Line %u in file %s !!!\n\n", __LINE__, __FILE__);
                     cleanUp(EXIT_FAILURE);
                 }
-		printf("\nGPU Parallel DGEMM: %.8g\n\n", h_oData);
             //Release kernels and program
          printf("Shutting down...\n\n");
             closeDGEMM();
@@ -389,18 +250,21 @@ int runDGEMM(const char* program_file){
 
 int cleanUp (int exitCode) {
     //Release other OpenCL Objects
-    if(d_iData) 
-	clReleaseMemObject(d_iData);
-    if(d_Histogram)
-	clReleaseMemObject(d_Histogram);
+    if(d_A.elements) 
+	clReleaseMemObject(d_A.elements);
+    if(d_B.elements) 
+	clReleaseMemObject(d_B.elements);
+    if(d_C.elements) 
+	clReleaseMemObject(d_C.elements);
     if(cqCommandQueue) 
 	clReleaseCommandQueue(cqCommandQueue);
     if(cxGPUContext) 
 	clReleaseContext(cxGPUContext);
 
     //Release host buffers
-    free(h_iData); 
-    free(h_HistogramGPU);
+    free(A.elements);
+    free(B.elements);
+    free(C.elements);
     
     return exitCode;
 }

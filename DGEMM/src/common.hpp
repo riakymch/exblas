@@ -40,6 +40,13 @@
 
 typedef long long int bintype;
 
+typedef struct {
+    int width;
+    int height;
+    int stride;
+    cl_mem elements;
+} Matrix;
+
 ////////////////////////////////////////////////////////////////////////////////
 // Common functions
 ////////////////////////////////////////////////////////////////////////////////
@@ -120,8 +127,9 @@ extern "C" void closeDGEMM(
 
 extern "C" size_t DGEMM(
     cl_command_queue cqCommandQueue,
-    cl_mem d_oData,
-    cl_mem d_iData,
+    Matrix d_mC,
+    const Matrix d_mA,
+    const Matrix d_mB,
     uint nbElements,
     cl_int *ciErrNum
 );

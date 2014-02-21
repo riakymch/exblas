@@ -157,12 +157,13 @@ inline uint iSnapDown(uint a, uint b){
 
 extern "C" size_t DGEMM(
     cl_command_queue cqCommandQueue,
-    cl_mem d_Accumulator,
-    cl_mem d_Data,
+    Matrix d_C,
+    const Matrix d_A,
+    const Matrix d_B,
     uint NbElements,
     cl_int *ciErrNumRes
 ){
-    cl_int ciErrNum;
+    /*cl_int ciErrNum;
     size_t NbThreadsPerWorkGroup, TotalNbThreads;
 
     if(!cqCommandQueue)
@@ -189,9 +190,6 @@ extern "C" size_t DGEMM(
 	    *ciErrNumRes = EXIT_FAILURE;
             return 0;
         }
-	/*int *h_Overflow = (int *) malloc(sizeof(int));
-        ciErrNum = clEnqueueReadBuffer(cqCommandQueue, d_Overflow, CL_TRUE, 0, sizeof(cl_int), h_Overflow, 0, NULL, NULL);
-	printf("Overflows in Superaccumulator() = %d \t", *h_Overflow);*/
     }
     {
         NbThreadsPerWorkGroup = MERGE_WORKGROUP_SIZE;
@@ -214,10 +212,7 @@ extern "C" size_t DGEMM(
 	    *ciErrNumRes = EXIT_FAILURE;
             return 0;
         }
-	/*int *h_Overflow = (int *) malloc(sizeof(int));
-        ciErrNum = clEnqueueReadBuffer(cqCommandQueue, d_Overflow, CL_TRUE, 0, sizeof(cl_int), h_Overflow, 0, NULL, NULL);
-	printf(" Merge() = %d\n", *h_Overflow);*/
     }
-
+*/
     return (WARP_SIZE * WARP_COUNT);
 }
