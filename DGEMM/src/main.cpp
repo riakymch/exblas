@@ -86,7 +86,7 @@ int main(int argc, char **argv)
     else if (__alg == 2)
         runSuperaccumulator("../src/Superaccumulator.FPE.EX.cl");
     else if (__alg == 3)
-        runReduction("../src/Reduction.cl");
+        runDGEMM("../src/DGEMM.cl");
 }
 
 int runSuperaccumulator(const char* program_file){
@@ -253,7 +253,7 @@ int runSuperaccumulator(const char* program_file){
     cleanUp(EXIT_SUCCESS);
 }
 
-int runReduction(const char* program_file){
+int runDGEMM(const char* program_file){
     cl_int ciErrNum;
     int    PassFailFlag = 1;
 
@@ -317,14 +317,14 @@ int runReduction(const char* program_file){
             cleanUp(EXIT_FAILURE);
         }
     {
-        printf("Initializing OpenCL Reduction...\n");
-            ciErrNum = initReduction(cxGPUContext, cqCommandQueue, cdDevice, program_file);
+        printf("Initializing OpenCL DGEMM...\n");
+            ciErrNum = initDGEMM(cxGPUContext, cqCommandQueue, cdDevice, program_file);
             if (ciErrNum != CL_SUCCESS)
                 cleanUp(EXIT_FAILURE);
 
-        printf("Running OpenCL Reduction with %u elements...\n\n", __nbElements);
+        printf("Running OpenCL DGEMM with %u elements...\n\n", __nbElements);
             //Just a single launch or a warmup iteration
-            Reduction(NULL, d_oData, d_iData, __nbElements, &ciErrNum);
+            DGEMM(NULL, d_oData, d_iData, __nbElements, &ciErrNum);
             if (ciErrNum != CL_SUCCESS)
                 cleanUp(EXIT_FAILURE);
 
@@ -340,7 +340,7 @@ int runReduction(const char* program_file){
                 cleanUp(EXIT_FAILURE);
             }
 
-            Reduction(NULL, d_oData, d_iData, __nbElements, &ciErrNum);
+            DGEMM(NULL, d_oData, d_iData, __nbElements, &ciErrNum);
 
             ciErrNum  = clEnqueueMarker(cqCommandQueue, &endMark);
             ciErrNum |= clFinish(cqCommandQueue);
@@ -365,164 +365,27 @@ int runReduction(const char* program_file){
             __range, __nbElements, __nbElements * sizeof(double), minTime, ((1e-9 * __nbElements * sizeof(double)) / minTime));
 #endif
 
-        printf("Validating Reduction OpenCL results...\n");
+        printf("Validating DGEMM OpenCL results...\n");
             printf(" ...reading back OpenCL results\n");
                 ciErrNum = clEnqueueReadBuffer(cqCommandQueue, d_oData, CL_TRUE, 0, sizeof(double), &h_oData, 0, NULL, NULL);
                 if (ciErrNum != CL_SUCCESS) {
                     printf("Error in clEnqueueReadBuffer Line %u in file %s !!!\n\n", __LINE__, __FILE__);
                     cleanUp(EXIT_FAILURE);
                 }
-		printf("\nGPU Parallel Reduction: %.8g\n\n", h_oData);
+		printf("\nGPU Parallel DGEMM: %.8g\n\n", h_oData);
             //Release kernels and program
          printf("Shutting down...\n\n");
-            closeReduction();
+            closeDGEMM();
     }
 
     // pass or fail
     if (!PassFailFlag)
-	printf("[Reduction] test results...\nPASSED\n");
+	printf("[DGEMM] test results...\nPASSED\n");
     else
-	printf("[Reduction] test results...\nFAILED\n");
+	printf("[DGEMM] test results...\nFAILED\n");
 
     cleanUp(EXIT_SUCCESS);
 }
-
-/*
-int runReductionOpenCLInAction(const char* program_file){
-    cl_int ciErrNum;
-    int    PassFailFlag = 1;
-
-    printf("Initializing data...\n");
-        //h_iData         = (void    *) malloc(__nbElements * sizeof(double));
-        PassFailFlag = posix_memalign(&h_iData, 64, __nbElements * sizeof(double));
-        if (PassFailFlag != 0) {
-            printf("ERROR: could not allocate memory with posix_memalign!\n");
-            exit(1);
-        }
-	// init data
-        int emax = E_BITS - log2(__nbElements);
-        init_fpuniform((double *) h_iData, __nbElements, __range, emax); // 2000
-
-    printf("Initializing OpenCL...\n");
-        char platform_name[64];
-	char device_name[32];
-#ifdef AMD
-        strcpy(platform_name, "AMD Accelerated Parallel Processing");
-	      strcpy(device_name, "Tahiti");
-#else
-        strcpy(platform_name, "NVIDIA CUDA");
-        strcpy(device_name, "Tesla K20c");
-#endif
-        cpPlatform = GetOCLPlatform(platform_name);
-        if (cpPlatform == NULL) {
-            printf("ERROR: Failed to find the platform '%s' ...\n", platform_name);
-            return -1;
-        }
-
-        //Get a GPU device
-        cdDevice = GetOCLDevice(cpPlatform, device_name);
-        if (cdDevice == NULL) {
-            printf("ERROR: Failed to find the device '%s' ...\n", device_name);
-            return -1;
-        }
-
-        //Create the context
-        cxGPUContext = clCreateContext(0, 1, &cdDevice, NULL, NULL, &ciErrNum);
-        if (ciErrNum != CL_SUCCESS) {
-            printf("Error in clCreateContext, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
-            cleanUp(EXIT_FAILURE);
-        }
-
-        //Create a command-queue
-        cqCommandQueue = clCreateCommandQueue(cxGPUContext, cdDevice, CL_QUEUE_PROFILING_ENABLE, &ciErrNum);
-        if (ciErrNum != CL_SUCCESS) {
-            printf("Error in clCreateCommandQueue, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
-            cleanUp(EXIT_FAILURE);
-        }
-
-    printf("Allocating OpenCL memory...\n\n");
-        d_iData = clCreateBuffer(cxGPUContext, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, __nbElements * sizeof(cl_double), h_iData, &ciErrNum);
-        if (ciErrNum != CL_SUCCESS) {
-            printf("Error in clCreateBuffer for d_iData, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
-            cleanUp(EXIT_FAILURE);
-        }
-        d_oData = clCreateBuffer(cxGPUContext, CL_MEM_WRITE_ONLY, sizeof(cl_double), NULL, &ciErrNum);
-        if (ciErrNum != CL_SUCCESS) {
-            printf("Error in clCreateBuffer for d_iData, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
-            cleanUp(EXIT_FAILURE);
-        }
-    {
-        printf("Initializing OpenCL Reduction...\n");
-            ciErrNum = initReduction(cxGPUContext, cqCommandQueue, cdDevice, program_file);
-            if (ciErrNum != CL_SUCCESS)
-                cleanUp(EXIT_FAILURE);
-
-        printf("Running OpenCL Reduction with %u elements...\n\n", __nbElements);
-            //Just a single launch or a warmup iteration
-            Reduction(NULL, d_iData, d_oData, __nbElements, &ciErrNum);
-            if (ciErrNum != CL_SUCCESS)
-                cleanUp(EXIT_FAILURE);
-
-#ifdef GPU_PROFILING
-	double gpuTime[NUM_ITER];
-        cl_event startMark, endMark;
-
-        for(uint iter = 0; iter < NUM_ITER; iter++) {
-            ciErrNum = clEnqueueMarker(cqCommandQueue, &startMark);
-            ciErrNum |= clFinish(cqCommandQueue);
-            if (ciErrNum != CL_SUCCESS) {
-                printf("Error in clEnqueueMarker, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
-                cleanUp(EXIT_FAILURE);
-            }
-
-            Reduction(NULL, d_iData, d_oData, __nbElements, &ciErrNum);
-
-            ciErrNum  = clEnqueueMarker(cqCommandQueue, &endMark);
-            ciErrNum |= clFinish(cqCommandQueue);
-            if (ciErrNum != CL_SUCCESS) {
-                printf("Error in clEnqueueMarker, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
-                cleanUp(EXIT_FAILURE);
-            }
-
-            //Get OpenCL profiler time
-            cl_ulong startTime = 0, endTime = 0;
-            ciErrNum  = clGetEventProfilingInfo(startMark, CL_PROFILING_COMMAND_END, sizeof(cl_ulong), &startTime, NULL);
-            ciErrNum |= clGetEventProfilingInfo(endMark, CL_PROFILING_COMMAND_END, sizeof(cl_ulong), &endTime, NULL);
-            if (ciErrNum != CL_SUCCESS) {
-                printf("Error in clGetEventProfilingInfo Line %u in file %s !!!\n\n", __LINE__, __FILE__);
-                cleanUp(EXIT_FAILURE);
-            }
-            gpuTime[iter] = 1.0e-9 * ((double)endTime - (double)startTime); // / (double)NUM_ITER;
-        }
-
-	double minTime = min(gpuTime, NUM_ITER);
-        printf("Alg = 2 \t Range = %u \t NbElements = %u \t Size = %lu \t Time = %.8f s \t Throughput = %.4f GB/s\n\n", 
-            __range, __nbElements, __nbElements * sizeof(double), minTime, ((1e-9 * __nbElements * sizeof(double)) / minTime));
-#endif
-
-        printf("Validating Reduction OpenCL results...\n");
-            printf(" ...reading back OpenCL results\n");
-                ciErrNum = clEnqueueReadBuffer(cqCommandQueue, d_oData, CL_TRUE, 0, sizeof(double), &h_oData, 0, NULL, NULL);
-                if (ciErrNum != CL_SUCCESS) {
-                    printf("Error in clEnqueueReadBuffer Line %u in file %s !!!\n\n", __LINE__, __FILE__);
-                    cleanUp(EXIT_FAILURE);
-                }
-		printf("\nGPU Parallel Reduction: %.8g\n\n", h_oData);
-
-            //Release kernels and program
-         printf("Shutting down...\n\n");
-            closeReduction();
-    }
-
-    // pass or fail
-    if (!PassFailFlag)
-	printf("[Reduction] test results...\nPASSED\n");
-    else
-	printf("[Reduction] test results...\nFAILED\n");
-
-    cleanUp(EXIT_SUCCESS);
-}
-*/
 
 int cleanUp (int exitCode) {
     //Release other OpenCL Objects

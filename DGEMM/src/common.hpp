@@ -107,18 +107,18 @@ extern "C" size_t Superaccumulate(
 ////////////////////////////////////////////////////////////////////////////////
 // GPU reduction related functions
 ////////////////////////////////////////////////////////////////////////////////
-extern "C" cl_int initReduction(
+extern "C" cl_int initDGEMM(
     cl_context cxGPUContext,
     cl_command_queue cqParamCommandQue,
     cl_device_id cdDevice,
     const char* program_file
 );
 
-extern "C" void closeReduction(
+extern "C" void closeDGEMM(
     void
 );
 
-extern "C" size_t Reduction(
+extern "C" size_t DGEMM(
     cl_command_queue cqCommandQueue,
     cl_mem d_oData,
     cl_mem d_iData,
@@ -150,6 +150,6 @@ extern "C" double roundKahan(
 // Executable functions from main.cpp
 ////////////////////////////////////////////////////////////////////////////////
 int runSuperaccumulator(const char*);
-int runReduction(const char*);
+int runDGEMM(const char*);
 
 #endif
