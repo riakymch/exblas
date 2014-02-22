@@ -130,7 +130,6 @@ extern "C" size_t DGEMM(
     Matrix d_mC,
     const Matrix d_mA,
     const Matrix d_mB,
-    uint nbElements,
     cl_int *ciErrNum
 );
 

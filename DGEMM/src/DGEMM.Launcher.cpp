@@ -14,31 +14,22 @@
 ////////////////////////////////////////////////////////////////////////////////
 // OpenCL launcher for bitonic sort kernel
 ////////////////////////////////////////////////////////////////////////////////
-#define SUPERACCUMULATOR_KERNEL        "Superaccumulator"
-#define MERGE_SUPERACCUMULATORS_KERNEL "mergeSuperaccumulators"
+#define DGEMM_KERNEL "matrixMulKernel"
+#define BLOCK_SIZE 16
 
 static size_t szKernelLength;	              // Byte size of kernel code
 static char* cSources = NULL;                 // Buffer to hold source for compilation
 
 static cl_program       cpProgram;            //OpenCL Superaccumulator program
-static cl_kernel        ckSuperacc;
-static cl_kernel        ckMergeSuperaccs;     //OpenCL Superaccumulator kernels
+static cl_kernel        ckMatrixMul;
 static cl_command_queue cqDefaultCommandQue;  //Default command queue for Superaccumulator
-static cl_mem           d_PartialAccumulators;
-//static cl_mem           d_Overflow;
 
-//static const uint  PARTIAL_ACCUMULATORS_COUNT = 2048;
-static const uint  PARTIAL_ACCUMULATORS_COUNT = 1;
-static const uint  WARP_COUNT                 = 16;
-static const uint  WARP_SIZE                  = 16;
-static const uint  MERGE_WORKGROUP_SIZE       = 256;
-static const uint  VECTOR_NUMBER              = 2;
+static const uint  VECTOR_NUMBER = 1;
 
 #ifdef AMD
-static char  compileOptions[256] = "-DWARP_COUNT=16 -DWARP_SIZE=16 -DMERGE_WORKGROUP_SIZE=256 -DUSE_KNUTH";
+static char  compileOptions[256] = "";
 #else
-static char  compileOptions[256] = "-DWARP_COUNT=16 -DWARP_SIZE=16 -DMERGE_WORKGROUP_SIZE=256 -DUSE_KNUTH -DNVIDIA -cl-mad-enable -cl-fast-relaxed-math";
-//static char  compileOptions[256] = "-DWARP_COUNT=16 -DWARP_SIZE=16 -DMERGE_WORKGROUP_SIZE=256 -DNVIDIA -cl-nv-verbose";
+static char  compileOptions[256] = "-DNVIDIA -cl-mad-enable -cl-fast-relaxed-math";
 #endif
 
 
@@ -102,24 +93,12 @@ extern "C" cl_int initDGEMM(
     fwrite(bn[0], sizeof(bn[0]), np[0], fp); // Save the binary, but my file stay empty  
     fclose(fp);*/
 
-    printf("...creating Superaccumulator kernels:\n");
-        ckSuperacc = clCreateKernel(cpProgram, SUPERACCUMULATOR_KERNEL, &ciErrNum);
+    printf("...creating DGEMM kernel:\n");
+        ckMatrixMul = clCreateKernel(cpProgram, DGEMM_KERNEL, &ciErrNum);
         if (ciErrNum != CL_SUCCESS) {
-            printf("Error in clCreateKernel: Superaccumulator, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
+            printf("Error in clCreateKernel, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
             return EXIT_FAILURE;
         }
-        ckMergeSuperaccs = clCreateKernel(cpProgram, MERGE_SUPERACCUMULATORS_KERNEL, &ciErrNum);
-        if (ciErrNum != CL_SUCCESS) {
-            printf("Error in clCreateKernel: mergeSuperaccumulators, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
-            return EXIT_FAILURE;
-        }
-    printf("...allocating internal buffer\n");
-        d_PartialAccumulators = clCreateBuffer(cxGPUContext, CL_MEM_READ_WRITE, PARTIAL_ACCUMULATORS_COUNT * BIN_COUNT * sizeof(cl_long), NULL, &ciErrNum);
-        if (ciErrNum != CL_SUCCESS) {
-            printf("Error in clCreateBuffer, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
-            return EXIT_FAILURE;
-        }
-        //d_Overflow = clCreateBuffer(cxGPUContext, CL_MEM_READ_WRITE, sizeof(cl_int), NULL, &ciErrNum);
 
     //Save default command queue
     cqDefaultCommandQue = cqParamCommandQue;
@@ -133,12 +112,10 @@ extern "C" cl_int initDGEMM(
 extern "C" void closeDGEMM(void){
     cl_int ciErrNum;
 
-    ciErrNum = clReleaseMemObject(d_PartialAccumulators);
-    ciErrNum |= clReleaseKernel(ckSuperacc);
-    ciErrNum |= clReleaseKernel(ckMergeSuperaccs);
+    ciErrNum = clReleaseKernel(ckMatrixMul);
     ciErrNum |= clReleaseProgram(cpProgram);
     if (ciErrNum != CL_SUCCESS) {
-        printf("Error in closeSuperaccumulator(), Line %u in file %s !!!\n\n", __LINE__, __FILE__);
+        printf("Error in closeDGEMM(), Line %u in file %s !!!\n\n", __LINE__, __FILE__);
     }
 }
 
@@ -160,59 +137,36 @@ extern "C" size_t DGEMM(
     Matrix d_C,
     const Matrix d_A,
     const Matrix d_B,
-    uint NbElements,
     cl_int *ciErrNumRes
 ){
-    /*cl_int ciErrNum;
-    size_t NbThreadsPerWorkGroup, TotalNbThreads;
+    cl_int ciErrNum;
 
     if(!cqCommandQueue)
         cqCommandQueue = cqDefaultCommandQue;
 
     {
-        NbThreadsPerWorkGroup  = WARP_SIZE * WARP_COUNT;
-        TotalNbThreads = PARTIAL_ACCUMULATORS_COUNT * NbThreadsPerWorkGroup;
-        NbElements = NbElements / VECTOR_NUMBER;
+        size_t NbThreadsPerWorkGroup[] = {BLOCK_SIZE, BLOCK_SIZE};
+        size_t TotalNbThreads[] = {d_B.width / BLOCK_SIZE, d_A.height / BLOCK_SIZE};
 
-        ciErrNum  = clSetKernelArg(ckSuperacc, 0, sizeof(cl_mem),  (void *)&d_PartialAccumulators);
-        ciErrNum |= clSetKernelArg(ckSuperacc, 1, sizeof(cl_mem),  (void *)&d_Data);
-        //ciErrNum |= clSetKernelArg(ckSuperacc, 2, sizeof(cl_mem), (void *)&d_Overflow);
-        ciErrNum |= clSetKernelArg(ckSuperacc, 2, sizeof(cl_uint), (void *)&NbElements);
+	cl_int i = 0;
+        ciErrNum  = clSetKernelArg(ckMatrixMul, i++, sizeof(cl_mem),  (void *)&d_C.elements);
+        ciErrNum |= clSetKernelArg(ckMatrixMul, i++, sizeof(cl_mem),  (void *)&d_A.elements);
+        ciErrNum |= clSetKernelArg(ckMatrixMul, i++, sizeof(cl_mem),  (void *)&d_B.elements);
+        ciErrNum |= clSetKernelArg(ckMatrixMul, i++, sizeof(cl_int),  (void *)&d_C.width);
+        ciErrNum |= clSetKernelArg(ckMatrixMul, i++, sizeof(cl_int),  (void *)&d_C.height);
+        ciErrNum |= clSetKernelArg(ckMatrixMul, i++, sizeof(cl_int),  (void *)&d_B.width);
         if (ciErrNum != CL_SUCCESS) {
             printf("Error in clSetKernelArg, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
 	    *ciErrNumRes = EXIT_FAILURE;
             return 0;
         }
 
-        ciErrNum = clEnqueueNDRangeKernel(cqCommandQueue, ckSuperacc, 1, NULL, &TotalNbThreads, &NbThreadsPerWorkGroup, 0, NULL, NULL);
+        ciErrNum = clEnqueueNDRangeKernel(cqCommandQueue, ckMatrixMul, 1, NULL, TotalNbThreads, NbThreadsPerWorkGroup, 0, 0, 0);
         if (ciErrNum != CL_SUCCESS) {
             printf("Error in clEnqueueNDRangeKernel, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
 	    *ciErrNumRes = EXIT_FAILURE;
             return 0;
         }
     }
-    {
-        NbThreadsPerWorkGroup = MERGE_WORKGROUP_SIZE;
-        //TotalNbThreads = iDivUp(PARTIAL_ACCUMULATORS_COUNT, NbThreadsPerWorkGroup) * NbThreadsPerWorkGroup;
-        TotalNbThreads = BIN_COUNT * NbThreadsPerWorkGroup;
-
-        ciErrNum  = clSetKernelArg(ckMergeSuperaccs, 0, sizeof(cl_mem),  (void *)&d_Accumulator);
-        ciErrNum |= clSetKernelArg(ckMergeSuperaccs, 1, sizeof(cl_mem),  (void *)&d_PartialAccumulators);
-        //ciErrNum |= clSetKernelArg(ckMergeSuperaccs, 2, sizeof(cl_mem), (void *)&d_Overflow);
-        ciErrNum |= clSetKernelArg(ckMergeSuperaccs, 2, sizeof(cl_uint), (void *)&PARTIAL_ACCUMULATORS_COUNT);
-        if (ciErrNum != CL_SUCCESS) {
-            printf("Error in clSetKernelArg, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
-	    *ciErrNumRes = EXIT_FAILURE;
-            return 0;
-        }
-
-        ciErrNum = clEnqueueNDRangeKernel(cqCommandQueue, ckMergeSuperaccs, 1, NULL, &TotalNbThreads, &NbThreadsPerWorkGroup, 0, NULL, NULL);
-        if (ciErrNum != CL_SUCCESS) {
-            printf("Error in clEnqueueNDRangeKernel, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
-	    *ciErrNumRes = EXIT_FAILURE;
-            return 0;
-        }
-    }
-*/
-    return (WARP_SIZE * WARP_COUNT);
+    return EXIT_SUCCESS;
 }

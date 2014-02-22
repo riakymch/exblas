@@ -13,7 +13,6 @@
 #include "common.hpp"
 
 #define NUM_ITER  20
-#define BLOCK_SIZE 16
 ////////////////////////////////////////////////////////////////////////////////
 // Variables used in the program 
 ////////////////////////////////////////////////////////////////////////////////
@@ -91,6 +90,7 @@ int main(int argc, char **argv)
 int runDGEMM(const char* program_file){
     cl_int ciErrNum;
     int    PassFailFlag = 1;
+    int nbElements = 0;
 
     printf("Initializing data...\n");
 	A.width = A.stride = __mC;
@@ -184,9 +184,10 @@ int runDGEMM(const char* program_file){
             if (ciErrNum != CL_SUCCESS)
                 cleanUp(EXIT_FAILURE);
 
-        printf("Running OpenCL DGEMM with %u elements...\n\n", __mC * __nB + __nB * __kC + __mC * __kC);
+	nbElements = A.width * A.height + B.width * B.height + C.width * C.height;
+        printf("Running OpenCL DGEMM with %u elements...\n\n", nbElements);
             //Just a single launch or a warmup iteration
-            DGEMM(NULL, d_C, d_A, d_B, __mC * __nB + __nB * __kC + __mC * __kC, &ciErrNum);
+            DGEMM(NULL, d_C, d_A, d_B, &ciErrNum);
             if (ciErrNum != CL_SUCCESS)
                 cleanUp(EXIT_FAILURE);
 
@@ -202,7 +203,7 @@ int runDGEMM(const char* program_file){
                 cleanUp(EXIT_FAILURE);
             }
 
-            DGEMM(NULL, d_C, d_A, d_B, __mC * __nB + __nB * __kC + __mC * __kC, &ciErrNum);
+            DGEMM(NULL, d_C, d_A, d_B, &ciErrNum);
 
             ciErrNum  = clEnqueueMarker(cqCommandQueue, &endMark);
             ciErrNum |= clFinish(cqCommandQueue);
@@ -224,7 +225,7 @@ int runDGEMM(const char* program_file){
 
 	double minTime = min(gpuTime, NUM_ITER);
         printf("Alg = 2 \t Range = %u \t NbElements = %u \t Size = %lu \t Time = %.8f s \t Throughput = %.4f GB/s\n\n", 
-            __range, __mC * __nB + __nB * __kC + __mC * __kC, (__mC * __nB + __nB * __kC + __mC * __kC) * sizeof(double), minTime, ((1e-9 * (__mC * __nB + __nB * __kC + __mC * __kC) * sizeof(double)) / minTime));
+            __range, nbElements, nbElements * sizeof(double), minTime, ((1e-9 * nbElements * sizeof(double)) / minTime));
 #endif
 
         printf("Validating DGEMM OpenCL results...\n");
