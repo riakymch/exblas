@@ -20,6 +20,7 @@
 #include <gmp.h>
 #include <mpfr.h>
 
+#include "DGEMM.hpp"
 #include "Superaccumulator.hpp"
 
 // All OpenCL headers

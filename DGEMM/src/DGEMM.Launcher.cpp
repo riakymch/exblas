@@ -146,7 +146,8 @@ extern "C" size_t DGEMM(
 
     {
         size_t NbThreadsPerWorkGroup[] = {BLOCK_SIZE, BLOCK_SIZE};
-        size_t TotalNbThreads[] = {d_B.width / BLOCK_SIZE, d_A.height / BLOCK_SIZE};
+        //size_t TotalNbThreads[] = {d_B.width / BLOCK_SIZE, d_A.height / BLOCK_SIZE};
+	size_t TotalNbThreads[] = {1, 1};
 
 	cl_int i = 0;
         ciErrNum  = clSetKernelArg(ckMatrixMul, i++, sizeof(cl_mem),  (void *)&d_C.elements);

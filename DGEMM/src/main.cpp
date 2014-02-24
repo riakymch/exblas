@@ -12,7 +12,7 @@
 // standard utilities and systems includes
 #include "common.hpp"
 
-#define NUM_ITER  40
+#define NUM_ITER  20
 ////////////////////////////////////////////////////////////////////////////////
 // Variables used in the program 
 ////////////////////////////////////////////////////////////////////////////////
@@ -21,14 +21,14 @@ cl_device_id      cdDevice;                     //OpenCL device list
 cl_context        cxGPUContext;                 //OpenCL context
 cl_command_queue  cqCommandQueue;               //OpenCL command que
 Matrix            d_A, d_B, d_C;                //OpenCL memory buffer objects
-Matrix            A, B, C;
+double            *A, *B, *C;
 
-static uint __mC    = 0;
-static uint __nB    = 0;
-static uint __kC    = 0;
-static uint __range = 0;
-static uint __nbfpe = 0;
-static uint __alg   = 0;
+static uint __nbRowsC    = 0;
+static uint __nbRowsB    = 0;
+static uint __nbColumnsC = 0;
+static uint __range      = 0;
+static uint __nbfpe      = 0;
+static uint __alg        = 0;
 
 static void __usage(int argc __attribute__((unused)), char **argv) {
   fprintf(stderr, "Usage: %s [-m number of rows in A -n number of columns in A -k number of columns in B -r range -e nbfpe -a alg (0-dgemm)] \n", argv[0]);
@@ -40,11 +40,11 @@ static void __parse_args(int argc, char **argv) {
 
   for (i = 1; i < argc; i++) {
     if ((strcmp(argv[i], "-m") == 0)) {
-      __mC = atoi(argv[++i]);
+      __nbRowsC = atoi(argv[++i]);
     }if ((strcmp(argv[i], "-n") == 0)) {
-      __nB = atoi(argv[++i]);
+      __nbRowsB = atoi(argv[++i]);
     }if ((strcmp(argv[i], "-k") == 0)) {
-      __kC = atoi(argv[++i]);
+      __nbColumnsC = atoi(argv[++i]);
     } if ((strcmp(argv[i], "-r") == 0)) {
       __range = atoi(argv[++i]);
     } if ((strcmp(argv[i], "-e") == 0)) {
@@ -61,7 +61,7 @@ static void __parse_args(int argc, char **argv) {
     }
   }
 
-  if ((__mC <= 0) || (__nB <= 0) || (__kC <= 0)) {
+  if ((__nbRowsC <= 0) || (__nbRowsB <= 0) || (__nbColumnsC <= 0)) {
     __usage(argc, argv);
     exit(-1);
   }
@@ -81,7 +81,7 @@ int cleanUp (
 int main(int argc, char **argv)
 {
     __parse_args(argc, argv);
-    printf("Starting with a matrices of %ix%ix%i double elements\n\n", __mC, __nB, __kC); 
+    printf("Starting with a matrices of %ix%ix%i double elements\n\n", __nbRowsC, __nbRowsB, __nbColumnsC); 
 
     if (__alg == 0)
         runDGEMM("../src/DGEMM.cl");
@@ -89,28 +89,22 @@ int main(int argc, char **argv)
 
 int runDGEMM(const char* program_file){
     cl_int ciErrNum;
-    int    PassFailFlag = 1;
+    int PassFailFlag = 1;
     int nbElements = 0;
 
     printf("Initializing data...\n");
-	A.width = A.stride = __mC;
-	A.height = __nB;
-	B.width = B.stride = __nB;
-	B.height = __kC;
-	C.width = C.stride = __mC;
-	C.height = __kC;
-        PassFailFlag  = posix_memalign((void **)&A.elements, 64, A.width * A.height * sizeof(double));
-        PassFailFlag |= posix_memalign((void **)&B.elements, 64, B.width * B.height * sizeof(double));
-        PassFailFlag |= posix_memalign((void **)&C.elements, 64, C.width * C.height * sizeof(double));
+        PassFailFlag  = posix_memalign((void **)&A, 64, __nbRowsC * __nbRowsB * sizeof(double));
+        PassFailFlag |= posix_memalign((void **)&B, 64, __nbRowsB * __nbColumnsC * sizeof(double));
+        PassFailFlag |= posix_memalign((void **)&C, 64, __nbRowsC * __nbColumnsC * sizeof(double));
         if (PassFailFlag != 0) {
             printf("ERROR: could not allocate memory with posix_memalign!\n");
             exit(1);
         }
 	// init data
-        int emax = E_BITS - log2(A.width * A.height + B.width * B.height + C.width * C.height);// use log in order to stay within [emin, emax]
-        init_fpuniform((double *) A.elements, A.width * A.height, __range, emax);
-        init_fpuniform((double *) B.elements, B.width * B.height, __range, emax);
-        init_fpuniform((double *) C.elements, C.width * C.height, __range, emax);
+        int emax = E_BITS - log2(__nbRowsC * __nbRowsB + __nbRowsB * __nbColumnsC + __nbRowsC * __nbColumnsC);// use log in order to stay within [emin, emax]
+        init_fpuniform(A, __nbRowsC * __nbRowsB, __range, emax);
+        init_fpuniform(B, __nbRowsB * __nbColumnsC, __range, emax);
+        init_fpuniform(C, __nbRowsC * __nbColumnsC, __range, emax);
 
     printf("Initializing OpenCL...\n");
         char platform_name[64];
@@ -152,26 +146,26 @@ int runDGEMM(const char* program_file){
 
     printf("Allocating OpenCL memory...\n\n");
 	Matrix d_A;
-	d_A.width = d_A.stride = A.width;
-	d_A.height = A.height;
+	d_A.width = d_A.stride = __nbRowsC;
+	d_A.height = __nbColumnsC;
 	size_t size = d_A.width * d_A.height * sizeof(double);
-	d_A.elements = clCreateBuffer(cxGPUContext, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, size, A.elements, &ciErrNum);
+	d_A.elements = clCreateBuffer(cxGPUContext, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, size, A, &ciErrNum);
         if (ciErrNum != CL_SUCCESS) {
             printf("Error in clCreateBuffer for d_A, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
             cleanUp(EXIT_FAILURE);
         }
 	Matrix d_B;
-	d_B.width = d_B.stride = B.width;
-	d_B.height = B.height;
+	d_B.width = d_B.stride = __nbRowsB;
+	d_B.height = __nbColumnsC;
 	size = d_B.width * d_B.height * sizeof(double);
-	d_B.elements = clCreateBuffer(cxGPUContext, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, size, B.elements, &ciErrNum);
+	d_B.elements = clCreateBuffer(cxGPUContext, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, size, B, &ciErrNum);
         if (ciErrNum != CL_SUCCESS) {
             printf("Error in clCreateBuffer for d_B, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
             cleanUp(EXIT_FAILURE);
         }
 	Matrix d_C;
-	d_C.width = d_C.stride = C.width;
-	d_C.height = C.height;
+	d_C.width = d_C.stride = __nbRowsC;
+	d_C.height = __nbColumnsC;
 	size = d_C.width * d_C.height * sizeof(double);
 	d_C.elements = clCreateBuffer(cxGPUContext, CL_MEM_WRITE_ONLY, size, NULL, &ciErrNum);
         if (ciErrNum != CL_SUCCESS) {
@@ -184,7 +178,7 @@ int runDGEMM(const char* program_file){
             if (ciErrNum != CL_SUCCESS)
                 cleanUp(EXIT_FAILURE);
 
-	nbElements = A.width * A.height + B.width * B.height + C.width * C.height;
+	nbElements = __nbRowsC * __nbRowsB + __nbRowsB * __nbColumnsC + __nbRowsC * __nbColumnsC;
         printf("Running OpenCL DGEMM with %u elements...\n\n", nbElements);
             //Just a single launch or a warmup iteration
             DGEMM(NULL, d_C, d_A, d_B, &ciErrNum);
@@ -231,28 +225,37 @@ int runDGEMM(const char* program_file){
         printf("Alg = 0 \t Range = %u \t NbElements = %u \t Size = %lu \t Time = %.8f s \t Throughput = %.4f GB/s\n\n", 
             __range, nbElements, nbElements * sizeof(double), minTime, perf);
 	perf = 1. / minTime;
-	perf *= 2.0 * C.width * C.height * B.width;
+	perf *= 2.0 * __nbRowsC * __nbColumnsC * __nbRowsB;
         printf("Alg = 0 \t Range = %u \t NbElements = %u \t Size = %lu \t Time = %.8f s \t Performance = %.4f GFLOPS\n\n", 
             __range, nbElements, nbElements * sizeof(double), minTime, perf);
 #endif
 
         printf("Validating DGEMM OpenCL results...\n");
             printf(" ...reading back OpenCL results\n");
-                ciErrNum = clEnqueueReadBuffer(cqCommandQueue, d_C.elements, CL_TRUE, 0, C.width * C.height * sizeof(double), C.elements, 0, NULL, NULL);
+                ciErrNum = clEnqueueReadBuffer(cqCommandQueue, d_C.elements, CL_TRUE, 0, __nbRowsC * __nbColumnsC * sizeof(double), C, 0, NULL, NULL);
                 if (ciErrNum != CL_SUCCESS) {
                     printf("Error in clEnqueueReadBuffer Line %u in file %s !!!\n\n", __LINE__, __FILE__);
                     cleanUp(EXIT_FAILURE);
                 }
-            //Release kernels and program
+		double *C_CPU;
+                C_CPU = (double *) calloc(__nbRowsC * __nbColumnsC, sizeof(double));
+		//Compute C = A * B on CPU
+                matrixMultiplicationCPUReference(C_CPU, A, B, __nbRowsC, __nbRowsB, __nbColumnsC);
+		//Compare the GPU to the CPU results
+		PassFailFlag = compare((const double *) C_CPU, (const double *) C, __nbRowsC * __nbColumnsC, 1e-16);
+		printMatrix(C, __nbRowsC, __nbColumnsC);
+		free(C_CPU);
+		
+         //Release kernels and program
          printf("Shutting down...\n\n");
             closeDGEMM();
     }
 
     // pass or fail
     if (!PassFailFlag)
-	printf("[DGEMM] test results...\nPASSED\n");
+	printf("[DGEMM] test results...\tPASSED\n");
     else
-	printf("[DGEMM] test results...\nFAILED\n");
+	printf("[DGEMM] test results...\tFAILED\n");
 
     cleanUp(EXIT_SUCCESS);
 }
@@ -271,9 +274,9 @@ int cleanUp (int exitCode) {
 	clReleaseContext(cxGPUContext);
 
     //Release host buffers
-    free(A.elements);
-    free(B.elements);
-    free(C.elements);
+    free(A);
+    free(B);
+    free(C);
     
     return exitCode;
 }
