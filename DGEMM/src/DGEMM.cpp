@@ -19,9 +19,9 @@ void matrixMultiplicationCPUReference(
             for(cl_uint k = 0; k < x; k++) {
                 output[i * z + j] += (input0[i * x + k] * input1[k * z + j]);
             }
-	    printf("%.4g\t", output[i * z + j]);
+	    //printf("%.4g\t", output[i * z + j]);
         }
-	printf("\n");
+	//printf("\n");
     }
 }
 
@@ -40,7 +40,6 @@ int compare(
         error += diff * diff;
         ref += refData[i] * refData[i];
     }
-    printf("error = %.8g\n", error);
 
     double normRef =::sqrt((double) ref);
     if (::fabs((double) ref) < 1e-7) {
@@ -48,7 +47,6 @@ int compare(
     }
     double normError = ::sqrt((double) error);
     error = normError / normRef;
-    printf("error = %.8g\n", error);
 
     return error < epsilon;
 }
@@ -62,5 +60,6 @@ void printMatrix(
         for (int j = 0; j < n; j++) {
 	     printf("%.4g\t", A[i * m + j]);
 	}
+	printf("\n");
     } 
 }

@@ -146,8 +146,8 @@ int runDGEMM(const char* program_file){
 
     printf("Allocating OpenCL memory...\n\n");
 	Matrix d_A;
-	d_A.width = d_A.stride = __nbRowsC;
-	d_A.height = __nbColumnsC;
+	d_A.width = d_A.stride = __nbColumnsC;
+	d_A.height = __nbRowsC;
 	size_t size = d_A.width * d_A.height * sizeof(double);
 	d_A.elements = clCreateBuffer(cxGPUContext, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, size, A, &ciErrNum);
         if (ciErrNum != CL_SUCCESS) {
@@ -155,8 +155,8 @@ int runDGEMM(const char* program_file){
             cleanUp(EXIT_FAILURE);
         }
 	Matrix d_B;
-	d_B.width = d_B.stride = __nbRowsB;
-	d_B.height = __nbColumnsC;
+	d_B.width = d_B.stride = __nbColumnsC;
+	d_B.height = __nbRowsB;
 	size = d_B.width * d_B.height * sizeof(double);
 	d_B.elements = clCreateBuffer(cxGPUContext, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, size, B, &ciErrNum);
         if (ciErrNum != CL_SUCCESS) {
@@ -164,8 +164,8 @@ int runDGEMM(const char* program_file){
             cleanUp(EXIT_FAILURE);
         }
 	Matrix d_C;
-	d_C.width = d_C.stride = __nbRowsC;
-	d_C.height = __nbColumnsC;
+	d_C.width = d_C.stride = __nbColumnsC;
+	d_C.height = __nbRowsC;
 	size = d_C.width * d_C.height * sizeof(double);
 	d_C.elements = clCreateBuffer(cxGPUContext, CL_MEM_WRITE_ONLY, size, NULL, &ciErrNum);
         if (ciErrNum != CL_SUCCESS) {
@@ -232,7 +232,7 @@ int runDGEMM(const char* program_file){
 
         printf("Validating DGEMM OpenCL results...\n");
             printf(" ...reading back OpenCL results\n");
-                ciErrNum = clEnqueueReadBuffer(cqCommandQueue, d_C.elements, CL_TRUE, 0, __nbRowsC * __nbColumnsC * sizeof(double), C, 0, NULL, NULL);
+                ciErrNum = clEnqueueReadBuffer(cqCommandQueue, d_C.elements, CL_TRUE, 0, d_C.width * d_C.height * sizeof(double), C, 0, NULL, NULL);
                 if (ciErrNum != CL_SUCCESS) {
                     printf("Error in clEnqueueReadBuffer Line %u in file %s !!!\n\n", __LINE__, __FILE__);
                     cleanUp(EXIT_FAILURE);
@@ -242,8 +242,9 @@ int runDGEMM(const char* program_file){
 		//Compute C = A * B on CPU
                 matrixMultiplicationCPUReference(C_CPU, A, B, __nbRowsC, __nbRowsB, __nbColumnsC);
 		//Compare the GPU to the CPU results
+		//printf("\n");
+		//printMatrix(C, __nbRowsC, __nbColumnsC);
 		PassFailFlag = compare((const double *) C_CPU, (const double *) C, __nbRowsC * __nbColumnsC, 1e-16);
-		printMatrix(C, __nbRowsC, __nbColumnsC);
 		free(C_CPU);
 		
          //Release kernels and program
@@ -252,7 +253,7 @@ int runDGEMM(const char* program_file){
     }
 
     // pass or fail
-    if (!PassFailFlag)
+    if (PassFailFlag)
 	printf("[DGEMM] test results...\tPASSED\n");
     else
 	printf("[DGEMM] test results...\tFAILED\n");
