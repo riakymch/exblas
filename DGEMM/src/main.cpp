@@ -12,7 +12,7 @@
 // standard utilities and systems includes
 #include "common.hpp"
 
-#define NUM_ITER  20
+#define NUM_ITER  40
 ////////////////////////////////////////////////////////////////////////////////
 // Variables used in the program 
 ////////////////////////////////////////////////////////////////////////////////
@@ -224,8 +224,16 @@ int runDGEMM(const char* program_file){
         }
 
 	double minTime = min(gpuTime, NUM_ITER);
-        printf("Alg = 2 \t Range = %u \t NbElements = %u \t Size = %lu \t Time = %.8f s \t Throughput = %.4f GB/s\n\n", 
-            __range, nbElements, nbElements * sizeof(double), minTime, ((1e-9 * nbElements * sizeof(double)) / minTime));
+	double perf;
+	perf = 1.0 / minTime;	
+	perf *= 1e-9;
+	perf *= nbElements * sizeof(double);
+        printf("Alg = 0 \t Range = %u \t NbElements = %u \t Size = %lu \t Time = %.8f s \t Throughput = %.4f GB/s\n\n", 
+            __range, nbElements, nbElements * sizeof(double), minTime, perf);
+	perf = 1. / minTime;
+	perf *= 2.0 * C.width * C.height * B.width;
+        printf("Alg = 0 \t Range = %u \t NbElements = %u \t Size = %lu \t Time = %.8f s \t Performance = %.4f GFLOPS\n\n", 
+            __range, nbElements, nbElements * sizeof(double), minTime, perf);
 #endif
 
         printf("Validating DGEMM OpenCL results...\n");

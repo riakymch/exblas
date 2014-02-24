@@ -6,13 +6,6 @@
 //Data type used for input data fetches
 typedef double data_t;
 
-typedef struct {
-   int width;
-   int height;
-   int stride;
-   __global data_t* elements;
-} Matrix;
-
 //Thread block size
 #define BLOCK_SIZE 16
 
@@ -33,13 +26,13 @@ __kernel void matrixMulKernel (
 
     //Each thread block computes one sub-matrix of C
     __global data_t* Csub = &C[Cwidth * BLOCK_SIZE * blockRow + BLOCK_SIZE * blockCol];
-    
-    //Each thread computes one element of Csub
-    data_t Cvalue = 0.0;
 
     //Thread row and column within Csub
     int row = get_local_id(1);
     int col = get_local_id(0);
+    
+    //Each thread computes one element of Csub
+    data_t Cvalue = 0.0;
 
     //Loop over all sub-matrices of A and B to compute Csub
     for (int m = 0; m < Cwidth / BLOCK_SIZE; ++m) {
@@ -50,7 +43,7 @@ __kernel void matrixMulKernel (
 	__global data_t* Bsub = &B[Bwidth * BLOCK_SIZE * m + BLOCK_SIZE * blockCol];
 
 	//Load Asub and Bsub from device memory to shared memory
-	/*As[row][col] = Asub[row * Cwidth + col];
+	As[row][col] = Asub[row * Cwidth + col];
 	Bs[row][col] = Bsub[row * Bwidth + col];
 
 	//Synchronize to make sure that the sub-matrices are loaded before the computation starts
@@ -59,8 +52,11 @@ __kernel void matrixMulKernel (
 	//Multiply Asub and Bsub
 	for (int i = 0; i < BLOCK_SIZE; ++i) {
 	    Cvalue += As[row][i] * Bs[i][col];
-	}*/
+	   
+            //Synchronize to make sure that the preceding computation is done before loading 
+            //two new sub-matrices of A and B in the next iteration
+	    barrier(CLK_LOCAL_MEM_FENCE);
+	}
 	Csub[row * Cwidth + col] = Cvalue;
     }
 }
-
