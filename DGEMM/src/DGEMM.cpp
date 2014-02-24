@@ -47,6 +47,7 @@ int compare(
     }
     double normError = ::sqrt((double) error);
     error = normError / normRef;
+    printf("error = %.8g\n", error);
 
     return error < epsilon;
 }

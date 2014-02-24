@@ -107,14 +107,20 @@ double min(double arr[], int size) {
 
 void init_fpuniform(double *array, int size, int range, int emax)
 {
-    /*for(int i = 0; i != size; ++i) {
-        array[i] = randDouble(emax-range, emax, 1);
+    /*//Generate numbers on several bins starting from emax
+    for(int i = 0; i != size; ++i) {
+        //array[i] = randDouble(emax-range, emax, 1);
+        array[i] = double(rand()) / double(RAND_MAX);
     }*/
-    //simple case for tests only
+    //Generate numbers on an interval [0, 1]
+    for(int i = 0; i != size; ++i) {
+        array[i] = double(rand()) / double(RAND_MAX);
+    }
+    /*//simple case for tests only
     for(int i = 0; i != size; i++) {
         array[i] = 0.1;
 	//(rand() & 0xFF) / 2147483647;
-    }
+    }*/
 }
 
 void print2Superaccumulators(bintype *binCPU, bintype *binGPU) {
