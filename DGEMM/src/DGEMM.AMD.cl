@@ -118,11 +118,13 @@ __kernel void mmmKernel_local(
 /* Output tile size : 4x4 = Each thread computes 16 double values*/
 /* Required global threads = (widthC / 4, heightC / 4) */
 /* This kernel runs on 7xx and CPU as they don't have hardware local memory */
-__kernel void mmmKernel(__global double4 *matrixA,
-                        __global double4 *matrixB,
-                        __global double4* matrixC,
-                        uint widthA, uint widthB)
-{
+__kernel void mmmKernel(
+    __global double4 *matrixA,
+    __global double4 *matrixB,
+    __global double4* matrixC,
+    uint widthA,
+    uint widthB
+) {
     int2 pos = (int2)(get_global_id(0), get_global_id(1));
 
     double4 sum0 = (double4)(0);
