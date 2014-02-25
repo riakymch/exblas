@@ -122,11 +122,30 @@ extern "C" cl_int initDGEMM(
     const char* program_file
 );
 
+extern "C" cl_int initDGEMMAMD(
+    cl_context cxGPUContext,
+    cl_command_queue cqParamCommandQue,
+    cl_device_id cdDevice,
+    const char* program_file
+);
+
 extern "C" void closeDGEMM(
     void
 );
 
+extern "C" void closeDGEMMAMD(
+    void
+);
+
 extern "C" size_t DGEMM(
+    cl_command_queue cqCommandQueue,
+    Matrix d_mC,
+    const Matrix d_mA,
+    const Matrix d_mB,
+    cl_int *ciErrNum
+);
+
+extern "C" size_t DGEMMAMD(
     cl_command_queue cqCommandQueue,
     Matrix d_mC,
     const Matrix d_mA,
@@ -157,7 +176,8 @@ extern "C" double roundKahan(
 ////////////////////////////////////////////////////////////////////////////////
 // Executable functions from main.cpp
 ////////////////////////////////////////////////////////////////////////////////
-int runSuperaccumulator(const char*);
 int runDGEMM(const char*);
+int runDGEMMAMD(const char*);
+int runSuperaccumulator(const char*);
 
 #endif
