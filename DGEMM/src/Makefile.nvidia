@@ -1,4 +1,4 @@
-SRCS = main.cpp common.cpp Superaccumulator.Launcher.cpp Superaccumulator.cpp Reduction.Launcher.cpp
+SRCS = main.cpp common.cpp Superaccumulator.Launcher.cpp Superaccumulator.cpp DGEMM.cpp DGEMM.Launcher.cpp
 EXE_NAME = main.out
 
 SOURCES = $(abspath $(SRCS))

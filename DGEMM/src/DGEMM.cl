@@ -2,6 +2,7 @@
 #pragma OPENCL EXTENSION cl_khr_fp64                   : enable  // For double precision numbers
 #pragma OPENCL EXTENSION cl_khr_int64_base_atomics     : enable  // For 64 atomic operations
 #pragma OPENCL EXTENSION cl_khr_byte_addressable_store : enable
+#pragma OPENCL EXTENSION cl_nv_pragma_unroll           : enable
 
 //Data type used for input data fetches
 typedef double data_t;
@@ -50,6 +51,7 @@ __kernel void matrixMulKernel (
 	barrier(CLK_LOCAL_MEM_FENCE);
 	
 	//Multiply Asub and Bsub
+        #pragma unroll
 	for (int i = 0; i < BLOCK_SIZE; ++i) {
 	    Cvalue += As[row][i] * Bs[i][col];
 	   
@@ -91,6 +93,7 @@ __kernel void matrixMulKernelSimple (
     barrier(CLK_LOCAL_MEM_FENCE);
 	
     //Multiply As and Bs
+    #pragma unroll
     for (int i = 0; i < BLOCK_SIZE; ++i) {
         Cvalue += As[row][i] * Bs[i][col];
     }
