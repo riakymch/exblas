@@ -119,7 +119,6 @@ void init_fpuniform(double *array, int size, int range, int emax)
     /*//simple case for tests only
     for(int i = 0; i != size; i++) {
         array[i] = 0.1;
-	//(rand() & 0xFF) / 2147483647;
     }*/
 }
 

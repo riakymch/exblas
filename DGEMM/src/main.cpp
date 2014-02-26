@@ -87,6 +87,7 @@ int main(int argc, char **argv)
         runDGEMM("../src/DGEMM.cl");
     if (__alg == 1)
         runDGEMMAMD("../src/DGEMM.AMD.cl");
+        //runDGEMMAMD("../src/DGEMM.AMD.Trial.cl");
 }
 
 int runDGEMM(const char* program_file){
@@ -237,6 +238,7 @@ int runDGEMM(const char* program_file){
                     printf("Error in clEnqueueReadBuffer Line %u in file %s !!!\n\n", __LINE__, __FILE__);
                     cleanUp(EXIT_FAILURE);
                 }
+		//printMatrix(C, __nbRowsC, __nbColumnsC);
 		/*double *C_CPU;
                 C_CPU = (double *) calloc(__nbRowsC * __nbColumnsC, sizeof(double));
 		//Compute C = A * B on CPU
@@ -409,6 +411,7 @@ int runDGEMMAMD(const char* program_file){
                     printf("Error in clEnqueueReadBuffer Line %u in file %s !!!\n\n", __LINE__, __FILE__);
                     cleanUp(EXIT_FAILURE);
                 }
+		//printMatrix(C, __nbRowsC, __nbColumnsC);
 		/*double *C_CPU;
                 C_CPU = (double *) calloc(__nbRowsC * __nbColumnsC, sizeof(double));
 		//Compute C = A * B on CPU

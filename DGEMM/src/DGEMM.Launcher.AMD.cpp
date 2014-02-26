@@ -65,7 +65,7 @@ extern "C" cl_int initDGEMMAMD(
             return EXIT_FAILURE;
         }
 
-    printf("...building Superaccumulator program\n");
+    printf("...building program\n");
         ciErrNum = clBuildProgram(cpProgram, 0, NULL, compileOptions, NULL, NULL);
         if (ciErrNum != CL_SUCCESS) {
             //printf("Error in clBuildProgram, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
