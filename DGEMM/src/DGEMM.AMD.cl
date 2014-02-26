@@ -13,12 +13,11 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
  OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ********************************************************************/
-#ifdef KHR_DP_EXTENSION
-  #pragma OPENCL EXTENSION cl_khr_fp64 : enable
-#else
-  #pragma OPENCL EXTENSION cl_amd_fp64 : enable
-#endif
+#pragma OPENCL EXTENSION cl_khr_fp64                   : enable
 #pragma OPENCL EXTENSION cl_khr_byte_addressable_store : enable
+#ifdef NVIDIA
+  #pragma OPENCL EXTENSION cl_nv_pragma_unroll         : enable
+#endif
 
 
 #define TILEX       4
@@ -70,6 +69,9 @@ __kernel void mmmKernel_local(
         int globalPosB = get_global_id(0) + ((i * get_local_size(0)) << TILEY_SHIFT) * get_global_size(0);
 
         /* This loop runs for number of threads in horizontal direction in the block of A */
+        #ifdef NVIDIA
+           #pragma unroll
+        #endif
         for(int j = 0; j < get_local_size(0) * 4; j=j+4)
         {
             /* Load 4 double4s from blockA : access patters = strided from local memory */

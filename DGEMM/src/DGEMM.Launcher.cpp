@@ -14,8 +14,8 @@
 ////////////////////////////////////////////////////////////////////////////////
 // OpenCL launcher for bitonic sort kernel
 ////////////////////////////////////////////////////////////////////////////////
-//#define DGEMM_KERNEL "matrixMulKernel"
-#define DGEMM_KERNEL "matrixMulKernelSimple"
+#define DGEMM_KERNEL "matrixMulKernel"
+//#define DGEMM_KERNEL "matrixMulKernelSimple"
 #define BLOCK_SIZE 16
 
 static size_t szKernelLength;	              // Byte size of kernel code
