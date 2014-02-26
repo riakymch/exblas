@@ -15,7 +15,7 @@
 // OpenCL launcher for bitonic sort kernel
 ////////////////////////////////////////////////////////////////////////////////
 #define DGEMM_KERNEL "matrixMul"
-#define BLOCK_SIZE 16
+#define BLOCK_SIZE 32
 
 static size_t szKernelLength;	              // Byte size of kernel code
 static char* cSources = NULL;                 // Buffer to hold source for compilation
