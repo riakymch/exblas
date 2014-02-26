@@ -14,8 +14,8 @@
 ////////////////////////////////////////////////////////////////////////////////
 // OpenCL launcher for bitonic sort kernel
 ////////////////////////////////////////////////////////////////////////////////
-#define DGEMM_KERNEL "matrixMulKernel"
-//#define DGEMM_KERNEL "matrixMulKernelSimple"
+//#define DGEMM_KERNEL "matrixMulKernel"
+#define DGEMM_KERNEL "matrixMulKernelSimple"
 #define BLOCK_SIZE 16
 
 static size_t szKernelLength;	              // Byte size of kernel code
@@ -147,15 +147,20 @@ extern "C" size_t DGEMM(
 
     {
         size_t NbThreadsPerWorkGroup[] = {BLOCK_SIZE, BLOCK_SIZE};
-	size_t TotalNbThreads[] = {d_B.width, d_A.height};
+	size_t widthB = d_B.width / VECTOR_NUMBER;
+	size_t heightA = d_A.height / VECTOR_NUMBER;
+	size_t TotalNbThreads[] = {widthB, heightA};
+	size_t neededLocalMemory = BLOCK_SIZE * BLOCK_SIZE * sizeof(cl_double);
 
 	cl_int i = 0;
         ciErrNum  = clSetKernelArg(ckMatrixMul, i++, sizeof(cl_mem),  (void *)&d_C.elements);
         ciErrNum |= clSetKernelArg(ckMatrixMul, i++, sizeof(cl_mem),  (void *)&d_A.elements);
         ciErrNum |= clSetKernelArg(ckMatrixMul, i++, sizeof(cl_mem),  (void *)&d_B.elements);
-        ciErrNum |= clSetKernelArg(ckMatrixMul, i++, sizeof(cl_int),  (void *)&d_C.width);
         ciErrNum |= clSetKernelArg(ckMatrixMul, i++, sizeof(cl_int),  (void *)&d_C.height);
-        ciErrNum |= clSetKernelArg(ckMatrixMul, i++, sizeof(cl_int),  (void *)&d_B.height);
+        ciErrNum |= clSetKernelArg(ckMatrixMul, i++, sizeof(cl_int),  (void *)&d_C.width);
+        ciErrNum |= clSetKernelArg(ckMatrixMul, i++, sizeof(cl_int),  (void *)&d_B.height); 
+        ciErrNum |= clSetKernelArg(ckMatrixMul, i++, neededLocalMemory,  NULL);
+        ciErrNum |= clSetKernelArg(ckMatrixMul, i++, neededLocalMemory,  NULL);
         if (ciErrNum != CL_SUCCESS) {
             printf("Error in clSetKernelArg, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
 	    *ciErrNumRes = EXIT_FAILURE;

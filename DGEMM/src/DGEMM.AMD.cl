@@ -59,7 +59,7 @@ __kernel void mmmKernel_local(
         int globalPosA = i * get_local_size(0) + get_local_id(0) + (get_global_id(1) << TILEY_SHIFT) * temp;
 
         /* Load values in blockA from matrixA */
-        blockA[blockPos] =							matrixA[globalPosA];
+        blockA[blockPos] =				matrixA[globalPosA];
         blockA[blockPos + get_local_size(0)] =		matrixA[globalPosA + temp];
         blockA[blockPos + 2 * get_local_size(0)] =	matrixA[globalPosA + 2 * temp];
         blockA[blockPos + 3 * get_local_size(0)] =	matrixA[globalPosA + 3 * temp];

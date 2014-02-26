@@ -15,19 +15,18 @@ __kernel void matrixMulKernel (
     __global data_t* C,
     __global data_t* A,
     __global data_t* B,
-    int Cwidth,
-    int Cheight,
-    int Bwidth
+    int m,
+    int n,
+    int k,
+    __local data_t *As,
+    __local data_t *Bs
 ) {
-    __local data_t As[BLOCK_SIZE][BLOCK_SIZE];
-    __local data_t Bs[BLOCK_SIZE][BLOCK_SIZE];
-
     //Block row and column
     int blockRow = get_group_id(1);
     int blockCol = get_group_id(0);
 
     //Each thread block computes one sub-matrix of C
-    __global data_t* Csub = &C[Cwidth * BLOCK_SIZE * blockRow + BLOCK_SIZE * blockCol];
+    __global data_t* Csub = &C[m * BLOCK_SIZE * blockRow + BLOCK_SIZE * blockCol];
 
     //Thread row and column within Csub
     int row = get_local_id(1);
@@ -37,16 +36,16 @@ __kernel void matrixMulKernel (
     data_t Cvalue = 0.0;
 
     //Loop over all sub-matrices of A and B to compute Csub
-    for (int m = 0; m < (Cwidth / BLOCK_SIZE); ++m) {
+    for (int i = 0; i < (m / BLOCK_SIZE); ++i) {
 	//Sub-matrix Asub of A
-        __global data_t* Asub = &A[Cwidth * BLOCK_SIZE * blockRow + BLOCK_SIZE * m];
+        __global data_t* Asub = &A[m * BLOCK_SIZE * blockRow + BLOCK_SIZE * i];
 
 	//Sub-matrix Bsub of B
-	__global data_t* Bsub = &B[Bwidth * BLOCK_SIZE * m + BLOCK_SIZE * blockCol];
+	__global data_t* Bsub = &B[k * BLOCK_SIZE * i + BLOCK_SIZE * blockCol];
 
 	//Load Asub and Bsub from device memory to shared memory
-	As[row][col] = Asub[row * Cwidth + col];
-	Bs[row][col] = Bsub[row * Bwidth + col];
+	As[row * BLOCK_SIZE + col] = Asub[row * m + col];
+	Bs[row * BLOCK_SIZE + col] = Bsub[row * k + col];
 
 	//Synchronize to make sure that the sub-matrices are loaded before the computation starts
 	barrier(CLK_LOCAL_MEM_FENCE);
@@ -56,13 +55,9 @@ __kernel void matrixMulKernel (
            #pragma unroll
         #endif
 	for (int i = 0; i < BLOCK_SIZE; ++i) {
-	    Cvalue += As[row][i] * Bs[i][col];
-	   
-            //Synchronize to make sure that the preceding computation is done before loading 
-            //two new sub-matrices of A and B in the next iteration
-	    //barrier(CLK_LOCAL_MEM_FENCE);
+	    Cvalue += As[row * BLOCK_SIZE + i] * Bs[i * BLOCK_SIZE + col];
 	}
-	Csub[row * Cwidth + col] = Cvalue;
+	Csub[row * m + col] = Cvalue;
     }
 }
 
@@ -70,13 +65,12 @@ __kernel void matrixMulKernelSimple (
     __global data_t* C,
     __global data_t* A,
     __global data_t* B,
-    int Cwidth,
-    int Cheight,
-    int Bwidth
+    int m,
+    int n,
+    int k,
+    __local data_t *As,
+    __local data_t *Bs
 ) {
-    __local data_t As[BLOCK_SIZE][BLOCK_SIZE];
-    __local data_t Bs[BLOCK_SIZE][BLOCK_SIZE];
-
     //Block row and column
     int blockRow = get_group_id(1);
     int blockCol = get_group_id(0);
@@ -89,8 +83,8 @@ __kernel void matrixMulKernelSimple (
     data_t Cvalue = 0.0;
 
     //Load Asub and Bsub from device memory to shared memory
-    As[row][col] = A[blockRow * BLOCK_SIZE + col];
-    Bs[row][col] = B[row * Cheight + blockCol];
+    As[row * BLOCK_SIZE + col] = A[blockRow * BLOCK_SIZE + col];
+    Bs[row * BLOCK_SIZE + col] = B[row * k + blockCol];
 
     //Synchronize to make sure that the sub-matrices are loaded before the computation starts
     barrier(CLK_LOCAL_MEM_FENCE);
@@ -100,7 +94,7 @@ __kernel void matrixMulKernelSimple (
       #pragma unroll
     #endif
     for (int i = 0; i < BLOCK_SIZE; ++i) {
-        Cvalue += As[row][i] * Bs[i][col];
+        Cvalue += As[row * BLOCK_SIZE + i] * Bs[i * BLOCK_SIZE + col];
     }
-    C[blockRow * Cheight + blockCol] = Cvalue;
+    C[blockRow * m + blockCol] = Cvalue;
 }

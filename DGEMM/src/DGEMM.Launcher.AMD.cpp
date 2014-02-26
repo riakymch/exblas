@@ -139,7 +139,7 @@ extern "C" size_t DGEMMAMD(
 	size_t widthB = d_B.width / VECTOR_NUMBER;
 	size_t heightA = d_A.height / VECTOR_NUMBER;
 	size_t TotalNbThreads[] = {widthB, heightA};
-	size_t neededLocalMemory = (BLOCK_SIZE * 4) * (BLOCK_SIZE * 4) * sizeof(cl_double);
+	size_t neededLocalMemory = (BLOCK_SIZE * VECTOR_NUMBER) * (BLOCK_SIZE * VECTOR_NUMBER) * sizeof(cl_double);
 
 	cl_int i = 0;
         ciErrNum  = clSetKernelArg(ckMatrixMul, i++, sizeof(cl_mem),  (void *)&d_C.elements);
