@@ -111,8 +111,8 @@ void Accumulate(__local volatile long *sa, double x) {
   int i;
   for (i = iup; xscaled != 0; --i) {
     double xrounded = rint(xscaled);
-    long xint = rint(xscaled);
-
+    long xint = (long) xrounded;
+ 
     AccumulateWord(sa, i, WARP_COUNT, xint);
 
     xscaled -= xrounded;

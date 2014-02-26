@@ -13,6 +13,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
  OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ********************************************************************/
+
 #pragma OPENCL EXTENSION cl_khr_fp64                   : enable
 #pragma OPENCL EXTENSION cl_khr_byte_addressable_store : enable
 #ifdef NVIDIA
@@ -71,7 +72,7 @@ __kernel void mmmKernel_local(
 
         /* This loop runs for number of threads in horizontal direction in the block of A */
         #ifdef NVIDIA
-           #pragma unroll
+          #pragma unroll
         #endif
         for(int j = 0; j < get_local_size(0) * 4; j=j+4)
         {

@@ -14,8 +14,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 // OpenCL launcher for bitonic sort kernel
 ////////////////////////////////////////////////////////////////////////////////
-#define DGEMM_KERNEL "matrixMulKernel"
-//#define DGEMM_KERNEL "matrixMulKernelSimple"
+#define DGEMM_KERNEL "matrixMul"
 #define BLOCK_SIZE 16
 
 static size_t szKernelLength;	              // Byte size of kernel code
@@ -28,13 +27,13 @@ static cl_command_queue cqDefaultCommandQue;  //Default command queue for Supera
 static const uint  VECTOR_NUMBER = 1;
 
 #ifdef AMD
-static char  compileOptions[256] = "";
+static char  compileOptions[256] = "-DBLOCK_SIZE=16 -DVECTOR_NUMBER=2";
 #else
-static char  compileOptions[256] = "-DNVIDIA -cl-mad-enable -cl-fast-relaxed-math";
+static char  compileOptions[256] = "-DBLOCK_SIZE=16 -DVECTOR_NUMBER=2 -DNVIDIA -cl-mad-enable -cl-fast-relaxed-math";
 #endif
 
 
-extern "C" cl_int initDGEMM(
+extern "C" cl_int initDGEMMNVIDIA(
     cl_context cxGPUContext, 
     cl_command_queue cqParamCommandQue, 
     cl_device_id cdDevice,
@@ -66,7 +65,7 @@ extern "C" cl_int initDGEMM(
             return EXIT_FAILURE;
         }
 
-    printf("...building Superaccumulator program\n");
+    printf("...building program\n");
         ciErrNum = clBuildProgram(cpProgram, 0, NULL, compileOptions, NULL, NULL);
         if (ciErrNum != CL_SUCCESS) {
             //printf("Error in clBuildProgram, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
@@ -110,7 +109,7 @@ extern "C" cl_int initDGEMM(
     return EXIT_SUCCESS;
 }
 
-extern "C" void closeDGEMM(void){
+extern "C" void closeDGEMMNVIDIA(void){
     cl_int ciErrNum;
 
     ciErrNum = clReleaseKernel(ckMatrixMul);
@@ -123,17 +122,7 @@ extern "C" void closeDGEMM(void){
 ////////////////////////////////////////////////////////////////////////////////
 // OpenCL launchers for Superaccumulator / mergeSuperaccumulators kernels
 ////////////////////////////////////////////////////////////////////////////////
-//Round a / b to nearest higher integer value
-inline uint iDivUp(uint a, uint b){
-    return (a % b != 0) ? (a / b + 1) : (a / b);
-}
-
-//Snap a to nearest lower multiple of b
-inline uint iSnapDown(uint a, uint b){
-    return a - a % b;
-}
-
-extern "C" size_t DGEMM(
+extern "C" size_t DGEMMNVIDIA(
     cl_command_queue cqCommandQueue,
     Matrix d_C,
     const Matrix d_A,
@@ -150,7 +139,7 @@ extern "C" size_t DGEMM(
 	size_t widthB = d_B.width / VECTOR_NUMBER;
 	size_t heightA = d_A.height / VECTOR_NUMBER;
 	size_t TotalNbThreads[] = {widthB, heightA};
-	size_t neededLocalMemory = BLOCK_SIZE * BLOCK_SIZE * sizeof(cl_double);
+	size_t neededLocalMemory = (BLOCK_SIZE * VECTOR_NUMBER) * BLOCK_SIZE * sizeof(cl_double);
 
 	cl_int i = 0;
         ciErrNum  = clSetKernelArg(ckMatrixMul, i++, sizeof(cl_mem),  (void *)&d_C.elements);

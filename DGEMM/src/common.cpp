@@ -112,14 +112,14 @@ void init_fpuniform(double *array, int size, int range, int emax)
         //array[i] = randDouble(emax-range, emax, 1);
         array[i] = double(rand()) / double(RAND_MAX);
     }*/
-    //Generate numbers on an interval [0, 1]
+    /*//Generate numbers on an interval [0, 1]
     for(int i = 0; i != size; ++i) {
         array[i] = double(rand()) / double(RAND_MAX);
-    }
-    /*//simple case for tests only
+    }*/
+    //simple case for tests only
     for(int i = 0; i != size; i++) {
         array[i] = 0.1;
-    }*/
+    }
 }
 
 void print2Superaccumulators(bintype *binCPU, bintype *binGPU) {
