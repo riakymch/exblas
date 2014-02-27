@@ -32,7 +32,6 @@ __kernel void matrixMul(
     int uiWB,
     __local data_t* As,
     __local data_t* Bs
-    //int trueLocalSize1
 ) {
     //Block index
     int bx = get_group_id(0);
@@ -43,8 +42,6 @@ __kernel void matrixMul(
     int ty = get_local_id(1);
 
     //Index of the first sub-matrix of A processed by the block
-    //uiWA = uiWA / VECTOR_NUMBER;
-    //uiWB = uiWB / VECTOR_NUMBER;
     int aBegin = uiWA * BLOCK_SIZE * by;
 
     //Index of the last sub-matrix of A processed by the block
@@ -84,10 +81,6 @@ __kernel void matrixMul(
           #pragma unroll
         #endif
         for (int k = 0; k < BLOCK_SIZE; ++k) {
-	    /*data_t tempA = AS(ty, k);
-	    data_t tempB = BS(k,tx);
-            sum.x += tempA.x * tempB.x;
-            sum.x += tempA.y * tempB.y;*/
 	    sum += AS(ty, k) * BS(k, tx);
 	}
 

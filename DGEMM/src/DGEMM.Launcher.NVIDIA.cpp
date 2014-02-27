@@ -15,7 +15,7 @@
 // OpenCL launcher for bitonic sort kernel
 ////////////////////////////////////////////////////////////////////////////////
 #define DGEMM_KERNEL "matrixMul"
-#define BLOCK_SIZE 32
+#define BLOCK_SIZE 16
 
 static size_t szKernelLength;	              // Byte size of kernel code
 static char* cSources = NULL;                 // Buffer to hold source for compilation
@@ -139,7 +139,7 @@ extern "C" size_t DGEMMNVIDIA(
 	size_t widthB = d_B.width / VECTOR_NUMBER;
 	size_t heightA = d_A.height / VECTOR_NUMBER;
 	size_t TotalNbThreads[] = {widthB, heightA};
-	size_t neededLocalMemory = (BLOCK_SIZE * VECTOR_NUMBER) * BLOCK_SIZE * sizeof(cl_double);
+	size_t neededLocalMemory = BLOCK_SIZE * BLOCK_SIZE * sizeof(cl_double);
 
 	cl_int i = 0;
         ciErrNum  = clSetKernelArg(ckMatrixMul, i++, sizeof(cl_mem),  (void *)&d_C.elements);
