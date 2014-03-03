@@ -32,7 +32,7 @@ typedef double4 data_t;
  * Matrix A is cached into local memory block
  * Output tile size : 4x4 = Each thread computes 16 double values
  * Required global threads = (widthC / 4, heightC / 4)
-*/
+ */
 __kernel void mmmKernel_local(
     __global data_t* matrixC,
     __global data_t *matrixA,

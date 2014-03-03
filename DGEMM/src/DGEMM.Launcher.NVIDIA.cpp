@@ -15,7 +15,7 @@
 // OpenCL launcher for bitonic sort kernel
 ////////////////////////////////////////////////////////////////////////////////
 #define DGEMM_KERNEL "matrixMul"
-#define BLOCK_SIZE 16
+#define BLOCK_SIZE 32
 
 static size_t szKernelLength;	              // Byte size of kernel code
 static char* cSources = NULL;                 // Buffer to hold source for compilation
@@ -27,9 +27,9 @@ static cl_command_queue cqDefaultCommandQue;  //Default command queue for Supera
 static const uint  VECTOR_NUMBER = 1;
 
 #ifdef AMD
-static char  compileOptions[256] = "-DBLOCK_SIZE=16 -DVECTOR_NUMBER=2";
+static char  compileOptions[256] = "-DBLOCK_SIZE=32 -DVECTOR_NUMBER=2";
 #else
-static char  compileOptions[256] = "-DBLOCK_SIZE=16 -DVECTOR_NUMBER=2 -DNVIDIA -cl-mad-enable -cl-fast-relaxed-math";
+static char  compileOptions[256] = "-DBLOCK_SIZE=32 -DVECTOR_NUMBER=2 -DNVIDIA -cl-mad-enable -cl-fast-relaxed-math";
 #endif
 
 
