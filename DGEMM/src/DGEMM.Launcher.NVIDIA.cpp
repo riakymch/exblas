@@ -15,7 +15,11 @@
 // OpenCL launcher for bitonic sort kernel
 ////////////////////////////////////////////////////////////////////////////////
 #define DGEMM_KERNEL "matrixMul"
-#define BLOCK_SIZE 32
+#ifdef AMD
+  #define BLOCK_SIZE 16
+#else
+  #define BLOCK_SIZE 32
+#endif
 
 static size_t szKernelLength;	              // Byte size of kernel code
 static char* cSources = NULL;                 // Buffer to hold source for compilation
@@ -27,9 +31,9 @@ static cl_command_queue cqDefaultCommandQue;  //Default command queue for Supera
 static const uint  VECTOR_NUMBER = 1;
 
 #ifdef AMD
-static char  compileOptions[256] = "-DBLOCK_SIZE=32 -DVECTOR_NUMBER=2";
+static char  compileOptions[256] = "-DBLOCK_SIZE=16 -DVECTOR_NUMBER=1";
 #else
-static char  compileOptions[256] = "-DBLOCK_SIZE=32 -DVECTOR_NUMBER=2 -DNVIDIA -cl-mad-enable -cl-fast-relaxed-math";
+static char  compileOptions[256] = "-DBLOCK_SIZE=32 -DVECTOR_NUMBER=1 -DNVIDIA -cl-mad-enable -cl-fast-relaxed-math";
 #endif
 
 
@@ -139,7 +143,7 @@ extern "C" size_t DGEMMNVIDIA(
 	size_t widthB = d_B.width / VECTOR_NUMBER;
 	size_t heightA = d_A.height / VECTOR_NUMBER;
 	size_t TotalNbThreads[] = {widthB, heightA};
-	size_t neededLocalMemory = BLOCK_SIZE * BLOCK_SIZE * sizeof(cl_double);
+	size_t neededLocalMemory = (BLOCK_SIZE * VECTOR_NUMBER) * (BLOCK_SIZE * VECTOR_NUMBER) * sizeof(cl_double);
 
 	cl_int i = 0;
         ciErrNum  = clSetKernelArg(ckMatrixMul, i++, sizeof(cl_mem),  (void *)&d_C.elements);
