@@ -28,12 +28,12 @@ static cl_program       cpProgram;            //OpenCL Superaccumulator program
 static cl_kernel        ckMatrixMul;
 static cl_command_queue cqDefaultCommandQue;  //Default command queue for Superaccumulator
 
-static const uint  VECTOR_NUMBER = 1;
+static const uint  VECTOR_NUMBER = 22;
 
 #ifdef AMD
-static char  compileOptions[256] = "-DBLOCK_SIZE=16 -DVECTOR_NUMBER=1";
+static char  compileOptions[256] = "-DBLOCK_SIZE=16";
 #else
-static char  compileOptions[256] = "-DBLOCK_SIZE=32 -DVECTOR_NUMBER=1 -DNVIDIA -cl-mad-enable -cl-fast-relaxed-math";
+static char  compileOptions[256] = "-DBLOCK_SIZE=32 -DNVIDIA -cl-mad-enable -cl-fast-relaxed-math";
 #endif
 
 
@@ -81,21 +81,6 @@ extern "C" cl_int initDGEMMNVIDIA(
 
             return EXIT_FAILURE;
         }
-	
-    /*//Get the binary
-    size_t nb_devices, nbread;
-    ciErrNum = clGetProgramInfo(cpProgram, CL_PROGRAM_NUM_DEVICES, sizeof(size_t), &nb_devices, &nbread);// Return 1 devices
-    printf("nb_devices = %d\n", nb_devices);
-    size_t *np = new size_t[nb_devices];//Create size array
-    ciErrNum = clGetProgramInfo(cpProgram, CL_PROGRAM_BINARY_SIZES, sizeof(size_t)*nb_devices, np, &nbread);//Load in np the size of my binary  
-    char** bn = new char* [nb_devices]; //Create the binary array   
-    for(int i =0; i < nb_devices;i++)
-        bn[i] = new char[np[i]]; // I know... it's bad... but if i use new char[np[i]], i have a segfault... :/  
-    ciErrNum = clGetProgramInfo(cpProgram, CL_PROGRAM_BINARIES, sizeof(unsigned char *)*nb_devices, bn, &nbread); //Load the binary itself    
-    //printf("%s\n", bn[0]); //Print the first binary. But here, I have some curious characters  
-    FILE *fp = fopen("Superaccumulator.cl.bin", "wb");  
-    fwrite(bn[0], sizeof(bn[0]), np[0], fp); // Save the binary, but my file stay empty  
-    fclose(fp);*/
 
     printf("...creating DGEMM kernel:\n");
         ckMatrixMul = clCreateKernel(cpProgram, DGEMM_KERNEL, &ciErrNum);
@@ -139,18 +124,18 @@ extern "C" size_t DGEMMNVIDIA(
         cqCommandQueue = cqDefaultCommandQue;
 
     {
-        size_t NbThreadsPerWorkGroup[] = {BLOCK_SIZE, BLOCK_SIZE};
-	size_t widthB = d_B.width / VECTOR_NUMBER;
-	size_t heightA = d_A.height / VECTOR_NUMBER;
-	size_t TotalNbThreads[] = {widthB, heightA};
+        size_t NbThreadsPerWorkGroup[] = {BLOCK_SIZE, BLOCK_SIZE / VECTOR_NUMBER};
+	size_t widthC = d_C.width / VECTOR_NUMBER;
+	size_t heightC = d_C.height / VECTOR_NUMBER;
+	size_t TotalNbThreads[] = {widthC, heightC};
 	size_t neededLocalMemory = (BLOCK_SIZE * VECTOR_NUMBER) * (BLOCK_SIZE * VECTOR_NUMBER) * sizeof(cl_double);
 
 	cl_int i = 0;
         ciErrNum  = clSetKernelArg(ckMatrixMul, i++, sizeof(cl_mem),  (void *)&d_C.elements);
         ciErrNum |= clSetKernelArg(ckMatrixMul, i++, sizeof(cl_mem),  (void *)&d_A.elements);
         ciErrNum |= clSetKernelArg(ckMatrixMul, i++, sizeof(cl_mem),  (void *)&d_B.elements);
-        ciErrNum |= clSetKernelArg(ckMatrixMul, i++, sizeof(cl_int),  (void *)&widthB);
-        ciErrNum |= clSetKernelArg(ckMatrixMul, i++, sizeof(cl_int),  (void *)&widthB);
+        ciErrNum |= clSetKernelArg(ckMatrixMul, i++, sizeof(cl_int),  (void *)&d_A.width);
+        ciErrNum |= clSetKernelArg(ckMatrixMul, i++, sizeof(cl_int),  (void *)&d_B.width);
         ciErrNum |= clSetKernelArg(ckMatrixMul, i++, neededLocalMemory,  NULL);
         ciErrNum |= clSetKernelArg(ckMatrixMul, i++, neededLocalMemory,  NULL);
         if (ciErrNum != CL_SUCCESS) {
