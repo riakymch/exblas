@@ -28,7 +28,7 @@ static cl_program       cpProgram;            //OpenCL Superaccumulator program
 static cl_kernel        ckMatrixMul;
 static cl_command_queue cqDefaultCommandQue;  //Default command queue for Superaccumulator
 
-static const uint  VECTOR_NUMBER = 22;
+static const uint  VECTOR_NUMBER = 2;
 
 #ifdef AMD
 static char  compileOptions[256] = "-DBLOCK_SIZE=16";
