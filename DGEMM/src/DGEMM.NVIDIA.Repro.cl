@@ -51,6 +51,11 @@ typedef double data_t;
     }
 #endif
 
+double TwoProductFMA(double a, double b, double *d) {
+    double x = a * b;
+    return fma(a, b, -x);
+}
+
 // signedcarry in {-1, 0, 1}
 long xadd(__local volatile long *sa, long x, uchar *of) {
     // OF and SF  -> carry=1
@@ -134,7 +139,7 @@ __kernel void matrixMul(
           #pragma unroll
         #endif
         for (int k = 0; k < BLOCK_SIZE; ++k) {
-	    fma(AS(ty, k), BS(k, tx), sum);
+	    sum = fma(AS(ty, k), BS(k, tx), sum);
 	}
 
         //Synchronize to make sure that the preceding computation is done before 

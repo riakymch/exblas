@@ -75,15 +75,15 @@ __kernel void mmmKernel_local(
             data_t tempB0 = matrixB[globalPosB  + j *  get_global_size(0)]; //Should be localId.x * (TILEX / 2)
             data_t tempB1 = matrixB[globalPosB  + (j + 1) * get_global_size(0)];
     
-            fma(tempA0.x, tempB0.x, sum0.x);
-            fma(tempA0.y, tempB1.x, sum0.x);
-            fma(tempA0.x, tempB0.y, sum0.y);
-            fma(tempA0.y, tempB1.y, sum0.y);
+            sum0.x = fma(tempA0.x, tempB0.x, sum0.x);
+            sum0.x = fma(tempA0.y, tempB1.x, sum0.x);
+            sum0.y = fma(tempA0.x, tempB0.y, sum0.y);
+            sum0.y = fma(tempA0.y, tempB1.y, sum0.y);
 
-            fma(tempA1.x, tempB0.x, sum1.x);
-            fma(tempA1.y, tempB1.x, sum1.x);
-            fma(tempA1.x, tempB0.y, sum1.y);
-            fma(tempA1.y, tempB1.y, sum1.y);
+            sum1.x = fma(tempA1.x, tempB0.x, sum1.x);
+            sum1.x = fma(tempA1.y, tempB1.x, sum1.x);
+            sum1.y = fma(tempA1.x, tempB0.y, sum1.y);
+            sum1.y = fma(tempA1.y, tempB1.y, sum1.y);
 		
             /*//old
             sum0.x += tempA0.x * tempB0.x + tempA0.y * tempB1.x;

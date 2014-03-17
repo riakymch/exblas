@@ -81,7 +81,7 @@ __kernel void matrixMul(
           #pragma unroll
         #endif
         for (int k = 0; k < BLOCK_SIZE; ++k) {
-	    fma(AS(ty, k), BS(k, tx), sum);
+	    sum = fma(AS(ty, k), BS(k, tx), sum);
 	}
 
         //Synchronize to make sure that the preceding computation is done before 
