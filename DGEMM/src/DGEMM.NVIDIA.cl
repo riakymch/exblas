@@ -16,7 +16,7 @@
   #pragma OPENCL EXTENSION cl_nv_pragma_unroll         : enable
 #endif
 
-typedef double2 data_t;
+typedef double data_t;
 
 #define AS(i, j) As[j + i * BLOCK_SIZE]
 #define BS(i, j) Bs[j + i * BLOCK_SIZE]
