@@ -10,6 +10,7 @@
  */
 
 #pragma OPENCL EXTENSION cl_khr_fp64                   : enable
+#pragma OPENCL EXTENSION cl_khr_int64_base_atomics     : enable  // For 64 atomic operations
 #pragma OPENCL EXTENSION cl_khr_byte_addressable_store : enable
 #ifdef NVIDIA
   #pragma OPENCL EXTENSION cl_nv_pragma_unroll         : enable
@@ -17,8 +18,57 @@
 
 typedef double data_t;
 
+#define BIN_COUNT      39
+#define K              8                    // High-radix carry-save bits
+#define digits         56
+#define deltaScale     72057594037927936.0  // Assumes K>0
+#define f_words        20 
+#define TSAFE          0
+
 #define AS(i, j) As[j + i * BLOCK_SIZE]
 #define BS(i, j) Bs[j + i * BLOCK_SIZE]
+
+
+////////////////////////////////////////////////////////////////////////////////
+// Auxiliary functions
+////////////////////////////////////////////////////////////////////////////////
+#ifdef USE_KNUTH
+    double Knuth2Sum(double a, double b, double *s) {
+        double r = a + b;
+        double z = r - a;
+        *s = (a - (r - z)) + (b - z);
+        return r;
+    }
+#else
+    //twosum
+    double Knuth2Sum(double a, double b, double *s) {
+        double r = a + b;
+        int doswap = fabs(b) > fabs(a);
+        double a2 = doswap ? b : a;
+        double b2 = doswap ? a : b;
+        *s = (a2 - r) + b2;
+        return r;
+    }
+#endif
+
+// signedcarry in {-1, 0, 1}
+long xadd(__local volatile long *sa, long x, uchar *of) {
+    // OF and SF  -> carry=1
+    // OF and !SF -> carry=-1
+    // !OF        -> carry=0
+    long y = atom_add(sa, x);
+    long z = y + x; // since the value sa->accumulator[i] can be changed by another work item
+
+    // TODO: cover also underflow
+    *of = 0;
+    if(x > 0 && y > 0 && z < 0)
+        *of = 1;
+    if(x < 0 && y < 0 && z > 0)
+        *of = 1;
+
+    return y;
+}
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Matrix multiplication on the device: C = A * B
@@ -56,19 +106,20 @@ __kernel void matrixMul(
     //Step size used to iterate through the sub-matrices of B
     int bStep  = BLOCK_SIZE * uiWB;
 
-    //sum is used to store the element of the block sub-matrix
-    //that is computed by the thread
+    //sum is used to store the element of the block sub-matrix that is computed by the thread
     data_t sum = 0;
     //data_t sum[2] = {0.0, 0.0};
+
+    //for floating-point expansion
+    double a[NBFPE] = {0.0};
 
     //Loop over all the sub-matrices of A and B
     //required to compute the block sub-matrix
     for (int a = aBegin, b = bBegin;
              a <= aEnd;
              a += aStep, b += bStep) {
-        //Load the matrices from device memory
-        //to shared memory; each thread loads
-        //one element of each matrix
+        //Load the matrices from device memory to shared memory;
+        //each thread loads one element of each matrix
         AS(ty, tx) = A[a + uiWA * ty + tx];
         BS(ty, tx) = B[b + uiWB * ty + tx];
         //AS(ty + 16, tx) = A[a + uiWA * (ty + 16) + tx];
@@ -78,19 +129,16 @@ __kernel void matrixMul(
         barrier(CLK_LOCAL_MEM_FENCE);
 
         //Multiply the two matrices together;
-        //each thread computes one element
-        //of the block sub-matrix        
+        //each thread computes one element of the block sub-matrix        
         #ifdef NVIDIA
           #pragma unroll
         #endif
         for (int k = 0; k < BLOCK_SIZE; ++k) {
-	    sum += AS(ty, k) * BS(k, tx);
-	    //sum[1] += AS(ty + 16, k) * BS(k, tx);
+	    fma(AS(ty, k), BS(k, tx), sum);
 	}
 
-        //Synchronize to make sure that the preceding
-        //computation is done before loading two new
-        //sub-matrices of A and B in the next iteration
+        //Synchronize to make sure that the preceding computation is done before 
+        //loading two new sub-matrices of A and B in the next iteration
         barrier(CLK_LOCAL_MEM_FENCE);
     }
 

@@ -55,7 +55,7 @@ __kernel void matrixMulKernel (
            #pragma unroll
         #endif
 	for (int i = 0; i < BLOCK_SIZE; ++i) {
-	    Cvalue += As[row * BLOCK_SIZE + i] * Bs[i * BLOCK_SIZE + col];
+	    fma(As[row * BLOCK_SIZE + i], Bs[i * BLOCK_SIZE + col], Cvalue);
 	}
 	Csub[row * m + col] = Cvalue;
     }

@@ -31,9 +31,9 @@ static cl_command_queue cqDefaultCommandQue;  //Default command queue for Supera
 static const uint  VECTOR_NUMBER = 1;
 
 #ifdef AMD
-static char  compileOptions[256] = "-DBLOCK_SIZE=16";
+static char  compileOptions[256] = "-DBLOCK_SIZE=16 -DUSE_KNUTH";
 #else
-static char  compileOptions[256] = "-DBLOCK_SIZE=32 -DNVIDIA -cl-mad-enable -cl-fast-relaxed-math";
+static char  compileOptions[256] = "-DBLOCK_SIZE=32 -DUSE_KNUTH -DNVIDIA -cl-mad-enable -cl-fast-relaxed-math";
 #endif
 
 
@@ -41,7 +41,8 @@ extern "C" cl_int initDGEMMNVIDIA(
     cl_context cxGPUContext, 
     cl_command_queue cqParamCommandQue, 
     cl_device_id cdDevice,
-    const char* program_file
+    const char* program_file,
+    const uint NbFPE
 ){
     cl_int ciErrNum;
     size_t kernelLength;
@@ -70,6 +71,7 @@ extern "C" cl_int initDGEMMNVIDIA(
         }
 
     printf("...building program\n");
+	sprintf(compileOptions, "%s -DNBFPE=%d", compileOptions, NbFPE);
         ciErrNum = clBuildProgram(cpProgram, 0, NULL, compileOptions, NULL, NULL);
         if (ciErrNum != CL_SUCCESS) {
             //printf("Error in clBuildProgram, Line %u in file %s !!!\n\n", __LINE__, __FILE__);

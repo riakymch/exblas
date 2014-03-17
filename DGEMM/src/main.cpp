@@ -31,7 +31,7 @@ static uint __nbfpe      = 0;
 static uint __alg        = 0;
 
 static void __usage(int argc __attribute__((unused)), char **argv) {
-  fprintf(stderr, "Usage: %s [-m number of rows in A -n number of columns in A -k number of columns in B -r range -e nbfpe -a alg (0-mine, 1-amd, 2-nvidia)] \n", argv[0]);
+  fprintf(stderr, "Usage: %s [-m number of rows in A -n number of columns in A -k number of columns in B -r range -e nbfpe -a alg (0-mine, 1-amd, 2-nvidia, 3-repro.nvidia)] \n", argv[0]);
   printf("       -?, -h:    Display this help and exit\n");
 }
 
@@ -65,7 +65,7 @@ static void __parse_args(int argc, char **argv) {
     __usage(argc, argv);
     exit(-1);
   }
-  if (__alg > 2) {
+  if (__alg > 3) {
     __usage(argc, argv);
     exit(-1);
   }
@@ -90,6 +90,8 @@ int main(int argc, char **argv)
         runDGEMMAMD("../src/DGEMM.AMD.Trial.cl");
     if (__alg == 2)
         runDGEMMNVIDIA("../src/DGEMM.NVIDIA.cl");
+    if (__alg == 3)
+        runDGEMMNVIDIA("../src/DGEMM.NVIDIA.Repro.cl");
 }
 
 int runDGEMM(const char* program_file){
@@ -257,10 +259,10 @@ int runDGEMM(const char* program_file){
     }
 
     // pass or fail
-    if (PassFailFlag)
+    /*if (PassFailFlag)
 	printf("[DGEMM] test results...\tPASSED\n");
     else
-	printf("[DGEMM] test results...\tFAILED\n");
+	printf("[DGEMM] test results...\tFAILED\n");*/
 
     cleanUp(EXIT_SUCCESS);
 }
@@ -430,10 +432,10 @@ int runDGEMMAMD(const char* program_file){
     }
 
     // pass or fail
-    if (PassFailFlag)
+    /*if (PassFailFlag)
 	printf("[DGEMM] test results...\tPASSED\n");
     else
-	printf("[DGEMM] test results...\tFAILED\n");
+	printf("[DGEMM] test results...\tFAILED\n");*/
 
     cleanUp(EXIT_SUCCESS);
 }
@@ -525,7 +527,7 @@ int runDGEMMNVIDIA(const char* program_file){
         }
     {
         printf("Initializing OpenCL DGEMM...\n");
-            ciErrNum = initDGEMMNVIDIA(cxGPUContext, cqCommandQueue, cdDevice, program_file);
+            ciErrNum = initDGEMMNVIDIA(cxGPUContext, cqCommandQueue, cdDevice, program_file, __nbfpe);
             if (ciErrNum != CL_SUCCESS)
                 cleanUp(EXIT_FAILURE);
 
@@ -603,10 +605,10 @@ int runDGEMMNVIDIA(const char* program_file){
     }
 
     // pass or fail
-    if (PassFailFlag)
+    /*if (PassFailFlag)
 	printf("[DGEMM] test results...\tPASSED\n");
     else
-	printf("[DGEMM] test results...\tFAILED\n");
+	printf("[DGEMM] test results...\tFAILED\n");*/
 
     cleanUp(EXIT_SUCCESS);
 }

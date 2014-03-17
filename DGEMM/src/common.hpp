@@ -133,7 +133,8 @@ extern "C" cl_int initDGEMMNVIDIA(
     cl_context cxGPUContext,
     cl_command_queue cqParamCommandQue,
     cl_device_id cdDevice,
-    const char* program_file
+    const char* program_file,
+    uint NbFPE
 );
 
 extern "C" void closeDGEMM(
