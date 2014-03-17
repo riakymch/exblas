@@ -116,7 +116,7 @@ __kernel void matrixMul(
     //data_t sum[2] = {0.0, 0.0};
 
     //for floating-point expansion
-    double a[NBFPE] = {0.0};
+    double a[NBFPE] = {0};
 
     //Loop over all the sub-matrices of A and B
     //required to compute the block sub-matrix

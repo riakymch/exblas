@@ -16,7 +16,7 @@
   #pragma OPENCL EXTENSION cl_nv_pragma_unroll         : enable
 #endif
 
-typedef double data_t;
+typedef double2 data_t;
 
 #define AS(i, j) As[j + i * BLOCK_SIZE]
 #define BS(i, j) Bs[j + i * BLOCK_SIZE]
@@ -58,8 +58,7 @@ __kernel void matrixMul(
     int bStep  = BLOCK_SIZE * uiWB;
 
     //sum is used to store the element of the block sub-matrix that is computed by the thread
-    data_t sum = 0;
-    //data_t sum[2] = {0.0, 0.0};
+    data_t sum = (data_t)(0.0);
 
     //Loop over all the sub-matrices of A and B required to compute the block sub-matrix
     for (int a = aBegin, b = bBegin;

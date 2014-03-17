@@ -91,7 +91,7 @@ int main(int argc, char **argv)
     if (__alg == 2)
         runDGEMMNVIDIA("../src/DGEMM.NVIDIA.cl");
     if (__alg == 3)
-        runDGEMMNVIDIA("../src/DGEMM.NVIDIA.Repro.cl");
+        runDGEMMNVIDIARepro("../src/DGEMM.NVIDIA.Repro.cl");
 }
 
 int runDGEMM(const char* program_file){
@@ -527,7 +527,7 @@ int runDGEMMNVIDIA(const char* program_file){
         }
     {
         printf("Initializing OpenCL DGEMM...\n");
-            ciErrNum = initDGEMMNVIDIA(cxGPUContext, cqCommandQueue, cdDevice, program_file, __nbfpe);
+            ciErrNum = initDGEMMNVIDIA(cxGPUContext, cqCommandQueue, cdDevice, program_file);
             if (ciErrNum != CL_SUCCESS)
                 cleanUp(EXIT_FAILURE);
 
@@ -612,6 +612,180 @@ int runDGEMMNVIDIA(const char* program_file){
 
     cleanUp(EXIT_SUCCESS);
 }
+
+int runDGEMMNVIDIARepro(const char* program_file){
+    cl_int ciErrNum;
+    int PassFailFlag = 1;
+    int nbElements = 0;
+
+    printf("Initializing data...\n");
+        PassFailFlag  = posix_memalign((void **)&A, 64, __nbRowsC * __nbRowsB * sizeof(double));
+        PassFailFlag |= posix_memalign((void **)&B, 64, __nbRowsB * __nbColumnsC * sizeof(double));
+        PassFailFlag |= posix_memalign((void **)&C, 64, __nbRowsC * __nbColumnsC * sizeof(double));
+        if (PassFailFlag != 0) {
+            printf("ERROR: could not allocate memory with posix_memalign!\n");
+            exit(1);
+        }
+	// init data
+        int emax = E_BITS - log2(__nbRowsC * __nbRowsB + __nbRowsB * __nbColumnsC + __nbRowsC * __nbColumnsC);// use log in order to stay within [emin, emax]
+        init_fpuniform(A, __nbRowsC * __nbRowsB, __range, emax);
+        init_fpuniform(B, __nbRowsB * __nbColumnsC, __range, emax);
+        init_fpuniform(C, __nbRowsC * __nbColumnsC, __range, emax);
+
+    printf("Initializing OpenCL...\n");
+        char platform_name[64];
+	char device_name[32];
+#ifdef AMD
+        strcpy(platform_name, "AMD Accelerated Parallel Processing");
+	strcpy(device_name, "Tahiti");
+#else
+        strcpy(platform_name, "NVIDIA CUDA");
+        strcpy(device_name, "Tesla K20c");
+#endif
+        //setenv("CUDA_CACHE_DISABLE", "1", 1);
+        cpPlatform = GetOCLPlatform(platform_name);
+        if (cpPlatform == NULL) {
+            printf("ERROR: Failed to find the platform '%s' ...\n", platform_name);
+            return -1;
+        }
+
+        //Get a GPU device
+        cdDevice = GetOCLDevice(cpPlatform, device_name);
+        if (cdDevice == NULL) {
+            printf("ERROR: Failed to find the device '%s' ...\n", device_name);
+            return -1;
+        }
+
+        //Create the context
+        cxGPUContext = clCreateContext(0, 1, &cdDevice, NULL, NULL, &ciErrNum);
+        if (ciErrNum != CL_SUCCESS) {
+            printf("Error in clCreateContext, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
+            cleanUp(EXIT_FAILURE);
+        }
+
+        //Create a command-queue
+        cqCommandQueue = clCreateCommandQueue(cxGPUContext, cdDevice, CL_QUEUE_PROFILING_ENABLE, &ciErrNum);
+        if (ciErrNum != CL_SUCCESS) {
+            printf("Error in clCreateCommandQueue, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
+            cleanUp(EXIT_FAILURE);
+        }
+
+    printf("Allocating OpenCL memory...\n\n");
+	Matrix d_A;
+	d_A.width = d_A.stride = __nbColumnsC;
+	d_A.height = __nbRowsC;
+	size_t size = d_A.width * d_A.height * sizeof(double);
+	d_A.elements = clCreateBuffer(cxGPUContext, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, size, A, &ciErrNum);
+        if (ciErrNum != CL_SUCCESS) {
+            printf("Error in clCreateBuffer for d_A, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
+            cleanUp(EXIT_FAILURE);
+        }
+	Matrix d_B;
+	d_B.width = d_B.stride = __nbColumnsC;
+	d_B.height = __nbRowsB;
+	size = d_B.width * d_B.height * sizeof(double);
+	d_B.elements = clCreateBuffer(cxGPUContext, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, size, B, &ciErrNum);
+        if (ciErrNum != CL_SUCCESS) {
+            printf("Error in clCreateBuffer for d_B, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
+            cleanUp(EXIT_FAILURE);
+        }
+	Matrix d_C;
+	d_C.width = d_C.stride = __nbColumnsC;
+	d_C.height = __nbRowsC;
+	size = d_C.width * d_C.height * sizeof(double);
+	d_C.elements = clCreateBuffer(cxGPUContext, CL_MEM_WRITE_ONLY, size, NULL, &ciErrNum);
+        if (ciErrNum != CL_SUCCESS) {
+            printf("Error in clCreateBuffer for d_C, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
+            cleanUp(EXIT_FAILURE);
+        }
+    {
+        printf("Initializing OpenCL DGEMM...\n");
+            ciErrNum = initDGEMMNVIDIARepro(cxGPUContext, cqCommandQueue, cdDevice, program_file, __nbfpe);
+            if (ciErrNum != CL_SUCCESS)
+                cleanUp(EXIT_FAILURE);
+
+	nbElements = __nbRowsC * __nbRowsB + __nbRowsB * __nbColumnsC + __nbRowsC * __nbColumnsC;
+        printf("Running OpenCL DGEMM with %u elements...\n\n", nbElements);
+            //Just a single launch or a warmup iteration
+            DGEMMNVIDIARepro(NULL, d_C, d_A, d_B, &ciErrNum);
+            if (ciErrNum != CL_SUCCESS)
+                cleanUp(EXIT_FAILURE);
+
+#ifdef GPU_PROFILING
+	double gpuTime[NUM_ITER];
+        cl_event startMark, endMark;
+
+        for(uint iter = 0; iter < NUM_ITER; iter++) {
+            ciErrNum = clEnqueueMarker(cqCommandQueue, &startMark);
+            ciErrNum |= clFinish(cqCommandQueue);
+            if (ciErrNum != CL_SUCCESS) {
+                printf("Error in clEnqueueMarker, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
+                cleanUp(EXIT_FAILURE);
+            }
+
+            DGEMMNVIDIARepro(NULL, d_C, d_A, d_B, &ciErrNum);
+
+            ciErrNum  = clEnqueueMarker(cqCommandQueue, &endMark);
+            ciErrNum |= clFinish(cqCommandQueue);
+            if (ciErrNum != CL_SUCCESS) {
+                printf("Error in clEnqueueMarker, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
+                cleanUp(EXIT_FAILURE);
+            }
+
+            //Get OpenCL profiler time
+            cl_ulong startTime = 0, endTime = 0;
+            ciErrNum  = clGetEventProfilingInfo(startMark, CL_PROFILING_COMMAND_END, sizeof(cl_ulong), &startTime, NULL);
+            ciErrNum |= clGetEventProfilingInfo(endMark, CL_PROFILING_COMMAND_END, sizeof(cl_ulong), &endTime, NULL);
+            if (ciErrNum != CL_SUCCESS) {
+                printf("Error in clGetEventProfilingInfo Line %u in file %s !!!\n\n", __LINE__, __FILE__);
+                cleanUp(EXIT_FAILURE);
+            }
+            gpuTime[iter] = 1.0e-9 * ((unsigned long)endTime - (unsigned long)startTime); // / (double)NUM_ITER;
+        }
+
+	double minTime = min(gpuTime, NUM_ITER);
+	double perf = nbElements * sizeof(double);
+	perf = (perf / minTime) * 1e-9;
+        printf("Alg = 1 \t Range = %u \t NbElements = %u \t Size = %lu \t Time = %.8f s \t Throughput = %.4f GB/s\n\n", 
+            __range, nbElements, nbElements * sizeof(double), minTime, perf);
+	perf = 2.0 * d_A.width * d_B.width * d_A.height;
+	perf = (perf / minTime) * 1e-9;
+        printf("Alg = 1 \t Range = %u \t NbElements = %u \t Size = %lu \t Time = %.8f s \t Performance = %.4f GFLOPS\n\n", 
+            __range, nbElements, nbElements * sizeof(double), minTime, perf);
+#endif
+
+        printf("Validating DGEMM OpenCL results...\n");
+            printf(" ...reading back OpenCL results\n");
+                ciErrNum = clEnqueueReadBuffer(cqCommandQueue, d_C.elements, CL_TRUE, 0, d_C.width * d_C.height * sizeof(double), C, 0, NULL, NULL);
+                if (ciErrNum != CL_SUCCESS) {
+                    printf("Error in clEnqueueReadBuffer Line %u in file %s !!!\n\n", __LINE__, __FILE__);
+                    cleanUp(EXIT_FAILURE);
+                }
+		//printMatrix(C, __nbRowsC, __nbColumnsC);
+		/*double *C_CPU;
+                C_CPU = (double *) calloc(__nbRowsC * __nbColumnsC, sizeof(double));
+		//Compute C = A * B on CPU
+                matrixMultiplicationCPUReference(C_CPU, A, B, __nbRowsC, __nbRowsB, __nbColumnsC);
+		//Compare the GPU to the CPU results
+		//printf("\n");
+		//printMatrix(C, __nbRowsC, __nbColumnsC);
+		PassFailFlag = compare((const double *) C_CPU, (const double *) C, __nbRowsC * __nbColumnsC, 1e-16);
+		free(C_CPU);*/
+		
+         //Release kernels and program
+         printf("Shutting down...\n\n");
+            closeDGEMMNVIDIARepro();
+    }
+
+    // pass or fail
+    /*if (PassFailFlag)
+	printf("[DGEMM] test results...\tPASSED\n");
+    else
+	printf("[DGEMM] test results...\tFAILED\n");*/
+
+    cleanUp(EXIT_SUCCESS);
+}
+
 int cleanUp (int exitCode) {
     //Release other OpenCL Objects
     if(d_A.elements) 

@@ -28,7 +28,7 @@ static cl_program       cpProgram;            //OpenCL Superaccumulator program
 static cl_kernel        ckMatrixMul;
 static cl_command_queue cqDefaultCommandQue;  //Default command queue for Superaccumulator
 
-static const uint  VECTOR_NUMBER = 1;
+static const uint  VECTOR_NUMBER = 2;
 
 #ifdef AMD
 static char  compileOptions[256] = "-DBLOCK_SIZE=16 -DUSE_KNUTH";
@@ -41,8 +41,7 @@ extern "C" cl_int initDGEMMNVIDIA(
     cl_context cxGPUContext, 
     cl_command_queue cqParamCommandQue, 
     cl_device_id cdDevice,
-    const char* program_file,
-    const uint NbFPE
+    const char* program_file
 ){
     cl_int ciErrNum;
     size_t kernelLength;
@@ -71,7 +70,6 @@ extern "C" cl_int initDGEMMNVIDIA(
         }
 
     printf("...building program\n");
-	sprintf(compileOptions, "%s -DNBFPE=%d", compileOptions, NbFPE);
         ciErrNum = clBuildProgram(cpProgram, 0, NULL, compileOptions, NULL, NULL);
         if (ciErrNum != CL_SUCCESS) {
             //printf("Error in clBuildProgram, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
@@ -126,7 +124,8 @@ extern "C" size_t DGEMMNVIDIA(
         cqCommandQueue = cqDefaultCommandQue;
 
     {
-        size_t NbThreadsPerWorkGroup[] = {BLOCK_SIZE, BLOCK_SIZE / VECTOR_NUMBER};
+        //size_t NbThreadsPerWorkGroup[] = {BLOCK_SIZE, BLOCK_SIZE / VECTOR_NUMBER};
+        size_t NbThreadsPerWorkGroup[] = {BLOCK_SIZE, BLOCK_SIZE};
 	size_t widthC = d_C.width / VECTOR_NUMBER;
 	size_t heightC = d_C.height / VECTOR_NUMBER;
 	size_t TotalNbThreads[] = {widthC, heightC};

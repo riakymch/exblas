@@ -15,7 +15,11 @@
 // OpenCL launcher for bitonic sort kernel
 ////////////////////////////////////////////////////////////////////////////////
 #define DGEMM_KERNEL "mmmKernel_local"
-#define BLOCK_SIZE 16
+#ifdef AMD
+  #define BLOCK_SIZE 16
+#else
+  #define BLOCK_SIZE 32
+#endif
 
 static size_t szKernelLength;	              // Byte size of kernel code
 static char* cSources = NULL;                 // Buffer to hold source for compilation
