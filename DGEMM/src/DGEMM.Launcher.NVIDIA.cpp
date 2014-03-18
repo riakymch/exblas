@@ -31,9 +31,9 @@ static cl_command_queue cqDefaultCommandQue;  //Default command queue for Supera
 static const uint  VECTOR_NUMBER = 2;
 
 #ifdef AMD
-static char  compileOptions[256] = "-DBLOCK_SIZE=16 -DUSE_KNUTH";
+static char  compileOptions[256] = "-DBLOCK_SIZE=16";
 #else
-static char  compileOptions[256] = "-DBLOCK_SIZE=32 -DUSE_KNUTH -DNVIDIA -cl-mad-enable -cl-fast-relaxed-math";
+static char  compileOptions[256] = "-DBLOCK_SIZE=32 -DNVIDIA -cl-mad-enable -cl-fast-relaxed-math";
 #endif
 
 
@@ -125,10 +125,10 @@ extern "C" size_t DGEMMNVIDIA(
 
     {
         size_t NbThreadsPerWorkGroup[] = {BLOCK_SIZE, BLOCK_SIZE / VECTOR_NUMBER};
-	size_t widthC = d_C.width;
-	size_t heightC = d_C.height;
+	size_t widthC = d_C.width / VECTOR_NUMBER;
+	size_t heightC = d_C.height / VECTOR_NUMBER;
 	size_t TotalNbThreads[] = {widthC, heightC};
-	size_t neededLocalMemory = BLOCK_SIZE * BLOCK_SIZE * sizeof(cl_double);
+	size_t neededLocalMemory = (BLOCK_SIZE * VECTOR_NUMBER) * (BLOCK_SIZE * VECTOR_NUMBER) * sizeof(cl_double);
 
 	cl_int i = 0;
         ciErrNum  = clSetKernelArg(ckMatrixMul, i++, sizeof(cl_mem),  (void *)&d_C.elements);

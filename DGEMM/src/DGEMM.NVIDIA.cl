@@ -10,7 +10,6 @@
  */
 
 #pragma OPENCL EXTENSION cl_khr_fp64                   : enable
-#pragma OPENCL EXTENSION cl_khr_int64_base_atomics     : enable  // For 64 atomic operations
 #pragma OPENCL EXTENSION cl_khr_byte_addressable_store : enable
 #ifdef NVIDIA
   #pragma OPENCL EXTENSION cl_nv_pragma_unroll         : enable
@@ -57,16 +56,18 @@ __kernel void matrixMul(
     //Step size used to iterate through the sub-matrices of B
     int bStep  = BLOCK_SIZE * uiWB;
 
-    //sum is used to store the element of the block sub-matrix that is computed by the thread
-    //data_t sum = (data_t)(0.0);
+    //sum is used to store the element of the block sub-matrix
+    //that is computed by the thread
     data_t sum[2] = {0.0, 0.0};
 
-    //Loop over all the sub-matrices of A and B required to compute the block sub-matrix
+    //Loop over all the sub-matrices of A and B
+    //required to compute the block sub-matrix
     for (int a = aBegin, b = bBegin;
              a <= aEnd;
              a += aStep, b += bStep) {
-        //Load the matrices from device memory to shared memory; 
-        //each thread loads one element of each matrix
+        //Load the matrices from device memory
+        //to shared memory; each thread loads
+        //one element of each matrix
         AS(ty, tx) = A[a + uiWA * ty + tx];
         BS(ty, tx) = B[b + uiWB * ty + tx];
         AS(ty + 16, tx) = A[a + uiWA * (ty + 16) + tx];
@@ -76,17 +77,19 @@ __kernel void matrixMul(
         barrier(CLK_LOCAL_MEM_FENCE);
 
         //Multiply the two matrices together;
-        //each thread computes one element of the block sub-matrix        
+        //each thread computes one element
+        //of the block sub-matrix        
         #ifdef NVIDIA
           #pragma unroll
         #endif
         for (int k = 0; k < BLOCK_SIZE; ++k) {
-	    sum[0] = fma(AS(ty, k), BS(k, tx), sum[0]);
-	    sum[1] = fma(AS(ty + 16, k), BS(k, tx), sum[1]);
+	    sum[0] += AS(ty, k) * BS(k, tx);
+	    sum[1] += AS(ty + 16, k) * BS(k, tx);
 	}
 
-        //Synchronize to make sure that the preceding computation is done before 
-        //loading two new sub-matrices of A and B in the next iteration
+        //Synchronize to make sure that the preceding
+        //computation is done before loading two new
+        //sub-matrices of A and B in the next iteration
         barrier(CLK_LOCAL_MEM_FENCE);
     }
 

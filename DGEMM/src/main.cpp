@@ -24,14 +24,14 @@ Matrix            d_A, d_B, d_C;                //OpenCL memory buffer objects
 double            *A, *B, *C;
 
 static uint __nbRowsC    = 0;
-static uint __nbRowsB    = 0;
 static uint __nbColumnsC = 0;
+static uint __nbRowsB    = 0;
 static uint __range      = 0;
 static uint __nbfpe      = 0;
 static uint __alg        = 0;
 
 static void __usage(int argc __attribute__((unused)), char **argv) {
-  fprintf(stderr, "Usage: %s [-m number of rows in A -n number of columns in A -k number of columns in B -r range -e nbfpe -a alg (0-mine, 1-amd, 2-nvidia, 3-repro.nvidia)] \n", argv[0]);
+  fprintf(stderr, "Usage: %s [-m number of rows in C -n number of columns in C -k number of columns in B -r range -e nbfpe -a alg (0-mine, 1-amd, 2-nvidia, 3-repro.nvidia)] \n", argv[0]);
   printf("       -?, -h:    Display this help and exit\n");
 }
 
@@ -42,9 +42,9 @@ static void __parse_args(int argc, char **argv) {
     if ((strcmp(argv[i], "-m") == 0)) {
       __nbRowsC = atoi(argv[++i]);
     }if ((strcmp(argv[i], "-n") == 0)) {
-      __nbRowsB = atoi(argv[++i]);
-    }if ((strcmp(argv[i], "-k") == 0)) {
       __nbColumnsC = atoi(argv[++i]);
+    }if ((strcmp(argv[i], "-k") == 0)) {
+      __nbRowsB = atoi(argv[++i]);
     } if ((strcmp(argv[i], "-r") == 0)) {
       __range = atoi(argv[++i]);
     } if ((strcmp(argv[i], "-e") == 0)) {
@@ -61,7 +61,7 @@ static void __parse_args(int argc, char **argv) {
     }
   }
 
-  if ((__nbRowsC <= 0) || (__nbRowsB <= 0) || (__nbColumnsC <= 0)) {
+  if ((__nbRowsC <= 0) || (__nbColumnsC <= 0) || (__nbRowsB <= 0)) {
     __usage(argc, argv);
     exit(-1);
   }
@@ -153,7 +153,7 @@ int runDGEMM(const char* program_file){
 
     printf("Allocating OpenCL memory...\n\n");
 	Matrix d_A;
-	d_A.width = d_A.stride = __nbColumnsC;
+	d_A.width = d_A.stride = __nbRowsB;
 	d_A.height = __nbRowsC;
 	size_t size = d_A.width * d_A.height * sizeof(double);
 	d_A.elements = clCreateBuffer(cxGPUContext, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, size, A, &ciErrNum);
@@ -326,7 +326,7 @@ int runDGEMMAMD(const char* program_file){
 
     printf("Allocating OpenCL memory...\n\n");
 	Matrix d_A;
-	d_A.width = d_A.stride = __nbColumnsC;
+	d_A.width = d_A.stride = __nbRowsB;
 	d_A.height = __nbRowsC;
 	size_t size = d_A.width * d_A.height * sizeof(double);
 	d_A.elements = clCreateBuffer(cxGPUContext, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, size, A, &ciErrNum);
@@ -499,7 +499,7 @@ int runDGEMMNVIDIA(const char* program_file){
 
     printf("Allocating OpenCL memory...\n\n");
 	Matrix d_A;
-	d_A.width = d_A.stride = __nbColumnsC;
+	d_A.width = d_A.stride = __nbRowsB;
 	d_A.height = __nbRowsC;
 	size_t size = d_A.width * d_A.height * sizeof(double);
 	d_A.elements = clCreateBuffer(cxGPUContext, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, size, A, &ciErrNum);
@@ -672,7 +672,7 @@ int runDGEMMNVIDIARepro(const char* program_file){
 
     printf("Allocating OpenCL memory...\n\n");
 	Matrix d_A;
-	d_A.width = d_A.stride = __nbColumnsC;
+	d_A.width = d_A.stride = __nbRowsB;
 	d_A.height = __nbRowsC;
 	size_t size = d_A.width * d_A.height * sizeof(double);
 	d_A.elements = clCreateBuffer(cxGPUContext, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, size, A, &ciErrNum);
