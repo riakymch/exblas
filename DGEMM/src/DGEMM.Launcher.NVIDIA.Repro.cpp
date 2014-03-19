@@ -115,6 +115,7 @@ extern "C" void closeDGEMMNVIDIARepro(void){
 ////////////////////////////////////////////////////////////////////////////////
 extern "C" size_t DGEMMNVIDIARepro(
     cl_command_queue cqCommandQueue,
+    cl_mem d_Accus,
     Matrix d_C,
     const Matrix d_A,
     const Matrix d_B,
@@ -134,7 +135,8 @@ extern "C" size_t DGEMMNVIDIARepro(
 	size_t neededLocalMemory = (BLOCK_SIZE * VECTOR_NUMBER) * (BLOCK_SIZE * VECTOR_NUMBER) * sizeof(cl_double);
 
 	cl_int i = 0;
-        ciErrNum  = clSetKernelArg(ckMatrixMul, i++, sizeof(cl_mem),  (void *)&d_C.elements);
+        ciErrNum  = clSetKernelArg(ckMatrixMul, i++, sizeof(cl_mem),  (void *)&d_Accus);
+        ciErrNum |= clSetKernelArg(ckMatrixMul, i++, sizeof(cl_mem),  (void *)&d_C.elements);
         ciErrNum |= clSetKernelArg(ckMatrixMul, i++, sizeof(cl_mem),  (void *)&d_A.elements);
         ciErrNum |= clSetKernelArg(ckMatrixMul, i++, sizeof(cl_mem),  (void *)&d_B.elements);
         ciErrNum |= clSetKernelArg(ckMatrixMul, i++, sizeof(cl_int),  (void *)&d_A.width);

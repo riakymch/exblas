@@ -22,6 +22,7 @@ cl_context        cxGPUContext;                 //OpenCL context
 cl_command_queue  cqCommandQueue;               //OpenCL command que
 Matrix            d_A, d_B, d_C;                //OpenCL memory buffer objects
 double            *A, *B, *C;
+bintype           *Accus;
 
 static uint __nbRowsC    = 0;
 static uint __nbColumnsC = 0;
@@ -107,11 +108,11 @@ int runDGEMM(const char* program_file){
             printf("ERROR: could not allocate memory with posix_memalign!\n");
             exit(1);
         }
+        Accus = (bintype *) calloc(__nbRowsC * __nbColumnsC * BIN_COUNT, sizeof(bintype));
 	// init data
         int emax = E_BITS - log2(__nbRowsC * __nbRowsB + __nbRowsB * __nbColumnsC + __nbRowsC * __nbColumnsC);// use log in order to stay within [emin, emax]
         init_fpuniform(A, __nbRowsC * __nbRowsB, __range, emax);
         init_fpuniform(B, __nbRowsB * __nbColumnsC, __range, emax);
-        init_fpuniform(C, __nbRowsC * __nbColumnsC, __range, emax);
 
     printf("Initializing OpenCL...\n");
         char platform_name[64];
@@ -284,7 +285,6 @@ int runDGEMMAMD(const char* program_file){
         int emax = E_BITS - log2(__nbRowsC * __nbRowsB + __nbRowsB * __nbColumnsC + __nbRowsC * __nbColumnsC);// use log in order to stay within [emin, emax]
         init_fpuniform(A, __nbRowsC * __nbRowsB, __range, emax);
         init_fpuniform(B, __nbRowsB * __nbColumnsC, __range, emax);
-        init_fpuniform(C, __nbRowsC * __nbColumnsC, __range, emax);
 
     printf("Initializing OpenCL...\n");
         char platform_name[64];
@@ -457,7 +457,6 @@ int runDGEMMNVIDIA(const char* program_file){
         int emax = E_BITS - log2(__nbRowsC * __nbRowsB + __nbRowsB * __nbColumnsC + __nbRowsC * __nbColumnsC);// use log in order to stay within [emin, emax]
         init_fpuniform(A, __nbRowsC * __nbRowsB, __range, emax);
         init_fpuniform(B, __nbRowsB * __nbColumnsC, __range, emax);
-        init_fpuniform(C, __nbRowsC * __nbColumnsC, __range, emax);
 
     printf("Initializing OpenCL...\n");
         char platform_name[64];
@@ -630,7 +629,6 @@ int runDGEMMNVIDIARepro(const char* program_file){
         int emax = E_BITS - log2(__nbRowsC * __nbRowsB + __nbRowsB * __nbColumnsC + __nbRowsC * __nbColumnsC);// use log in order to stay within [emin, emax]
         init_fpuniform(A, __nbRowsC * __nbRowsB, __range, emax);
         init_fpuniform(B, __nbRowsB * __nbColumnsC, __range, emax);
-        init_fpuniform(C, __nbRowsC * __nbColumnsC, __range, emax);
 
     printf("Initializing OpenCL...\n");
         char platform_name[64];
@@ -698,6 +696,13 @@ int runDGEMMNVIDIARepro(const char* program_file){
             printf("Error in clCreateBuffer for d_C, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
             cleanUp(EXIT_FAILURE);
         }
+	cl_mem d_Accus;
+	size = d_C.width * d_C.height * BIN_COUNT * sizeof(bintype);
+	d_Accus = clCreateBuffer(cxGPUContext, CL_MEM_READ_WRITE, size, Accus, &ciErrNum);
+        if (ciErrNum != CL_SUCCESS) {
+            printf("Error in clCreateBuffer for d_C, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
+            cleanUp(EXIT_FAILURE);
+        }
     {
         printf("Initializing OpenCL DGEMM...\n");
             ciErrNum = initDGEMMNVIDIARepro(cxGPUContext, cqCommandQueue, cdDevice, program_file, __nbfpe);
@@ -707,7 +712,7 @@ int runDGEMMNVIDIARepro(const char* program_file){
 	nbElements = __nbRowsC * __nbRowsB + __nbRowsB * __nbColumnsC + __nbRowsC * __nbColumnsC;
         printf("Running OpenCL DGEMM with %u elements...\n\n", nbElements);
             //Just a single launch or a warmup iteration
-            DGEMMNVIDIARepro(NULL, d_C, d_A, d_B, &ciErrNum);
+            DGEMMNVIDIARepro(NULL, d_Accus, d_C, d_A, d_B, &ciErrNum);
             if (ciErrNum != CL_SUCCESS)
                 cleanUp(EXIT_FAILURE);
 
@@ -723,7 +728,7 @@ int runDGEMMNVIDIARepro(const char* program_file){
                 cleanUp(EXIT_FAILURE);
             }
 
-            DGEMMNVIDIARepro(NULL, d_C, d_A, d_B, &ciErrNum);
+            DGEMMNVIDIARepro(NULL, d_Accus, d_C, d_A, d_B, &ciErrNum);
 
             ciErrNum  = clEnqueueMarker(cqCommandQueue, &endMark);
             ciErrNum |= clFinish(cqCommandQueue);

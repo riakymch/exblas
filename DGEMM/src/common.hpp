@@ -39,7 +39,7 @@
 #define E_BITS 1023
 #define F_BITS (1023 + 52)
 
-typedef long long int bintype;
+typedef cl_long bintype;
 
 typedef struct {
     int width;
@@ -186,6 +186,7 @@ extern "C" size_t DGEMMNVIDIA(
 
 extern "C" size_t DGEMMNVIDIARepro(
     cl_command_queue cqCommandQueue,
+    cl_mem d_Accus,
     Matrix d_mC,
     const Matrix d_mA,
     const Matrix d_mB,

@@ -143,6 +143,7 @@ void Accumulate(__local volatile long *sa, double x) {
 // uiWA is A's width and uiWB is B's width
 ////////////////////////////////////////////////////////////////////////////////
 __kernel void matrixMul(
+    __global long* Accus,
     __global data_t* C,
     __global data_t* A,
     __global data_t* B, 
