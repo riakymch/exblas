@@ -76,6 +76,68 @@ long xadd(__local volatile long *sa, long x, uchar *of) {
 }
 
 
+////////////////////////////////////////////////////////////////////////////////
+// Main computation pass: compute partial accumulators
+////////////////////////////////////////////////////////////////////////////////
+void AccumulateWord(__local volatile long *sa, int i, int lda, long x) {
+  // With atomic accumulator updates
+  // accumulation and carry propagation can happen in any order
+  long carry = x;
+  long carrybit;
+  uchar overflow;
+  long oldword = xadd(&sa[i * lda], x, &overflow);
+
+  // To propagate over- or underflow 
+  while (overflow) {
+    // Carry or borrow
+    // oldword has sign S
+    // x has sign S
+    // accumulator[i] has sign !S (just after update)
+    // carry has sign !S
+    // carrybit has sign S
+    carry = (oldword + carry) >> digits;
+    bool s = oldword > 0;
+    carrybit = (s ? 1l << K : -1l << K);
+
+    // Cancel carry-save bits
+    xadd(&sa[i * lda], (long) -(carry << digits), &overflow);
+    if (TSAFE && (s ^ overflow)) {
+      carrybit *= 2;
+    }
+    carry += carrybit;
+
+    ++i;
+    if (i >= BIN_COUNT) {
+      return;
+    }
+    oldword = xadd(&sa[i * lda], carry, &overflow);
+  }
+}
+
+void Accumulate(__local volatile long *sa, double x) {
+  if (x == 0)
+    return;
+
+  int e;
+  frexp(x, &e);
+  int exp_word = e / digits;  // Word containing MSbit
+  int iup = exp_word + f_words;
+
+  double xscaled = ldexp(x, -digits * exp_word);
+
+  int i;
+  for (i = iup; xscaled != 0; --i) {
+    double xrounded = rint(xscaled);
+    long xint = (long) xrounded;
+ 
+    //AccumulateWord(sa, i, WARP_COUNT, xint);
+
+    xscaled -= xrounded;
+    xscaled *= deltaScale;
+  }
+}
+
+
 ///////////////////////////////////////////////////////////////////////////////
 // Matrix multiplication on the device: C = A * B
 // uiWA is A's width and uiWB is B's width
