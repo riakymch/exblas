@@ -52,8 +52,9 @@ typedef double data_t;
 #endif
 
 double TwoProductFMA(double a, double b, double *d) {
-    double x = a * b;
-    return fma(a, b, -x);
+    double p = a * b;
+    *d = fma(a, b, -p);
+    return p;
 }
 
 // signedcarry in {-1, 0, 1}
@@ -111,12 +112,8 @@ __kernel void matrixMul(
     //Step size used to iterate through the sub-matrices of B
     int bStep  = BLOCK_SIZE * uiWB;
 
-    //sum is used to store the element of the block sub-matrix that is computed by the thread
-    data_t sum = 0;
-    //data_t sum[2] = {0.0, 0.0};
-
     //for floating-point expansion
-    double a[NBFPE] = {0};
+    double sum[NBFPE] = {0};
 
     //Loop over all the sub-matrices of A and B
     //required to compute the block sub-matrix
@@ -127,19 +124,29 @@ __kernel void matrixMul(
         //each thread loads one element of each matrix
         AS(ty, tx) = A[a + uiWA * ty + tx];
         BS(ty, tx) = B[b + uiWB * ty + tx];
-        //AS(ty + 16, tx) = A[a + uiWA * (ty + 16) + tx];
-        //BS(ty + 16, tx) = B[b + uiWB * (ty + 16) + tx];
 	
         //Synchronize to make sure the matrices are loaded
         barrier(CLK_LOCAL_MEM_FENCE);
 
         //Multiply the two matrices together;
-        //each thread computes one element of the block sub-matrix        
+        //each thread computes one element of the block sub-matrix
         #ifdef NVIDIA
           #pragma unroll
         #endif
         for (int k = 0; k < BLOCK_SIZE; ++k) {
-	    sum = fma(AS(ty, k), BS(k, tx), sum);
+	    double r;
+            double x = TwoProductFMA(AS(ty, k), BS(k, tx), &r);
+            #ifdef NVIDIA
+                #pragma unroll
+            #endif
+            for(uint i = 0; i != NBFPE; ++i) {
+                double s;
+                sum[i] = Knuth2Sum(sum[i], x, &s);
+                x = s + r;
+            }
+            if(x != 0.0) {
+	        //Accumulate(l_workingBase, x.x);
+            }
 	}
 
         //Synchronize to make sure that the preceding computation is done before 
@@ -148,8 +155,7 @@ __kernel void matrixMul(
     }
 
     int c = uiWB * BLOCK_SIZE * by + BLOCK_SIZE * bx;
-    //C[get_global_id(1) * get_global_size(0) + get_global_id(0)] = sum;
-    C[c + uiWB * ty + tx] = sum;
-    //C[c + uiWB * (ty + 16) + tx] = sum[1];
+    //TODO: the first non-zero from rigth
+    C[c + uiWB * ty + tx] = sum[0];
 }
 
