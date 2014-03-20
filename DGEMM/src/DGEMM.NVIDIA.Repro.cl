@@ -58,7 +58,7 @@ double TwoProductFMA(double a, double b, double *d) {
 }
 
 // signedcarry in {-1, 0, 1}
-long xadd(__local volatile long *sa, long x, uchar *of) {
+long xadd(__global volatile long *sa, long x, uchar *of) {
     // OF and SF  -> carry=1
     // OF and !SF -> carry=-1
     // !OF        -> carry=0
@@ -79,13 +79,13 @@ long xadd(__local volatile long *sa, long x, uchar *of) {
 ////////////////////////////////////////////////////////////////////////////////
 // Main computation pass: compute partial accumulators
 ////////////////////////////////////////////////////////////////////////////////
-void AccumulateWord(__local volatile long *sa, int i, int lda, long x) {
+void AccumulateWord(__global volatile long *sa, int i, long x) {
   // With atomic accumulator updates
   // accumulation and carry propagation can happen in any order
   long carry = x;
   long carrybit;
   uchar overflow;
-  long oldword = xadd(&sa[i * lda], x, &overflow);
+  long oldword = xadd(&sa[i], x, &overflow);
 
   // To propagate over- or underflow 
   while (overflow) {
@@ -100,7 +100,7 @@ void AccumulateWord(__local volatile long *sa, int i, int lda, long x) {
     carrybit = (s ? 1l << K : -1l << K);
 
     // Cancel carry-save bits
-    xadd(&sa[i * lda], (long) -(carry << digits), &overflow);
+    xadd(&sa[i], (long) -(carry << digits), &overflow);
     if (TSAFE && (s ^ overflow)) {
       carrybit *= 2;
     }
@@ -110,11 +110,11 @@ void AccumulateWord(__local volatile long *sa, int i, int lda, long x) {
     if (i >= BIN_COUNT) {
       return;
     }
-    oldword = xadd(&sa[i * lda], carry, &overflow);
+    oldword = xadd(&sa[i], carry, &overflow);
   }
 }
 
-void Accumulate(__local volatile long *sa, double x) {
+void Accumulate(__global volatile long *sa, double x) {
   if (x == 0)
     return;
 
@@ -130,7 +130,7 @@ void Accumulate(__local volatile long *sa, double x) {
     double xrounded = rint(xscaled);
     long xint = (long) xrounded;
  
-    //AccumulateWord(sa, i, WARP_COUNT, xint);
+    AccumulateWord(sa, i, xint);
 
     xscaled -= xrounded;
     xscaled *= deltaScale;
@@ -175,6 +175,10 @@ __kernel void matrixMul(
     //Step size used to iterate through the sub-matrices of B
     int bStep  = BLOCK_SIZE * uiWB;
 
+    //A superaccumulator that corresponds to a single value in the matrix C
+    int c = uiWB * BLOCK_SIZE * by + BLOCK_SIZE * bx;
+    __global long *g_workingBase = Accus + (c + uiWB * ty + tx);
+
     //for floating-point expansion
     double sum[NBFPE] = {0};
 
@@ -197,18 +201,18 @@ __kernel void matrixMul(
           #pragma unroll
         #endif
         for (int k = 0; k < BLOCK_SIZE; ++k) {
-	    double r;
+	    double r; //residual of multiplication
             double x = TwoProductFMA(AS(ty, k), BS(k, tx), &r);
             #ifdef NVIDIA
                 #pragma unroll
             #endif
             for(uint i = 0; i != NBFPE; ++i) {
-                double s;
+                double s; //residual of addition
                 sum[i] = Knuth2Sum(sum[i], x, &s);
                 x = s + r;
             }
             if(x != 0.0) {
-	        //Accumulate(l_workingBase, x.x);
+	        Accumulate(g_workingBase, x);
             }
 	}
 
@@ -216,8 +220,15 @@ __kernel void matrixMul(
         //loading two new sub-matrices of A and B in the next iteration
         barrier(CLK_LOCAL_MEM_FENCE);
     }
+    //Flush to the accumulator
+#ifdef NVIDIA
+    #pragma unroll
+#endif
+    for(uint i = 0; i != NBFPE; ++i) {
+	Accumulate(g_workingBase, sum[i]);
+    }
 
-    int c = uiWB * BLOCK_SIZE * by + BLOCK_SIZE * bx;
+    //int c = uiWB * BLOCK_SIZE * by + BLOCK_SIZE * bx;
     //TODO: the first non-zero from rigth
     C[c + uiWB * ty + tx] = sum[0];
 }
