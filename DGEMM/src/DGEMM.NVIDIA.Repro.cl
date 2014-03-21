@@ -75,34 +75,45 @@ long xadd(__global volatile long *sa, long x, uchar *of) {
     return y;
 }
 
+double OddRoundSumNonnegative(double th, double tl) {
+    union {
+        double d;
+        long l;
+    } thdb;
+
+    thdb.d = th + tl;
+    // - if the mantissa of th is odd, there is nothing to do
+    // - otherwise, round up as both tl and th are positive
+    // in both cases, this means setting the msb to 1 when tl>0
+    thdb.l |= (tl != 0.0);
+    return thdb.d;
+}
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // Rounding functions
 ////////////////////////////////////////////////////////////////////////////////
-int Normalize() {
-  if (imin > imax) {
-    return false;
+int Normalize(__global volatile long *accumulator, int *imin, int *imax) {
+  if (*imin > *imax) {
+    return 0;
   }
-  overflow_counter = 0;
-  int64_t carry_in = accumulator[imin] >> digits;
-  accumulator[imin] -= carry_in << digits;
+  long carry_in = accumulator[*imin] >> digits;
+  accumulator[*imin] -= carry_in << digits;
   int i;
   // Sign-extend all the way
-  for (i = imin + 1;
-//        (i <= imax || carry_in != 0) && i < f_words + e_words;
-      i < f_words + e_words; ++i) {
+  for (i = *imin + 1; i < BIN_COUNT; ++i) {
 #if 1
-    int64_t carry_out = accumulator[i] >> digits;    // Arithmetic shift
+    long carry_out = accumulator[i] >> digits;    // Arithmetic shift
     accumulator[i] += carry_in - (carry_out << digits);
 #else
     // BUGGY
     // get carry of accumulator[i] + carry_in
     unsigned char overflow;
-    int64_t oldword = xadd(accumulator[i], carry_in, overflow);
-    bool s = oldword > 0;
-    int64_t carrybit = (s ? 1ll << K : -1ll << K);
+    long oldword = xadd(&accumulator[i], carry_in, &overflow);
+    int s = oldword > 0;
+    long carrybit = (s ? 1ll << K : -1ll << K);
 
-    int64_t carry_out = (accumulator[i] >> digits) + carrybit;// Arithmetic shift
+    long carry_out = (accumulator[i] >> digits) + carrybit;// Arithmetic shift
     accumulator[i] -= carry_out << digits;
 #endif
     carry_in = carry_out;
@@ -110,59 +121,57 @@ int Normalize() {
   imax = i - 1;
 
   if (carry_in != 0 && carry_in != -1) {
-    status = Overflow;
+    //TODO: handle overflow
+    //status = Overflow;
   }
   return carry_in < 0;
 }
 
-double Round() {
-  // BUG for negative numbers
-  if (imin > imax) {
-    return 0;
-  }
-  int negative = Normalize();
+double Round(__global volatile long *accumulator) {
+  int imin = 38; 
+  int imax = 0;
+  int negative = Normalize(accumulator, &imin, &imax);
 
-  // Find leading word
+  //Find leading word
   int i;
-  // Skip zeroes
+  //Skip zeroes
   for (i = imax; accumulator[i] == 0 && i >= imin; --i) {
   }
   if (negative) {
-    // Skip ones
+    //Skip ones
     for (; accumulator[i] == ((1ll << digits) - 1) && i >= imin; --i) {
     }
   }
   if (i < 0) {
-    // TODO: should we preserve sign of zero?
+    //TODO: should we preserve sign of zero?
     return 0.;
   }
 
-  int64_t hiword = negative ? (1ll << digits) - accumulator[i] : accumulator[i];
-  double rounded = double(hiword);
+  long hiword = negative ? (1ll << digits) - accumulator[i] : accumulator[i];
+  double rounded = (double) hiword;
   double hi = ldexp(rounded, (i - f_words) * digits);
   if (i == 0) {
     return negative ? -hi : hi;  // Correct rounding achieved
   }
-  hiword -= myllrint(rounded);
-  double mid = ldexp(double(hiword), (i - f_words) * digits);
+  hiword -= (long) rint(rounded);
+  double mid = ldexp((double) hiword, (i - f_words) * digits);
 
-  // Compute sticky
-  int64_t sticky = 0;
+  //Compute sticky
+  long sticky = 0;
   for (int j = imin; j != i - 1; ++j) {
     sticky |= negative ? (1ll << digits) - accumulator[j] : accumulator[j];
   }
 
-  int64_t loword =
-      negative ? (1ll << digits) - accumulator[i - 1] : accumulator[i - 1];
+  long loword = negative ? (1ll << digits) - accumulator[i - 1] : accumulator[i - 1];
   loword |= !!sticky;
-  double lo = ldexp(double(loword), (i - 1 - f_words) * digits);
+  double lo = ldexp((double) loword, (i - 1 - f_words) * digits);
 
-  // Now add3(hi, mid, lo)
-  // No overlap, we have already normalized
+  //Now add3(hi, mid, lo)
+  //No overlap, we have already normalized
   if (mid != 0) {
     lo = OddRoundSumNonnegative(mid, lo);
   }
-  // Final rounding
+  //Final rounding
   hi = hi + lo;
   return negative ? -hi : hi;
 }
