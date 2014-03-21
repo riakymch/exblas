@@ -77,6 +77,98 @@ long xadd(__global volatile long *sa, long x, uchar *of) {
 
 
 ////////////////////////////////////////////////////////////////////////////////
+// Rounding functions
+////////////////////////////////////////////////////////////////////////////////
+int Normalize() {
+  if (imin > imax) {
+    return false;
+  }
+  overflow_counter = 0;
+  int64_t carry_in = accumulator[imin] >> digits;
+  accumulator[imin] -= carry_in << digits;
+  int i;
+  // Sign-extend all the way
+  for (i = imin + 1;
+//        (i <= imax || carry_in != 0) && i < f_words + e_words;
+      i < f_words + e_words; ++i) {
+#if 1
+    int64_t carry_out = accumulator[i] >> digits;    // Arithmetic shift
+    accumulator[i] += carry_in - (carry_out << digits);
+#else
+    // BUGGY
+    // get carry of accumulator[i] + carry_in
+    unsigned char overflow;
+    int64_t oldword = xadd(accumulator[i], carry_in, overflow);
+    bool s = oldword > 0;
+    int64_t carrybit = (s ? 1ll << K : -1ll << K);
+
+    int64_t carry_out = (accumulator[i] >> digits) + carrybit;// Arithmetic shift
+    accumulator[i] -= carry_out << digits;
+#endif
+    carry_in = carry_out;
+  }
+  imax = i - 1;
+
+  if (carry_in != 0 && carry_in != -1) {
+    status = Overflow;
+  }
+  return carry_in < 0;
+}
+
+double Round() {
+  // BUG for negative numbers
+  if (imin > imax) {
+    return 0;
+  }
+  int negative = Normalize();
+
+  // Find leading word
+  int i;
+  // Skip zeroes
+  for (i = imax; accumulator[i] == 0 && i >= imin; --i) {
+  }
+  if (negative) {
+    // Skip ones
+    for (; accumulator[i] == ((1ll << digits) - 1) && i >= imin; --i) {
+    }
+  }
+  if (i < 0) {
+    // TODO: should we preserve sign of zero?
+    return 0.;
+  }
+
+  int64_t hiword = negative ? (1ll << digits) - accumulator[i] : accumulator[i];
+  double rounded = double(hiword);
+  double hi = ldexp(rounded, (i - f_words) * digits);
+  if (i == 0) {
+    return negative ? -hi : hi;  // Correct rounding achieved
+  }
+  hiword -= myllrint(rounded);
+  double mid = ldexp(double(hiword), (i - f_words) * digits);
+
+  // Compute sticky
+  int64_t sticky = 0;
+  for (int j = imin; j != i - 1; ++j) {
+    sticky |= negative ? (1ll << digits) - accumulator[j] : accumulator[j];
+  }
+
+  int64_t loword =
+      negative ? (1ll << digits) - accumulator[i - 1] : accumulator[i - 1];
+  loword |= !!sticky;
+  double lo = ldexp(double(loword), (i - 1 - f_words) * digits);
+
+  // Now add3(hi, mid, lo)
+  // No overlap, we have already normalized
+  if (mid != 0) {
+    lo = OddRoundSumNonnegative(mid, lo);
+  }
+  // Final rounding
+  hi = hi + lo;
+  return negative ? -hi : hi;
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
 // Main computation pass: compute partial accumulators
 ////////////////////////////////////////////////////////////////////////////////
 void AccumulateWord(__global volatile long *sa, int i, long x) {
@@ -136,7 +228,6 @@ void Accumulate(__global volatile long *sa, double x) {
     xscaled *= deltaScale;
   }
 }
-
 
 ///////////////////////////////////////////////////////////////////////////////
 // Matrix multiplication on the device: C = A * B
@@ -227,6 +318,9 @@ __kernel void matrixMul(
     for(uint i = 0; i != NBFPE; ++i) {
 	Accumulate(g_workingBase, sum[i]);
     }
+
+    //TODO: Round the results back
+
 
     //int c = uiWB * BLOCK_SIZE * by + BLOCK_SIZE * bx;
     //TODO: the first non-zero from rigth
