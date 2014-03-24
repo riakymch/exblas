@@ -311,9 +311,9 @@ __kernel void matrixMul(
                 sum[i] = Knuth2Sum(sum[i], x, &s);
                 x = s + r;
             }
-            if(x != 0.0) {
+            /*if(x != 0.0) {
 	        Accumulate(g_workingBase, x);
-            }
+            }*/
 	}
 
         //Synchronize to make sure that the preceding computation is done before 
@@ -324,9 +324,9 @@ __kernel void matrixMul(
 #ifdef NVIDIA
     #pragma unroll
 #endif
-    for(uint i = 0; i != NBFPE; ++i) {
+    /*for(uint i = 0; i != NBFPE; ++i) {
 	Accumulate(g_workingBase, sum[i]);
-    }
+    }*/
 
     //TODO: Round the results back
 
