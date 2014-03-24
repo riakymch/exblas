@@ -27,6 +27,7 @@ static char* cSources = NULL;                 // Buffer to hold source for compi
 static cl_program       cpProgram;            //OpenCL Superaccumulator program
 static cl_kernel        ckMatrixMul;
 static cl_command_queue cqDefaultCommandQue;  //Default command queue for Superaccumulator
+static cl_mem 		d_Accus;
 
 static const uint  VECTOR_NUMBER = 1;
 
@@ -42,7 +43,9 @@ extern "C" cl_int initDGEMMNVIDIARepro(
     cl_command_queue cqParamCommandQue, 
     cl_device_id cdDevice,
     const char* program_file,
-    const uint NbFPE
+    const uint NbFPE,
+    const uint width,
+    const uint height
 ){
     cl_int ciErrNum;
     size_t kernelLength;
@@ -91,6 +94,14 @@ extern "C" cl_int initDGEMMNVIDIARepro(
             return EXIT_FAILURE;
         }
 
+    printf("...allocating memory for a matrix of superaccumualtors\n");
+        size_t size = width * height * BIN_COUNT * sizeof(bintype);
+        d_Accus = clCreateBuffer(cxGPUContext, CL_MEM_READ_WRITE, size, NULL, &ciErrNum);
+        if (ciErrNum != CL_SUCCESS) {
+            printf("Error in clCreateBuffer for d_C, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
+            return EXIT_FAILURE;
+        }
+
     //Save default command queue
     cqDefaultCommandQue = cqParamCommandQue;
 
@@ -115,7 +126,6 @@ extern "C" void closeDGEMMNVIDIARepro(void){
 ////////////////////////////////////////////////////////////////////////////////
 extern "C" size_t DGEMMNVIDIARepro(
     cl_command_queue cqCommandQueue,
-    cl_mem d_Accus,
     Matrix d_C,
     const Matrix d_A,
     const Matrix d_B,

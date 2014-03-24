@@ -12,9 +12,11 @@
 #ifndef COMMON_H
 #define COMMON_H
 
+#include <iostream>
 #include <cmath>
 #include <cstdio>
 #include <cstdlib>
+#include <string>
 #include <string.h>
 
 #include <gmp.h>
@@ -141,7 +143,9 @@ extern "C" cl_int initDGEMMNVIDIARepro(
     cl_command_queue cqParamCommandQue,
     cl_device_id cdDevice,
     const char* program_file,
-    uint NbFPE
+    const uint NbFPE,
+    const uint width,
+    const uint height
 );
 
 extern "C" void closeDGEMM(
@@ -186,7 +190,6 @@ extern "C" size_t DGEMMNVIDIA(
 
 extern "C" size_t DGEMMNVIDIARepro(
     cl_command_queue cqCommandQueue,
-    cl_mem d_Accus,
     Matrix d_mC,
     const Matrix d_mA,
     const Matrix d_mB,
@@ -217,9 +220,7 @@ extern "C" double roundKahan(
 // Executable functions from main.cpp
 ////////////////////////////////////////////////////////////////////////////////
 int runDGEMM(const char*);
-int runDGEMMAMD(const char*);
 int runDGEMMNVIDIA(const char*);
-int runDGEMMNVIDIARepro(const char*);
 int runSuperaccumulator(const char*);
 
 #endif
