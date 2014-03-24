@@ -118,7 +118,7 @@ int Normalize(__global volatile long *accumulator, int *imin, int *imax) {
 #endif
     carry_in = carry_out;
   }
-  imax = i - 1;
+  *imax = i - 1;
 
   if (carry_in != 0 && carry_in != -1) {
     //TODO: handle overflow
@@ -139,7 +139,7 @@ double Round(__global volatile long *accumulator) {
   }
   if (negative) {
     //Skip ones
-    for (; accumulator[i] == ((1ll << digits) - 1) && i >= imin; --i) {
+    for (; accumulator[i] == ((1 << digits) - 1) && i >= imin; --i) {
     }
   }
   if (i < 0) {
@@ -147,7 +147,7 @@ double Round(__global volatile long *accumulator) {
     return 0.;
   }
 
-  long hiword = negative ? (1ll << digits) - accumulator[i] : accumulator[i];
+  long hiword = negative ? (1 << digits) - accumulator[i] : accumulator[i];
   double rounded = (double) hiword;
   double hi = ldexp(rounded, (i - f_words) * digits);
   if (i == 0) {
@@ -159,10 +159,10 @@ double Round(__global volatile long *accumulator) {
   //Compute sticky
   long sticky = 0;
   for (int j = imin; j != i - 1; ++j) {
-    sticky |= negative ? (1ll << digits) - accumulator[j] : accumulator[j];
+    sticky |= negative ? (1 << digits) - accumulator[j] : accumulator[j];
   }
 
-  long loword = negative ? (1ll << digits) - accumulator[i - 1] : accumulator[i - 1];
+  long loword = negative ? (1 << digits) - accumulator[i - 1] : accumulator[i - 1];
   loword |= !!sticky;
   double lo = ldexp((double) loword, (i - 1 - f_words) * digits);
 
