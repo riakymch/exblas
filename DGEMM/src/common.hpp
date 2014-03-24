@@ -220,7 +220,5 @@ extern "C" double roundKahan(
 // Executable functions from main.cpp
 ////////////////////////////////////////////////////////////////////////////////
 int runDGEMM(const char*);
-int runDGEMMNVIDIA(const char*);
-int runSuperaccumulator(const char*);
 
 #endif
