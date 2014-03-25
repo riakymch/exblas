@@ -248,19 +248,22 @@ int runDGEMM(const char* program_file){
 
 	double minTime = min(gpuTime, NUM_ITER);
 	double perf = nbElements * sizeof(double);
-	perf = (perf / minTime) * 1e-9;
-        printf("Alg = 1 \t Range = %u \t NbElements = %u \t Size = %lu \t Time = %.8f s \t Throughput = %.4f GB/s\n\n", 
-            __range, nbElements, nbElements * sizeof(double), minTime, perf);
+	double throughput = (perf / minTime) * 1e-9;
 	perf = 2.0 * d_A.width * d_B.width * d_A.height;
 	perf = (perf / minTime) * 1e-9;
-        if (str.find("NVIDIA.Repro") < str.length())
+        if (str.find("NVIDIA.Repro") < str.length()) {
+            printf("Alg = 3 \t Range = %u \t NbElements = %u \t Size = %lu \t Time = %.8f s \t Throughput = %.4f GB/s\n\n", __range, nbElements, nbElements * sizeof(double), minTime, throughput);
             printf("Alg = 3 \t Range = %u \t NbElements = %u \t Size = %lu \t Time = %.8f s \t Performance = %.4f GFLOPS\n\n", __range, nbElements, nbElements * sizeof(double), minTime, perf);
-        else if (str.find("NVIDIA.Repro") < str.length())
+        } else if (str.find("NVIDIA.Repro") < str.length()) {
+            printf("Alg = 2 \t Range = %u \t NbElements = %u \t Size = %lu \t Time = %.8f s \t Throughput = %.4f GB/s\n\n", __range, nbElements, nbElements * sizeof(double), minTime, throughput);
             printf("Alg = 2 \t Range = %u \t NbElements = %u \t Size = %lu \t Time = %.8f s \t Performance = %.4f GFLOPS\n\n", __range, nbElements, nbElements * sizeof(double), minTime, perf);
-        else if (str.find("AMD") < str.length()) 
+        } else if (str.find("AMD") < str.length()) {
+            printf("Alg = 1 \t Range = %u \t NbElements = %u \t Size = %lu \t Time = %.8f s \t Throughput = %.4f GB/s\n\n", __range, nbElements, nbElements * sizeof(double), minTime, throughput);
             printf("Alg = 1 \t Range = %u \t NbElements = %u \t Size = %lu \t Time = %.8f s \t Performance = %.4f GFLOPS\n\n", __range, nbElements, nbElements * sizeof(double), minTime, perf);
-	else
+	} else {
+            printf("Alg = 0 \t Range = %u \t NbElements = %u \t Size = %lu \t Time = %.8f s \t Throughput = %.4f GB/s\n\n", __range, nbElements, nbElements * sizeof(double), minTime, throughput);
             printf("Alg = 0 \t Range = %u \t NbElements = %u \t Size = %lu \t Time = %.8f s \t Performance = %.4f GFLOPS\n\n", __range, nbElements, nbElements * sizeof(double), minTime, perf);
+	}
 #endif
 
         printf("Validating DGEMM OpenCL results...\n");
