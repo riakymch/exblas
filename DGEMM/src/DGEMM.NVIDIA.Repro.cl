@@ -58,7 +58,7 @@ double TwoProductFMA(double a, double b, double *d) {
 }
 
 // signedcarry in {-1, 0, 1}
-long xadd(__global volatile long *sa, long x, uchar *of) {
+long xadd(__local volatile long *sa, long x, uchar *of) {
     // OF and SF  -> carry=1
     // OF and !SF -> carry=-1
     // !OF        -> carry=0
@@ -93,7 +93,7 @@ double OddRoundSumNonnegative(double th, double tl) {
 ////////////////////////////////////////////////////////////////////////////////
 // Rounding functions
 ////////////////////////////////////////////////////////////////////////////////
-int Normalize(__global volatile long *accumulator, int *imin, int *imax) {
+int Normalize(__local volatile long *accumulator, int *imin, int *imax) {
   if (*imin > *imax) {
     return 0;
   }
@@ -127,7 +127,7 @@ int Normalize(__global volatile long *accumulator, int *imin, int *imax) {
   return carry_in < 0;
 }
 
-double Round(__global volatile long *accumulator) {
+double Round(__local volatile long *accumulator) {
   int imin = 38; 
   int imax = 0;
   int negative = Normalize(accumulator, &imin, &imax);
@@ -180,7 +180,7 @@ double Round(__global volatile long *accumulator) {
 ////////////////////////////////////////////////////////////////////////////////
 // Main computation pass: compute partial accumulators
 ////////////////////////////////////////////////////////////////////////////////
-void AccumulateWord(__global volatile long *sa, int i, long x) {
+void AccumulateWord(__local volatile long *sa, int i, long x) {
   // With atomic accumulator updates
   // accumulation and carry propagation can happen in any order
   long carry = x;
@@ -215,7 +215,7 @@ void AccumulateWord(__global volatile long *sa, int i, long x) {
   }
 }
 
-void Accumulate(__global volatile long *sa, double x) {
+void Accumulate(__local volatile long *sa, double x) {
   if (x == 0)
     return;
 
@@ -277,7 +277,7 @@ __kernel void matrixMul(
 
     //A superaccumulator that corresponds to a single value in the matrix C
     int c = uiWB * BLOCK_SIZE * by + BLOCK_SIZE * bx;
-    //__global long *g_workingBase = Accus + (c + uiWB * ty + tx);
+    __local long *g_workingBase = Accus[(c + uiWB * ty + tx) * BIN_COUNT];
 
     //for floating-point expansion
     double sum[NBFPE] = {0};
@@ -312,9 +312,9 @@ __kernel void matrixMul(
                 x = s + r;
 		r = 0;
             }
-            /*if(x != 0.0) {
+            if(x != 0.0) {
 	        Accumulate(g_workingBase, x);
-            }*/
+            }
 	}
 
         //Synchronize to make sure that the preceding computation is done before 
@@ -325,9 +325,9 @@ __kernel void matrixMul(
 #ifdef NVIDIA
     #pragma unroll
 #endif
-    /*for(uint i = 0; i != NBFPE; ++i) {
+    for(uint i = 0; i != NBFPE; ++i) {
 	Accumulate(g_workingBase, sum[i]);
-    }*/
+    }
 
     //TODO: Round the results back
 
