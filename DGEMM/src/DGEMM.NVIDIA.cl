@@ -18,13 +18,6 @@
 
 typedef double data_t;
 
-#define BIN_COUNT      39
-#define K              8                    // High-radix carry-save bits
-#define digits         56
-#define deltaScale     72057594037927936.0  // Assumes K>0
-#define f_words        20 
-#define TSAFE          0
-
 #define AS(i, j) As[j + i * BLOCK_SIZE]
 #define BS(i, j) Bs[j + i * BLOCK_SIZE]
 
@@ -67,7 +60,6 @@ __kernel void matrixMul(
 
     //sum is used to store the element of the block sub-matrix that is computed by the thread
     data_t sum = 0;
-    //data_t sum[2] = {0.0, 0.0};
 
     //Loop over all the sub-matrices of A and B
     //required to compute the block sub-matrix
@@ -78,8 +70,6 @@ __kernel void matrixMul(
         //each thread loads one element of each matrix
         AS(ty, tx) = A[a + uiWA * ty + tx];
         BS(ty, tx) = B[b + uiWB * ty + tx];
-        //AS(ty + 16, tx) = A[a + uiWA * (ty + 16) + tx];
-        //BS(ty + 16, tx) = B[b + uiWB * (ty + 16) + tx];
 	
         //Synchronize to make sure the matrices are loaded
         barrier(CLK_LOCAL_MEM_FENCE);
@@ -101,6 +91,5 @@ __kernel void matrixMul(
     int c = uiWB * BLOCK_SIZE * by + BLOCK_SIZE * bx;
     //C[get_global_id(1) * get_global_size(0) + get_global_id(0)] = sum;
     C[c + uiWB * ty + tx] = sum;
-    //C[c + uiWB * (ty + 16) + tx] = sum[1];
 }
 
