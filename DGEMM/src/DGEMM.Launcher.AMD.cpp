@@ -31,9 +31,9 @@ static cl_command_queue cqDefaultCommandQue;  //Default command queue for Supera
 static const uint  VECTOR_NUMBER = 2;
 
 #ifdef AMD
-static char  compileOptions[256] = "";
+static char  compileOptions[256] = "-DBLOCK_SIZE=16";
 #else
-static char  compileOptions[256] = "-DNVIDIA -cl-mad-enable -cl-fast-relaxed-math";
+static char  compileOptions[256] = "-DBLOCK_SIZE=32 -DNVIDIA -cl-mad-enable -cl-fast-relaxed-math";
 #endif
 
 

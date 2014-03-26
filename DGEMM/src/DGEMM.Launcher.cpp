@@ -16,7 +16,11 @@
 ////////////////////////////////////////////////////////////////////////////////
 #define DGEMM_KERNEL "matrixMulKernel"
 //#define DGEMM_KERNEL "matrixMulKernelSimple"
-#define BLOCK_SIZE 16
+#ifdef AMD
+  #define BLOCK_SIZE 16
+#else
+  #define BLOCK_SIZE 32
+#endif
 
 static size_t szKernelLength;	              // Byte size of kernel code
 static char* cSources = NULL;                 // Buffer to hold source for compilation
@@ -28,9 +32,9 @@ static cl_command_queue cqDefaultCommandQue;  //Default command queue for Supera
 static const uint  VECTOR_NUMBER = 1;
 
 #ifdef AMD
-static char  compileOptions[256] = "";
+static char  compileOptions[256] = "-DBLOCK_SIZE=16";
 #else
-static char  compileOptions[256] = "-DNVIDIA -cl-mad-enable -cl-fast-relaxed-math";
+static char  compileOptions[256] = "-DBLOCK_SIZE=32 -DNVIDIA -cl-mad-enable -cl-fast-relaxed-math";
 #endif
 
 

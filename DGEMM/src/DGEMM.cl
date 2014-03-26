@@ -8,9 +8,6 @@
 //Data type used for input data fetches
 typedef double data_t;
 
-//Thread block size
-#define BLOCK_SIZE 16
-
 __kernel void matrixMulKernel (
     __global data_t* C,
     __global data_t* A,
