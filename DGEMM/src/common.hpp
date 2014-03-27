@@ -12,11 +12,9 @@
 #ifndef COMMON_H
 #define COMMON_H
 
-#include <iostream>
 #include <cmath>
 #include <cstdio>
 #include <cstdlib>
-#include <string>
 #include <string.h>
 
 #include <gmp.h>

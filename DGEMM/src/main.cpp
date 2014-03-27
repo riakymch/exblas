@@ -181,17 +181,16 @@ int runDGEMM(const char* program_file){
         }
     {
         printf("Initializing OpenCL DGEMM...\n");
-	    std::string str(program_file);
-            if (str.find("NVIDIA.Repro.Private") < str.length())
-                ciErrNum = initDGEMMNVIDIAReproPrivate(cxGPUContext, cqCommandQueue, cdDevice, program_file, __nbfpe, __nbColumnsC, __nbRowsC);
-            else if (str.find("NVIDIA.Repro") < str.length())
-                ciErrNum = initDGEMMNVIDIARepro(cxGPUContext, cqCommandQueue, cdDevice, program_file, __nbfpe, __nbColumnsC, __nbRowsC);
-            else if (str.find("NVIDIA") < str.length())
-                ciErrNum = initDGEMMNVIDIA(cxGPUContext, cqCommandQueue, cdDevice, program_file);
-            else if (str.find("AMD") < str.length()) 
-                ciErrNum = initDGEMMAMD(cxGPUContext, cqCommandQueue, cdDevice, program_file);
-	    else
+	    if (__alg == 0)
                 ciErrNum = initDGEMM(cxGPUContext, cqCommandQueue, cdDevice, program_file);
+            else if (__alg == 1)
+                ciErrNum = initDGEMMAMD(cxGPUContext, cqCommandQueue, cdDevice, program_file);
+            else if (__alg == 2)
+                ciErrNum = initDGEMMNVIDIA(cxGPUContext, cqCommandQueue, cdDevice, program_file);
+            else if (__alg == 3)
+                ciErrNum = initDGEMMNVIDIARepro(cxGPUContext, cqCommandQueue, cdDevice, program_file, __nbfpe, __nbColumnsC, __nbRowsC);
+            else if (__alg == 4)
+                ciErrNum = initDGEMMNVIDIAReproPrivate(cxGPUContext, cqCommandQueue, cdDevice, program_file, __nbfpe, __nbColumnsC, __nbRowsC);
             
             if (ciErrNum != CL_SUCCESS)
                 cleanUp(EXIT_FAILURE);
@@ -199,16 +198,16 @@ int runDGEMM(const char* program_file){
 	nbElements = __nbRowsC * __nbRowsB + __nbRowsB * __nbColumnsC + __nbRowsC * __nbColumnsC;
         printf("Running OpenCL DGEMM with %u elements...\n\n", nbElements);
             //Just a single launch or a warmup iteration
-            if (str.find("NVIDIA.Repro.Private") < str.length())
-                DGEMMNVIDIAReproPrivate(NULL, d_C, d_A, d_B, &ciErrNum);
-            else if (str.find("NVIDIA.Repro") < str.length())
-                DGEMMNVIDIARepro(NULL, d_C, d_A, d_B, &ciErrNum);
-            else if (str.find("NVIDIA") < str.length())
-                DGEMMNVIDIA(NULL, d_C, d_A, d_B, &ciErrNum);
-            else if (str.find("AMD") < str.length()) 
-                DGEMMAMD(NULL, d_C, d_A, d_B, &ciErrNum);
-	    else
+            if (__alg == 0)
                 DGEMM(NULL, d_C, d_A, d_B, &ciErrNum);
+            else if (__alg == 1)
+                DGEMMAMD(NULL, d_C, d_A, d_B, &ciErrNum);
+            else if (__alg == 2)
+                DGEMMNVIDIA(NULL, d_C, d_A, d_B, &ciErrNum);
+            else if (__alg == 3)
+                DGEMMNVIDIARepro(NULL, d_C, d_A, d_B, &ciErrNum);
+            else if (__alg == 4)
+                DGEMMNVIDIAReproPrivate(NULL, d_C, d_A, d_B, &ciErrNum);
 
             if (ciErrNum != CL_SUCCESS)
                 cleanUp(EXIT_FAILURE);
@@ -225,16 +224,16 @@ int runDGEMM(const char* program_file){
                 cleanUp(EXIT_FAILURE);
             }
 
-            if (str.find("NVIDIA.Repro.Private") < str.length())
-                DGEMMNVIDIAReproPrivate(NULL, d_C, d_A, d_B, &ciErrNum);
-            else if (str.find("NVIDIA.Repro") < str.length())
-                DGEMMNVIDIARepro(NULL, d_C, d_A, d_B, &ciErrNum);
-            else if (str.find("NVIDIA") < str.length())
-                DGEMMNVIDIA(NULL, d_C, d_A, d_B, &ciErrNum);
-            else if (str.find("AMD") < str.length()) 
-                DGEMMAMD(NULL, d_C, d_A, d_B, &ciErrNum);
-	    else
+            if (__alg == 0)
                 DGEMM(NULL, d_C, d_A, d_B, &ciErrNum);
+            else if (__alg == 1)
+                DGEMMAMD(NULL, d_C, d_A, d_B, &ciErrNum);
+            else if (__alg == 2)
+                DGEMMNVIDIA(NULL, d_C, d_A, d_B, &ciErrNum);
+            else if (__alg == 3)
+                DGEMMNVIDIARepro(NULL, d_C, d_A, d_B, &ciErrNum);
+            else if (__alg == 4)
+                DGEMMNVIDIAReproPrivate(NULL, d_C, d_A, d_B, &ciErrNum);
 
             ciErrNum  = clEnqueueMarker(cqCommandQueue, &endMark);
             ciErrNum |= clFinish(cqCommandQueue);
@@ -259,19 +258,8 @@ int runDGEMM(const char* program_file){
 	double throughput = (perf / minTime) * 1e-9;
 	perf = 2.0 * d_A.width * d_B.width * d_A.height;
 	perf = (perf / minTime) * 1e-9;
-        if (str.find("NVIDIA.Repro") < str.length()) {
-            printf("Alg = 3 \t Range = %u \t NbElements = %u \t Size = %lu \t Time = %.8f s \t Throughput = %.4f GB/s\n\n", __range, nbElements, nbElements * sizeof(double), minTime, throughput);
-            printf("Alg = 3 \t Range = %u \t NbElements = %u \t Size = %lu \t Time = %.8f s \t Performance = %.4f GFLOPS\n\n", __range, nbElements, nbElements * sizeof(double), minTime, perf);
-        } else if (str.find("NVIDIA.Repro") < str.length()) {
-            printf("Alg = 2 \t Range = %u \t NbElements = %u \t Size = %lu \t Time = %.8f s \t Throughput = %.4f GB/s\n\n", __range, nbElements, nbElements * sizeof(double), minTime, throughput);
-            printf("Alg = 2 \t Range = %u \t NbElements = %u \t Size = %lu \t Time = %.8f s \t Performance = %.4f GFLOPS\n\n", __range, nbElements, nbElements * sizeof(double), minTime, perf);
-        } else if (str.find("AMD") < str.length()) {
-            printf("Alg = 1 \t Range = %u \t NbElements = %u \t Size = %lu \t Time = %.8f s \t Throughput = %.4f GB/s\n\n", __range, nbElements, nbElements * sizeof(double), minTime, throughput);
-            printf("Alg = 1 \t Range = %u \t NbElements = %u \t Size = %lu \t Time = %.8f s \t Performance = %.4f GFLOPS\n\n", __range, nbElements, nbElements * sizeof(double), minTime, perf);
-	} else {
-            printf("Alg = 0 \t Range = %u \t NbElements = %u \t Size = %lu \t Time = %.8f s \t Throughput = %.4f GB/s\n\n", __range, nbElements, nbElements * sizeof(double), minTime, throughput);
-            printf("Alg = 0 \t Range = %u \t NbElements = %u \t Size = %lu \t Time = %.8f s \t Performance = %.4f GFLOPS\n\n", __range, nbElements, nbElements * sizeof(double), minTime, perf);
-	}
+        printf("Alg = %u \t Range = %u \t NbElements = %u \t Size = %lu \t Time = %.8f s \t Throughput = %.4f GB/s\n\n", __alg, __range, nbElements, nbElements * sizeof(double), minTime, throughput);
+        printf("Alg = %u \t Range = %u \t NbElements = %u \t Size = %lu \t Time = %.8f s \t Performance = %.4f GFLOPS\n\n", __alg, __range, nbElements, nbElements * sizeof(double), minTime, perf);
 #endif
 
         printf("Validating DGEMM OpenCL results...\n");
@@ -294,16 +282,16 @@ int runDGEMM(const char* program_file){
 		
          //Release kernels and program
          printf("Shutting down...\n\n");
-            if (str.find("NVIDIA.Repro.Private") < str.length())
-                closeDGEMMNVIDIAReproPrivate();
-            else if (str.find("NVIDIA.Repro") < str.length())
-                closeDGEMMNVIDIARepro();
-            else if (str.find("NVIDIA") < str.length())
-                closeDGEMMNVIDIA();
-            else if (str.find("AMD") < str.length()) 
-                closeDGEMMAMD();
-	    else
+            if (__alg == 0)
 		closeDGEMM();
+            else if (__alg == 1)
+                closeDGEMMAMD();
+            else if (__alg == 2)
+                closeDGEMMNVIDIA();
+            else if (__alg == 3)
+                closeDGEMMNVIDIARepro();
+            else if (__alg == 4)
+                closeDGEMMNVIDIAReproPrivate();
     }
 
     // pass or fail
