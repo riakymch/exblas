@@ -59,7 +59,7 @@ __kernel void matrixMul(
     int bStep  = BLOCK_SIZE * uiWB;
 
     //sum is used to store the element of the block sub-matrix that is computed by the thread
-    data_t sum = 0;
+    data_t sum = 0.0;
 
     //Loop over all the sub-matrices of A and B
     //required to compute the block sub-matrix

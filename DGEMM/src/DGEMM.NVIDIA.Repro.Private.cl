@@ -58,18 +58,18 @@ double TwoProductFMA(double a, double b, double *d) {
 }
 
 // signedcarry in {-1, 0, 1}
-long xadd(__local volatile long *sa, long x, uchar *of) {
+long xadd(volatile long *sa, long x, uchar *of) {
     // OF and SF  -> carry=1
     // OF and !SF -> carry=-1
     // !OF        -> carry=0
-    long y = atom_add(sa, x);
-    long z = y + x; // since the value sa->accumulator[i] can be changed by another work item
+    long y = *sa;
+    *sa = *sa + x;
 
     // TODO: cover also underflow
     *of = 0;
-    if(x > 0 && y > 0 && z < 0)
+    if(x > 0 && y > 0 && *sa < 0)
         *of = 1;
-    if(x < 0 && y < 0 && z > 0)
+    if(x < 0 && y < 0 && *sa > 0)
         *of = 1;
 
     return y;
@@ -93,7 +93,7 @@ double OddRoundSumNonnegative(double th, double tl) {
 ////////////////////////////////////////////////////////////////////////////////
 // Rounding functions
 ////////////////////////////////////////////////////////////////////////////////
-int Normalize(__local volatile long *accumulator, int *imin, int *imax) {
+int Normalize(long *accumulator, int *imin, int *imax) {
   if (*imin > *imax) {
     return 0;
   }
@@ -127,7 +127,7 @@ int Normalize(__local volatile long *accumulator, int *imin, int *imax) {
   return carry_in < 0;
 }
 
-double Round(__local volatile long *accumulator) {
+double Round(long *accumulator) {
   int imin = 38; 
   int imax = 0;
   int negative = Normalize(accumulator, &imin, &imax);
@@ -180,7 +180,7 @@ double Round(__local volatile long *accumulator) {
 ////////////////////////////////////////////////////////////////////////////////
 // Main computation pass: compute partial accumulators
 ////////////////////////////////////////////////////////////////////////////////
-void AccumulateWord(__local volatile long *sa, int i, long x) {
+void AccumulateWord(long *sa, int i, long x) {
   // With atomic accumulator updates
   // accumulation and carry propagation can happen in any order
   long carry = x;
@@ -215,7 +215,7 @@ void AccumulateWord(__local volatile long *sa, int i, long x) {
   }
 }
 
-void Accumulate(__local volatile long *sa, double x) {
+void Accumulate(long *sa, double x) {
   if (x == 0)
     return;
 
@@ -243,7 +243,6 @@ void Accumulate(__local volatile long *sa, double x) {
 // uiWA is A's width and uiWB is B's width
 ////////////////////////////////////////////////////////////////////////////////
 __kernel void matrixMul(
-    __global long* Accus,
     __global data_t* C,
     __global data_t* A,
     __global data_t* B, 
@@ -276,8 +275,7 @@ __kernel void matrixMul(
     int bStep  = BLOCK_SIZE * uiWB;
 
     //A superaccumulator that corresponds to a single value in the matrix C
-    int c = uiWB * BLOCK_SIZE * by + BLOCK_SIZE * bx;
-    __local long *g_workingBase = Accus[(c + uiWB * ty + tx) * BIN_COUNT];
+    long p_workingBase[BIN_COUNT] = {0};
 
     //for floating-point expansion
     double sum[NBFPE] = {0.0};
@@ -313,7 +311,7 @@ __kernel void matrixMul(
 		r = 0;
             }
             if(x != 0.0) {
-	        Accumulate(g_workingBase, x);
+	        Accumulate(p_workingBase, x);
             }
 	}
 
@@ -326,7 +324,7 @@ __kernel void matrixMul(
     #pragma unroll
 #endif
     for(uint i = 0; i != NBFPE; ++i) {
-	Accumulate(g_workingBase, sum[i]);
+	Accumulate(p_workingBase, sum[i]);
     }
 
     //TODO: Round the results back
@@ -334,6 +332,7 @@ __kernel void matrixMul(
 
     //int c = uiWB * BLOCK_SIZE * by + BLOCK_SIZE * bx;
     //TODO: the first non-zero from rigth
+    int c = uiWB * BLOCK_SIZE * by + BLOCK_SIZE * bx;
     C[c + uiWB * ty + tx] = sum[0];
 }
 

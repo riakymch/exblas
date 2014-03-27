@@ -31,7 +31,7 @@ static uint __nbfpe      = 0;
 static uint __alg        = 0;
 
 static void __usage(int argc __attribute__((unused)), char **argv) {
-  fprintf(stderr, "Usage: %s [-m number of rows in C -n number of columns in C -k number of columns in B -r range -e nbfpe -a alg (0-mine, 1-amd, 2-nvidia, 3-repro.nvidia)] \n", argv[0]);
+  fprintf(stderr, "Usage: %s [-m number of rows in C -n number of columns in C -k number of columns in B -r range -e nbfpe -a alg (0-mine, 1-amd, 2-nvidia, 3-repro.nvidia 4-repro.nvidia.private)] \n", argv[0]);
   printf("       -?, -h:    Display this help and exit\n");
 }
 
@@ -65,7 +65,7 @@ static void __parse_args(int argc, char **argv) {
     __usage(argc, argv);
     exit(-1);
   }
-  if (__alg > 3) {
+  if (__alg > 4) {
     __usage(argc, argv);
     exit(-1);
   }
@@ -91,6 +91,8 @@ int main(int argc, char **argv)
         runDGEMM("../src/DGEMM.NVIDIA.cl");
     if (__alg == 3)
         runDGEMM("../src/DGEMM.NVIDIA.Repro.cl");
+    if (__alg == 4)
+        runDGEMM("../src/DGEMM.NVIDIA.Repro.Private.cl");
 }
 
 int runDGEMM(const char* program_file){
@@ -180,7 +182,9 @@ int runDGEMM(const char* program_file){
     {
         printf("Initializing OpenCL DGEMM...\n");
 	    std::string str(program_file);
-            if (str.find("NVIDIA.Repro") < str.length())
+            if (str.find("NVIDIA.Repro.Private") < str.length())
+                ciErrNum = initDGEMMNVIDIAReproPrivate(cxGPUContext, cqCommandQueue, cdDevice, program_file, __nbfpe, __nbColumnsC, __nbRowsC);
+            else if (str.find("NVIDIA.Repro") < str.length())
                 ciErrNum = initDGEMMNVIDIARepro(cxGPUContext, cqCommandQueue, cdDevice, program_file, __nbfpe, __nbColumnsC, __nbRowsC);
             else if (str.find("NVIDIA") < str.length())
                 ciErrNum = initDGEMMNVIDIA(cxGPUContext, cqCommandQueue, cdDevice, program_file);
@@ -195,7 +199,9 @@ int runDGEMM(const char* program_file){
 	nbElements = __nbRowsC * __nbRowsB + __nbRowsB * __nbColumnsC + __nbRowsC * __nbColumnsC;
         printf("Running OpenCL DGEMM with %u elements...\n\n", nbElements);
             //Just a single launch or a warmup iteration
-            if (str.find("NVIDIA.Repro") < str.length())
+            if (str.find("NVIDIA.Repro.Private") < str.length())
+                DGEMMNVIDIAReproPrivate(NULL, d_C, d_A, d_B, &ciErrNum);
+            else if (str.find("NVIDIA.Repro") < str.length())
                 DGEMMNVIDIARepro(NULL, d_C, d_A, d_B, &ciErrNum);
             else if (str.find("NVIDIA") < str.length())
                 DGEMMNVIDIA(NULL, d_C, d_A, d_B, &ciErrNum);
@@ -219,7 +225,9 @@ int runDGEMM(const char* program_file){
                 cleanUp(EXIT_FAILURE);
             }
 
-            if (str.find("NVIDIA.Repro") < str.length())
+            if (str.find("NVIDIA.Repro.Private") < str.length())
+                DGEMMNVIDIAReproPrivate(NULL, d_C, d_A, d_B, &ciErrNum);
+            else if (str.find("NVIDIA.Repro") < str.length())
                 DGEMMNVIDIARepro(NULL, d_C, d_A, d_B, &ciErrNum);
             else if (str.find("NVIDIA") < str.length())
                 DGEMMNVIDIA(NULL, d_C, d_A, d_B, &ciErrNum);
@@ -286,7 +294,9 @@ int runDGEMM(const char* program_file){
 		
          //Release kernels and program
          printf("Shutting down...\n\n");
-            if (str.find("NVIDIA.Repro") < str.length())
+            if (str.find("NVIDIA.Repro.Private") < str.length())
+                closeDGEMMNVIDIAReproPrivate();
+            else if (str.find("NVIDIA.Repro") < str.length())
                 closeDGEMMNVIDIARepro();
             else if (str.find("NVIDIA") < str.length())
                 closeDGEMMNVIDIA();

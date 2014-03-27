@@ -44,8 +44,8 @@ __kernel void mmmKernel_local(
     int globalPos =  get_global_id(0) + (get_global_id(1) << TILEY_SHIFT) * get_global_size(0);
 
     //Each thread writes 2 data_t
-    data_t sum0 = (data_t)(0);
-    data_t sum1 = (data_t)(0);
+    data_t sum0 = (data_t)(0.0);
+    data_t sum1 = (data_t)(0.0);
 
     int temp = widthA / 2;
     //This loop runs for number of blocks of A in horizontal direction 

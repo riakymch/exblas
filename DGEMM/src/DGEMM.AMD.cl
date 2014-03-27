@@ -46,10 +46,10 @@ __kernel void mmmKernel_local(
     int globalPos =  get_global_id(0) + (get_global_id(1) << TILEY_SHIFT) * get_global_size(0);
 
     /* Each thread writes 4 data_ts */
-    data_t sum0 = (data_t)(0);
-    data_t sum1 = (data_t)(0);
-    data_t sum2 = (data_t)(0);
-    data_t sum3 = (data_t)(0);
+    data_t sum0 = (data_t)(0.0);
+    data_t sum1 = (data_t)(0.0);
+    data_t sum2 = (data_t)(0.0);
+    data_t sum3 = (data_t)(0.0);
 
     int temp = widthA / 4;
 
@@ -131,10 +131,10 @@ __kernel void mmmKernel(
 ) {
     int2 pos = (int2)(get_global_id(0), get_global_id(1));
 
-    data_t sum0 = (data_t)(0);
-    data_t sum1 = (data_t)(0);
-    data_t sum2 = (data_t)(0);
-    data_t sum3 = (data_t)(0);
+    data_t sum0 = (data_t)(0.0);
+    data_t sum1 = (data_t)(0.0);
+    data_t sum2 = (data_t)(0.0);
+    data_t sum3 = (data_t)(0.0);
 
     /* Vectorization of input Matrices reduces their width by a factor of 4 */
     widthB /= 4;
