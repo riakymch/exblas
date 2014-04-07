@@ -86,6 +86,7 @@ int main(int argc, char **argv)
     if (__alg == 0)
         runDGEMM("../src/DGEMM.cl");
     if (__alg == 1)
+        //runDGEMM("../src/DGEMM.AMD.cl");
         runDGEMM("../src/DGEMM.AMD.Trial.cl");
     if (__alg == 2)
         runDGEMM("../src/DGEMM.NVIDIA.cl");
@@ -270,7 +271,7 @@ int runDGEMM(const char* program_file){
                     cleanUp(EXIT_FAILURE);
                 }
 		//printMatrix(C, __nbRowsC, __nbColumnsC);
-		/*double *C_CPU;
+		double *C_CPU;
                 C_CPU = (double *) calloc(__nbRowsC * __nbColumnsC, sizeof(double));
 		//Compute C = A * B on CPU
                 matrixMultiplicationCPUReference(C_CPU, A, B, __nbRowsC, __nbRowsB, __nbColumnsC);
@@ -278,7 +279,7 @@ int runDGEMM(const char* program_file){
 		//printf("\n");
 		//printMatrix(C, __nbRowsC, __nbColumnsC);
 		PassFailFlag = compare((const double *) C_CPU, (const double *) C, __nbRowsC * __nbColumnsC, 1e-16);
-		free(C_CPU);*/
+		free(C_CPU);
 		
          //Release kernels and program
          printf("Shutting down...\n\n");
@@ -295,10 +296,10 @@ int runDGEMM(const char* program_file){
     }
 
     // pass or fail
-    /*if (PassFailFlag)
+    if (PassFailFlag)
 	printf("[DGEMM] test results...\tPASSED\n");
     else
-	printf("[DGEMM] test results...\tFAILED\n");*/
+	printf("[DGEMM] test results...\tFAILED\n");
 
     cleanUp(EXIT_SUCCESS);
 }
