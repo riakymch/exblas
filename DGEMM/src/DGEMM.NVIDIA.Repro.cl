@@ -32,24 +32,12 @@ typedef double data_t;
 ////////////////////////////////////////////////////////////////////////////////
 // Auxiliary functions
 ////////////////////////////////////////////////////////////////////////////////
-#ifdef USE_KNUTH
-    double Knuth2Sum(double a, double b, double *s) {
-        double r = a + b;
-        double z = r - a;
-        *s = (a - (r - z)) + (b - z);
-        return r;
-    }
-#else
-    //twosum
-    double Knuth2Sum(double a, double b, double *s) {
-        double r = a + b;
-        int doswap = fabs(b) > fabs(a);
-        double a2 = doswap ? b : a;
-        double b2 = doswap ? a : b;
-        *s = (a2 - r) + b2;
-        return r;
-    }
-#endif
+double Knuth2Sum(double a, double b, double *s) {
+    double r = a + b;
+    double z = r - a;
+    *s = (a - (r - z)) + (b - z);
+    return r;
+}
 
 double TwoProductFMA(double a, double b, double *d) {
     double p = a * b;
@@ -309,12 +297,13 @@ __kernel void matrixMul(
             for(uint i = 0; i != NBFPE; ++i) {
                 double s; //residual of addition
                 sum[i] = Knuth2Sum(sum[i], x, &s);
-                x = s + r;
-		r = 0;
+		x = s;
+                //x = s + r;
+		//r = 0.0;
             }
-            //if(x != 0.0) {
-	    //    Accumulate(g_workingBase, x);
-            //}
+            if(x != 0.0) {
+	        Accumulate(g_workingBase, x);
+            }
 	}
 
         //Synchronize to make sure that the preceding computation is done before 

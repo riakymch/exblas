@@ -32,9 +32,9 @@ static cl_mem 		d_Accus;
 static const uint  VECTOR_NUMBER = 1;
 
 #ifdef AMD
-static char  compileOptions[256] = "-DBLOCK_SIZE=16 -DUSE_KNUTH";
+static char  compileOptions[256] = "-DBLOCK_SIZE=16";
 #else
-static char  compileOptions[256] = "-DBLOCK_SIZE=32 -DUSE_KNUTH -DNVIDIA -cl-mad-enable -cl-fast-relaxed-math";
+static char  compileOptions[256] = "-DBLOCK_SIZE=32 -DNVIDIA -cl-mad-enable -cl-fast-relaxed-math";
 #endif
 
 
