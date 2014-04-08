@@ -46,7 +46,7 @@ double TwoProductFMA(double a, double b, double *d) {
 }
 
 // signedcarry in {-1, 0, 1}
-long xadd(__local volatile long *sa, long x, uchar *of) {
+long xadd(__global volatile long *sa, long x, uchar *of) {
     // OF and SF  -> carry=1
     // OF and !SF -> carry=-1
     // !OF        -> carry=0
@@ -168,7 +168,7 @@ double Round(__local volatile long *accumulator) {
 ////////////////////////////////////////////////////////////////////////////////
 // Main computation pass: compute partial accumulators
 ////////////////////////////////////////////////////////////////////////////////
-void AccumulateWord(__local volatile long *sa, int i, long x) {
+void AccumulateWord(__global volatile long *sa, int i, long x) {
   // With atomic accumulator updates
   // accumulation and carry propagation can happen in any order
   long carry = x;
@@ -203,7 +203,7 @@ void AccumulateWord(__local volatile long *sa, int i, long x) {
   }
 }
 
-void Accumulate(__local volatile long *sa, double x) {
+void Accumulate(__global volatile long *sa, double x) {
   if (x == 0)
     return;
 
@@ -265,10 +265,10 @@ __kernel void matrixMul(
 
     //A superaccumulator that corresponds to a single value in the matrix C
     int c = uiWB * BLOCK_SIZE * by + BLOCK_SIZE * bx;
-    __local long *g_workingBase = Accus[(c + uiWB * ty + tx) * BIN_COUNT];
+    __global long *g_workingBase = Accus[(c + uiWB * ty + tx) * BIN_COUNT];
 
     //for floating-point expansion
-    double sum[NBFPE] = {0.0};
+    double sum[NBFPE] = {0};
 
     //Loop over all the sub-matrices of A and B
     //required to compute the block sub-matrix
@@ -297,11 +297,10 @@ __kernel void matrixMul(
             for(uint i = 0; i != NBFPE; ++i) {
                 double s; //residual of addition
                 sum[i] = Knuth2Sum(sum[i], x, &s);
-		x = s;
-                //x = s + r;
-		//r = 0.0;
+                x = s + r;
+		r = 0;
             }
-            if(x != 0.0) {
+            if(x != 0) {
 	        Accumulate(g_workingBase, x);
             }
 	}

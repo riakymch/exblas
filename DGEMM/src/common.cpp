@@ -118,7 +118,7 @@ void init_fpuniform(double *array, int size, int range, int emax)
     }*/
     //Generate numbers on an interval [1, 2]
     for(int i = 0; i != size; ++i) {
-        array[i] = 1.0 + double(rand()) / double(RAND_MAX);
+        array[i] = 1.0;// + double(rand()) / double(RAND_MAX);
     }
     /*//simple case for tests only
     for(int i = 0; i != size; i++) {
