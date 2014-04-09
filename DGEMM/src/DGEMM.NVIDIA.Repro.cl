@@ -268,7 +268,7 @@ __kernel void matrixMul(
     __global long *g_workingBase = Accus[(c + uiWB * ty + tx) * BIN_COUNT];
 
     //for floating-point expansion
-    double sum[NBFPE] = {0};
+    double sum[NBFPE] = {0.0};
 
     //Loop over all the sub-matrices of A and B
     //required to compute the block sub-matrix
@@ -298,11 +298,11 @@ __kernel void matrixMul(
                 double s; //residual of addition
                 sum[i] = Knuth2Sum(sum[i], x, &s);
                 x = s + r;
-		r = 0;
+		r = 0.0;
             }
-            //if(x != 0) {
-	    //    Accumulate(g_workingBase, x);
-            //}
+            if(x != 0.0) {
+	        Accumulate(g_workingBase, x);
+            }
 	}
 
         //Synchronize to make sure that the preceding computation is done before 
