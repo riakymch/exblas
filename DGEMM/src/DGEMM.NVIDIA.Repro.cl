@@ -300,9 +300,9 @@ __kernel void matrixMul(
                 x = s + r;
 		r = 0;
             }
-            if(x != 0) {
-	        Accumulate(g_workingBase, x);
-            }
+            //if(x != 0) {
+	    //    Accumulate(g_workingBase, x);
+            //}
 	}
 
         //Synchronize to make sure that the preceding computation is done before 

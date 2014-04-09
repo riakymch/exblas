@@ -34,7 +34,7 @@ int compare(
     double error = 0.0;
     double ref = 0.0;
 
-    for(int i = 1; i < length; ++i) 
+    for(int i = 0; i < length; ++i) 
     {
         double diff = refData[i] - data[i];
         error += diff * diff;
