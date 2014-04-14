@@ -290,19 +290,19 @@ __kernel void matrixMul(
         #endif
         for (int k = 0; k < BLOCK_SIZE; ++k) {
 	    double r; //residual of multiplication
-            double x = TwoProductFMA(AS(ty, k), BS(k, tx), &r);
+            //double x = TwoProductFMA(AS(ty, k), BS(k, tx), &r);
+	    double x = AS(ty, k);
             #ifdef NVIDIA
                 #pragma unroll
             #endif
             for(uint i = 0; i != NBFPE; ++i) {
                 double s; //residual of addition
                 sum[i] = Knuth2Sum(sum[i], x, &s);
-                x = s + r;
-		r = 0.0;
+                x = s;
             }
-            if(x != 0.0) {
-	        Accumulate(g_workingBase, x);
-            }
+            //if(x != 0.0) {
+	    //    Accumulate(g_workingBase, x);
+            //}
 	}
 
         //Synchronize to make sure that the preceding computation is done before 

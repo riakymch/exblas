@@ -89,7 +89,8 @@ int main(int argc, char **argv)
         //runDGEMM("../src/DGEMM.AMD.cl");
         runDGEMM("../src/DGEMM.AMD.Trial.cl");
     if (__alg == 2)
-        runDGEMM("../src/DGEMM.NVIDIA.cl");
+        //runDGEMM("../src/DGEMM.NVIDIA.cl");
+        runDGEMM("../src/DGEMM.NVIDIA.Trial.cl");
     if (__alg == 3)
         runDGEMM("../src/DGEMM.NVIDIA.Repro.cl");
     if (__alg == 4)
