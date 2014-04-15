@@ -32,21 +32,14 @@ int compare(
     const double epsilon
 ) {
     double error = 0.0;
-    double ref = 0.0;
 
     for(int i = 0; i < length; ++i) 
     {
         double diff = refData[i] - data[i];
-        error += diff * diff;
-        ref += refData[i] * refData[i];
+        error += pow(abs(diff), 2);
     }
 
-    double normRef =::sqrt((double) ref);
-    if (::fabs((double) ref) < 1e-7) {
-        return 0;
-    }
-    double normError = ::sqrt((double) error);
-    error = normError / normRef;
+    error = ::sqrt((double) error);
     printf("error = %.8g\n", error);
 
     return error < epsilon;
