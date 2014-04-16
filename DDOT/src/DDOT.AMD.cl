@@ -1,9 +1,6 @@
 
 #pragma OPENCL EXTENSION cl_khr_fp64                   : enable  // For double precision numbers
 #pragma OPENCL EXTENSION cl_khr_byte_addressable_store : enable
-#ifdef NVIDIA
-  #pragma OPENCL EXTENSION cl_nv_pragma_unroll         : enable
-#endif
 
 //Data type used for input data fetches
 typedef double data_t;
@@ -24,11 +21,8 @@ void DDOT(
 
     // Each work-item accumulates as many elements as necessary into local variable "sum"
     data_t sum = 0.0;
-    #ifdef NVIDIA
-        #pragma unroll
-    #endif
     for(uint gid = get_global_id(0); gid < NbElements; gid += get_global_size(0)){
-	sum = fma(d_a[gid], d_b[gid], sum);
+	fma(d_a[gid], d_b[gid], sum);
     }
     l_sa[lid] = sum; 
 
@@ -71,16 +65,10 @@ void DDOTComplete(
     uint gid = get_group_id(0);
 
     data_t sum = 0.0;
-    #ifdef NVIDIA
-        #pragma unroll
-    #endif
     for(uint i = lid; i < NbElements; i += MERGE_WORKGROUP_SIZE)
         sum += d_PartialSuperaccs[gid * MERGE_WORKGROUP_SIZE + i];
     l_Data[lid] = sum;
 
-    #ifdef NVIDIA
-        #pragma unroll
-    #endif
     for(uint stride = MERGE_WORKGROUP_SIZE / 2; stride > 0; stride /= 2){
         barrier(CLK_LOCAL_MEM_FENCE);
         if(lid < stride)

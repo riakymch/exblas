@@ -1,4 +1,4 @@
-SRCS = main.cpp common.cpp Superaccumulator.cpp DDOT.Launcher.cpp
+SRCS = main.cpp common.cpp Superaccumulator.cpp DDOT.cpp DDOT.Launcher.cpp
 #DDOT.Launcher.AMD.cpp DDOT.Launcher.NVIDIA.cpp DDOT.Launcher.Repro.cpp
 EXE_NAME = main.out
 

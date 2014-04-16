@@ -20,6 +20,7 @@
 #include <gmp.h>
 #include <mpfr.h>
 
+#include "DDOT.hpp"
 #include "Superaccumulator.hpp"
 
 // All OpenCL headers
@@ -173,5 +174,6 @@ extern "C" double round_mpfr(
 // Executable functions from main.cpp
 ////////////////////////////////////////////////////////////////////////////////
 int runDDOT(const char*);
+int runDDOTSimple(const char*);
 
 #endif
