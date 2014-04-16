@@ -20,7 +20,6 @@
 #include <gmp.h>
 #include <mpfr.h>
 
-#include "DDOT.hpp"
 #include "Superaccumulator.hpp"
 
 // All OpenCL headers
@@ -126,6 +125,7 @@ extern "C" size_t DDOT(
     cl_mem d_res,
     const cl_mem d_a,
     const cl_mem d_b,
+    const uint NbElements,
     cl_int *ciErrNum
 );
 
@@ -134,6 +134,7 @@ extern "C" size_t DDOTAMD(
     cl_mem d_res,
     const cl_mem d_a,
     const cl_mem d_b,
+    const uint NbElements,
     cl_int *ciErrNum
 );
 
@@ -142,6 +143,7 @@ extern "C" size_t DDOTNVIDIA(
     cl_mem d_res,
     const cl_mem d_a,
     const cl_mem d_b,
+    const uint NbElements,
     cl_int *ciErrNum
 );
 
@@ -150,6 +152,7 @@ extern "C" size_t DDOTRepro(
     cl_mem d_res,
     const cl_mem d_a,
     const cl_mem d_b,
+    const uint NbElements,
     cl_int *ciErrNum
 );
 
