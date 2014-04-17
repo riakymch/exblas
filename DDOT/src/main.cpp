@@ -91,7 +91,6 @@ int main(int argc, char **argv)
 int runDDOT(const char* program_file){
     cl_int ciErrNum;
     int PassFailFlag = 1;
-    int nbElements = 0;
 
     printf("Initializing data...\n");
         PassFailFlag  = posix_memalign((void **)&h_a, 64, __nbElements * sizeof(double));
@@ -157,7 +156,7 @@ int runDDOT(const char* program_file){
             printf("Error in clCreateBuffer for d_a, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
             cleanUp(EXIT_FAILURE);
         }
-	d_Superacc = clCreateBuffer(cxGPUContext, CL_MEM_WRITE_ONLY, BIN_COUNT * sizeof(bintype), NULL, &ciErrNum);
+	d_Superacc = clCreateBuffer(cxGPUContext, CL_MEM_READ_WRITE, BIN_COUNT * sizeof(bintype), NULL, &ciErrNum);
         if (ciErrNum != CL_SUCCESS) {
             printf("Error in clCreateBuffer for d_a, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
             cleanUp(EXIT_FAILURE);
@@ -165,7 +164,7 @@ int runDDOT(const char* program_file){
     {
         printf("Initializing OpenCL DDOT...\n");
             if (__alg == 1)
-                ciErrNum = initDDOT(cxGPUContext, cqCommandQueue, cdDevice, program_file);
+                ciErrNum = initDDOT(cxGPUContext, cqCommandQueue, cdDevice, program_file, __nbfpe);
             
             if (ciErrNum != CL_SUCCESS)
                 cleanUp(EXIT_FAILURE);
@@ -216,8 +215,8 @@ int runDDOT(const char* program_file){
 	double throughput = (perf / minTime) * 1e-9;
 	perf = 2.0 * __nbElements;
 	perf = (perf / minTime) * 1e-9;
-        printf("Alg = %u \t Range = %u \t NbElements = %u \t Size = %lu \t Time = %.8f s \t Throughput = %.4f GB/s\n\n", __alg, __range, nbElements, nbElements * sizeof(double), minTime, throughput);
-        printf("Alg = %u \t Range = %u \t NbElements = %u \t Size = %lu \t Time = %.8f s \t Performance = %.4f GFLOPS\n\n", __alg, __range, nbElements, nbElements * sizeof(double), minTime, perf);
+        printf("Alg = %u \t Range = %u \t NbElements = %u \t Size = %lu \t Time = %.8f s \t Throughput = %.4f GB/s\n\n", __alg, __range, __nbElements, __nbElements * sizeof(double), minTime, throughput);
+        printf("Alg = %u \t Range = %u \t NbElements = %u \t Size = %lu \t Time = %.8f s \t Performance = %.4f GFLOPS\n\n", __alg, __range, __nbElements, __nbElements * sizeof(double), minTime, perf);
 #endif
 
         printf("Validating DDOT OpenCL results...\n");
@@ -227,7 +226,8 @@ int runDDOT(const char* program_file){
                     printf("Error in clEnqueueReadBuffer Line %u in file %s !!!\n\n", __LINE__, __FILE__);
                     cleanUp(EXIT_FAILURE);
                 }
-		
+		for (uint i = 0; i < BIN_COUNT; i++)
+		    printf("[%u] %lX\n", i, h_Superacc[i]);
                 Superaccumulator superaccGPU((int64_t *) h_Superacc, E_BITS, F_BITS);
 
             printf(" ...SupersuperaccCPU()\n");
@@ -235,7 +235,7 @@ int runDDOT(const char* program_file){
                 Superaccumulator superaccCPU(E_BITS, F_BITS);
                 // accumulate numbers
                 for (uint i = 0; i < __nbElements; i++) {
-                    superaccCPU.Accumulate(((double *) h_a)[i]);// * ((double *) h_b)[i]);
+                    superaccCPU.Accumulate(((double *) h_a)[i] * ((double *) h_b)[i]);
                 }
 
             printf(" ...comparing the results\n");
@@ -248,11 +248,11 @@ int runDDOT(const char* program_file){
 	       double res_rounded = superaccCPU.Round();
                PassFailFlag |= superaccGPU.CompareRoundedResults(res_mpfr, res_rounded);*/
 
-	       /*double roundCPU = superaccCPU.Round();
-	       double roundGPU = superaccGPU.Round();
-	       PassFailFlag = abs(roundCPU - roundGPU) < 1e-16 ? 1 : 0;
-	       printf("[CPU] Rounded value of the compuation: %.17g\n", roundCPU);
-	       printf("[GPU] Rounded value of the compuation: %.17g\n", roundGPU);*/
+	       //double roundCPU = superaccCPU.Round();
+	       //double roundGPU = superaccGPU.Round();
+	       //PassFailFlag = abs(roundCPU - roundGPU) < 1e-16 ? 1 : 0;
+	       //printf("[CPU] Rounded value of the compuation: %.17g\n", roundCPU);
+	       //printf("[GPU] Rounded value of the compuation: %.17g\n", roundGPU);
             
   	       //print the final result of using superaccumulator
                //printf("//--------------------------------------------------------\n");
@@ -276,7 +276,6 @@ int runDDOT(const char* program_file){
 int runDDOTSimple(const char* program_file){
     cl_int ciErrNum;
     int PassFailFlag = 1;
-    int nbElements = 0;
 
     printf("Initializing data...\n");
         PassFailFlag  = posix_memalign((void **)&h_a, 64, __nbElements * sizeof(double));
@@ -397,8 +396,8 @@ int runDDOTSimple(const char* program_file){
 	double throughput = (perf / minTime) * 1e-9;
 	perf = 2.0 * __nbElements;
 	perf = (perf / minTime) * 1e-9;
-        printf("Alg = %u \t Range = %u \t NbElements = %u \t Size = %lu \t Time = %.8f s \t Throughput = %.4f GB/s\n\n", __alg, __range, nbElements, nbElements * sizeof(double), minTime, throughput);
-        printf("Alg = %u \t Range = %u \t NbElements = %u \t Size = %lu \t Time = %.8f s \t Performance = %.4f GFLOPS\n\n", __alg, __range, nbElements, nbElements * sizeof(double), minTime, perf);
+        printf("Alg = %u \t Range = %u \t NbElements = %u \t Size = %lu \t Time = %.8f s \t Throughput = %.4f GB/s\n\n", __alg, __range, __nbElements, __nbElements * sizeof(double), minTime, throughput);
+        printf("Alg = %u \t Range = %u \t NbElements = %u \t Size = %lu \t Time = %.8f s \t Performance = %.4f GFLOPS\n\n", __alg, __range, __nbElements, __nbElements * sizeof(double), minTime, perf);
 #endif
 
         printf("Validating DDOT OpenCL results...\n");

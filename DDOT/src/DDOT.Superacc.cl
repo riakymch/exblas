@@ -1,14 +1,110 @@
 
 #pragma OPENCL EXTENSION cl_khr_fp64                   : enable  // For double precision numbers
+#pragma OPENCL EXTENSION cl_khr_int64_base_atomics     : enable  // For 64 atomic operations
 #pragma OPENCL EXTENSION cl_khr_byte_addressable_store : enable
 
 //Data type used for input data fetches
 typedef double data_t;
 
+#define BIN_COUNT      39
+#define K              8                    // High-radix carry-save bits
+#define digits         56
+#define deltaScale     72057594037927936.0  // Assumes K>0
+#define f_words        20 
+#define TSAFE          0
+
 
 ////////////////////////////////////////////////////////////////////////////////
-// Main computation pass: compute partial reductions
+// Auxiliary functions
 ////////////////////////////////////////////////////////////////////////////////
+double TwoProductFMA(double a, double b, double *d) {
+    double p = a * b;
+    *d = fma(a, b, -p);
+    return p;
+}
+
+// signedcarry in {-1, 0, 1}
+long xadd(__local volatile long *sa, long x, uchar *of) {
+    // OF and SF  -> carry=1
+    // OF and !SF -> carry=-1
+    // !OF        -> carry=0
+    long y = atom_add(sa, x);
+    long z = y + x; // since the value sa->accumulator[i] can be changed by another work item
+
+    // TODO: cover also underflow
+    *of = 0;
+    if(x > 0 && y > 0 && z < 0)
+        *of = 1;
+    if(x < 0 && y < 0 && z > 0)
+        *of = 1;
+
+    return y;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Main computation pass: compute partial accumulators
+////////////////////////////////////////////////////////////////////////////////
+void AccumulateWord(__local volatile long *sa, int i, long x) {
+  // With atomic accumulator updates
+  // accumulation and carry propagation can happen in any order,
+  // as long as addition is atomic
+  // only constraint is: never forget an overflow bit
+  long carry = x;
+  long carrybit;
+  uchar overflow;
+  long oldword = xadd(&sa[i * WARP_COUNT], x, &overflow);
+
+  // To propagate over- or underflow 
+  while (overflow) {
+    //atomic_inc(d_Overflow); 
+    // Carry or borrow
+    // oldword has sign S
+    // x has sign S
+    // accumulator[i] has sign !S (just after update)
+    // carry has sign !S
+    // carrybit has sign S
+    carry = (oldword + carry) >> digits;    // Arithmetic shift
+    bool s = oldword > 0;
+    carrybit = (s ? 1l << K : -1l << K);
+
+    // Cancel carry-save bits
+    xadd(&sa[i * WARP_COUNT], (long) -(carry << digits), &overflow);
+    if (TSAFE && (s ^ overflow)) {
+      carrybit *= 2;
+    }
+    carry += carrybit;
+
+    ++i;
+    if (i >= BIN_COUNT) {
+      return;
+    }
+    oldword = xadd(&sa[i * WARP_COUNT], carry, &overflow);
+  }
+}
+
+void Accumulate(__local volatile long *sa, double x) {
+  if (x == 0)
+    return;
+
+  int e;
+  frexp(x, &e);
+  int exp_word = e / digits;  // Word containing MSbit
+  int iup = exp_word + f_words;
+
+  double xscaled = ldexp(x, -digits * exp_word);
+
+  int i;
+  for (i = iup; xscaled != 0; --i) {
+    double xrounded = rint(xscaled);
+    long xint = (long) xrounded;
+
+    AccumulateWord(sa, i, xint);
+
+    xscaled -= xrounded;
+    xscaled *= deltaScale;
+  }
+}
+
 __kernel __attribute__((reqd_work_group_size(WORKGROUP_SIZE, 1, 1)))
 void DDOT(
     __global data_t *d_PartialSuperaccs,
@@ -16,60 +112,63 @@ void DDOT(
     __global data_t *d_b,
     const uint NbElements
 ){
-    __local data_t l_sa[WORKGROUP_SIZE] __attribute__((aligned(8)));
-    uint lid = get_local_id(0);
+    __local long l_sa[WARP_COUNT * BIN_COUNT] __attribute__((aligned(8)));
+    __local long *l_workingBase = l_sa + (get_local_id(0) & (WARP_COUNT - 1));
 
-    // Each work-item accumulates as many elements as necessary into local variable "sum"
-    data_t sum = 0.0;
-    for(uint gid = get_global_id(0); gid < NbElements; gid += get_global_size(0)){
-	sum = fma(d_a[gid], d_b[gid], sum);
+    //Initialize accumulators
+    //TODO: optimize
+    if (get_local_id(0) < WARP_COUNT) {
+        for (uint i = 0; i < BIN_COUNT; i++)
+           l_workingBase[i * WARP_COUNT] = 0;
     }
-    l_sa[lid] = sum; 
-
-    // Perform parallel reduction to add each work-item's 
-    // partial summation together
-    for (uint stride = get_local_size(0) / 2; stride > 0; stride /= 2) { 
-        // Synchronize to make sure each work-item is done updating 
-        // shared memory; this is necessary because work-items read 
-        // results written by other work-items during each parallel 
-        // reduction step 
-        barrier(CLK_LOCAL_MEM_FENCE); 
-
-        // Only the first work-items in the work-group add elements together 
-        if (get_local_id(0) < stride) { 
-            // Add two elements from the l_sa array 
-            // and store the result in l_sa[index] 
-            l_sa[lid] += l_sa[lid + stride]; 
-        } 
-    } 
-
-    // Write the result of the reduction to global memory 
-    if (lid == 0)
-        d_PartialSuperaccs[get_group_id(0)] = l_sa[0];
-
-    // Synchronize to make sure the first work-item is done reading partialSummation 
     barrier(CLK_LOCAL_MEM_FENCE);
+
+    //Read data from global memory and scatter it to sub-accumulators
+    for(uint pos = get_global_id(0); pos < NbElements; pos += get_global_size(0)){
+	//TODO: add TwoProductFMA()
+        data_t x = d_a[pos] * d_b[pos];
+	Accumulate(l_workingBase, x);
+    }
+    barrier(CLK_LOCAL_MEM_FENCE);
+
+    //Merge sub-accumulators into work-group partial-accumulator
+    uint pos = get_local_id(0);
+    if (pos < BIN_COUNT){
+        long sum = 0;
+
+        for(uint i = 0; i < WARP_COUNT; i++){
+            sum += l_sa[pos * WARP_COUNT + i];
+        }
+        barrier(CLK_LOCAL_MEM_FENCE);
+	
+        d_PartialSuperaccs[get_group_id(0) * BIN_COUNT + pos] = sum;
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// Merging
+// Merge SuperAccumulators
 ////////////////////////////////////////////////////////////////////////////////
 __kernel __attribute__((reqd_work_group_size(MERGE_WORKGROUP_SIZE, 1, 1)))
 void DDOTComplete(
     __global data_t *d_Superacc,
     __global data_t *d_PartialSuperaccs,
-    uint NbElements
+    const uint NbPartialSuperaccs
 ){
-    __local data_t l_Data[MERGE_WORKGROUP_SIZE];
+    __local long l_Data[MERGE_WORKGROUP_SIZE];
+
+    //Reduce to one work group
     uint lid = get_local_id(0);
     uint gid = get_group_id(0);
 
-    data_t sum = 0.0;
-    for(uint i = lid; i < NbElements; i += MERGE_WORKGROUP_SIZE)
-        sum += d_PartialSuperaccs[gid * MERGE_WORKGROUP_SIZE + i];
+    long sum = 0;
+    for(uint i = lid; i < NbPartialSuperaccs; i += MERGE_WORKGROUP_SIZE) {
+        sum += d_PartialSuperaccs[gid + i * BIN_COUNT];
+    }
     l_Data[lid] = sum;
+    barrier(CLK_LOCAL_MEM_FENCE);
 
-    for(uint stride = MERGE_WORKGROUP_SIZE / 2; stride > 0; stride /= 2){
+    //Reduce within the work group
+    for(uint stride = MERGE_WORKGROUP_SIZE / 2; stride > 0; stride >>= 1){
         barrier(CLK_LOCAL_MEM_FENCE);
         if(lid < stride)
             l_Data[lid] += l_Data[lid + stride];
@@ -77,7 +176,4 @@ void DDOTComplete(
     
     if(lid == 0)
         d_Superacc[gid] = l_Data[0];
-
-    barrier(CLK_LOCAL_MEM_FENCE);
 }
-

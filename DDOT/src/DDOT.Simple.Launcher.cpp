@@ -14,8 +14,8 @@
 ////////////////////////////////////////////////////////////////////////////////
 // OpenCL launcher for bitonic sort kernel
 ////////////////////////////////////////////////////////////////////////////////
-#define REDUCTION_KERNEL          "DDOT"
-#define REDUCTION_COMPLETE_KERNEL "DDOTComplete"
+#define DDOT_KERNEL          "DDOT"
+#define DDOT_COMPLETE_KERNEL "DDOTComplete"
 
 static size_t szKernelLength;		       // Byte size of kernel code
 static char* cSources = NULL;                  // Buffer to hold source for compilation
@@ -85,12 +85,12 @@ extern "C" cl_int initDDOTSimple(
         }
 
     printf("...creating Reduction kernels:\n");
-        ckKernel = clCreateKernel(cpProgram, REDUCTION_KERNEL, &ciErrNum);
+        ckKernel = clCreateKernel(cpProgram, DDOT_KERNEL, &ciErrNum);
         if (ciErrNum != CL_SUCCESS) {
             printf("Error in clCreateKernel: Reduction, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
             return EXIT_FAILURE;
         }
-        ckComplete = clCreateKernel(cpProgram, REDUCTION_COMPLETE_KERNEL, &ciErrNum);
+        ckComplete = clCreateKernel(cpProgram, DDOT_COMPLETE_KERNEL, &ciErrNum);
         if (ciErrNum != CL_SUCCESS) {
             printf("Error in clCreateKernel: Reduction_Complete, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
             return EXIT_FAILURE;

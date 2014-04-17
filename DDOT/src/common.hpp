@@ -78,7 +78,8 @@ extern "C" cl_int initDDOT(
     cl_context cxGPUContext,
     cl_command_queue cqParamCommandQue,
     cl_device_id cdDevice,
-    const char* program_file
+    const char* program_file,
+    const uint NbFPE
 );
 
 extern "C" cl_int initDDOTSimple(

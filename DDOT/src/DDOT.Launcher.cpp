@@ -14,8 +14,8 @@
 ////////////////////////////////////////////////////////////////////////////////
 // OpenCL launcher for bitonic sort kernel
 ////////////////////////////////////////////////////////////////////////////////
-#define REDUCTION_KERNEL          "DDOT"
-#define REDUCTION_COMPLETE_KERNEL "DDOTComplete"
+#define DDOT_KERNEL          "DDOT"
+#define DDOT_COMPLETE_KERNEL "DDOTComplete"
 
 static size_t szKernelLength;		       // Byte size of kernel code
 static char* cSources = NULL;                  // Buffer to hold source for compilation
@@ -25,17 +25,17 @@ static cl_kernel        ckKernel, ckComplete;
 static cl_command_queue cqDefaultCommandQue;   //Default command queue for Reduction
 static cl_mem           d_PartialSuperaccs;
 
-static const uint  PARTIAL_SUPERACCS_COUNT = 2048;
-static const uint  WARP_SIZE                  = 32;
+static const uint  PARTIAL_SUPERACCS_COUNT    = 1;//2048;
+static const uint  WARP_COUNT                 = 16;
 static const uint  WORKGROUP_SIZE             = 256;
 static const uint  MERGE_WORKGROUP_SIZE       = 256;
 static const uint  VECTOR_NUMBER              = 1;
 
 #ifdef AMD
-static char  compileOptions[256] = "-DWARP_SIZE=16 -DWORKGROUP_SIZE=256 -DMERGE_WORKGROUP_SIZE=256";
+static char  compileOptions[256] = "-DWARP_COUNT=16 -DWORKGROUP_SIZE=256 -DMERGE_WORKGROUP_SIZE=256 -DUSE_KNUTH";
 #else
-static char  compileOptions[256] = "-DWARP_SIZE=16 -DWORKGROUP_SIZE=256 -DMERGE_WORKGROUP_SIZE=256 -cl-mad-enable -cl-fast-relaxed-math";
-//static char  compileOptions[256] = "-DWARP_SIZE=16 -DWORKGROUP_SIZE=256 -DMERGE_WORKGROUP_SIZE=256 -cl-nv-verbose";
+static char  compileOptions[256] = "-DNVIDIA -DWARP_COUNT=16 -DWORKGROUP_SIZE=256 -DMERGE_WORKGROUP_SIZE=256 -DUSE_KNUTH -cl-mad-enable -cl-fast-relaxed-math";
+//static char  compileOptions[256] = "-DWARP_COUNT=16 -DWARP_SIZE=16 -DMERGE_WORKGROUP_SIZE=256 -DNVIDIA -cl-nv-verbose";
 #endif
 
 
@@ -43,7 +43,8 @@ extern "C" cl_int initDDOT(
     cl_context cxGPUContext, 
     cl_command_queue cqParamCommandQue, 
     cl_device_id cdDevice,
-    const char* program_file
+    const char* program_file,
+    const uint NbFPE
 ){
     cl_int ciErrNum;
     size_t kernelLength;
@@ -72,6 +73,7 @@ extern "C" cl_int initDDOT(
         }
 
     printf("...building Reduction program\n");
+	sprintf(compileOptions, "%s -DNBFPE=%d", compileOptions, NbFPE);
         ciErrNum = clBuildProgram(cpProgram, 0, NULL, compileOptions, NULL, NULL);
         if (ciErrNum != CL_SUCCESS) {
             //printf("Error in clBuildProgram, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
@@ -84,19 +86,19 @@ extern "C" cl_int initDDOT(
             return EXIT_FAILURE;
         }
 
-    printf("...creating Reduction kernels:\n");
-        ckKernel = clCreateKernel(cpProgram, REDUCTION_KERNEL, &ciErrNum);
+    printf("...creating Superaccs kernels:\n");
+        ckKernel = clCreateKernel(cpProgram, DDOT_KERNEL, &ciErrNum);
         if (ciErrNum != CL_SUCCESS) {
             printf("Error in clCreateKernel: Reduction, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
             return EXIT_FAILURE;
         }
-        ckComplete = clCreateKernel(cpProgram, REDUCTION_COMPLETE_KERNEL, &ciErrNum);
+        ckComplete = clCreateKernel(cpProgram, DDOT_COMPLETE_KERNEL, &ciErrNum);
         if (ciErrNum != CL_SUCCESS) {
             printf("Error in clCreateKernel: Reduction_Complete, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
             return EXIT_FAILURE;
         }
     printf("...allocating internal buffer\n");
-        d_PartialSuperaccs = clCreateBuffer(cxGPUContext, CL_MEM_READ_WRITE, PARTIAL_SUPERACCS_COUNT * sizeof(cl_double), NULL, &ciErrNum);
+        d_PartialSuperaccs = clCreateBuffer(cxGPUContext, CL_MEM_READ_WRITE, PARTIAL_SUPERACCS_COUNT * BIN_COUNT * sizeof(cl_long), NULL, &ciErrNum);
         if (ciErrNum != CL_SUCCESS) {
             printf("Error in clCreateBuffer, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
             return EXIT_FAILURE;
@@ -174,7 +176,7 @@ extern "C" size_t DDOT(
     }
     {
         NbThreadsPerWorkGroup = MERGE_WORKGROUP_SIZE;
-        TotalNbThreads = NbThreadsPerWorkGroup;
+        TotalNbThreads = BIN_COUNT * NbThreadsPerWorkGroup;
 
         ciErrNum  = clSetKernelArg(ckComplete, 0, sizeof(cl_mem),  (void *)&d_Superacc);
         ciErrNum |= clSetKernelArg(ckComplete, 1, sizeof(cl_mem),  (void *)&d_PartialSuperaccs);
