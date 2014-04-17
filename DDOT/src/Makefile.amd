@@ -1,5 +1,4 @@
-SRCS = main.cpp common.cpp Superaccumulator.cpp DDOT.cpp DDOT.Launcher.cpp
-#DDOT.Launcher.AMD.cpp DDOT.Launcher.NVIDIA.cpp DDOT.Launcher.Repro.cpp
+SRCS = main.cpp common.cpp Superaccumulator.cpp DDOT.cpp DDOT.Simple.Launcher.cpp DDOT.Launcher.cpp
 EXE_NAME = main.out
 
 SOURCES = $(abspath $(SRCS))

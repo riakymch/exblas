@@ -81,43 +81,18 @@ extern "C" cl_int initDDOT(
     const char* program_file
 );
 
-extern "C" cl_int initDDOTAMD(
+extern "C" cl_int initDDOTSimple(
     cl_context cxGPUContext,
     cl_command_queue cqParamCommandQue,
     cl_device_id cdDevice,
     const char* program_file
-);
-
-extern "C" cl_int initDDOTNVIDIA(
-    cl_context cxGPUContext,
-    cl_command_queue cqParamCommandQue,
-    cl_device_id cdDevice,
-    const char* program_file
-);
-
-extern "C" cl_int initDDOTRepro(
-    cl_context cxGPUContext,
-    cl_command_queue cqParamCommandQue,
-    cl_device_id cdDevice,
-    const char* program_file,
-    const uint NbFPE,
-    const uint width,
-    const uint height
 );
 
 extern "C" void closeDDOT(
     void
 );
 
-extern "C" void closeDDOTAMD(
-    void
-);
-
-extern "C" void closeDDOTNVIDIA(
-    void
-);
-
-extern "C" void closeDDOTRepro(
+extern "C" void closeDDOTSimple(
     void
 );
 
@@ -130,25 +105,7 @@ extern "C" size_t DDOT(
     cl_int *ciErrNum
 );
 
-extern "C" size_t DDOTAMD(
-    cl_command_queue cqCommandQueue,
-    cl_mem d_res,
-    const cl_mem d_a,
-    const cl_mem d_b,
-    const uint NbElements,
-    cl_int *ciErrNum
-);
-
-extern "C" size_t DDOTNVIDIA(
-    cl_command_queue cqCommandQueue,
-    cl_mem d_res,
-    const cl_mem d_a,
-    const cl_mem d_b,
-    const uint NbElements,
-    cl_int *ciErrNum
-);
-
-extern "C" size_t DDOTRepro(
+extern "C" size_t DDOTSimple(
     cl_command_queue cqCommandQueue,
     cl_mem d_res,
     const cl_mem d_a,

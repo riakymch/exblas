@@ -22,7 +22,7 @@ void DDOT(
     // Each work-item accumulates as many elements as necessary into local variable "sum"
     data_t sum = 0.0;
     for(uint gid = get_global_id(0); gid < NbElements; gid += get_global_size(0)){
-	fma(d_a[gid], d_b[gid], sum);
+	sum = fma(d_a[gid], d_b[gid], sum);
     }
     l_sa[lid] = sum; 
 
