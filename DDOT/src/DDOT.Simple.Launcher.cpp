@@ -23,13 +23,13 @@ static char* cSources = NULL;                  // Buffer to hold source for comp
 static cl_program       cpProgram;             //OpenCL Reduction program
 static cl_kernel        ckKernel, ckComplete;
 static cl_command_queue cqDefaultCommandQue;   //Default command queue for Reduction
-static cl_mem           d_PartialSuperaccs;
+static cl_mem           d_PartialSum;
 
-static const uint  PARTIAL_SUPERACCS_COUNT = 2048;
-static const uint  WARP_SIZE                  = 32;
-static const uint  WORKGROUP_SIZE             = 256;
-static const uint  MERGE_WORKGROUP_SIZE       = 256;
-static const uint  VECTOR_NUMBER              = 1;
+static const uint  PARTIAL_SUMMATION_COUNT = 2048;
+static const uint  WARP_SIZE               = 32;
+static const uint  WORKGROUP_SIZE          = 256;
+static const uint  MERGE_WORKGROUP_SIZE    = 256;
+static const uint  VECTOR_NUMBER           = 1;
 
 #ifdef AMD
 static char  compileOptions[256] = "-DWARP_SIZE=16 -DWORKGROUP_SIZE=256 -DMERGE_WORKGROUP_SIZE=256";
@@ -96,7 +96,7 @@ extern "C" cl_int initDDOT(
             return EXIT_FAILURE;
         }
     printf("...allocating internal buffer\n");
-        d_PartialSuperaccs = clCreateBuffer(cxGPUContext, CL_MEM_READ_WRITE, PARTIAL_SUPERACCS_COUNT * sizeof(cl_double), NULL, &ciErrNum);
+        d_PartialSum = clCreateBuffer(cxGPUContext, CL_MEM_READ_WRITE, PARTIAL_SUMMATION_COUNT * sizeof(cl_double), NULL, &ciErrNum);
         if (ciErrNum != CL_SUCCESS) {
             printf("Error in clCreateBuffer, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
             return EXIT_FAILURE;
@@ -114,7 +114,7 @@ extern "C" cl_int initDDOT(
 extern "C" void closeDDOT(void){
     cl_int ciErrNum;
 
-    ciErrNum = clReleaseMemObject(d_PartialSuperaccs);
+    ciErrNum = clReleaseMemObject(d_PartialSum);
     ciErrNum |= clReleaseKernel(ckKernel);
     ciErrNum |= clReleaseKernel(ckComplete);
     ciErrNum |= clReleaseProgram(cpProgram);
@@ -138,7 +138,7 @@ inline uint iSnapDown(uint a, uint b){
 
 extern "C" size_t DDOT(
     cl_command_queue cqCommandQueue,
-    cl_mem d_Superacc,
+    cl_mem d_FinalSum,
     cl_mem d_a,
     cl_mem d_b,
     uint NbElements,
@@ -152,10 +152,10 @@ extern "C" size_t DDOT(
 
     {
         NbThreadsPerWorkGroup  = WORKGROUP_SIZE;
-        TotalNbThreads = PARTIAL_SUPERACCS_COUNT * NbThreadsPerWorkGroup;
+        TotalNbThreads = PARTIAL_SUMMATION_COUNT * NbThreadsPerWorkGroup;
         NbElements = NbElements / VECTOR_NUMBER;
 
-        ciErrNum  = clSetKernelArg(ckKernel, 0, sizeof(cl_mem),  (void *)&d_PartialSuperaccs);
+        ciErrNum  = clSetKernelArg(ckKernel, 0, sizeof(cl_mem),  (void *)&d_PartialSum);
         ciErrNum |= clSetKernelArg(ckKernel, 1, sizeof(cl_mem),  (void *)&d_a);
         ciErrNum |= clSetKernelArg(ckKernel, 2, sizeof(cl_mem),  (void *)&d_b);
         ciErrNum |= clSetKernelArg(ckKernel, 3, sizeof(cl_uint), (void *)&NbElements);
@@ -176,9 +176,9 @@ extern "C" size_t DDOT(
         NbThreadsPerWorkGroup = MERGE_WORKGROUP_SIZE;
         TotalNbThreads = NbThreadsPerWorkGroup;
 
-        ciErrNum  = clSetKernelArg(ckComplete, 0, sizeof(cl_mem),  (void *)&d_Superacc);
-        ciErrNum |= clSetKernelArg(ckComplete, 1, sizeof(cl_mem),  (void *)&d_PartialSuperaccs);
-        ciErrNum |= clSetKernelArg(ckComplete, 2, sizeof(cl_uint), (void *)&PARTIAL_SUPERACCS_COUNT);
+        ciErrNum  = clSetKernelArg(ckComplete, 0, sizeof(cl_mem),  (void *)&d_FinalSum);
+        ciErrNum |= clSetKernelArg(ckComplete, 1, sizeof(cl_mem),  (void *)&d_PartialSum);
+        ciErrNum |= clSetKernelArg(ckComplete, 2, sizeof(cl_uint), (void *)&PARTIAL_SUMMATION_COUNT);
         if (ciErrNum != CL_SUCCESS) {
             printf("Error in clSetKernelArg, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
 	    *ciErrNumRes = EXIT_FAILURE;
