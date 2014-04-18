@@ -25,7 +25,7 @@ static cl_kernel        ckKernel, ckComplete;
 static cl_command_queue cqDefaultCommandQue;   //Default command queue for Reduction
 static cl_mem           d_PartialSuperaccs;
 
-static const uint  PARTIAL_SUPERACCS_COUNT    = 1;//2048;
+static const uint  PARTIAL_SUPERACCS_COUNT    = 2048;
 static const uint  WARP_COUNT                 = 16;
 static const uint  WORKGROUP_SIZE             = 256;
 static const uint  MERGE_WORKGROUP_SIZE       = 256;
@@ -141,8 +141,8 @@ inline uint iSnapDown(uint a, uint b){
 extern "C" size_t DDOT(
     cl_command_queue cqCommandQueue,
     cl_mem d_Superacc,
-    cl_mem d_a,
-    cl_mem d_b,
+    const cl_mem d_a,
+    const cl_mem d_b,
     uint NbElements,
     cl_int *ciErrNumRes
 ){

@@ -102,7 +102,7 @@ extern "C" size_t DDOT(
     cl_mem d_res,
     const cl_mem d_a,
     const cl_mem d_b,
-    const uint NbElements,
+    uint NbElements,
     cl_int *ciErrNum
 );
 
@@ -111,7 +111,7 @@ extern "C" size_t DDOTSimple(
     cl_mem d_res,
     const cl_mem d_a,
     const cl_mem d_b,
-    const uint NbElements,
+    uint NbElements,
     cl_int *ciErrNum
 );
 

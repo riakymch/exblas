@@ -126,7 +126,7 @@ void DDOT(
     //Read data from global memory and scatter it to sub-accumulators
     for(uint pos = get_global_id(0); pos < NbElements; pos += get_global_size(0)){
 	//TODO: add TwoProductFMA()
-        data_t x = d_a[pos] * d_b[pos];
+        data_t x = 1.0; //d_a[pos] * d_b[pos];
 	Accumulate(l_workingBase, x);
     }
     barrier(CLK_LOCAL_MEM_FENCE);
