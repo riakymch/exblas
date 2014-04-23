@@ -221,13 +221,11 @@ int runDDOT(const char* program_file){
 
         printf("Validating DDOT OpenCL results...\n");
             printf(" ...reading back OpenCL results\n");
-                ciErrNum = clEnqueueReadBuffer(cqCommandQueue, d_Superacc, CL_TRUE, 0, sizeof(double), h_Superacc, 0, NULL, NULL);
+                ciErrNum = clEnqueueReadBuffer(cqCommandQueue, d_Superacc, CL_TRUE, 0, BIN_COUNT * sizeof(bintype), h_Superacc, 0, NULL, NULL);
                 if (ciErrNum != CL_SUCCESS) {
                     printf("Error in clEnqueueReadBuffer Line %u in file %s !!!\n\n", __LINE__, __FILE__);
                     cleanUp(EXIT_FAILURE);
                 }
-		for (uint i = 0; i < BIN_COUNT; i++)
-		    printf("[%u] %lX\n", i, h_Superacc[i]);
                 Superaccumulator superaccGPU((int64_t *) h_Superacc, E_BITS, F_BITS);
 
             printf(" ...SupersuperaccCPU()\n");
@@ -239,8 +237,8 @@ int runDDOT(const char* program_file){
                 }
 
             printf(" ...comparing the results\n");
-	       //superaccCPU.PrintAccumulator();
-	       //superaccGPU.PrintAccumulator();
+	       superaccCPU.PrintAccumulator();
+	       superaccGPU.PrintAccumulator();
                //check the results using mpfr algorithm
                /*printf("//--------------------------------------------------------\n");
 	       mpfr_t *res_mpfr = sum_mpfr((double *) h_iData, __nbElements);
@@ -248,16 +246,12 @@ int runDDOT(const char* program_file){
 	       double res_rounded = superaccCPU.Round();
                PassFailFlag |= superaccGPU.CompareRoundedResults(res_mpfr, res_rounded);*/
 
-	       //double roundCPU = superaccCPU.Round();
-	       //double roundGPU = superaccGPU.Round();
-	       //PassFailFlag = abs(roundCPU - roundGPU) < 1e-16 ? 1 : 0;
-	       //printf("[CPU] Rounded value of the compuation: %.17g\n", roundCPU);
-	       //printf("[GPU] Rounded value of the compuation: %.17g\n", roundGPU);
+	       double roundCPU = superaccCPU.Round();
+	       double roundGPU = superaccGPU.Round();
+	       PassFailFlag = abs(roundCPU - roundGPU) < 1e-16 ? 1 : 0;
+	       printf("[CPU] Rounded value of the compuation: %.17g\n", roundCPU);
+	       printf("[GPU] Rounded value of the compuation: %.17g\n", roundGPU);
             
-  	       //print the final result of using superaccumulator
-               //printf("//--------------------------------------------------------\n");
-               //roundSuperaccumulator(h_HistogramGPU);
-
          //Release kernels and program
          printf("Shutting down...\n\n");
             if (__alg == 1)

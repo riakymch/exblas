@@ -34,8 +34,7 @@ static const uint  VECTOR_NUMBER              = 1;
 #ifdef AMD
 static char  compileOptions[256] = "-DWARP_COUNT=16 -DWORKGROUP_SIZE=256 -DMERGE_WORKGROUP_SIZE=256 -DUSE_KNUTH";
 #else
-static char  compileOptions[256] = "-DNVIDIA -DWARP_COUNT=16 -DWORKGROUP_SIZE=256 -DMERGE_WORKGROUP_SIZE=256 -DUSE_KNUTH -cl-mad-enable -cl-fast-relaxed-math";
-//static char  compileOptions[256] = "-DWARP_COUNT=16 -DWARP_SIZE=16 -DMERGE_WORKGROUP_SIZE=256 -DNVIDIA -cl-nv-verbose";
+static char  compileOptions[256] = "-DNVIDIA -DWARP_COUNT=16 -DWORKGROUP_SIZE=256 -DMERGE_WORKGROUP_SIZE=256 -DUSE_KNUTH -cl-mad-enable -cl-fast-relaxed-math"; // -cl-nv-verbose";
 #endif
 
 
