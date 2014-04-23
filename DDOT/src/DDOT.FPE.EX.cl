@@ -149,7 +149,7 @@ void DDOT(
         if(x != 0.0) 
 	    Accumulate(l_workingBase, x);
 
-	//if (r != 0.0) {
+	//if (r != 0.0) { // without it is better for the performance, especially on nvidia
             #ifdef NVIDIA
               #pragma unroll
             #endif
