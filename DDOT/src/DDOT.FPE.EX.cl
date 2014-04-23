@@ -133,42 +133,62 @@ void DDOT(
     barrier(CLK_LOCAL_MEM_FENCE);
 
     //Read data from global memory and scatter it to sub-accumulators
-    double a[NBFPE] = {0.0};
+    double a[4] = {0.0};
     for(uint pos = get_global_id(0); pos < NbElements; pos += get_global_size(0)){
 	double r = 0.0;
 	data_t x = TwoProductFMA(d_a[pos], d_b[pos], &r);
 
-        #ifdef NVIDIA
-          #pragma unroll
-        #endif
-        for(uint i = 0; i != NBFPE; ++i) {
-            double s;
-            a[i] = Knuth2Sum(a[i], x, &s);
+        double s;
+        a[0] = Knuth2Sum(a[0], x, &s);
+        x = s;
+        if(x != 0.0) {
+            a[1] = Knuth2Sum(a[1], x, &s);
             x = s;
-        }
+            if(x != 0.0) {
+                a[2] = Knuth2Sum(a[2], x, &s);
+                x = s;
+                if(x != 0.0) {
+                    a[3] = Knuth2Sum(a[3], x, &s);
+                    x = s;
+                    /*if(x != 0.0) {
+                        a[4] = Knuth2Sum(a[4], x, &s);
+                        x = s;
+	            }*/
+	        }
+	    }
+	}
         if(x != 0.0) 
 	    Accumulate(l_workingBase, x);
 
 	//if (r != 0.0) { // without it is better for the performance, especially on nvidia
-            #ifdef NVIDIA
-              #pragma unroll
-            #endif
-            for(uint i = 0; i != NBFPE; ++i) {
-                double s;
-                a[i] = Knuth2Sum(a[i], r, &s);
+            //double s;
+            a[0] = Knuth2Sum(a[0], r, &s);
+            r = s;
+            if(r != 0.0) {
+                a[1] = Knuth2Sum(a[1], r, &s);
                 r = s;
+                if(r != 0.0) {
+                    a[2] = Knuth2Sum(a[2], r, &s);
+                    r = s;
+                    if(r != 0.0) {
+                        a[3] = Knuth2Sum(a[3], r, &s);
+                        r = s;
+                        /*if(r != 0.0) {
+                            a[4] = Knuth2Sum(a[4], r, &s);
+                            r = s;
+   	                }*/
+	            }
+   	        }
             }
             if(r != 0.0)
 	        Accumulate(l_workingBase, r);
 	//}
     }
     //Flush to the accumulator
-    #ifdef NVIDIA
-      #pragma unroll
-    #endif
-    for(uint i = 0; i != NBFPE; ++i) {
-	Accumulate(l_workingBase, a[i]);
-    }
+    Accumulate(l_workingBase, a[0]);
+    Accumulate(l_workingBase, a[1]);
+    Accumulate(l_workingBase, a[2]);
+    Accumulate(l_workingBase, a[3]);
     barrier(CLK_LOCAL_MEM_FENCE);
 
     //Merge sub-accumulators into work-group partial-accumulator

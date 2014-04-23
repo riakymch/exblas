@@ -150,10 +150,6 @@ void DDOT(
                 if(x != 0.0) {
                     a[3] = Knuth2Sum(a[3], x, &s);
                     x = s;
-                    /*if(x != 0.0) {
-                        a[4] = Knuth2Sum(a[4], x, &s);
-                        x = s;
-	            }*/
 	        }
 	    }
 	}
@@ -173,10 +169,6 @@ void DDOT(
                     if(r != 0.0) {
                         a[3] = Knuth2Sum(a[3], r, &s);
                         r = s;
-                        /*if(r != 0.0) {
-                            a[4] = Knuth2Sum(a[4], r, &s);
-                            r = s;
-   	                }*/
 	            }
    	        }
             }

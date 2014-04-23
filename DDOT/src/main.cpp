@@ -30,7 +30,7 @@ static uint __nbfpe      = 0;
 static uint __alg        = 0;
 
 static void __usage(int argc __attribute__((unused)), char **argv) {
-  fprintf(stderr, "Usage: %s [-n number of elements -r range -e nbfpe -a alg (0-ddot, 1-acc, 2-fpe, 3-fpeee)] \n", argv[0]);
+  fprintf(stderr, "Usage: %s [-n number of elements -r range -e nbfpe -a alg (0-ddot, 1-acc, 2-fpe, 3-fpeex8, 4-fpeex4, 5-fpeex6)] \n", argv[0]);
   printf("       -?, -h:    Display this help and exit\n");
 }
 
@@ -60,7 +60,7 @@ static void __parse_args(int argc, char **argv) {
     __usage(argc, argv);
     exit(-1);
   }
-  if (__alg > 3) {
+  if (__alg > 5) {
     __usage(argc, argv);
     exit(-1);
   }
@@ -78,14 +78,22 @@ int main(int argc, char **argv)
     __parse_args(argc, argv);
     printf("Starting with two vectors with  %i double elements\n\n", __nbElements); 
 
-    if (__alg == 0)
+    if (__alg == 0) {
         runDDOTSimple("../src/DDOT.Simple.cl");
-    if (__alg == 1)
+    } else if (__alg == 1) {
         runDDOT("../src/DDOT.Superacc.cl");
-    if (__alg == 2)
+    } else if (__alg == 2) {
         runDDOT("../src/DDOT.FPE.cl");
-    if (__alg == 3)
-        runDDOT("../src/DDOT.FPE.EX.cl");
+    } else if (__alg == 3) {
+	__nbfpe = 8;
+        runDDOT("../src/DDOT.FPE.EX.8.cl");
+    } else if (__alg == 4) {
+	__nbfpe = 4;
+        runDDOT("../src/DDOT.FPE.EX.4.cl");
+    } else if (__alg == 5) {
+	__nbfpe = 6;
+        runDDOT("../src/DDOT.FPE.EX.6.cl");
+    }
 }
 
 int runDDOT(const char* program_file){

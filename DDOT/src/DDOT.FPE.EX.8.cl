@@ -133,7 +133,7 @@ void DDOT(
     barrier(CLK_LOCAL_MEM_FENCE);
 
     //Read data from global memory and scatter it to sub-accumulators
-    double a[4] = {0.0};
+    double a[8] = {0.0};
     for(uint pos = get_global_id(0); pos < NbElements; pos += get_global_size(0)){
 	double r = 0.0;
 	data_t x = TwoProductFMA(d_a[pos], d_b[pos], &r);
@@ -150,10 +150,22 @@ void DDOT(
                 if(x != 0.0) {
                     a[3] = Knuth2Sum(a[3], x, &s);
                     x = s;
-                    /*if(x != 0.0) {
+                    if(x != 0.0) {
                         a[4] = Knuth2Sum(a[4], x, &s);
                         x = s;
-	            }*/
+                        if(x != 0.0) {
+                            a[5] = Knuth2Sum(a[5], x, &s);
+                            x = s;
+                            if(x != 0.0) {
+                                a[6] = Knuth2Sum(a[6], x, &s);
+                                x = s;
+                                if(x != 0.0) {
+                                    a[7] = Knuth2Sum(a[7], x, &s);
+                                    x = s;
+ 	                        }
+ 	                    }
+	                }
+	            }
 	        }
 	    }
 	}
@@ -173,10 +185,22 @@ void DDOT(
                     if(r != 0.0) {
                         a[3] = Knuth2Sum(a[3], r, &s);
                         r = s;
-                        /*if(r != 0.0) {
+                        if(r != 0.0) {
                             a[4] = Knuth2Sum(a[4], r, &s);
                             r = s;
-   	                }*/
+                            if(r != 0.0) {
+                                a[5] = Knuth2Sum(a[5], r, &s);
+                                r = s;
+                                if(r != 0.0) {
+                                    a[6] = Knuth2Sum(a[6], r, &s);
+                                    r = s;
+                                    if(r != 0.0) {
+                                        a[7] = Knuth2Sum(a[7], r, &s);
+                                        r = s;
+   	                            }
+   	                        }
+   	                    }
+   	                }
 	            }
    	        }
             }
@@ -189,6 +213,10 @@ void DDOT(
     Accumulate(l_workingBase, a[1]);
     Accumulate(l_workingBase, a[2]);
     Accumulate(l_workingBase, a[3]);
+    Accumulate(l_workingBase, a[4]);
+    Accumulate(l_workingBase, a[5]);
+    Accumulate(l_workingBase, a[6]);
+    Accumulate(l_workingBase, a[7]);
     barrier(CLK_LOCAL_MEM_FENCE);
 
     //Merge sub-accumulators into work-group partial-accumulator
