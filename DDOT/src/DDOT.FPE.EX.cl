@@ -2,6 +2,9 @@
 #pragma OPENCL EXTENSION cl_khr_fp64                   : enable  //For double precision numbers
 #pragma OPENCL EXTENSION cl_khr_int64_base_atomics     : enable  //For 64 atomic operations
 #pragma OPENCL EXTENSION cl_khr_byte_addressable_store : enable
+#ifdef NVIDIA
+    #pragma OPENCL EXTENSION cl_nv_pragma_unroll       : enable
+#endif
 
 //Data type used for input data fetches
 typedef double data_t;
@@ -21,6 +24,13 @@ double TwoProductFMA(double a, double b, double *d) {
     double p = a * b;
     *d = fma(a, b, -p);
     return p;
+}
+
+double Knuth2Sum(double a, double b, double *s) {
+    double r = a + b;
+    double z = r - a;
+    *s = (a - (r - z)) + (b - z);
+    return r;
 }
 
 // signedcarry in {-1, 0, 1}
@@ -123,14 +133,41 @@ void DDOT(
     barrier(CLK_LOCAL_MEM_FENCE);
 
     //Read data from global memory and scatter it to sub-accumulators
-    #ifdef NVIDIA
-        #pragma unroll
-    #endif
+    double a[NBFPE] = {0.0};
     for(uint pos = get_global_id(0); pos < NbElements; pos += get_global_size(0)){
 	double r = 0.0;
 	data_t x = TwoProductFMA(d_a[pos], d_b[pos], &r);
-	Accumulate(l_workingBase, x);
-	Accumulate(l_workingBase, r);
+
+        #ifdef NVIDIA
+          #pragma unroll
+        #endif
+        for(uint i = 0; i != NBFPE; ++i) {
+            double s;
+            a[i] = Knuth2Sum(a[i], x, &s);
+            x = s;
+        }
+        if(x != 0.0) 
+	    Accumulate(l_workingBase, x);
+
+	//if (r != 0.0) {
+            #ifdef NVIDIA
+              #pragma unroll
+            #endif
+            for(uint i = 0; i != NBFPE; ++i) {
+                double s;
+                a[i] = Knuth2Sum(a[i], r, &s);
+                r = s;
+            }
+            if(r != 0.0)
+	        Accumulate(l_workingBase, r);
+	//}
+    }
+    //Flush to the accumulator
+    #ifdef NVIDIA
+      #pragma unroll
+    #endif
+    for(uint i = 0; i != NBFPE; ++i) {
+	Accumulate(l_workingBase, a[i]);
     }
     barrier(CLK_LOCAL_MEM_FENCE);
 

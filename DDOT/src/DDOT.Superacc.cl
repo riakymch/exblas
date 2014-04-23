@@ -2,6 +2,9 @@
 #pragma OPENCL EXTENSION cl_khr_fp64                   : enable  //For double precision numbers
 #pragma OPENCL EXTENSION cl_khr_int64_base_atomics     : enable  //For 64 atomic operations
 #pragma OPENCL EXTENSION cl_khr_byte_addressable_store : enable
+#ifdef NVIDIA
+    #pragma OPENCL EXTENSION cl_nv_pragma_unroll       : enable
+#endif
 
 //Data type used for input data fetches
 typedef double data_t;
@@ -130,7 +133,8 @@ void DDOT(
 	double r = 0.0;
 	data_t x = TwoProductFMA(d_a[pos], d_b[pos], &r);
 	Accumulate(l_workingBase, x);
-	Accumulate(l_workingBase, r);
+	if (r != 0.0)
+ 	    Accumulate(l_workingBase, r);
     }
     barrier(CLK_LOCAL_MEM_FENCE);
 
