@@ -1,17 +1,17 @@
 
-#pragma OPENCL EXTENSION cl_khr_fp64                   : enable  // For double precision numbers
-#pragma OPENCL EXTENSION cl_khr_int64_base_atomics     : enable  // For 64 atomic operations
+#pragma OPENCL EXTENSION cl_khr_fp64                   : enable  //For double precision numbers
+#pragma OPENCL EXTENSION cl_khr_int64_base_atomics     : enable  //For 64 atomic operations
 #pragma OPENCL EXTENSION cl_khr_byte_addressable_store : enable
 
 //Data type used for input data fetches
 typedef double data_t;
 
-#define BIN_COUNT      39
-#define K              8                    // High-radix carry-save bits
-#define digits         56
-#define deltaScale     72057594037927936.0  // Assumes K>0
-#define f_words        20 
-#define TSAFE          0
+#define BIN_COUNT  39
+#define K          8                    //High-radix carry-save bits
+#define digits     56
+#define deltaScale 72057594037927936.0  //Assumes K > 0
+#define f_words    20 
+#define TSAFE      0
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -56,7 +56,6 @@ void AccumulateWord(__local volatile long *sa, int i, long x) {
 
   // To propagate over- or underflow 
   while (overflow) {
-    //atomic_inc(d_Overflow); 
     // Carry or borrow
     // oldword has sign S
     // x has sign S
@@ -107,7 +106,7 @@ void Accumulate(__local volatile long *sa, double x) {
 
 __kernel __attribute__((reqd_work_group_size(WORKGROUP_SIZE, 1, 1)))
 void DDOT(
-    __global data_t *d_PartialSuperaccs,
+    __global long *d_PartialSuperaccs,
     __global data_t *d_a,
     __global data_t *d_b,
     const uint NbElements
@@ -124,10 +123,14 @@ void DDOT(
     barrier(CLK_LOCAL_MEM_FENCE);
 
     //Read data from global memory and scatter it to sub-accumulators
+    #ifdef NVIDIA
+        #pragma unroll
+    #endif
     for(uint pos = get_global_id(0); pos < NbElements; pos += get_global_size(0)){
-	//TODO: add TwoProductFMA()
-        data_t x = 1.0; //d_a[pos] * d_b[pos];
+	double r = 0.0;
+	data_t x = TwoProductFMA(d_a[pos], d_b[pos], &r);
 	Accumulate(l_workingBase, x);
+	Accumulate(l_workingBase, r);
     }
     barrier(CLK_LOCAL_MEM_FENCE);
 
@@ -150,8 +153,8 @@ void DDOT(
 ////////////////////////////////////////////////////////////////////////////////
 __kernel __attribute__((reqd_work_group_size(MERGE_WORKGROUP_SIZE, 1, 1)))
 void DDOTComplete(
-    __global data_t *d_Superacc,
-    __global data_t *d_PartialSuperaccs,
+    __global long *d_Superacc,
+    __global long *d_PartialSuperaccs,
     const uint NbPartialSuperaccs
 ){
     __local long l_Data[MERGE_WORKGROUP_SIZE];
@@ -161,13 +164,18 @@ void DDOTComplete(
     uint gid = get_group_id(0);
 
     long sum = 0;
+    #ifdef NVIDIA
+        #pragma unroll
+    #endif
     for(uint i = lid; i < NbPartialSuperaccs; i += MERGE_WORKGROUP_SIZE) {
         sum += d_PartialSuperaccs[gid + i * BIN_COUNT];
     }
     l_Data[lid] = sum;
-    barrier(CLK_LOCAL_MEM_FENCE);
 
     //Reduce within the work group
+    #ifdef NVIDIA
+        #pragma unroll
+    #endif
     for(uint stride = MERGE_WORKGROUP_SIZE / 2; stride > 0; stride >>= 1){
         barrier(CLK_LOCAL_MEM_FENCE);
         if(lid < stride)

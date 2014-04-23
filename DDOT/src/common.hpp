@@ -127,6 +127,16 @@ extern "C" double round_mpfr(
     int size
 );
 
+extern "C" double roundKahan(
+    double *data,
+    int size
+);
+
+extern "C" double TwoProductFMA(
+    double a,
+    double b,
+    double *d
+);
 
 ////////////////////////////////////////////////////////////////////////////////
 // Executable functions from main.cpp

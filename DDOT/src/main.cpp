@@ -85,7 +85,7 @@ int main(int argc, char **argv)
     if (__alg == 2)
         runDDOT("../src/DDOT.FPE.cl");
     if (__alg == 3)
-        runDDOT("../src/DDOT.FPE.EE.cl");
+        runDDOT("../src/DDOT.FPE.EX.cl");
 }
 
 int runDDOT(const char* program_file){
@@ -163,16 +163,14 @@ int runDDOT(const char* program_file){
         }
     {
         printf("Initializing OpenCL DDOT...\n");
-            if (__alg == 1)
-                ciErrNum = initDDOT(cxGPUContext, cqCommandQueue, cdDevice, program_file, __nbfpe);
+            ciErrNum = initDDOT(cxGPUContext, cqCommandQueue, cdDevice, program_file, __nbfpe);
             
             if (ciErrNum != CL_SUCCESS)
                 cleanUp(EXIT_FAILURE);
 
         printf("Running OpenCL DDOT with %u elements...\n\n", __nbElements);
             //Just a single launch or a warmup iteration
-            if (__alg == 1)
-                DDOT(NULL, d_Superacc, d_a, d_b, __nbElements, &ciErrNum);
+            DDOT(NULL, d_Superacc, d_a, d_b, __nbElements, &ciErrNum);
 
             if (ciErrNum != CL_SUCCESS)
                 cleanUp(EXIT_FAILURE);
@@ -189,8 +187,7 @@ int runDDOT(const char* program_file){
                 cleanUp(EXIT_FAILURE);
             }
 
-            if (__alg == 1)
-                DDOT(NULL, d_Superacc, d_a, d_b, __nbElements, &ciErrNum);
+            DDOT(NULL, d_Superacc, d_a, d_b, __nbElements, &ciErrNum);
 
             ciErrNum  = clEnqueueMarker(cqCommandQueue, &endMark);
             ciErrNum |= clFinish(cqCommandQueue);
@@ -211,9 +208,9 @@ int runDDOT(const char* program_file){
         }
 
 	double minTime = min(gpuTime, NUM_ITER);
-	double perf = 2.0 * __nbElements * sizeof(double);
-	double throughput = (perf / minTime) * 1e-9;
-	perf = 2.0 * __nbElements;
+	double throughput = 2.0 * __nbElements * sizeof(double);
+	throughput = (throughput / minTime) * 1e-9;
+	double perf = 2.0 * __nbElements;
 	perf = (perf / minTime) * 1e-9;
         printf("Alg = %u \t Range = %u \t NbElements = %u \t Size = %lu \t Time = %.8f s \t Throughput = %.4f GB/s\n\n", __alg, __range, __nbElements, __nbElements * sizeof(double), minTime, throughput);
         printf("Alg = %u \t Range = %u \t NbElements = %u \t Size = %lu \t Time = %.8f s \t Performance = %.4f GFLOPS\n\n", __alg, __range, __nbElements, __nbElements * sizeof(double), minTime, perf);
@@ -233,10 +230,14 @@ int runDDOT(const char* program_file){
                 Superaccumulator superaccCPU(E_BITS, F_BITS);
                 // accumulate numbers
                 for (uint i = 0; i < __nbElements; i++) {
-                    superaccCPU.Accumulate(((double *) h_a)[i] * ((double *) h_b)[i]);
+		    double r = 0.0;
+		    double x = TwoProductFMA(((double *) h_a)[i], ((double *) h_b)[i], &r);
+                    superaccCPU.Accumulate(x);
+                    superaccCPU.Accumulate(r);
                 }
 
             printf(" ...comparing the results\n");
+               printf("//--------------------------------------------------------\n");
 	       superaccCPU.PrintAccumulator();
 	       superaccGPU.PrintAccumulator();
                //check the results using mpfr algorithm
@@ -251,11 +252,11 @@ int runDDOT(const char* program_file){
 	       PassFailFlag = abs(roundCPU - roundGPU) < 1e-16 ? 1 : 0;
 	       printf("[CPU] Rounded value of the compuation: %.17g\n", roundCPU);
 	       printf("[GPU] Rounded value of the compuation: %.17g\n", roundGPU);
+               printf("//--------------------------------------------------------\n");
             
          //Release kernels and program
          printf("Shutting down...\n\n");
-            if (__alg == 1)
-                closeDDOT();
+             closeDDOT();
     }
 
     // pass or fail
@@ -341,8 +342,7 @@ int runDDOTSimple(const char* program_file){
         }
     {
         printf("Initializing OpenCL DDOT...\n");
-	    if (__alg == 0)
-                ciErrNum = initDDOTSimple(cxGPUContext, cqCommandQueue, cdDevice, program_file);
+            ciErrNum = initDDOTSimple(cxGPUContext, cqCommandQueue, cdDevice, program_file);
             
             if (ciErrNum != CL_SUCCESS)
                 cleanUp(EXIT_FAILURE);
@@ -413,8 +413,7 @@ int runDDOTSimple(const char* program_file){
 
          //Release kernels and program
          printf("Shutting down...\n\n");
-            if (__alg == 0)
-		closeDDOTSimple();
+             closeDDOTSimple();
     }
 
     // pass or fail

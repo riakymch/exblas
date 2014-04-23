@@ -56,7 +56,6 @@ void AccumulateWord(__local volatile long *sa, int i, long x) {
 
   // To propagate over- or underflow 
   while (overflow) {
-    //atomic_inc(d_Overflow); 
     // Carry or borrow
     // oldword has sign S
     // x has sign S
@@ -128,7 +127,7 @@ void DDOT(
         #pragma unroll
     #endif
     for(uint pos = get_global_id(0); pos < NbElements; pos += get_global_size(0)){
-	double r = 0;
+	double r = 0.0;
 	data_t x = TwoProductFMA(d_a[pos], d_b[pos], &r);
 	Accumulate(l_workingBase, x);
 	Accumulate(l_workingBase, r);

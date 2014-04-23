@@ -192,6 +192,12 @@ extern "C" double round_mpfr(double *data, int size) {
   return result_d;
 }
 
+extern "C" double TwoProductFMA(double a, double b, double *d) {
+    double p = a * b;
+    *d = fma(a, b, -p);
+    return p;
+}
+
 /*
  * Kahan Summation :
  * We use Kahan summation for an accurate sum of large arrays.
