@@ -18,10 +18,17 @@ Superaccumulator::Superaccumulator(int64_t *acc, int e_bits, int f_bits) :
       K(8), digits(64 - K), deltaScale(double(1ull << digits)),
       f_words((f_bits + digits - 1) / digits),   // Round up
       e_words((e_bits + digits - 1) / digits),
-      imin(f_words + e_words - 1), imax(0),
+      imin(0), imax(0),
       status(Exact), overflow_counter((1ll << K) - 1) {
-  for (int i = 0; i < f_words + e_words; ++i)
+  for (int i = 0; i < f_words + e_words; ++i) {
     accumulator.push_back(acc[i]);
+    //to find imin
+    if ((acc[i] != 0) && (imin == 0))
+	imin = i;
+    //to find imax
+    if ((acc[i] == 0) && (imin != 0) && (imax == 0))
+	imax = i - 1;
+  }
 }
 
 void Superaccumulator::AccumulateWord(int64_t x, int i) {

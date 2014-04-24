@@ -245,26 +245,26 @@ int runDDOT(const char* program_file){
                 }
 
             printf(" ...comparing the results\n");
-               printf("//--------------------------------------------------------\n");
-	       superaccCPU.PrintAccumulator();
-	       superaccGPU.PrintAccumulator();
-               //check the results using mpfr algorithm
-               /*printf("//--------------------------------------------------------\n");
-	       mpfr_t *res_mpfr = sum_mpfr((double *) h_iData, __nbElements);
-               PassFailFlag = superaccGPU.CompareSuperaccumulatorWithMPFR(res_mpfr);
-	       double res_rounded = superaccCPU.Round();
-               PassFailFlag |= superaccGPU.CompareRoundedResults(res_mpfr, res_rounded);*/
+                printf("//--------------------------------------------------------\n");
+	        //superaccCPU.PrintAccumulator();
+	        //superaccGPU.PrintAccumulator();
+                //check the results using mpfr algorithm
+                /*printf("//--------------------------------------------------------\n");
+	        mpfr_t *res_mpfr = sum_mpfr((double *) h_iData, __nbElements);
+                PassFailFlag = superaccGPU.CompareSuperaccumulatorWithMPFR(res_mpfr);
+	        double res_rounded = superaccCPU.Round();
+                PassFailFlag |= superaccGPU.CompareRoundedResults(res_mpfr, res_rounded);*/
 
-	       double roundCPU = superaccCPU.Round();
-	       double roundGPU = superaccGPU.Round();
-	       PassFailFlag = abs(roundCPU - roundGPU) < 1e-16 ? 1 : 0;
-	       printf("[CPU] Rounded value of the compuation: %.17g\n", roundCPU);
-	       printf("[GPU] Rounded value of the compuation: %.17g\n", roundGPU);
-               printf("//--------------------------------------------------------\n");
+	        double roundCPU = superaccCPU.Round();
+	        double roundGPU = superaccGPU.Round();
+	        PassFailFlag = abs(roundCPU - roundGPU) < 1e-16 ? 1 : 0;
+	        printf("[CPU] Rounded value of the compuation: %.17g\n", roundCPU);
+	        printf("[GPU] Rounded value of the compuation: %.17g\n", roundGPU);
+                printf("//--------------------------------------------------------\n");
             
-         //Release kernels and program
-         printf("Shutting down...\n\n");
-             closeDDOT();
+        //Release kernels and program
+        printf("Shutting down...\n\n");
+            closeDDOT();
     }
 
     // pass or fail
