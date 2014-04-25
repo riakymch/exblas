@@ -26,7 +26,7 @@ double TwoProductFMA(double a, double b, double *d) {
     return p;
 }
 
-double Knuth2Sum(double a, double b, double *s) {
+double KnuthTwoSum(double a, double b, double *s) {
     double r = a + b;
     double z = r - a;
     *s = (a - (r - z)) + (b - z);
@@ -143,7 +143,7 @@ void DDOT(
         #endif
         for(uint i = 0; i != NBFPE; ++i) {
             double s;
-            a[i] = Knuth2Sum(a[i], x, &s);
+            a[i] = KnuthTwoSum(a[i], x, &s);
             x = s;
         }
         if(x != 0.0) 
@@ -155,7 +155,7 @@ void DDOT(
             #endif
             for(uint i = 0; i != NBFPE; ++i) {
                 double s;
-                a[i] = Knuth2Sum(a[i], r, &s);
+                a[i] = KnuthTwoSum(a[i], r, &s);
                 r = s;
             }
             if(r != 0.0)

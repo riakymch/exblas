@@ -257,7 +257,10 @@ int runDDOT(const char* program_file){
 
 	        double roundCPU = superaccCPU.Round();
 	        double roundGPU = superaccGPU.Round();
-	        PassFailFlag = abs(roundCPU - roundGPU) < 1e-16 ? 1 : 0;
+		double r = 0.0;
+		double x = KnuthTwoSum(roundCPU, -roundGPU, &r);
+		printf("x = %.32g \t r = %.32g\n", x, r);
+	        PassFailFlag = ((x < 1e-16) && (r < 1e-16)) ? 1 : 0;
 	        printf("[CPU] Rounded value of the compuation: %.17g\n", roundCPU);
 	        printf("[GPU] Rounded value of the compuation: %.17g\n", roundGPU);
                 printf("//--------------------------------------------------------\n");

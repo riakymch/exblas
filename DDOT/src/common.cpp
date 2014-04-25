@@ -192,6 +192,13 @@ extern "C" double round_mpfr(double *data, int size) {
   return result_d;
 }
 
+extern "C" double KnuthTwoSum(double a, double b, double *s) {
+    double r = a + b;
+    double z = r - a;
+    *s = (a - (r - z)) + (b - z);
+    return r;
+}
+
 extern "C" double TwoProductFMA(double a, double b, double *d) {
     double p = a * b;
     *d = fma(a, b, -p);

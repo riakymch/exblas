@@ -26,7 +26,7 @@ double TwoProductFMA(double a, double b, double *d) {
     return p;
 }
 
-double Knuth2Sum(double a, double b, double *s) {
+double KnuthTwoSum(double a, double b, double *s) {
     double r = a + b;
     double z = r - a;
     *s = (a - (r - z)) + (b - z);
@@ -139,16 +139,16 @@ void DDOT(
 	data_t x = TwoProductFMA(d_a[pos], d_b[pos], &r);
 
         double s;
-        a[0] = Knuth2Sum(a[0], x, &s);
+        a[0] = KnuthTwoSum(a[0], x, &s);
         x = s;
         if(x != 0.0) {
-            a[1] = Knuth2Sum(a[1], x, &s);
+            a[1] = KnuthTwoSum(a[1], x, &s);
             x = s;
             if(x != 0.0) {
-                a[2] = Knuth2Sum(a[2], x, &s);
+                a[2] = KnuthTwoSum(a[2], x, &s);
                 x = s;
                 if(x != 0.0) {
-                    a[3] = Knuth2Sum(a[3], x, &s);
+                    a[3] = KnuthTwoSum(a[3], x, &s);
                     x = s;
 	        }
 	    }
@@ -158,16 +158,16 @@ void DDOT(
 
 	//if (r != 0.0) { // without it is better for the performance, especially on nvidia
             //double s;
-            a[0] = Knuth2Sum(a[0], r, &s);
+            a[0] = KnuthTwoSum(a[0], r, &s);
             r = s;
             if(r != 0.0) {
-                a[1] = Knuth2Sum(a[1], r, &s);
+                a[1] = KnuthTwoSum(a[1], r, &s);
                 r = s;
                 if(r != 0.0) {
-                    a[2] = Knuth2Sum(a[2], r, &s);
+                    a[2] = KnuthTwoSum(a[2], r, &s);
                     r = s;
                     if(r != 0.0) {
-                        a[3] = Knuth2Sum(a[3], r, &s);
+                        a[3] = KnuthTwoSum(a[3], r, &s);
                         r = s;
 	            }
    	        }
