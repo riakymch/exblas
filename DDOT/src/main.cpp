@@ -234,9 +234,7 @@ int runDDOT(const char* program_file){
                 Superaccumulator superaccGPU((int64_t *) h_Superacc, E_BITS, F_BITS);
 
             printf(" ...SupersuperaccCPU()\n");
-                // init accumulator
                 Superaccumulator superaccCPU(E_BITS, F_BITS);
-                // accumulate numbers
                 for (uint i = 0; i < __nbElements; i++) {
 		    double r = 0.0;
 		    double x = TwoProductFMA(((double *) h_a)[i], ((double *) h_b)[i], &r);
@@ -246,8 +244,8 @@ int runDDOT(const char* program_file){
 
             printf(" ...comparing the results\n");
                 printf("//--------------------------------------------------------\n");
-	        //superaccCPU.PrintAccumulator();
-	        //superaccGPU.PrintAccumulator();
+	        superaccCPU.PrintAccumulator();
+	        superaccGPU.PrintAccumulator();
                 //check the results using mpfr algorithm
                 /*printf("//--------------------------------------------------------\n");
 	        mpfr_t *res_mpfr = sum_mpfr((double *) h_iData, __nbElements);
