@@ -220,8 +220,8 @@ int runDDOT(const char* program_file){
 	throughput = (throughput / minTime) * 1e-9;
 	double perf = 2.0 * __nbElements;
 	perf = (perf / minTime) * 1e-9;
-        printf("Alg = %u \t Range = %u \t NbElements = %u \t Size = %lu \t Time = %.8f s \t Throughput = %.4f GB/s\n\n", __alg, __range, __nbElements, __nbElements * sizeof(double), minTime, throughput);
-        printf("Alg = %u \t Range = %u \t NbElements = %u \t Size = %lu \t Time = %.8f s \t Performance = %.4f GFLOPS\n\n", __alg, __range, __nbElements, __nbElements * sizeof(double), minTime, perf);
+        printf("Alg = %u \t NbFPE = %u \t Range = %u \t NbElements = %u \t Size = %lu \t Time = %.8f s \t Throughput = %.4f GB/s\n\n", __alg, __nbfpe, __range, __nbElements, __nbElements * sizeof(double), minTime, throughput);
+        printf("Alg = %u \t NbFPE = %u \t Range = %u \t NbElements = %u \t Size = %lu \t Time = %.8f s \t Performance = %.4f GFLOPS\n\n", __alg, __nbfpe, __range, __nbElements, __nbElements * sizeof(double), minTime, perf);
 #endif
 
         printf("Validating DDOT OpenCL results...\n");
@@ -244,8 +244,8 @@ int runDDOT(const char* program_file){
 
             printf(" ...comparing the results\n");
                 printf("//--------------------------------------------------------\n");
-	        superaccCPU.PrintAccumulator();
-	        superaccGPU.PrintAccumulator();
+	        //superaccCPU.PrintAccumulator();
+	        //superaccGPU.PrintAccumulator();
                 //check the results using mpfr algorithm
                 /*printf("//--------------------------------------------------------\n");
 	        mpfr_t *res_mpfr = sum_mpfr((double *) h_iData, __nbElements);
