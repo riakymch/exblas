@@ -13,7 +13,7 @@ rangeMax=700
 step=10
 alg=1
 exe=./../src/main.out
-file=../results/InputRange.VS.GBs.NVIDIA.2014.04.25.dat
+file=../results/InputRange.VS.GBs.AMD.2014.04.25.dat
 echo
 touch $file
 echo -n "" > $file
