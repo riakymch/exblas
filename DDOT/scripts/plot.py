@@ -19,7 +19,7 @@ def readDataFromFileAll(filename, str1, str2):
 
     results = []
     for line in f:
-        if line.find(str1) != -1 and line.find(str2) != -1 and line.find("Performance = ") != -1:
+        if line.find(str1) != -1 and line.find(str2) != -1 and line.find("Throughput = ") != -1:
             if line.find("NbFPE") != -1:
                 line = line.split();
                 #results.append([line[11], line[len(line) - 2]])
@@ -127,7 +127,7 @@ def plotNbElementsVSGbsAll(input, output):
     fpe8 = readDataFromFileAll(input, "Alg = 2", "NbFPE = 8")    
     fpe8ee = readDataFromFileAll(input, "Alg = 3", "NbFPE = 8")
     fpe4ee = readDataFromFileAll(input, "Alg = 4", "NbFPE = 4")
-    fpe5ee = readDataFromFileAll(input, "Alg = 5", "NbFPE = 6")        
+    fpe5ee = readDataFromFileAll(input, "Alg = 5", "NbFPE = 6")
 
     # plot the results
     gp = Gnuplot.Gnuplot(persist=1)
@@ -140,7 +140,7 @@ def plotNbElementsVSGbsAll(input, output):
     gp('set xrange [1000:1.e+09]')
     gp('set logscale x 10')
     gp('set yrange [0:]')
-    gp('set output "| epstopdf --filter > ' + output + '"')    
+    gp('set output "| epstopdf --filter > ' + output + '"')
 
     # legend
     gp('set key width -7. samplen 1.8')
@@ -160,11 +160,10 @@ def plotNbElementsVSGbsAll(input, output):
     plotfpe6 = Gnuplot.Data(fpe6, with_='lines lt 7 lw 4.0', title="Expansion 6")
     plotfpe7 = Gnuplot.Data(fpe7, with_='lines lt 0 lw 4.0', title="Expansion 7")
     plotfpe8 = Gnuplot.Data(fpe8, with_='lines lt 3 lw 4.0', title="Expansion 8")
-    plotfpe8ee = Gnuplot.Data(fpe8ee, with_='lines lt 9 lw 4.0', title="Expansion 8 early-exit")    
+    plotfpe8ee = Gnuplot.Data(fpe8ee, with_='lines lt 9 lw 4.0', title="Expansion 8 early-exit")
     
-    #gp.plot(plotDDOT, plotSuperaccs, plotfpe2, plotfpe3, plotfpe4, plotfpe5, plotfpe6, plotfpe7, plotfpe8, plotfpe8ee)
-    print ddot
-    gp.plot(plotDDOT)
+    gp.plot(plotDDOT, plotSuperaccs, plotfpe2, plotfpe3, plotfpe4, plotfpe5, plotfpe6, plotfpe7, plotfpe8, plotfpe8ee)
+#     gp.plot(plotDDOT)
     return
 
 def plotInputRangeVSGbs(input, output): 
