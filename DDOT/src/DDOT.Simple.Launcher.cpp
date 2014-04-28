@@ -17,8 +17,8 @@
 #define DDOT_KERNEL          "DDOT"
 #define DDOT_COMPLETE_KERNEL "DDOTComplete"
 
-static size_t szKernelLength;		       // Byte size of kernel code
-static char* cSources = NULL;                  // Buffer to hold source for compilation
+static size_t szKernelLength;		       //Byte size of kernel code
+static char* cSources = NULL;                  //Buffer to hold source for compilation
 
 static cl_program       cpProgram;             //OpenCL Reduction program
 static cl_kernel        ckKernel, ckComplete;
@@ -26,7 +26,6 @@ static cl_command_queue cqDefaultCommandQue;   //Default command queue for Reduc
 static cl_mem           d_PartialSum;
 
 static const uint  PARTIAL_SUMMATION_COUNT = 2048;
-static const uint  WARP_SIZE               = 32;
 static const uint  WORKGROUP_SIZE          = 256;
 static const uint  MERGE_WORKGROUP_SIZE    = 256;
 static const uint  VECTOR_NUMBER           = 1;

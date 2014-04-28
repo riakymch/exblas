@@ -21,7 +21,8 @@ cl_device_id      cdDevice;              //OpenCL device list
 cl_context        cxGPUContext;          //OpenCL context
 cl_command_queue  cqCommandQueue;        //OpenCL command que
 cl_mem            d_a, d_b, d_Superacc, d_res;  //OpenCL memory buffer objects
-double            *h_a, *h_b, h_res;
+void              *h_a, *h_b;
+double            h_res;
 bintype           *h_Superacc;
 
 static uint __nbElements = 0;
@@ -101,8 +102,8 @@ int runDDOT(const char* program_file){
     int PassFailFlag = 1;
 
     printf("Initializing data...\n");
-        PassFailFlag  = posix_memalign((void **)&h_a, 64, __nbElements * sizeof(double));
-        PassFailFlag |= posix_memalign((void **)&h_b, 64, __nbElements * sizeof(double));
+        PassFailFlag  = posix_memalign(&h_a, 64, __nbElements * sizeof(double));
+        PassFailFlag |= posix_memalign(&h_b, 64, __nbElements * sizeof(double));
         if (PassFailFlag != 0) {
             printf("ERROR: could not allocate memory with posix_memalign!\n");
             exit(1);
@@ -111,8 +112,8 @@ int runDDOT(const char* program_file){
 
 	// init data
         int emax = E_BITS - log2(__nbElements);// use log in order to stay within [emin, emax]
-        init_fpuniform(h_a, __nbElements, __range, emax);
-        init_fpuniform(h_b, __nbElements, __range, emax);
+        init_fpuniform((double *) h_a, __nbElements, __range, emax);
+        init_fpuniform((double *) h_b, __nbElements, __range, emax);
 
     printf("Initializing OpenCL...\n");
         char platform_name[64];
@@ -153,7 +154,7 @@ int runDDOT(const char* program_file){
         }
 
     printf("Allocating OpenCL memory...\n\n");
-	size_t size = __nbElements * sizeof(double);
+	size_t size = __nbElements * sizeof(cl_double);
 	d_a = clCreateBuffer(cxGPUContext, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, size, h_a, &ciErrNum);
         if (ciErrNum != CL_SUCCESS) {
             printf("Error in clCreateBuffer for d_a, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
@@ -161,12 +162,12 @@ int runDDOT(const char* program_file){
         }
 	d_b = clCreateBuffer(cxGPUContext, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, size, h_b, &ciErrNum);
         if (ciErrNum != CL_SUCCESS) {
-            printf("Error in clCreateBuffer for d_a, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
+            printf("Error in clCreateBuffer for d_b, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
             cleanUp(EXIT_FAILURE);
         }
 	d_Superacc = clCreateBuffer(cxGPUContext, CL_MEM_READ_WRITE, BIN_COUNT * sizeof(bintype), NULL, &ciErrNum);
         if (ciErrNum != CL_SUCCESS) {
-            printf("Error in clCreateBuffer for d_a, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
+            printf("Error in clCreateBuffer for d_res, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
             cleanUp(EXIT_FAILURE);
         }
     {
@@ -282,8 +283,8 @@ int runDDOTSimple(const char* program_file){
     int PassFailFlag = 1;
 
     printf("Initializing data...\n");
-        PassFailFlag  = posix_memalign((void **)&h_a, 64, __nbElements * sizeof(double));
-        PassFailFlag |= posix_memalign((void **)&h_b, 64, __nbElements * sizeof(double));
+        PassFailFlag  = posix_memalign(&h_a, 64, __nbElements * sizeof(double));
+        PassFailFlag |= posix_memalign(&h_b, 64, __nbElements * sizeof(double));
         if (PassFailFlag != 0) {
             printf("ERROR: could not allocate memory with posix_memalign!\n");
             exit(1);
@@ -291,8 +292,8 @@ int runDDOTSimple(const char* program_file){
 
 	// init data
         int emax = E_BITS - log2(__nbElements);// use log in order to stay within [emin, emax]
-        init_fpuniform(h_a, __nbElements, __range, emax);
-        init_fpuniform(h_b, __nbElements, __range, emax);
+        init_fpuniform((double *) h_a, __nbElements, __range, emax);
+        init_fpuniform((double *) h_b, __nbElements, __range, emax);
 
     printf("Initializing OpenCL...\n");
         char platform_name[64];
@@ -341,12 +342,12 @@ int runDDOTSimple(const char* program_file){
         }
 	d_b = clCreateBuffer(cxGPUContext, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, size, h_b, &ciErrNum);
         if (ciErrNum != CL_SUCCESS) {
-            printf("Error in clCreateBuffer for d_a, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
+            printf("Error in clCreateBuffer for d_b, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
             cleanUp(EXIT_FAILURE);
         }
 	d_res = clCreateBuffer(cxGPUContext, CL_MEM_READ_WRITE, sizeof(cl_double), NULL, &ciErrNum);
         if (ciErrNum != CL_SUCCESS) {
-            printf("Error in clCreateBuffer for d_a, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
+            printf("Error in clCreateBuffer for d_res, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
             cleanUp(EXIT_FAILURE);
         }
     {
@@ -395,9 +396,9 @@ int runDDOTSimple(const char* program_file){
         }
 
 	double minTime = min(gpuTime, NUM_ITER);
-	double perf = 2.0 * __nbElements * sizeof(double);
-	double throughput = (perf / minTime) * 1e-9;
-	perf = 2.0 * __nbElements;
+	double throughput = 2.0 * __nbElements * sizeof(double);
+	throughput = (throughput / minTime) * 1e-9;
+	double perf = 2.0 * __nbElements;
 	perf = (perf / minTime) * 1e-9;
         printf("Alg = %u \t Range = %u \t NbElements = %u \t Size = %lu \t Time = %.8f s \t Throughput = %.4f GB/s\n\n", __alg, __range, __nbElements, __nbElements * sizeof(double), minTime, throughput);
         printf("Alg = %u \t Range = %u \t NbElements = %u \t Size = %lu \t Time = %.8f s \t Performance = %.4f GFLOPS\n\n", __alg, __range, __nbElements, __nbElements * sizeof(double), minTime, perf);
@@ -413,7 +414,7 @@ int runDDOTSimple(const char* program_file){
 		
             printf(" ...ddotCPU()\n");
                 // init accumulator
-		double res_cpu = DDOT_CPU(h_a, h_b, __nbElements);
+		double res_cpu = DDOT_CPU((double *) h_a, (double *) h_b, __nbElements);
 
             printf(" ...comparing the results\n");
 		printf("[CPU]Results of simple dot product %.8g\n", res_cpu);
