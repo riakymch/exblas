@@ -121,13 +121,13 @@ def plotNbElementsVSGbsAll(input, output):
     fpe2 = readDataFromFileAll(input, "Alg = 2", "NbFPE = 2")
     fpe3 = readDataFromFileAll(input, "Alg = 2", "NbFPE = 3")
     fpe4 = readDataFromFileAll(input, "Alg = 2", "NbFPE = 4")
-    fpe5 = readDataFromFileAll(input, "Alg = 2", "NbFPE = 5")
-    fpe6 = readDataFromFileAll(input, "Alg = 2", "NbFPE = 6")
-    fpe7 = readDataFromFileAll(input, "Alg = 2", "NbFPE = 7")
-    fpe8 = readDataFromFileAll(input, "Alg = 2", "NbFPE = 8")    
-    fpe8ee = readDataFromFileAll(input, "Alg = 3", "NbFPE = 8")
+#     fpe5 = readDataFromFileAll(input, "Alg = 2", "NbFPE = 5")
+#     fpe6 = readDataFromFileAll(input, "Alg = 2", "NbFPE = 6")
+#     fpe7 = readDataFromFileAll(input, "Alg = 2", "NbFPE = 7")
+    fpe8 = readDataFromFileAll(input, "Alg = 2", "NbFPE = 8")  
     fpe4ee = readDataFromFileAll(input, "Alg = 4", "NbFPE = 4")
-    fpe5ee = readDataFromFileAll(input, "Alg = 5", "NbFPE = 6")
+    fpe6ee = readDataFromFileAll(input, "Alg = 5", "NbFPE = 6")      
+    fpe8ee = readDataFromFileAll(input, "Alg = 3", "NbFPE = 8")
 
     # plot the results
     gp = Gnuplot.Gnuplot(persist=1)
@@ -156,14 +156,16 @@ def plotNbElementsVSGbsAll(input, output):
     plotfpe2 = Gnuplot.Data(fpe2, with_='lines lt 8 lw 4.0', title="Expansion 2")
     plotfpe3 = Gnuplot.Data(fpe3, with_='lines lt 5 lw 4.0', title="Expansion 3")
     plotfpe4 = Gnuplot.Data(fpe4, with_='lines lt 2 lw 4.0', title="Expansion 4")
-    plotfpe5 = Gnuplot.Data(fpe5, with_='lines lt 6 lw 4.0', title="Expansion 5")
-    plotfpe6 = Gnuplot.Data(fpe6, with_='lines lt 7 lw 4.0', title="Expansion 6")
-    plotfpe7 = Gnuplot.Data(fpe7, with_='lines lt 0 lw 4.0', title="Expansion 7")
+#     plotfpe5 = Gnuplot.Data(fpe5, with_='lines lt 6 lw 4.0', title="Expansion 5")
+#     plotfpe6 = Gnuplot.Data(fpe6, with_='lines lt 7 lw 4.0', title="Expansion 6")
+#     plotfpe7 = Gnuplot.Data(fpe7, with_='lines lt 0 lw 4.0', title="Expansion 7")
     plotfpe8 = Gnuplot.Data(fpe8, with_='lines lt 3 lw 4.0', title="Expansion 8")
-    plotfpe8ee = Gnuplot.Data(fpe8ee, with_='lines lt 9 lw 4.0', title="Expansion 8 early-exit")
+    plotfpe4ee = Gnuplot.Data(fpe4ee, with_='lines lt 0 lw 4.0', title="Expansion 4 early-exit")
+    plotfpe6ee = Gnuplot.Data(fpe6ee, with_='lines lt 7 lw 4.0', title="Expansion 6 early-exit")        
+    plotfpe8ee = Gnuplot.Data(fpe8ee, with_='lines lt 9 lw 4.0', title="Expansion 8 early-exit")    
     
-    gp.plot(plotDDOT, plotSuperaccs, plotfpe2, plotfpe3, plotfpe4, plotfpe5, plotfpe6, plotfpe7, plotfpe8, plotfpe8ee)
-#     gp.plot(plotDDOT)
+#     gp.plot(plotDDOT, plotSuperaccs, plotfpe2, plotfpe3, plotfpe4, plotfpe5, plotfpe6, plotfpe7, plotfpe8, plotfpe8ee)
+    gp.plot(plotDDOT, plotSuperaccs, plotfpe2, plotfpe3, plotfpe4, plotfpe8, plotfpe4ee, plotfpe6ee, plotfpe8ee)    
     return
 
 def plotInputRangeVSGbs(input, output): 
