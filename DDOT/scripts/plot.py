@@ -159,9 +159,9 @@ def plotNbElementsVSGbsAll(input, output):
 #     plotfpe5 = Gnuplot.Data(fpe5, with_='lines lt 6 lw 4.0', title="Expansion 5")
 #     plotfpe6 = Gnuplot.Data(fpe6, with_='lines lt 7 lw 4.0', title="Expansion 6")
 #     plotfpe7 = Gnuplot.Data(fpe7, with_='lines lt 0 lw 4.0', title="Expansion 7")
-    plotfpe8 = Gnuplot.Data(fpe8, with_='lines lt 3 lw 4.0', title="Expansion 8")
+    plotfpe8 = Gnuplot.Data(fpe8, with_='lines lt 7 lw 4.0', title="Expansion 8")
     plotfpe4ee = Gnuplot.Data(fpe4ee, with_='lines lt 0 lw 4.0', title="Expansion 4 early-exit")
-    plotfpe6ee = Gnuplot.Data(fpe6ee, with_='lines lt 7 lw 4.0', title="Expansion 6 early-exit")        
+    plotfpe6ee = Gnuplot.Data(fpe6ee, with_='lines lt 3 lw 4.0', title="Expansion 6 early-exit")        
     plotfpe8ee = Gnuplot.Data(fpe8ee, with_='lines lt 9 lw 4.0', title="Expansion 8 early-exit")    
     
 #     gp.plot(plotDDOT, plotSuperaccs, plotfpe2, plotfpe3, plotfpe4, plotfpe5, plotfpe6, plotfpe7, plotfpe8, plotfpe8ee)
@@ -236,23 +236,21 @@ def plotInputRangeVSGbsAll(input, output):
     
 #     resultTotal = []
 #     for data in ddot:
-#         resultTotal.append([data[0], data[1]])
-#                            results5.pop(0)[1], results2.pop(0)[1], \
-#                            results3.pop(0)[1], results4.pop(0)[1]])
+#         if int(data[0]) > 500:
+#             break
+#         resultTotal.append([data[0], data[1], superaccs.pop(0)[1], \
+#                            fpe2.pop(0)[1], fpe3.pop(0)[1], fpe4.pop(0)[1], \
+#                            fpe8.pop(0)[1], fpe4ee.pop(0)[1], fpe6ee.pop(0)[1], \
+#                            fpe8ee.pop(0)[1]])
 #     f = open(input[0:len(input)-3] + "gnuplot.dat", "w")
-#     for data in results9:
-#         str = ""
-#         for i in resultTotal.pop(0):
-#             str += i + "\t"
-#         str += data[0] + "\t" + data[1] + "\n"
-#         f.write(str)
 #     for data in resultTotal:
 #         str = ""
 #         for i in data:
 #             str += i + "\t"
-#         str += ". \n"
+#         str += ".  \n"
 #         f.write(str)            
 #     f.close()
+#     exit
     
     # plot the results
     gp = Gnuplot.Gnuplot(persist=1)
@@ -286,9 +284,9 @@ def plotInputRangeVSGbsAll(input, output):
 #     plotfpe5 = Gnuplot.Data(fpe5, with_='lines lt 6 lw 4.0', title="Expansion 5")
 #     plotfpe6 = Gnuplot.Data(fpe6, with_='lines lt 7 lw 4.0', title="Expansion 6")
 #     plotfpe7 = Gnuplot.Data(fpe7, with_='lines lt 0 lw 4.0', title="Expansion 7")
-    plotfpe8 = Gnuplot.Data(fpe8, with_='lines lt 3 lw 4.0', title="Expansion 8")
+    plotfpe8 = Gnuplot.Data(fpe8, with_='lines lt 7 lw 4.0', title="Expansion 8")
     plotfpe4ee = Gnuplot.Data(fpe4ee, with_='lines lt 0 lw 4.0', title="Expansion 4 early-exit")
-    plotfpe6ee = Gnuplot.Data(fpe6ee, with_='lines lt 7 lw 4.0', title="Expansion 6 early-exit")        
+    plotfpe6ee = Gnuplot.Data(fpe6ee, with_='lines lt 3 lw 4.0', title="Expansion 6 early-exit")        
     plotfpe8ee = Gnuplot.Data(fpe8ee, with_='lines lt 9 lw 4.0', title="Expansion 8 early-exit")    
     
 #     gp.plot(plotDDOT, plotSuperaccs, plotfpe2, plotfpe3, plotfpe4, plotfpe5, plotfpe6, plotfpe7, plotfpe8, plotfpe8ee)
