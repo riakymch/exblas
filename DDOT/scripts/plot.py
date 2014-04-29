@@ -19,7 +19,7 @@ def readDataFromFileAll(filename, str1, str2):
 
     results = []
     for line in f:
-        if line.find(str1) != -1 and line.find(str2) != -1 and line.find("Throughput = ") != -1:
+        if line.find("Throughput = ") != -1 and line.find(str1) != -1 and line.find(str2) != -1:
             if line.find("NbFPE") != -1:
                 line = line.split();
                 #results.append([line[11], line[len(line) - 2]])
@@ -49,7 +49,7 @@ def readDataFromFileInputRangeAll(filename, str1, str2):
 
     results = []
     for line in f:
-        if line.find(str1) != -1 and line.find(str2) != -1:
+        if line.find("Throughput") != -1 and line.find(str1) != -1 and line.find(str2) != -1:
             if line.find("NbFPE") != -1:
                 line = line.split();
                 #if float(line[8]) > 500:
@@ -221,37 +221,38 @@ def plotInputRangeVSGbs(input, output):
     return
     
 def plotInputRangeVSGbsAll(input, output):
-    results0 = readDataFromFileInputRangeAll(input, "Alg = 0", "Alg = 0")
-    results1 = readDataFromFileInputRangeAll(input, "Alg = 1", "NbFPE = 2")
-    results2 = readDataFromFileInputRangeAll(input, "Alg = 1", "NbFPE = 4")
-    results3 = readDataFromFileInputRangeAll(input, "Alg = 1", "NbFPE = 8")
-    results4 = readDataFromFileInputRangeAll(input, "Alg = 2", "Alg = 2")
-    results5 = readDataFromFileInputRangeAll(input, "Alg = 1", "NbFPE = 3")
-    #results6 = readDataFromFileInputRangeAll(input, "Alg = 1", "NbFPE = 5")
-    #results7 = readDataFromFileInputRangeAll(input, "Alg = 1", "NbFPE = 6")
-    #results8 = readDataFromFileInputRangeAll(input, "Alg = 1", "NbFPE = 7")
-    results9 = readDataFromFileInputRangeAll(input, "Alg = 3", "NbFPE = 8")
+    ddot = readDataFromFileInputRangeAll(input, "Alg = 0", "Alg = 0")
+    superaccs = readDataFromFileInputRangeAll(input, "Alg = 1", "Alg = 1")
+    fpe2 = readDataFromFileInputRangeAll(input, "Alg = 2", "NbFPE = 2")
+    fpe3 = readDataFromFileInputRangeAll(input, "Alg = 2", "NbFPE = 3")
+    fpe4 = readDataFromFileInputRangeAll(input, "Alg = 2", "NbFPE = 4")
+    fpe5 = readDataFromFileInputRangeAll(input, "Alg = 2", "NbFPE = 5")
+    fpe6 = readDataFromFileInputRangeAll(input, "Alg = 2", "NbFPE = 6")
+    fpe7 = readDataFromFileInputRangeAll(input, "Alg = 2", "NbFPE = 7")
+    fpe8 = readDataFromFileInputRangeAll(input, "Alg = 2", "NbFPE = 8")  
+    fpe4ee = readDataFromFileInputRangeAll(input, "Alg = 4", "NbFPE = 4")
+    fpe6ee = readDataFromFileInputRangeAll(input, "Alg = 5", "NbFPE = 6")      
+    fpe8ee = readDataFromFileInputRangeAll(input, "Alg = 3", "NbFPE = 8")
     
-    resultTotal = []
-    for data in results0:
-        resultTotal.append([data[0], data[1], results1.pop(0)[1], \
-                           results5.pop(0)[1], results2.pop(0)[1], \
-                           results3.pop(0)[1], results4.pop(0)[1]])
-    f = open(input[0:len(input)-3] + "gnuplot.dat", "w")
-    for data in results9:
-        str = ""
-        for i in resultTotal.pop(0):
-            str += i + "\t"
-        str += data[0] + "\t" + data[1] + "\n"
-        f.write(str)
-    for data in resultTotal:
-        str = ""
-        for i in data:
-            str += i + "\t"
-        str += ". \n"
-        f.write(str)            
-    f.close()
-    exit(0)
+#     resultTotal = []
+#     for data in ddot:
+#         resultTotal.append([data[0], data[1]])
+#                            results5.pop(0)[1], results2.pop(0)[1], \
+#                            results3.pop(0)[1], results4.pop(0)[1]])
+#     f = open(input[0:len(input)-3] + "gnuplot.dat", "w")
+#     for data in results9:
+#         str = ""
+#         for i in resultTotal.pop(0):
+#             str += i + "\t"
+#         str += data[0] + "\t" + data[1] + "\n"
+#         f.write(str)
+#     for data in resultTotal:
+#         str = ""
+#         for i in data:
+#             str += i + "\t"
+#         str += ". \n"
+#         f.write(str)            
+#     f.close()
     
     # plot the results
     gp = Gnuplot.Gnuplot(persist=1)
@@ -259,10 +260,10 @@ def plotInputRangeVSGbsAll(input, output):
     gp('set grid noxtics noytics')
     gp('set xlabel "Dynamic range (bits)" font "Times, 26"')
     gp('set ylabel "Gacc/s" font "Times, 26"')
-    gp('set logscale x')
     #gp('set format x "1e+%.0f"')    
     #gp('set xrange [1:3.3e150]')
     #gp('set xrange [1:1.0e40]')
+    gp('set xrange [0:500]')
     gp('set yrange [0:]')
     gp('set xtics nomirror rotate by -15')
     gp('set output "| epstopdf --filter > ' + output + '"')
@@ -277,23 +278,25 @@ def plotInputRangeVSGbsAll(input, output):
     gp('set rmargin 2.')
     gp('set lmargin 6.5')
     
-   # plot0 = Gnuplot.Data(results0, with_='lines lt 1 lw 4.0', title="Superaccumulator")
-   # plot1 = Gnuplot.Data(results1, with_='lines lt 8 lw 4.0', title="Expansion 2")
-   # plot2 = Gnuplot.Data(results5, with_='lines lt 5 lw 4.0', title="Expansion 3")
-   # plot3 = Gnuplot.Data(results2, with_='lines lt 2 lw 4.0', title="Expansion 4")
-    #plot4 = Gnuplot.Data(results6, with_='lines lt 6 lw 4.0', title="Expansion 5")
-    #plot5 = Gnuplot.Data(results7, with_='lines lt 7 lw 4.0', title="Expansion 6")
-    #plot6 = Gnuplot.Data(results8, with_='lines lt 0 lw 4.0', title="Expansion 7")
-   # plot7 = Gnuplot.Data(results3, with_='lines lt 7 lw 4.0', title="Expansion 8")    
-   # plot8 = Gnuplot.Data(results4, with_='lines lt 4 lw 4.0', title="Parallel FP Sum")
-   # plot9 = Gnuplot.Data(results9, with_='lines lt 3 lw 4.0', title="Expansion 8 early-exit")
-
-    #gp.plot(plot8, plot1, plot2, plot3, plot4, plot5, plot6, plot7, plot0)
-    #gp.plot(plot8, plot1, plot2, plot3, plot7, plot9, plot0)
+    plotDDOT = Gnuplot.Data(ddot, with_='lines lt 4 lw 4.0', title="Parallel DDOT")
+    plotSuperaccs = Gnuplot.Data(superaccs, with_='lines lt 1 lw 4.0', title="Superaccumulator")    
+    plotfpe2 = Gnuplot.Data(fpe2, with_='lines lt 8 lw 4.0', title="Expansion 2")
+    plotfpe3 = Gnuplot.Data(fpe3, with_='lines lt 5 lw 4.0', title="Expansion 3")
+    plotfpe4 = Gnuplot.Data(fpe4, with_='lines lt 2 lw 4.0', title="Expansion 4")
+#     plotfpe5 = Gnuplot.Data(fpe5, with_='lines lt 6 lw 4.0', title="Expansion 5")
+#     plotfpe6 = Gnuplot.Data(fpe6, with_='lines lt 7 lw 4.0', title="Expansion 6")
+#     plotfpe7 = Gnuplot.Data(fpe7, with_='lines lt 0 lw 4.0', title="Expansion 7")
+    plotfpe8 = Gnuplot.Data(fpe8, with_='lines lt 3 lw 4.0', title="Expansion 8")
+    plotfpe4ee = Gnuplot.Data(fpe4ee, with_='lines lt 0 lw 4.0', title="Expansion 4 early-exit")
+    plotfpe6ee = Gnuplot.Data(fpe6ee, with_='lines lt 7 lw 4.0', title="Expansion 6 early-exit")        
+    plotfpe8ee = Gnuplot.Data(fpe8ee, with_='lines lt 9 lw 4.0', title="Expansion 8 early-exit")    
+    
+#     gp.plot(plotDDOT, plotSuperaccs, plotfpe2, plotfpe3, plotfpe4, plotfpe5, plotfpe6, plotfpe7, plotfpe8, plotfpe8ee)
+    gp.plot(plotDDOT, plotSuperaccs, plotfpe2, plotfpe3, plotfpe4, plotfpe8, plotfpe4ee, plotfpe6ee, plotfpe8ee)
     return    
     
 #plotNbElementsVSGbs(sys.argv[1], sys.argv[2])
-plotNbElementsVSGbsAll(sys.argv[1], sys.argv[2])
+# plotNbElementsVSGbsAll(sys.argv[1], sys.argv[2])
 
 #plotInputRangeVSGbs(sys.argv[1], sys.argv[2])
-#plotInputRangeVSGbsAll(sys.argv[1], sys.argv[2])
+plotInputRangeVSGbsAll(sys.argv[1], sys.argv[2])
