@@ -179,6 +179,9 @@ void Superaccumulator::Accumulate(Superaccumulator & other) {
 }
 
 double Superaccumulator::Round() {
+  //TODO: a small fix for numbers of the same exp -- Round did not work well
+  imin = 0;
+  imax = 38;
   // BUG for negative numbers
   assert(digits >= 52);
   //printf("imin=%d, imax=%d\n", imin, imax);

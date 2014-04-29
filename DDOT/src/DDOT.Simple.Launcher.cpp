@@ -137,7 +137,7 @@ inline uint iSnapDown(uint a, uint b){
 
 extern "C" size_t DDOTSimple(
     cl_command_queue cqCommandQueue,
-    cl_mem d_FinalSum,
+    cl_mem d_res,
     const cl_mem d_a,
     const cl_mem d_b,
     uint NbElements,
@@ -175,7 +175,7 @@ extern "C" size_t DDOTSimple(
         NbThreadsPerWorkGroup = MERGE_WORKGROUP_SIZE;
         TotalNbThreads = NbThreadsPerWorkGroup;
 
-        ciErrNum  = clSetKernelArg(ckComplete, 0, sizeof(cl_mem),  (void *)&d_FinalSum);
+        ciErrNum  = clSetKernelArg(ckComplete, 0, sizeof(cl_mem),  (void *)&d_res);
         ciErrNum |= clSetKernelArg(ckComplete, 1, sizeof(cl_mem),  (void *)&d_PartialSum);
         ciErrNum |= clSetKernelArg(ckComplete, 2, sizeof(cl_uint), (void *)&PARTIAL_SUMMATION_COUNT);
         if (ciErrNum != CL_SUCCESS) {

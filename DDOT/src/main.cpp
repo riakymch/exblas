@@ -16,14 +16,13 @@
 ////////////////////////////////////////////////////////////////////////////////
 // Variables used in the program 
 ////////////////////////////////////////////////////////////////////////////////
-cl_platform_id    cpPlatform;            //OpenCL platform
-cl_device_id      cdDevice;              //OpenCL device list    
-cl_context        cxGPUContext;          //OpenCL context
-cl_command_queue  cqCommandQueue;        //OpenCL command que
-cl_mem            d_a, d_b, d_Superacc, d_res;  //OpenCL memory buffer objects
+cl_platform_id    cpPlatform;      //OpenCL platform
+cl_device_id      cdDevice;        //OpenCL device list    
+cl_context        cxGPUContext;    //OpenCL context
+cl_command_queue  cqCommandQueue;  //OpenCL command que
+cl_mem            d_a, d_b, d_res; //OpenCL memory buffer objects
 void              *h_a, *h_b;
 double            h_res;
-bintype           *h_Superacc;
 
 static uint __nbElements = 0;
 static uint __range      = 0;
@@ -108,7 +107,7 @@ int runDDOT(const char* program_file){
             printf("ERROR: could not allocate memory with posix_memalign!\n");
             exit(1);
         }
-	h_Superacc = (bintype *) malloc(BIN_COUNT * sizeof(bintype));
+	//h_Supperacc = (bintype *) malloc(BIN_COUNT * sizeof(bintype));
 
 	// init data
         int emax = E_BITS - log2(__nbElements);// use log in order to stay within [emin, emax]
@@ -165,7 +164,8 @@ int runDDOT(const char* program_file){
             printf("Error in clCreateBuffer for d_b, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
             cleanUp(EXIT_FAILURE);
         }
-	d_Superacc = clCreateBuffer(cxGPUContext, CL_MEM_READ_WRITE, BIN_COUNT * sizeof(bintype), NULL, &ciErrNum);
+	//d_Superacc = clCreateBuffer(cxGPUContext, CL_MEM_READ_WRITE, BIN_COUNT * sizeof(bintype), NULL, &ciErrNum);
+	d_res = clCreateBuffer(cxGPUContext, CL_MEM_READ_WRITE, sizeof(cl_double), NULL, &ciErrNum);
         if (ciErrNum != CL_SUCCESS) {
             printf("Error in clCreateBuffer for d_res, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
             cleanUp(EXIT_FAILURE);
@@ -179,7 +179,7 @@ int runDDOT(const char* program_file){
 
         printf("Running OpenCL DDOT with %u elements...\n\n", __nbElements);
             //Just a single launch or a warmup iteration
-            DDOT(NULL, d_Superacc, d_a, d_b, __nbElements, &ciErrNum);
+            DDOT(NULL, d_res, d_a, d_b, __nbElements, &ciErrNum);
 
             if (ciErrNum != CL_SUCCESS)
                 cleanUp(EXIT_FAILURE);
@@ -196,7 +196,7 @@ int runDDOT(const char* program_file){
                 cleanUp(EXIT_FAILURE);
             }
 
-            DDOT(NULL, d_Superacc, d_a, d_b, __nbElements, &ciErrNum);
+            DDOT(NULL, d_res, d_a, d_b, __nbElements, &ciErrNum);
 
             ciErrNum  = clEnqueueMarker(cqCommandQueue, &endMark);
             ciErrNum |= clFinish(cqCommandQueue);
@@ -227,12 +227,13 @@ int runDDOT(const char* program_file){
 
         printf("Validating DDOT OpenCL results...\n");
             printf(" ...reading back OpenCL results\n");
-                ciErrNum = clEnqueueReadBuffer(cqCommandQueue, d_Superacc, CL_TRUE, 0, BIN_COUNT * sizeof(bintype), h_Superacc, 0, NULL, NULL);
+                //ciErrNum = clEnqueueReadBuffer(cqCommandQueue, d_Superacc, CL_TRUE, 0, BIN_COUNT * sizeof(bintype), h_Supperacc, 0, NULL, NULL);
+                ciErrNum = clEnqueueReadBuffer(cqCommandQueue, d_res, CL_TRUE, 0, sizeof(cl_double), (void *)&h_res, 0, NULL, NULL);
                 if (ciErrNum != CL_SUCCESS) {
                     printf("Error in clEnqueueReadBuffer Line %u in file %s !!!\n\n", __LINE__, __FILE__);
                     cleanUp(EXIT_FAILURE);
                 }
-                Superaccumulator superaccGPU((int64_t *) h_Superacc, E_BITS, F_BITS);
+                //Superaccumulator superaccGPU((int64_t *) h_Supperacc, E_BITS, F_BITS);
 
             printf(" ...SupersuperaccCPU()\n");
                 Superaccumulator superaccCPU(E_BITS, F_BITS);
@@ -245,8 +246,6 @@ int runDDOT(const char* program_file){
 
             printf(" ...comparing the results\n");
                 printf("//--------------------------------------------------------\n");
-	        //superaccCPU.PrintAccumulator();
-	        //superaccGPU.PrintAccumulator();
                 //check the results using mpfr algorithm
                 /*printf("//--------------------------------------------------------\n");
 	        mpfr_t *res_mpfr = sum_mpfr((double *) h_iData, __nbElements);
@@ -255,13 +254,12 @@ int runDDOT(const char* program_file){
                 PassFailFlag |= superaccGPU.CompareRoundedResults(res_mpfr, res_rounded);*/
 
 	        double roundCPU = superaccCPU.Round();
-	        double roundGPU = superaccGPU.Round();
 		double r = 0.0;
-		double x = KnuthTwoSum(roundCPU, -roundGPU, &r);
-		printf("x = %.32g \t r = %.32g\n", x, r);
+		double x = KnuthTwoSum(roundCPU, -h_res, &r);
+		//printf("x = %.32g \t r = %.32g\n", x, r);
 	        PassFailFlag = ((x < 1e-16) && (r < 1e-16)) ? 1 : 0;
 	        printf("[CPU] Rounded value of the compuation: %.17g\n", roundCPU);
-	        printf("[GPU] Rounded value of the compuation: %.17g\n", roundGPU);
+	        printf("[GPU] Rounded value of the compuation: %.17g\n", h_res);
                 printf("//--------------------------------------------------------\n");
             
         //Release kernels and program
@@ -417,8 +415,8 @@ int runDDOTSimple(const char* program_file){
 		double res_cpu = DDOT_CPU((double *) h_a, (double *) h_b, __nbElements);
 
             printf(" ...comparing the results\n");
-		printf("[CPU]Results of simple dot product %.8g\n", res_cpu);
-		printf("[GPU]Results of simple dot product %.8g\n", h_res);
+		printf("[CPU]Results of simple dot product %.17g\n", res_cpu);
+		printf("[GPU]Results of simple dot product %.17g\n", h_res);
 	        PassFailFlag = abs(h_res - res_cpu) < 1e-16 ? 1 : 0;
 
          //Release kernels and program
