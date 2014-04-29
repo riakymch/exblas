@@ -51,6 +51,108 @@ long xadd(__local volatile long *sa, long x, uchar *of) {
     return y;
 }
 
+
+////////////////////////////////////////////////////////////////////////////////
+// Rounding functions
+////////////////////////////////////////////////////////////////////////////////
+double OddRoundSumNonnegative(double th, double tl) {
+    union {
+        double d;
+        long l;
+    } thdb;
+
+    thdb.d = th + tl;
+    // - if the mantissa of th is odd, there is nothing to do
+    // - otherwise, round up as both tl and th are positive
+    // in both cases, this means setting the msb to 1 when tl>0
+    thdb.l |= (tl != 0.0);
+    return thdb.d;
+}
+
+int Normalize(__global long *accumulator, int *imin, int *imax) {
+  if (*imin > *imax) {
+    return 0;
+  }
+  long carry_in = accumulator[*imin] >> digits;
+  accumulator[*imin] -= carry_in << digits;
+  int i;
+  // Sign-extend all the way
+  for (i = *imin + 1; i < BIN_COUNT; ++i) {
+#if 1
+    long carry_out = accumulator[i] >> digits;    // Arithmetic shift
+    accumulator[i] += carry_in - (carry_out << digits);
+#else
+    // BUGGY
+    // get carry of accumulator[i] + carry_in
+    unsigned char overflow;
+    long oldword = xadd(&accumulator[i], carry_in, &overflow);
+    int s = oldword > 0;
+    long carrybit = (s ? 1ll << K : -1ll << K);
+
+    long carry_out = (accumulator[i] >> digits) + carrybit;// Arithmetic shift
+    accumulator[i] -= carry_out << digits;
+#endif
+    carry_in = carry_out;
+  }
+  *imax = i - 1;
+
+  if (carry_in != 0 && carry_in != -1) {
+    //TODO: handle overflow
+    //status = Overflow;
+  }
+  return carry_in < 0;
+}
+
+double Round(__global long *accumulator) {
+  int imin = 0; 
+  int imax = 38;
+  int negative = Normalize(accumulator, &imin, &imax);
+
+  //Find leading word
+  int i;
+  //Skip zeroes
+  for (i = imax; accumulator[i] == 0 && i >= imin; --i) {
+  }
+  if (negative) {
+    //Skip ones
+    for (; accumulator[i] == ((1 << digits) - 1) && i >= imin; --i) {
+    }
+  }
+  if (i < 0) {
+    //TODO: should we preserve sign of zero?
+    return 0.;
+  }
+
+  long hiword = negative ? (1 << digits) - accumulator[i] : accumulator[i];
+  double rounded = (double) hiword;
+  double hi = ldexp(rounded, (i - f_words) * digits);
+  if (i == 0) {
+    return negative ? -hi : hi;  // Correct rounding achieved
+  }
+  hiword -= (long) rint(rounded);
+  double mid = ldexp((double) hiword, (i - f_words) * digits);
+
+  //Compute sticky
+  long sticky = 0;
+  for (int j = imin; j != i - 1; ++j) {
+    sticky |= negative ? (1 << digits) - accumulator[j] : accumulator[j];
+  }
+
+  long loword = negative ? (1 << digits) - accumulator[i - 1] : accumulator[i - 1];
+  loword |= !!sticky;
+  double lo = ldexp((double) loword, (i - 1 - f_words) * digits);
+
+  //Now add3(hi, mid, lo)
+  //No overlap, we have already normalized
+  if (mid != 0) {
+    lo = OddRoundSumNonnegative(mid, lo);
+  }
+  //Final rounding
+  hi = hi + lo;
+  return negative ? -hi : hi;
+}
+
+
 ////////////////////////////////////////////////////////////////////////////////
 // Main computation pass: compute partial accumulators
 ////////////////////////////////////////////////////////////////////////////////
@@ -221,4 +323,17 @@ void DDOTComplete(
     
     if(lid == 0)
         d_Superacc[gid] = l_Data[0];
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Round the results
+////////////////////////////////////////////////////////////////////////////////
+__kernel __attribute__((reqd_work_group_size(MERGE_WORKGROUP_SIZE, 1, 1)))
+void DDOTRound(
+    __global double *d_res,
+    __global long *d_Superacc
+){
+    uint pos = get_local_id(0);
+    if (pos == 0)
+	d_res[0] = Round(d_Superacc);
 }

@@ -303,10 +303,4 @@ void DDOTRound(
     uint pos = get_local_id(0);
     if (pos == 0)
 	d_res[0] = Round(d_Superacc);
-	/*for (uint i = 0; i < BIN_COUNT; i++)
-	    if (d_Superacc[i] != 0.0) {
-		d_res[0] = i;
-		break;
-	    }
-        */
 }
