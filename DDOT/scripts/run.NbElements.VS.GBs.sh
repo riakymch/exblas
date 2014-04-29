@@ -11,7 +11,7 @@ fi
 nbMax=1000000000
 step=2
 exe=./../src/main.out
-file=../results/NbElements.VS.GBs.AMD.2014.04.25.dat
+file=../results/NbElements.VS.GBs.AMD.2014.04.29.Round.dat
 
 touch $file
 echo -n "" > $file
