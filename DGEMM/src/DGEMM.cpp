@@ -6,18 +6,18 @@
 /*
  * Naive implementation of DGEMM for comparision only; it is much easy to port than the BLAS implementation
  */
-void matrixMultiplicationCPUReference(
-    double *output,
-    double *input0,
-    double *input1,
-    const uint y,
-    const uint x,
-    const uint z
+void DGEMMCPU(
+    double *C,
+    const double *A,
+    const double *B,
+    const uint m,
+    const uint n,
+    const uint k
 ) {
-    for(cl_uint i = 0; i < y; i++) {
-        for(cl_uint j = 0; j < z; j++) {
-            for(cl_uint k = 0; k < x; k++) {
-                output[i * z + j] += (input0[i * x + k] * input1[k * z + j]);
+    for(uint i = 0; i < m; i++) {
+        for(uint j = 0; j < n; j++) {
+            for(uint l = 0; l < k; l++) {
+                C[j * m + i] += A[l * m + i] * B[j * k + l];
             }
 	    //printf("%.4g\t", output[i * z + j]);
         }
@@ -26,16 +26,16 @@ void matrixMultiplicationCPUReference(
 }
 
 int compare(
-    const double *refData,
-    const double *data,
-    const int length,
+    const double *ref_dgemm,
+    const double *dgemm,
+    const uint length,
     const double epsilon
 ) {
     double error = 0.0;
 
-    for(int i = 0; i < length; ++i) 
+    for(uint i = 0; i < length; ++i) 
     {
-        double diff = refData[i] - data[i];
+        double diff = ref_dgemm[i] - dgemm[i];
         error += pow(abs(diff), 2);
     }
 
@@ -46,12 +46,12 @@ int compare(
 }
 
 void printMatrix(
-    double *A,
-    int m,
-    int n
+    const double *A,
+    const uint m,
+    const uint n
 ){
-    for (int i = 0; i < m; i++) {
-        for (int j = 0; j < n; j++) {
+    for (uint i = 0; i < m; i++) {
+        for (uint j = 0; j < n; j++) {
 	     printf("%.4g\t", A[i * m + j]);
 	}
 	printf("\n");

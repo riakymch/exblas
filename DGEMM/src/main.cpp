@@ -271,15 +271,19 @@ int runDGEMM(const char* program_file){
                     printf("Error in clEnqueueReadBuffer Line %u in file %s !!!\n\n", __LINE__, __FILE__);
                     cleanUp(EXIT_FAILURE);
                 }
-		//printMatrix(C, __nbRowsC, __nbColumnsC);
+
+            printf(" ...DGEMM on CPU\n");
 		double *C_CPU;
                 C_CPU = (double *) calloc(__nbRowsC * __nbColumnsC, sizeof(double));
-		//Compute C = A * B on CPU
-                matrixMultiplicationCPUReference(C_CPU, A, B, __nbRowsC, __nbRowsB, __nbColumnsC);
+                DGEMMCPU(C_CPU, (const double *)A, (const double *)B, __nbRowsC, __nbColumnsC, __nbRowsB);
+
+            printf(" ...comparing the results\n");
+                printf("//--------------------------------------------------------\n");
 		//Compare the GPU to the CPU results
-		//printf("\n");
-		//printMatrix(C, __nbRowsC, __nbColumnsC);
-		PassFailFlag = compare((const double *) C_CPU, (const double *) C, __nbRowsC * __nbColumnsC, 1e-16);
+		//PassFailFlag = compare((const double *) C_CPU, (const double *) C, __nbRowsC * __nbColumnsC, 1e-16);
+                //printf("//--------------------------------------------------------\n");
+		PassFailFlag = compareDGEMMWithMPFR((const double *)C, (const double *)A, (const double *)B, __nbRowsC, __nbColumnsC, __nbRowsB);
+                printf("//--------------------------------------------------------\n");
 		free(C_CPU);
 		
          //Release kernels and program

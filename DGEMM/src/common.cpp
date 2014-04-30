@@ -105,21 +105,20 @@ double min(double arr[], int size) {
     return val;
 }
 
-void init_fpuniform(double *array, int size, int range, int emax)
-{
-    /*//Generate numbers on several bins starting from emax
+void init_fpuniform(double *array, int size, int range, int emax) {
+    //Generate numbers on several bins starting from emax
     for(int i = 0; i != size; ++i) {
         //array[i] = randDouble(emax-range, emax, 1);
-        array[i] = double(rand()) / double(RAND_MAX);
-    }*/
-    /*//Generate numbers on an interval [0, 1]
-    for(int i = 0; i != size; ++i) {
-        array[i] = double(rand()) / double(RAND_MAX);
-    }*/
-    //Generate numbers on an interval [1, 2]
-    for(int i = 0; i != size; ++i) {
-        array[i] = 1.0;// + double(rand()) / double(RAND_MAX);
+        array[i] = randDouble(0, range, 1);
     }
+    /*//Generate nubers on an interval [0, 1]
+    for(int i = 0; i != size; ++i) {
+        array[i] = double(rand()) / double(RAND_MAX);
+    }*/
+    /*//Generate numbers on an interval [1, 2]
+    for(int i = 0; i != size; ++i) {
+        array[i] = 1.0 + double(rand()) / double(RAND_MAX);
+    }*/
     /*//simple case for tests only
     for(int i = 0; i != size; i++) {
         array[i] = 1.1;
@@ -142,82 +141,45 @@ extern "C" double roundSuperaccumulator(
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// MPFR and Kahan summation functions
+// MPFR functions
 ////////////////////////////////////////////////////////////////////////////////
-extern "C" char *sum_mpfr(double *data, int size) {
-  mpfr_t result;
-  int i;
+extern "C" bool compareDGEMMWithMPFR(const double *dgemm, const double *h_a, const double *h_b, const uint m, const uint n, const uint k) {
+  double *dgemm_mpfr;
+  mpfr_t sum, ddot, op1;
 
-  mpfr_init2(result, 2098);
-  mpfr_set_d(result, 0.0, MPFR_RNDN);
+  dgemm_mpfr = (double *) malloc(m * n * sizeof(double));
 
-  for (i = 0; i < size; i++)
-    mpfr_add_d(result, result, data[i], MPFR_RNDN);
+  mpfr_init2(op1, 64);
+  mpfr_init2(ddot, 128);
+  mpfr_init2(sum, 2098);
+  mpfr_set_d(ddot, 0.0, MPFR_RNDN);
 
-  //printf ("\tSum MPFR (52):");
-  //mpfr_out_str (stdout, 10, 52, result, MPFR_RNDD);
-  //putchar ('\n');
-  mpfr_exp_t exp_ptr;
-  char *res_str = mpfr_get_str(NULL, &exp_ptr, 10, 52, result, MPFR_RNDD);
-  printf("\tSum MPFR (52)      : %s \t e%d\n", res_str, (int)exp_ptr);
-  mpfr_free_str(res_str);
-  
+  //Produce a result matrix of DGEMM using MPFR
+  for(uint i = 0; i < m; i++) {
+      for(uint j = 0; j < n; j++) {
+          mpfr_set_d(sum, 0.0, MPFR_RNDN);
+          for(uint l = 0; l < k; l++) {
+    		mpfr_set_d(op1, h_a[l * m + i], MPFR_RNDN);
+		mpfr_mul_d(ddot, op1, h_b[j * k + l], MPFR_RNDN);
+		mpfr_add(sum, sum, ddot, MPFR_RNDN);
+          }
+	  dgemm_mpfr[j * m + i] = mpfr_get_d(sum, MPFR_RNDD);
+      }
+  }
 
-  //mpfr_out_str (stdout, 2, 0, result, MPFR_RNDD);
-  char *res = mpfr_get_str(NULL, &exp_ptr, 10, 2098, result, MPFR_RNDD);
-  printf ("\tSum MPFR (2098)    : %s\n", res);
+  bool dgemm_cmp = false;
+  double norm = 0.0;
+  //Compare the GPU and MPFR results
+  for (uint i = 0; i < m * n; i++) {
+      norm += pow(abs(dgemm[i] - dgemm_mpfr[i]), 2);
+  }
+  norm = ::sqrt(norm);
+  printf("Compare to MPFR. Norm = %.17g\n", norm);
+  if (norm < 1e-16)
+      dgemm_cmp = true;
 
-  mpfr_clear(result);
+  free(dgemm_mpfr);
   mpfr_free_cache();
 
-  return res;
-}
-
-extern "C" double round_mpfr(double *data, int size) {
-  mpfr_t result;
-  double result_d;
-  int i;
-
-  mpfr_init2(result, 2098);
-  mpfr_set_d(result, 0.0, MPFR_RNDN);
-
-  for (i = 0; i < size; i++)
-    mpfr_add_d(result, result, data[i], MPFR_RNDN);
-
-  result_d = mpfr_get_d(result, MPFR_RNDN);
-  mpfr_clear(result);
-  mpfr_free_cache();
-
-  printf("MPFR Sum: %a \n", result_d);
-  return result_d;
-}
-
-/*
- * Kahan Summation :
- * We use Kahan summation for an accurate sum of large arrays.
- * http://en.wikipedia.org/wiki/Kahan_summation_algorithm
- */
-inline void KahanSummation(double *s, double *c, double d) {
-  double y, t;
-
-  y = d - *c;
-  t = *s + y;
-  *c = (t - *s) - y;
-  *s = t;
-}
-
-extern "C" double roundKahan(double *data, int size) {
-  double r1, r2;
-  int i;
-
-  r1 = 0.;
-  r2 = 0.;
-  for (i = 0; i < size; i++)
-    KahanSummation(&r1, &r2, data[i]);
-
-  //printf("\tKahan Summation  : %a %a \n", r1, r2);
-  printf("\tKahan Result     : %.52g \n", r1);
-  printf("\tKahan Error      : %.52g \n", r2);
-
-  return r1;
+  return dgemm_cmp;
 }

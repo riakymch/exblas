@@ -9,26 +9,26 @@
     #include <CL/opencl.h>
 #endif
 
-void matrixMultiplicationCPUReference(
-    cl_double *output,
-    cl_double *input0,
-    cl_double *input1,
-    const cl_uint y,
-    const cl_uint x,
-    const cl_uint z
+void DGEMMCPU(
+    double *C,
+    const double *A,
+    const double *B,
+    const uint y,
+    const uint x,
+    const uint z
 );
 
 
 int compare(
-    const double *refData,
-    const double *data,
-    const int length,
+    const double *ref_dgemm,
+    const double *dgemm,
+    const uint length,
     const double epsilon
 );
 
 void printMatrix(
-    double *A,
-    int m,
-    int n
+    const double *A,
+    const uint m,
+    const uint n
 );
 #endif

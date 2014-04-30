@@ -243,11 +243,11 @@ int runDDOT(const char* program_file){
                     superaccCPU.Accumulate(x);
                     superaccCPU.Accumulate(r);
                 }
+	        double roundedCPU = superaccCPU.Round();
 
             printf(" ...comparing the results\n");
                 printf("//--------------------------------------------------------\n");
                 //compare the results with MPRF
-	        double roundedCPU = superaccCPU.Round();
 	        mpfr_t *ddot_mpfr = ddotWithMPFR((double *) h_a, (double *) h_b, __nbElements);
                 printf("//--------------------------------------------------------\n");
                 //PassFailFlag = superaccGPU.CompareSuperaccumulatorWithMPFR(res_mpfr);

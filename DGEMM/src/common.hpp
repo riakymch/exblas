@@ -217,22 +217,15 @@ extern "C" size_t DGEMMNVIDIAReproPrivate(
 );
 
 ////////////////////////////////////////////////////////////////////////////////
-// MPFR and Kahan summation functions
+// MPFR functions
 ////////////////////////////////////////////////////////////////////////////////
-extern "C" char *sum_mpfr(
-    double *data,
-    int size);
-
-extern "C" double round_mpfr(
-    double *data,
-    int size
-);
-
-// extern "C" void KahanSummation(double *s, double *c, double d);
-// extern "C" double roundKulish(bintype *bin);
-extern "C" double roundKahan(
-    double *data,
-    int size
+extern "C" bool compareDGEMMWithMPFR(
+    const double *dgemm,
+    const double *h_a,
+    const double *h_b,
+    const uint m,
+    const uint n,
+    const uint k 
 );
 
 
