@@ -246,19 +246,19 @@ int runDDOT(const char* program_file){
 
             printf(" ...comparing the results\n");
                 printf("//--------------------------------------------------------\n");
-                //check the results using mpfr algorithm
-                /*printf("//--------------------------------------------------------\n");
-	        mpfr_t *res_mpfr = sum_mpfr((double *) h_iData, __nbElements);
-                PassFailFlag = superaccGPU.CompareSuperaccumulatorWithMPFR(res_mpfr);
-	        double res_rounded = superaccCPU.Round();
-                PassFailFlag |= superaccGPU.CompareRoundedResults(res_mpfr, res_rounded);*/
+                //compare the results with MPRF
+	        double roundedCPU = superaccCPU.Round();
+	        mpfr_t *ddot_mpfr = ddotWithMPFR((double *) h_a, (double *) h_b, __nbElements);
+                printf("//--------------------------------------------------------\n");
+                //PassFailFlag = superaccGPU.CompareSuperaccumulatorWithMPFR(res_mpfr);
+                //PassFailFlag |= superaccGPU.CompareRoundedResults(res_mpfr, res_rounded);
+                PassFailFlag = compareRoundedResults(ddot_mpfr, h_res);
 
-	        double roundCPU = superaccCPU.Round();
-		double r = 0.0;
+		/*double r = 0.0;
 		double x = KnuthTwoSum(roundCPU, -h_res, &r);
 		//printf("x = %.32g \t r = %.32g\n", x, r);
-	        PassFailFlag = ((x < 1e-16) && (r < 1e-16)) ? 1 : 0;
-	        printf("[CPU] Rounded value of the compuation: %.17g\n", roundCPU);
+	        PassFailFlag = ((x < 1e-16) && (r < 1e-16)) ? 1 : 0;*/
+	        printf("[CPU] Rounded value of the compuation: %.17g\n", roundedCPU);
 	        printf("[GPU] Rounded value of the compuation: %.17g\n", h_res);
                 printf("//--------------------------------------------------------\n");
             

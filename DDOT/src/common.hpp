@@ -118,13 +118,19 @@ extern "C" size_t DDOTSimple(
 ////////////////////////////////////////////////////////////////////////////////
 // MPFR and Kahan summation functions
 ////////////////////////////////////////////////////////////////////////////////
-extern "C" char *sum_mpfr(
-    double *data,
+extern "C" mpfr_t *ddotWithMPFR(
+    double *h_a,
+    double *h_b,
     int size);
 
-extern "C" double round_mpfr(
+extern "C" double roundMPFR(
     double *data,
     int size
+);
+
+extern "C" bool compareRoundedResults(
+    mpfr_t *ddot_mpfr,
+    double ddot_rounded
 );
 
 extern "C" double roundKahan(
