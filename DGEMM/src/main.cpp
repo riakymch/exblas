@@ -31,7 +31,7 @@ static uint __nbfpe      = 0;
 static uint __alg        = 0;
 
 static void __usage(int argc __attribute__((unused)), char **argv) {
-  fprintf(stderr, "Usage: %s [-m nbrows of C -n nbcolumns of C -k nbcolumns of B -r range -e nbfpe -a alg (0-mine, 1-amd, 2-nvidia, 3-nvidia.superacc 4-rnvidia.superacc.private)] \n", argv[0]);
+  fprintf(stderr, "Usage: %s [-m nbrows of C -n nbcolumns of C -k nbcolumns of B -r range -e nbfpe -a alg (0-mine, 1-amd, 2-nvidia, 3-superacc 4-fpe 5-superacc.private)] \n", argv[0]);
   printf("       -?, -h:    Display this help and exit\n");
 }
 
@@ -65,7 +65,7 @@ static void __parse_args(int argc, char **argv) {
     __usage(argc, argv);
     exit(-1);
   }
-  if (__alg > 4) {
+  if (__alg > 5) {
     __usage(argc, argv);
     exit(-1);
   }
@@ -92,6 +92,8 @@ int main(int argc, char **argv)
     if (__alg == 3)
         runDGEMM("../src/DGEMM.NVIDIA.Superacc.cl");
     if (__alg == 4)
+        runDGEMM("../src/DGEMM.NVIDIA.FPE.cl");
+    if (__alg == 5)
         runDGEMM("../src/DGEMM.NVIDIA.Superacc.Private.cl");
 }
 
