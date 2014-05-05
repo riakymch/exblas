@@ -31,7 +31,7 @@ static uint __nbfpe      = 0;
 static uint __alg        = 0;
 
 static void __usage(int argc __attribute__((unused)), char **argv) {
-  fprintf(stderr, "Usage: %s [-m number of rows in C -n number of columns in C -k number of columns in B -r range -e nbfpe -a alg (0-mine, 1-amd, 2-nvidia, 3-repro.nvidia 4-repro.nvidia.private)] \n", argv[0]);
+  fprintf(stderr, "Usage: %s [-m nbrows of C -n nbcolumns of C -k nbcolumns of B -r range -e nbfpe -a alg (0-mine, 1-amd, 2-nvidia, 3-nvidia.superacc 4-rnvidia.superacc.private)] \n", argv[0]);
   printf("       -?, -h:    Display this help and exit\n");
 }
 
@@ -86,15 +86,13 @@ int main(int argc, char **argv)
     if (__alg == 0)
         runDGEMM("../src/DGEMM.cl");
     if (__alg == 1)
-        //runDGEMM("../src/DGEMM.AMD.cl");
-        runDGEMM("../src/DGEMM.AMD.Trial.cl");
+        runDGEMM("../src/DGEMM.AMD.cl");
     if (__alg == 2)
-        //runDGEMM("../src/DGEMM.NVIDIA.cl");
-        runDGEMM("../src/DGEMM.NVIDIA.Trial.cl");
+        runDGEMM("../src/DGEMM.NVIDIA.cl");
     if (__alg == 3)
-        runDGEMM("../src/DGEMM.NVIDIA.Repro.cl");
+        runDGEMM("../src/DGEMM.NVIDIA.Superacc.cl");
     if (__alg == 4)
-        runDGEMM("../src/DGEMM.NVIDIA.Repro.Private.cl");
+        runDGEMM("../src/DGEMM.NVIDIA.Superacc.Private.cl");
 }
 
 int runDGEMM(const char* program_file){
@@ -275,14 +273,13 @@ int runDGEMM(const char* program_file){
             printf(" ...DGEMM on CPU\n");
 		double *C_CPU;
                 C_CPU = (double *) calloc(__nbRowsC * __nbColumnsC, sizeof(double));
-                DGEMMCPU(C_CPU, (const double *)A, (const double *)B, __nbRowsC, __nbColumnsC, __nbRowsB);
+                //DGEMMCPU(C_CPU, (const double *)A, (const double *)B, __nbRowsC, __nbColumnsC, __nbRowsB);
 
             printf(" ...comparing the results\n");
                 printf("//--------------------------------------------------------\n");
 		//Compare the GPU to the CPU results
 		//PassFailFlag = compare((const double *) C_CPU, (const double *) C, __nbRowsC * __nbColumnsC, 1e-16);
-                //printf("//--------------------------------------------------------\n");
-		PassFailFlag = compareDGEMMWithMPFR((const double *)C, (const double *)A, (const double *)B, __nbRowsC, __nbColumnsC, __nbRowsB);
+		//PassFailFlag = compareDGEMMWithMPFR((const double *)C_CPU, (const double *)A, (const double *)B, __nbRowsC, __nbColumnsC, __nbRowsB);
                 printf("//--------------------------------------------------------\n");
 		free(C_CPU);
 		

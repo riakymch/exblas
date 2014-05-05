@@ -21,7 +21,6 @@ typedef double data_t;
 #define AS(i, j) As[j + i * BLOCK_SIZE]
 #define BS(i, j) Bs[j + i * BLOCK_SIZE]
 
-
 ///////////////////////////////////////////////////////////////////////////////
 // Matrix multiplication on the device: C = A * B
 // uiWA is A's width and uiWB is B's width
@@ -59,17 +58,18 @@ __kernel void matrixMul(
     int bStep  = BLOCK_SIZE * uiWB;
 
     //sum is used to store the element of the block sub-matrix that is computed by the thread
-    data_t sum = 0.0;
+    data_t sum[2] = {0.0, 0.0};
 
-    //Loop over all the sub-matrices of A and B
-    //required to compute the block sub-matrix
+    //Loop over all the sub-matrices of A and B required to compute the block sub-matrix
     for (int a = aBegin, b = bBegin;
              a <= aEnd;
              a += aStep, b += bStep) {
-        //Load the matrices from device memory to shared memory;
+        //Load the matrices from device memory to shared memory; 
         //each thread loads one element of each matrix
         AS(ty, tx) = A[a + uiWA * ty + tx];
         BS(ty, tx) = B[b + uiWB * ty + tx];
+        AS(ty + 8, tx) = A[a + uiWA * (ty + 8) + tx];
+        BS(ty + 8, tx) = B[b + uiWB * (ty + 8) + tx];
 	
         //Synchronize to make sure the matrices are loaded
         barrier(CLK_LOCAL_MEM_FENCE);
@@ -80,7 +80,8 @@ __kernel void matrixMul(
           #pragma unroll
         #endif
         for (int k = 0; k < BLOCK_SIZE; ++k) {
-	    sum = fma(AS(ty, k), BS(k, tx), sum);
+	    sum[0] = fma(AS(ty, k), BS(k, tx), sum[0]);
+	    sum[1] = fma(AS(ty + 8, k), BS(k, tx), sum[1]);
 	}
 
         //Synchronize to make sure that the preceding computation is done before 
@@ -89,7 +90,7 @@ __kernel void matrixMul(
     }
 
     int c = uiWB * BLOCK_SIZE * by + BLOCK_SIZE * bx;
-    //C[get_global_id(1) * get_global_size(0) + get_global_id(0)] = sum;
-    C[c + uiWB * ty + tx] = sum;
+    C[c + uiWB * ty + tx] = sum[0];
+    C[c + uiWB * (ty + 8) + tx] = sum[1];
 }
 
