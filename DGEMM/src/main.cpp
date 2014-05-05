@@ -190,9 +190,11 @@ int runDGEMM(const char* program_file){
             else if (__alg == 2)
                 ciErrNum = initDGEMMNVIDIA(cxGPUContext, cqCommandQueue, cdDevice, program_file);
             else if (__alg == 3)
-                ciErrNum = initDGEMMNVIDIARepro(cxGPUContext, cqCommandQueue, cdDevice, program_file, __nbfpe, __nbColumnsC, __nbRowsC);
+                ciErrNum = initDGEMMNVIDIASuperacc(cxGPUContext, cqCommandQueue, cdDevice, program_file, __nbfpe, __nbColumnsC, __nbRowsC);
             else if (__alg == 4)
-                ciErrNum = initDGEMMNVIDIAReproPrivate(cxGPUContext, cqCommandQueue, cdDevice, program_file, __nbfpe, __nbColumnsC, __nbRowsC);
+                ciErrNum = initDGEMMNVIDIAFPE(cxGPUContext, cqCommandQueue, cdDevice, program_file, __nbfpe, __nbColumnsC, __nbRowsC);
+            else if (__alg == 5)
+                ciErrNum = initDGEMMNVIDIASuperaccPrivate(cxGPUContext, cqCommandQueue, cdDevice, program_file, __nbfpe, __nbColumnsC, __nbRowsC);
             
             if (ciErrNum != CL_SUCCESS)
                 cleanUp(EXIT_FAILURE);
@@ -207,9 +209,11 @@ int runDGEMM(const char* program_file){
             else if (__alg == 2)
                 DGEMMNVIDIA(NULL, d_C, d_A, d_B, &ciErrNum);
             else if (__alg == 3)
-                DGEMMNVIDIARepro(NULL, d_C, d_A, d_B, &ciErrNum);
+                DGEMMNVIDIASuperacc(NULL, d_C, d_A, d_B, &ciErrNum);
             else if (__alg == 4)
-                DGEMMNVIDIAReproPrivate(NULL, d_C, d_A, d_B, &ciErrNum);
+                DGEMMNVIDIAFPE(NULL, d_C, d_A, d_B, &ciErrNum);
+            else if (__alg == 5)
+                DGEMMNVIDIASuperaccPrivate(NULL, d_C, d_A, d_B, &ciErrNum);
 
             if (ciErrNum != CL_SUCCESS)
                 cleanUp(EXIT_FAILURE);
@@ -233,9 +237,11 @@ int runDGEMM(const char* program_file){
             else if (__alg == 2)
                 DGEMMNVIDIA(NULL, d_C, d_A, d_B, &ciErrNum);
             else if (__alg == 3)
-                DGEMMNVIDIARepro(NULL, d_C, d_A, d_B, &ciErrNum);
+                DGEMMNVIDIASuperacc(NULL, d_C, d_A, d_B, &ciErrNum);
             else if (__alg == 4)
-                DGEMMNVIDIAReproPrivate(NULL, d_C, d_A, d_B, &ciErrNum);
+                DGEMMNVIDIAFPE(NULL, d_C, d_A, d_B, &ciErrNum);
+            else if (__alg == 5)
+                DGEMMNVIDIASuperaccPrivate(NULL, d_C, d_A, d_B, &ciErrNum);
 
             ciErrNum  = clEnqueueMarker(cqCommandQueue, &endMark);
             ciErrNum |= clFinish(cqCommandQueue);
@@ -275,12 +281,12 @@ int runDGEMM(const char* program_file){
             printf(" ...DGEMM on CPU\n");
 		double *C_CPU;
                 C_CPU = (double *) calloc(__nbRowsC * __nbColumnsC, sizeof(double));
-                //DGEMMCPU(C_CPU, (const double *)A, (const double *)B, __nbRowsC, __nbColumnsC, __nbRowsB);
+                DGEMMCPU(C_CPU, (const double *)A, (const double *)B, __nbRowsC, __nbColumnsC, __nbRowsB);
 
             printf(" ...comparing the results\n");
                 printf("//--------------------------------------------------------\n");
 		//Compare the GPU to the CPU results
-		//PassFailFlag = compare((const double *) C_CPU, (const double *) C, __nbRowsC * __nbColumnsC, 1e-16);
+		PassFailFlag = compare((const double *) C_CPU, (const double *) C, __nbRowsC * __nbColumnsC, 1e-16);
 		//PassFailFlag = compareDGEMMWithMPFR((const double *)C_CPU, (const double *)A, (const double *)B, __nbRowsC, __nbColumnsC, __nbRowsB);
                 printf("//--------------------------------------------------------\n");
 		free(C_CPU);
@@ -294,9 +300,11 @@ int runDGEMM(const char* program_file){
             else if (__alg == 2)
                 closeDGEMMNVIDIA();
             else if (__alg == 3)
-                closeDGEMMNVIDIARepro();
+                closeDGEMMNVIDIASuperacc();
             else if (__alg == 4)
-                closeDGEMMNVIDIAReproPrivate();
+                closeDGEMMNVIDIAFPE();
+            else if (__alg == 5)
+                closeDGEMMNVIDIASuperaccPrivate();
     }
 
     // pass or fail

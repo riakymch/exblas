@@ -37,7 +37,7 @@ static char  compileOptions[256] = "-DBLOCK_SIZE=32 -DUSE_KNUTH -DNVIDIA -cl-mad
 #endif
 
 
-extern "C" cl_int initDGEMMNVIDIAReproPrivate(
+extern "C" cl_int initDGEMMNVIDIASuperaccPrivate(
     cl_context cxGPUContext, 
     cl_command_queue cqParamCommandQue, 
     cl_device_id cdDevice,
@@ -102,7 +102,7 @@ extern "C" cl_int initDGEMMNVIDIAReproPrivate(
     return EXIT_SUCCESS;
 }
 
-extern "C" void closeDGEMMNVIDIAReproPrivate(void){
+extern "C" void closeDGEMMNVIDIASuperaccPrivate(void){
     cl_int ciErrNum;
 
     ciErrNum = clReleaseKernel(ckMatrixMul);
@@ -115,7 +115,7 @@ extern "C" void closeDGEMMNVIDIAReproPrivate(void){
 ////////////////////////////////////////////////////////////////////////////////
 // OpenCL launchers for Superaccumulator / mergeSuperaccumulators kernels
 ////////////////////////////////////////////////////////////////////////////////
-extern "C" size_t DGEMMNVIDIAReproPrivate(
+extern "C" size_t DGEMMNVIDIASuperaccPrivate(
     cl_command_queue cqCommandQueue,
     Matrix d_C,
     const Matrix d_A,

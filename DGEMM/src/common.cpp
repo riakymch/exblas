@@ -109,7 +109,7 @@ void init_fpuniform(double *array, int size, int range, int emax) {
     //Generate numbers on several bins starting from emax
     for(int i = 0; i != size; ++i) {
         //array[i] = randDouble(emax-range, emax, 1);
-        array[i] = 1.1; //randDouble(0, range, 1);
+        array[i] = 1.0; //randDouble(0, range, 1);
     }
     /*//Generate nubers on an interval [0, 1]
     for(int i = 0; i != size; ++i) {

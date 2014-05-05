@@ -136,7 +136,7 @@ extern "C" cl_int initDGEMMNVIDIA(
     const char* program_file
 );
 
-extern "C" cl_int initDGEMMNVIDIARepro(
+extern "C" cl_int initDGEMMNVIDIASuperacc(
     cl_context cxGPUContext,
     cl_command_queue cqParamCommandQue,
     cl_device_id cdDevice,
@@ -146,7 +146,17 @@ extern "C" cl_int initDGEMMNVIDIARepro(
     const uint height
 );
 
-extern "C" cl_int initDGEMMNVIDIAReproPrivate(
+extern "C" cl_int initDGEMMNVIDIAFPE(
+    cl_context cxGPUContext,
+    cl_command_queue cqParamCommandQue,
+    cl_device_id cdDevice,
+    const char* program_file,
+    const uint NbFPE,
+    const uint width,
+    const uint height
+);
+
+extern "C" cl_int initDGEMMNVIDIASuperaccPrivate(
     cl_context cxGPUContext,
     cl_command_queue cqParamCommandQue,
     cl_device_id cdDevice,
@@ -168,11 +178,15 @@ extern "C" void closeDGEMMNVIDIA(
     void
 );
 
-extern "C" void closeDGEMMNVIDIARepro(
+extern "C" void closeDGEMMNVIDIASuperacc(
     void
 );
 
-extern "C" void closeDGEMMNVIDIAReproPrivate(
+extern "C" void closeDGEMMNVIDIAFPE(
+    void
+);
+
+extern "C" void closeDGEMMNVIDIASuperaccPrivate(
     void
 );
 
@@ -200,7 +214,7 @@ extern "C" size_t DGEMMNVIDIA(
     cl_int *ciErrNum
 );
 
-extern "C" size_t DGEMMNVIDIARepro(
+extern "C" size_t DGEMMNVIDIASuperacc(
     cl_command_queue cqCommandQueue,
     Matrix d_mC,
     const Matrix d_mA,
@@ -208,7 +222,15 @@ extern "C" size_t DGEMMNVIDIARepro(
     cl_int *ciErrNum
 );
 
-extern "C" size_t DGEMMNVIDIAReproPrivate(
+extern "C" size_t DGEMMNVIDIAFPE(
+    cl_command_queue cqCommandQueue,
+    Matrix d_mC,
+    const Matrix d_mA,
+    const Matrix d_mB,
+    cl_int *ciErrNum
+);
+
+extern "C" size_t DGEMMNVIDIASuperaccPrivate(
     cl_command_queue cqCommandQueue,
     Matrix d_mC,
     const Matrix d_mA,

@@ -10,7 +10,7 @@ fi
 
 nbElements=67108864
 exe=./../src/main.out
-file=../results/InputRange.VS.GBs.AMD.2014.04.29.Round.dat
+file=../results/InputRange.VS.GBs.NVIDIA.2014.04.29.Round.dat
 echo
 touch $file
 echo -n "" > $file
