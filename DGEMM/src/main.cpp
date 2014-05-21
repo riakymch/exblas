@@ -31,7 +31,7 @@ static uint __nbfpe      = 0;
 static uint __alg        = 0;
 
 static void __usage(int argc __attribute__((unused)), char **argv) {
-  fprintf(stderr, "Usage: %s [-m nbrows of C -n nbcolumns of C -k nbcolumns of B -r range -e nbfpe -a alg (0-mine, 1-amd, 2-nvidia, 3-superacc 4-fpe 5-superacc.private)] \n", argv[0]);
+  fprintf(stderr, "Usage: %s [-m nbrows of C -n nbcolumns of C -k nbcolumns of B -r range -e nbfpe -a alg (0-mine, 1-amd, 2-nvidia, 3-superacc, 4-fpe, 5-superacc.private)] \n", argv[0]);
   printf("       -?, -h:    Display this help and exit\n");
 }
 
@@ -282,11 +282,13 @@ int runDGEMM(const char* program_file){
 		double *C_CPU;
                 C_CPU = (double *) calloc(__nbRowsC * __nbColumnsC, sizeof(double));
                 DGEMMCPU(C_CPU, (const double *)A, (const double *)B, __nbRowsC, __nbColumnsC, __nbRowsB);
+                //printMatrix(C, d_C.width, d_C.height);
 
             printf(" ...comparing the results\n");
                 printf("//--------------------------------------------------------\n");
 		//Compare the GPU to the CPU results
 		PassFailFlag = compare((const double *) C_CPU, (const double *) C, __nbRowsC * __nbColumnsC, 1e-16);
+                 
 		//PassFailFlag = compareDGEMMWithMPFR((const double *)C_CPU, (const double *)A, (const double *)B, __nbRowsC, __nbColumnsC, __nbRowsB);
                 printf("//--------------------------------------------------------\n");
 		free(C_CPU);

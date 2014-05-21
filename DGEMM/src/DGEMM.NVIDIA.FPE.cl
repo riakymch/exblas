@@ -226,6 +226,7 @@ void Accumulate(__global volatile long *sa, double x) {
   }
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
 // Matrix multiplication on the device: C = A * B
 // uiWA is A's width and uiWB is B's width
@@ -290,8 +291,7 @@ __kernel void matrixMul(
         #endif
         for (int k = 0; k < BLOCK_SIZE; ++k) {
 	    double r; //residual of multiplication
-            //double x = TwoProductFMA(AS(ty, k), BS(k, tx), &r);
-	    double x = AS(ty, k);
+            double x = TwoProductFMA(AS(ty, k), BS(k, tx), &r);
             #ifdef NVIDIA
                 #pragma unroll
             #endif
@@ -299,10 +299,11 @@ __kernel void matrixMul(
                 double s; //residual of addition
                 sum[i] = Knuth2Sum(sum[i], x, &s);
                 x = s;
+		r = 0;
             }
-            //if(x != 0.0) {
-	    //    Accumulate(g_workingBase, x);
-            //}
+            if(x != 0.0) {
+	        Accumulate(g_workingBase, x);
+            }
 	}
 
         //Synchronize to make sure that the preceding computation is done before 
@@ -313,15 +314,12 @@ __kernel void matrixMul(
 #ifdef NVIDIA
     #pragma unroll
 #endif
-    //for(uint i = 0; i != NBFPE; ++i) {
-    //	Accumulate(g_workingBase, sum[i]);
-    //}
+    for(uint i = 0; i != NBFPE; ++i) {
+    	Accumulate(g_workingBase, sum[i]);
+    }
 
-    //TODO: Round the results back
-
-
-    //int c = uiWB * BLOCK_SIZE * by + BLOCK_SIZE * bx;
     //TODO: the first non-zero from rigth
-    C[c + uiWB * ty + tx] = sum[0];
+    //C[c + uiWB * ty + tx] = sum[0];
+    C[c + uiWB * ty + tx] = Round(g_workingBase);
 }
 

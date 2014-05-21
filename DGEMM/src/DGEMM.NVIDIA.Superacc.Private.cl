@@ -32,24 +32,12 @@ typedef double data_t;
 ////////////////////////////////////////////////////////////////////////////////
 // Auxiliary functions
 ////////////////////////////////////////////////////////////////////////////////
-#ifdef USE_KNUTH
-    double Knuth2Sum(double a, double b, double *s) {
-        double r = a + b;
-        double z = r - a;
-        *s = (a - (r - z)) + (b - z);
-        return r;
-    }
-#else
-    //twosum
-    double Knuth2Sum(double a, double b, double *s) {
-        double r = a + b;
-        int doswap = fabs(b) > fabs(a);
-        double a2 = doswap ? b : a;
-        double b2 = doswap ? a : b;
-        *s = (a2 - r) + b2;
-        return r;
-    }
-#endif
+double Knuth2Sum(double a, double b, double *s) {
+    double r = a + b;
+    double z = r - a;
+    *s = (a - (r - z)) + (b - z);
+    return r;
+}
 
 double TwoProductFMA(double a, double b, double *d) {
     double p = a * b;
@@ -75,6 +63,10 @@ long xadd(volatile long *sa, long x, uchar *of) {
     return y;
 }
 
+
+////////////////////////////////////////////////////////////////////////////////
+// Rounding functions
+////////////////////////////////////////////////////////////////////////////////
 double OddRoundSumNonnegative(double th, double tl) {
     union {
         double d;
@@ -89,10 +81,6 @@ double OddRoundSumNonnegative(double th, double tl) {
     return thdb.d;
 }
 
-
-////////////////////////////////////////////////////////////////////////////////
-// Rounding functions
-////////////////////////////////////////////////////////////////////////////////
 int Normalize(long *accumulator, int *imin, int *imax) {
   if (*imin > *imax) {
     return 0;
@@ -128,8 +116,8 @@ int Normalize(long *accumulator, int *imin, int *imax) {
 }
 
 double Round(long *accumulator) {
-  int imin = 38; 
-  int imax = 0;
+  int imin = 0; 
+  int imax = 38;
   int negative = Normalize(accumulator, &imin, &imax);
 
   //Find leading word
@@ -327,12 +315,9 @@ __kernel void matrixMul(
 	Accumulate(p_workingBase, sum[i]);
     }
 
-    //TODO: Round the results back
-
-
-    //int c = uiWB * BLOCK_SIZE * by + BLOCK_SIZE * bx;
     //TODO: the first non-zero from rigth
     int c = uiWB * BLOCK_SIZE * by + BLOCK_SIZE * bx;
-    C[c + uiWB * ty + tx] = sum[0];
+    //C[c + uiWB * ty + tx] = sum[0];
+    C[c + uiWB * ty + tx] = Round(p_workingBase);
 }
 

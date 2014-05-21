@@ -265,7 +265,7 @@ __kernel void matrixMul(
 
     //A superaccumulator that corresponds to a single value in the matrix C
     int c = uiWB * BLOCK_SIZE * by + BLOCK_SIZE * bx;
-    /*__global long *g_workingBase = Accus[(c + uiWB * ty + tx) * BIN_COUNT];
+    __global long *g_workingBase = Accus[(c + uiWB * ty + tx) * BIN_COUNT];
 
 
     //Loop over all the sub-matrices of A and B
@@ -298,10 +298,15 @@ __kernel void matrixMul(
         //Synchronize to make sure that the preceding computation is done before 
         //loading two new sub-matrices of A and B in the next iteration
         barrier(CLK_LOCAL_MEM_FENCE);
-    }*/
-
+    }
 
     //int c = uiWB * BLOCK_SIZE * by + BLOCK_SIZE * bx;
-    C[c + uiWB * ty + tx] = 1.0; //Round(g_workingBase);
+    C[c + uiWB * ty + tx] = Round(g_workingBase);
+    /*for (int i = 0; i < BIN_COUNT; i++)
+        if (g_workingBase[i] != 0) {
+            C[c + uiWB * ty + tx] = g_workingBase[i];
+	    break;
+        }
+    */
 }
 
