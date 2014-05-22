@@ -9,6 +9,9 @@
     #include <CL/opencl.h>
 #endif
 
+#include <gmp.h>
+#include <mpfr.h>
+
 void DGEMMCPU(
     double *C,
     const double *A,
@@ -18,12 +21,20 @@ void DGEMMCPU(
     const uint z
 );
 
-
 int compare(
     const double *ref_dgemm,
     const double *dgemm,
     const uint length,
     const double epsilon
+);
+
+extern "C" bool compareDGEMMWithMPFR(
+    const double *dgemm,
+    const double *h_a,
+    const double *h_b,
+    const uint m,
+    const uint n,
+    const uint k 
 );
 
 void printMatrix(

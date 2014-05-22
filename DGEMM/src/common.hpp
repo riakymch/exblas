@@ -17,9 +17,6 @@
 #include <cstdlib>
 #include <string.h>
 
-#include <gmp.h>
-#include <mpfr.h>
-
 #include "DGEMM.hpp"
 #include "Superaccumulator.hpp"
 
@@ -236,18 +233,6 @@ extern "C" size_t DGEMMNVIDIASuperaccPrivate(
     const Matrix d_mA,
     const Matrix d_mB,
     cl_int *ciErrNum
-);
-
-////////////////////////////////////////////////////////////////////////////////
-// MPFR functions
-////////////////////////////////////////////////////////////////////////////////
-extern "C" bool compareDGEMMWithMPFR(
-    const double *dgemm,
-    const double *h_a,
-    const double *h_b,
-    const uint m,
-    const uint n,
-    const uint k 
 );
 
 

@@ -107,22 +107,14 @@ double min(double arr[], int size) {
 
 void init_fpuniform(double *array, int size, int range, int emax) {
     //Generate numbers on several bins starting from emax
-    for(int i = 0; i != size; ++i) {
+    /*for(int i = 0; i != size; ++i) {
         //array[i] = randDouble(emax-range, emax, 1);
-        array[i] = 1.0; //randDouble(0, range, 1);
-    }
-    /*//Generate nubers on an interval [0, 1]
-    for(int i = 0; i != size; ++i) {
-        array[i] = double(rand()) / double(RAND_MAX);
+        //array[i] = 1.1; //randDouble(0, range, 1);
     }*/
-    /*//Generate numbers on an interval [1, 2]
+    //Generate numbers on an interval [1, 2]
     for(int i = 0; i != size; ++i) {
         array[i] = 1.0 + double(rand()) / double(RAND_MAX);
-    }*/
-    /*//simple case for tests only
-    for(int i = 0; i != size; i++) {
-        array[i] = 1.1;
-    }*/
+    }
 }
 
 void print2Superaccumulators(bintype *binCPU, bintype *binGPU) {
@@ -140,46 +132,3 @@ extern "C" double roundSuperaccumulator(
 );
 
 
-////////////////////////////////////////////////////////////////////////////////
-// MPFR functions
-////////////////////////////////////////////////////////////////////////////////
-extern "C" bool compareDGEMMWithMPFR(const double *dgemm, const double *h_a, const double *h_b, const uint m, const uint n, const uint k) {
-  double *dgemm_mpfr;
-  mpfr_t sum, ddot, op1;
-
-  dgemm_mpfr = (double *) malloc(m * n * sizeof(double));
-
-  mpfr_init2(op1, 64);
-  mpfr_init2(ddot, 128);
-  mpfr_init2(sum, 2098);
-  mpfr_set_d(ddot, 0.0, MPFR_RNDN);
-
-  //Produce a result matrix of DGEMM using MPFR
-  for(uint i = 0; i < m; i++) {
-      for(uint j = 0; j < n; j++) {
-          mpfr_set_d(sum, 0.0, MPFR_RNDN);
-          for(uint l = 0; l < k; l++) {
-    		mpfr_set_d(op1, h_a[l * m + i], MPFR_RNDN);
-		mpfr_mul_d(ddot, op1, h_b[j * k + l], MPFR_RNDN);
-		mpfr_add(sum, sum, ddot, MPFR_RNDN);
-          }
-	  dgemm_mpfr[j * m + i] = mpfr_get_d(sum, MPFR_RNDD);
-      }
-  }
-
-  bool dgemm_cmp = false;
-  double norm = 0.0;
-  //Compare the GPU and MPFR results
-  for (uint i = 0; i < m * n; i++) {
-      norm += pow(abs(dgemm[i] - dgemm_mpfr[i]), 2);
-  }
-  norm = ::sqrt(norm);
-  printf("Compare to MPFR. Norm = %.17g\n", norm);
-  if (norm < 1e-16)
-      dgemm_cmp = true;
-
-  free(dgemm_mpfr);
-  mpfr_free_cache();
-
-  return dgemm_cmp;
-}
