@@ -46,18 +46,18 @@ double TwoProductFMA(double a, double b, double *d) {
 }
 
 // signedcarry in {-1, 0, 1}
-long xadd(__global volatile long *sa, long x, uchar *of) {
+long xadd(__global long *sa, long x, uchar *of) {
     // OF and SF  -> carry=1
     // OF and !SF -> carry=-1
     // !OF        -> carry=0
-    long y = atom_add(sa, x);
-    long z = y + x; // since the value sa->accumulator[i] can be changed by another work item
+    long y = *sa;
+    *sa = *sa + x; // since the value sa->accumulator[i] can be changed by another work item
 
     // TODO: cover also underflow
     *of = 0;
-    if(x > 0 && y > 0 && z < 0)
+    if(x > 0 && y > 0 && *sa < 0)
         *of = 1;
-    if(x < 0 && y < 0 && z > 0)
+    if(x < 0 && y < 0 && *sa > 0)
         *of = 1;
 
     return y;
@@ -168,7 +168,7 @@ double Round(__global long *accumulator) {
 ////////////////////////////////////////////////////////////////////////////////
 // Main computation pass: compute partial accumulators
 ////////////////////////////////////////////////////////////////////////////////
-void AccumulateWord(__global volatile long *sa, int i, long x) {
+void AccumulateWord(__global long *sa, int i, long x) {
   // With atomic accumulator updates
   // accumulation and carry propagation can happen in any order
   long carry = x;
@@ -203,7 +203,7 @@ void AccumulateWord(__global volatile long *sa, int i, long x) {
   }
 }
 
-void Accumulate(__global volatile long *sa, double x) {
+void Accumulate(__global long *sa, double x) {
   if (x == 0)
     return;
 
@@ -265,8 +265,9 @@ __kernel void matrixMul(
 
     //A superaccumulator that corresponds to a single value in the matrix C
     int c = uiWB * BLOCK_SIZE * by + BLOCK_SIZE * bx;
-    __global long *g_workingBase = Accus[(c + uiWB * ty + tx) * BIN_COUNT];
-
+    __global long *g_workingBase = Accus + (c + uiWB * ty + tx) * BIN_COUNT;
+    for (uint i = 0; i < BIN_COUNT; i++)
+        g_workingBase[i] = 0;
 
     //Loop over all the sub-matrices of A and B
     //required to compute the block sub-matrix
@@ -302,11 +303,5 @@ __kernel void matrixMul(
 
     //int c = uiWB * BLOCK_SIZE * by + BLOCK_SIZE * bx;
     C[c + uiWB * ty + tx] = Round(g_workingBase);
-    /*for (int i = 0; i < BIN_COUNT; i++)
-        if (g_workingBase[i] != 0) {
-            C[c + uiWB * ty + tx] = g_workingBase[i];
-	    break;
-        }
-    */
 }
 

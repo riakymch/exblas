@@ -225,6 +225,8 @@ int runDGEMM(const char* program_file){
         for(uint iter = 0; iter < NUM_ITER; iter++) {
             ciErrNum = clEnqueueMarker(cqCommandQueue, &startMark);
             ciErrNum |= clFinish(cqCommandQueue);
+            //if (ciErrNum == CL_INVALID_COMMAND_QUEUE)
+ 	    //    printf("CL_INVALID_COMMAND_QUEUE\n");
             if (ciErrNum != CL_SUCCESS) {
                 printf("Error in clEnqueueMarker, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
                 cleanUp(EXIT_FAILURE);

@@ -50,7 +50,7 @@ extern "C" cl_int initDGEMMNVIDIAFPE(
     cl_int ciErrNum;
     size_t kernelLength;
 
-    // Read the OpenCL kernel in from source file
+    // Read the OpenCL kernel from source file
     FILE *program_handle;
     printf("Load the program sources (%s)...\n", program_file);
     program_handle = fopen(program_file, "r");
@@ -113,6 +113,9 @@ extern "C" cl_int initDGEMMNVIDIAFPE(
 
 extern "C" void closeDGEMMNVIDIAFPE(void){
     cl_int ciErrNum;
+
+    if(d_Accus) 
+	clReleaseMemObject(d_Accus);
 
     ciErrNum = clReleaseKernel(ckMatrixMul);
     ciErrNum |= clReleaseProgram(cpProgram);
