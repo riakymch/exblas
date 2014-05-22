@@ -60,6 +60,9 @@ __kernel void matrixMul(
     //sum is used to store the element of the block sub-matrix that is computed by the thread
     data_t sum[2] = {0.0, 0.0};
 
+    //step
+    int step = BLOCK_SIZE / 2;
+
     //Loop over all the sub-matrices of A and B required to compute the block sub-matrix
     for (int a = aBegin, b = bBegin;
              a <= aEnd;
@@ -68,8 +71,8 @@ __kernel void matrixMul(
         //each thread loads one element of each matrix
         AS(ty, tx) = A[a + uiWA * ty + tx];
         BS(ty, tx) = B[b + uiWB * ty + tx];
-        AS(ty + 8, tx) = A[a + uiWA * (ty + 8) + tx];
-        BS(ty + 8, tx) = B[b + uiWB * (ty + 8) + tx];
+        AS(ty + step, tx) = A[a + uiWA * (ty + step) + tx];
+        BS(ty + step, tx) = B[b + uiWB * (ty + step) + tx];
 	
         //Synchronize to make sure the matrices are loaded
         barrier(CLK_LOCAL_MEM_FENCE);
@@ -81,7 +84,7 @@ __kernel void matrixMul(
         #endif
         for (int k = 0; k < BLOCK_SIZE; ++k) {
 	    sum[0] = fma(AS(ty, k), BS(k, tx), sum[0]);
-	    sum[1] = fma(AS(ty + 8, k), BS(k, tx), sum[1]);
+	    sum[1] = fma(AS(ty + step, k), BS(k, tx), sum[1]);
 	}
 
         //Synchronize to make sure that the preceding computation is done before 
@@ -91,6 +94,6 @@ __kernel void matrixMul(
 
     int c = uiWB * BLOCK_SIZE * by + BLOCK_SIZE * bx;
     C[c + uiWB * ty + tx] = sum[0];
-    C[c + uiWB * (ty + 8) + tx] = sum[1];
+    C[c + uiWB * (ty + step) + tx] = sum[1];
 }
 

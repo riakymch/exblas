@@ -285,6 +285,7 @@ int runDGEMM(const char* program_file){
                 C_CPU = (double *) calloc(__nbRowsC * __nbColumnsC, sizeof(double));
                 DGEMMCPU(C_CPU, (const double *)A, (const double *)B, __nbRowsC, __nbColumnsC, __nbRowsB);
                 //printMatrix(C, d_C.width, d_C.height);
+                //printMatrix(C_CPU, d_C.width, d_C.height);
 
             printf(" ...comparing the results\n");
                 printf("//--------------------------------------------------------\n");
