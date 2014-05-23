@@ -31,7 +31,7 @@ static uint __nbfpe      = 0;
 static uint __alg        = 0;
 
 static void __usage(int argc __attribute__((unused)), char **argv) {
-  fprintf(stderr, "Usage: %s [-m nbrows of C -n nbcolumns of C -k nbcolumns of B -r range -e nbfpe -a alg (0-mine, 1-amd, 2-nvidia, 3-superacc, 4-fpe, 5-superacc.private)] \n", argv[0]);
+  fprintf(stderr, "Usage: %s [-m nbrows of C -n nbcolumns of C -k nbcolumns of B\n -r range -e nbfpe\n -a alg (0-mine, 1-amd, 2-nvidia, 3-sagl, 4-fpegl, 5-sapr)] \n", argv[0]);
   printf("       -?, -h:    Display this help and exit\n");
 }
 
@@ -90,9 +90,9 @@ int main(int argc, char **argv)
     if (__alg == 2)
         runDGEMM("../src/DGEMM.NVIDIA.cl");
     if (__alg == 3)
-        runDGEMM("../src/DGEMM.NVIDIA.Superacc.cl");
+        runDGEMM("../src/DGEMM.NVIDIA.Superacc.Global.cl");
     if (__alg == 4)
-        runDGEMM("../src/DGEMM.NVIDIA.FPE.cl");
+        runDGEMM("../src/DGEMM.NVIDIA.FPE.Global.cl");
     if (__alg == 5)
         runDGEMM("../src/DGEMM.NVIDIA.Superacc.Private.cl");
 }
@@ -190,9 +190,9 @@ int runDGEMM(const char* program_file){
             else if (__alg == 2)
                 ciErrNum = initDGEMMNVIDIA(cxGPUContext, cqCommandQueue, cdDevice, program_file);
             else if (__alg == 3)
-                ciErrNum = initDGEMMNVIDIASuperacc(cxGPUContext, cqCommandQueue, cdDevice, program_file, __nbfpe, __nbColumnsC, __nbRowsC);
+                ciErrNum = initDGEMMNVIDIASuperaccGlobal(cxGPUContext, cqCommandQueue, cdDevice, program_file, __nbfpe, __nbColumnsC, __nbRowsC);
             else if (__alg == 4)
-                ciErrNum = initDGEMMNVIDIAFPE(cxGPUContext, cqCommandQueue, cdDevice, program_file, __nbfpe, __nbColumnsC, __nbRowsC);
+                ciErrNum = initDGEMMNVIDIAFPEGlobal(cxGPUContext, cqCommandQueue, cdDevice, program_file, __nbfpe, __nbColumnsC, __nbRowsC);
             else if (__alg == 5)
                 ciErrNum = initDGEMMNVIDIASuperaccPrivate(cxGPUContext, cqCommandQueue, cdDevice, program_file, __nbfpe, __nbColumnsC, __nbRowsC);
             
@@ -209,9 +209,9 @@ int runDGEMM(const char* program_file){
             else if (__alg == 2)
                 DGEMMNVIDIA(NULL, d_C, d_A, d_B, &ciErrNum);
             else if (__alg == 3)
-                DGEMMNVIDIASuperacc(NULL, d_C, d_A, d_B, &ciErrNum);
+                DGEMMNVIDIASuperaccGlobal(NULL, d_C, d_A, d_B, &ciErrNum);
             else if (__alg == 4)
-                DGEMMNVIDIAFPE(NULL, d_C, d_A, d_B, &ciErrNum);
+                DGEMMNVIDIAFPEGlobal(NULL, d_C, d_A, d_B, &ciErrNum);
             else if (__alg == 5)
                 DGEMMNVIDIASuperaccPrivate(NULL, d_C, d_A, d_B, &ciErrNum);
 
@@ -239,9 +239,9 @@ int runDGEMM(const char* program_file){
             else if (__alg == 2)
                 DGEMMNVIDIA(NULL, d_C, d_A, d_B, &ciErrNum);
             else if (__alg == 3)
-                DGEMMNVIDIASuperacc(NULL, d_C, d_A, d_B, &ciErrNum);
+                DGEMMNVIDIASuperaccGlobal(NULL, d_C, d_A, d_B, &ciErrNum);
             else if (__alg == 4)
-                DGEMMNVIDIAFPE(NULL, d_C, d_A, d_B, &ciErrNum);
+                DGEMMNVIDIAFPEGlobal(NULL, d_C, d_A, d_B, &ciErrNum);
             else if (__alg == 5)
                 DGEMMNVIDIASuperaccPrivate(NULL, d_C, d_A, d_B, &ciErrNum);
 
@@ -305,9 +305,9 @@ int runDGEMM(const char* program_file){
             else if (__alg == 2)
                 closeDGEMMNVIDIA();
             else if (__alg == 3)
-                closeDGEMMNVIDIASuperacc();
+                closeDGEMMNVIDIASuperaccGlobal();
             else if (__alg == 4)
-                closeDGEMMNVIDIAFPE();
+                closeDGEMMNVIDIAFPEGlobal();
             else if (__alg == 5)
                 closeDGEMMNVIDIASuperaccPrivate();
     }
