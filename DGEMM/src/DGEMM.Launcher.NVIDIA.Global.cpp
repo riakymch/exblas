@@ -27,17 +27,18 @@ static char* cSources = NULL;                 // Buffer to hold source for compi
 static cl_program       cpProgram;            //OpenCL Superaccumulator program
 static cl_kernel        ckMatrixMul;
 static cl_command_queue cqDefaultCommandQue;  //Default command queue for Superaccumulator
+static cl_mem 		d_Accus;
 
 static const uint  VECTOR_NUMBER = 1;
 
 #ifdef AMD
-static char  compileOptions[256] = "-DBLOCK_SIZE=16 -DUSE_KNUTH";
+static char  compileOptions[256] = "-DBLOCK_SIZE=16";
 #else
-static char  compileOptions[256] = "-DBLOCK_SIZE=32 -DUSE_KNUTH -DNVIDIA -cl-mad-enable -cl-fast-relaxed-math";
+static char  compileOptions[256] = "-DBLOCK_SIZE=32 -DNVIDIA -cl-mad-enable -cl-fast-relaxed-math";
 #endif
 
 
-extern "C" cl_int initDGEMMNVIDIASuperaccPrivate(
+extern "C" cl_int initDGEMMNVIDIAGlobal(
     cl_context cxGPUContext, 
     cl_command_queue cqParamCommandQue, 
     cl_device_id cdDevice,
@@ -49,7 +50,7 @@ extern "C" cl_int initDGEMMNVIDIASuperaccPrivate(
     cl_int ciErrNum;
     size_t kernelLength;
 
-    // Read the OpenCL kernel in from source file
+    // Read the OpenCL kernel from source file
     FILE *program_handle;
     printf("Load the program sources (%s)...\n", program_file);
     program_handle = fopen(program_file, "r");
@@ -93,6 +94,14 @@ extern "C" cl_int initDGEMMNVIDIASuperaccPrivate(
             return EXIT_FAILURE;
         }
 
+    printf("...allocating memory for a matrix of superaccumualtors\n");
+        size_t size = width * height * BIN_COUNT * sizeof(bintype);
+        d_Accus = clCreateBuffer(cxGPUContext, CL_MEM_READ_WRITE, size, NULL, &ciErrNum);
+        if (ciErrNum != CL_SUCCESS) {
+            printf("Error in clCreateBuffer for d_C, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
+            return EXIT_FAILURE;
+        }
+
     //Save default command queue
     cqDefaultCommandQue = cqParamCommandQue;
 
@@ -102,8 +111,11 @@ extern "C" cl_int initDGEMMNVIDIASuperaccPrivate(
     return EXIT_SUCCESS;
 }
 
-extern "C" void closeDGEMMNVIDIASuperaccPrivate(void){
+extern "C" void closeDGEMMNVIDIAGlobal(void){
     cl_int ciErrNum;
+
+    if(d_Accus) 
+	clReleaseMemObject(d_Accus);
 
     ciErrNum = clReleaseKernel(ckMatrixMul);
     ciErrNum |= clReleaseProgram(cpProgram);
@@ -115,7 +127,7 @@ extern "C" void closeDGEMMNVIDIASuperaccPrivate(void){
 ////////////////////////////////////////////////////////////////////////////////
 // OpenCL launchers for Superaccumulator / mergeSuperaccumulators kernels
 ////////////////////////////////////////////////////////////////////////////////
-extern "C" size_t DGEMMNVIDIASuperaccPrivate(
+extern "C" size_t DGEMMNVIDIAGlobal(
     cl_command_queue cqCommandQueue,
     Matrix d_C,
     const Matrix d_A,
@@ -136,7 +148,8 @@ extern "C" size_t DGEMMNVIDIASuperaccPrivate(
 	size_t neededLocalMemory = (BLOCK_SIZE * VECTOR_NUMBER) * (BLOCK_SIZE * VECTOR_NUMBER) * sizeof(cl_double);
 
 	cl_int i = 0;
-        ciErrNum  = clSetKernelArg(ckMatrixMul, i++, sizeof(cl_mem),  (void *)&d_C.elements);
+        ciErrNum  = clSetKernelArg(ckMatrixMul, i++, sizeof(cl_mem),  (void *)&d_Accus);
+        ciErrNum |= clSetKernelArg(ckMatrixMul, i++, sizeof(cl_mem),  (void *)&d_C.elements);
         ciErrNum |= clSetKernelArg(ckMatrixMul, i++, sizeof(cl_mem),  (void *)&d_A.elements);
         ciErrNum |= clSetKernelArg(ckMatrixMul, i++, sizeof(cl_mem),  (void *)&d_B.elements);
         ciErrNum |= clSetKernelArg(ckMatrixMul, i++, sizeof(cl_int),  (void *)&d_A.width);
@@ -158,3 +171,4 @@ extern "C" size_t DGEMMNVIDIASuperaccPrivate(
     }
     return EXIT_SUCCESS;
 }
+

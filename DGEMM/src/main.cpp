@@ -190,11 +190,11 @@ int runDGEMM(const char* program_file){
             else if (__alg == 2)
                 ciErrNum = initDGEMMNVIDIA(cxGPUContext, cqCommandQueue, cdDevice, program_file);
             else if (__alg == 3)
-                ciErrNum = initDGEMMNVIDIASuperaccGlobal(cxGPUContext, cqCommandQueue, cdDevice, program_file, __nbfpe, __nbColumnsC, __nbRowsC);
+                ciErrNum = initDGEMMNVIDIAGlobal(cxGPUContext, cqCommandQueue, cdDevice, program_file, __nbfpe, __nbColumnsC, __nbRowsC);
             else if (__alg == 4)
-                ciErrNum = initDGEMMNVIDIAFPEGlobal(cxGPUContext, cqCommandQueue, cdDevice, program_file, __nbfpe, __nbColumnsC, __nbRowsC);
+                ciErrNum = initDGEMMNVIDIAGlobal(cxGPUContext, cqCommandQueue, cdDevice, program_file, __nbfpe, __nbColumnsC, __nbRowsC);
             else if (__alg == 5)
-                ciErrNum = initDGEMMNVIDIASuperaccPrivate(cxGPUContext, cqCommandQueue, cdDevice, program_file, __nbfpe, __nbColumnsC, __nbRowsC);
+                ciErrNum = initDGEMMNVIDIAPrivate(cxGPUContext, cqCommandQueue, cdDevice, program_file, __nbfpe, __nbColumnsC, __nbRowsC);
             
             if (ciErrNum != CL_SUCCESS)
                 cleanUp(EXIT_FAILURE);
@@ -209,11 +209,11 @@ int runDGEMM(const char* program_file){
             else if (__alg == 2)
                 DGEMMNVIDIA(NULL, d_C, d_A, d_B, &ciErrNum);
             else if (__alg == 3)
-                DGEMMNVIDIASuperaccGlobal(NULL, d_C, d_A, d_B, &ciErrNum);
+                DGEMMNVIDIAGlobal(NULL, d_C, d_A, d_B, &ciErrNum);
             else if (__alg == 4)
-                DGEMMNVIDIAFPEGlobal(NULL, d_C, d_A, d_B, &ciErrNum);
+                DGEMMNVIDIAGlobal(NULL, d_C, d_A, d_B, &ciErrNum);
             else if (__alg == 5)
-                DGEMMNVIDIASuperaccPrivate(NULL, d_C, d_A, d_B, &ciErrNum);
+                DGEMMNVIDIAPrivate(NULL, d_C, d_A, d_B, &ciErrNum);
 
             if (ciErrNum != CL_SUCCESS)
                 cleanUp(EXIT_FAILURE);
@@ -239,11 +239,11 @@ int runDGEMM(const char* program_file){
             else if (__alg == 2)
                 DGEMMNVIDIA(NULL, d_C, d_A, d_B, &ciErrNum);
             else if (__alg == 3)
-                DGEMMNVIDIASuperaccGlobal(NULL, d_C, d_A, d_B, &ciErrNum);
+                DGEMMNVIDIAGlobal(NULL, d_C, d_A, d_B, &ciErrNum);
             else if (__alg == 4)
-                DGEMMNVIDIAFPEGlobal(NULL, d_C, d_A, d_B, &ciErrNum);
+                DGEMMNVIDIAGlobal(NULL, d_C, d_A, d_B, &ciErrNum);
             else if (__alg == 5)
-                DGEMMNVIDIASuperaccPrivate(NULL, d_C, d_A, d_B, &ciErrNum);
+                DGEMMNVIDIAPrivate(NULL, d_C, d_A, d_B, &ciErrNum);
 
             ciErrNum  = clEnqueueMarker(cqCommandQueue, &endMark);
             ciErrNum |= clFinish(cqCommandQueue);
@@ -305,11 +305,11 @@ int runDGEMM(const char* program_file){
             else if (__alg == 2)
                 closeDGEMMNVIDIA();
             else if (__alg == 3)
-                closeDGEMMNVIDIASuperaccGlobal();
+                closeDGEMMNVIDIAGlobal();
             else if (__alg == 4)
-                closeDGEMMNVIDIAFPEGlobal();
+                closeDGEMMNVIDIAGlobal();
             else if (__alg == 5)
-                closeDGEMMNVIDIASuperaccPrivate();
+                closeDGEMMNVIDIAPrivate();
     }
 
     // pass or fail
