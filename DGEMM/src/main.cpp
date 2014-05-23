@@ -31,7 +31,7 @@ static uint __nbfpe      = 0;
 static uint __alg        = 0;
 
 static void __usage(int argc __attribute__((unused)), char **argv) {
-  fprintf(stderr, "Usage: %s [-m nbrows of C -n nbcolumns of C -k nbcolumns of B\n -r range -e nbfpe\n -a alg (0-mine, 1-amd, 2-nvidia, 3-sagl, 4-fpegl, 5-sapr)] \n", argv[0]);
+  fprintf(stderr, "Usage: %s [-m nbrows of C -n nbcolumns of C -k nbcolumns of B\n -r range -e nbfpe\n -a alg (0-mine, 1-amd, 2-nvidia, 3-sagl, 4-fpegl, 5-sapr, 6-fpepr)] \n", argv[0]);
   printf("       -?, -h:    Display this help and exit\n");
 }
 
@@ -65,7 +65,7 @@ static void __parse_args(int argc, char **argv) {
     __usage(argc, argv);
     exit(-1);
   }
-  if (__alg > 5) {
+  if (__alg > 6) {
     __usage(argc, argv);
     exit(-1);
   }
@@ -95,6 +95,8 @@ int main(int argc, char **argv)
         runDGEMM("../src/DGEMM.NVIDIA.FPE.Global.cl");
     if (__alg == 5)
         runDGEMM("../src/DGEMM.NVIDIA.Superacc.Private.cl");
+    if (__alg == 6)
+        runDGEMM("../src/DGEMM.NVIDIA.FPE.Private.cl");
 }
 
 int runDGEMM(const char* program_file){
@@ -195,6 +197,8 @@ int runDGEMM(const char* program_file){
                 ciErrNum = initDGEMMNVIDIAGlobal(cxGPUContext, cqCommandQueue, cdDevice, program_file, __nbfpe, __nbColumnsC, __nbRowsC);
             else if (__alg == 5)
                 ciErrNum = initDGEMMNVIDIAPrivate(cxGPUContext, cqCommandQueue, cdDevice, program_file, __nbfpe, __nbColumnsC, __nbRowsC);
+            else if (__alg == 6)
+                ciErrNum = initDGEMMNVIDIAPrivate(cxGPUContext, cqCommandQueue, cdDevice, program_file, __nbfpe, __nbColumnsC, __nbRowsC);
             
             if (ciErrNum != CL_SUCCESS)
                 cleanUp(EXIT_FAILURE);
@@ -213,6 +217,8 @@ int runDGEMM(const char* program_file){
             else if (__alg == 4)
                 DGEMMNVIDIAGlobal(NULL, d_C, d_A, d_B, &ciErrNum);
             else if (__alg == 5)
+                DGEMMNVIDIAPrivate(NULL, d_C, d_A, d_B, &ciErrNum);
+            else if (__alg == 6)
                 DGEMMNVIDIAPrivate(NULL, d_C, d_A, d_B, &ciErrNum);
 
             if (ciErrNum != CL_SUCCESS)
@@ -243,6 +249,8 @@ int runDGEMM(const char* program_file){
             else if (__alg == 4)
                 DGEMMNVIDIAGlobal(NULL, d_C, d_A, d_B, &ciErrNum);
             else if (__alg == 5)
+                DGEMMNVIDIAPrivate(NULL, d_C, d_A, d_B, &ciErrNum);
+            else if (__alg == 6)
                 DGEMMNVIDIAPrivate(NULL, d_C, d_A, d_B, &ciErrNum);
 
             ciErrNum  = clEnqueueMarker(cqCommandQueue, &endMark);
@@ -309,6 +317,8 @@ int runDGEMM(const char* program_file){
             else if (__alg == 4)
                 closeDGEMMNVIDIAGlobal();
             else if (__alg == 5)
+                closeDGEMMNVIDIAPrivate();
+            else if (__alg == 6)
                 closeDGEMMNVIDIAPrivate();
     }
 

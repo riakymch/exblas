@@ -265,9 +265,6 @@ __kernel void matrixMul(
     //A superaccumulator that corresponds to a single value in the matrix C
     long p_workingBase[BIN_COUNT] = {0};
 
-    //for floating-point expansion
-    double sum[NBFPE] = {0.0};
-
     //Loop over all the sub-matrices of A and B
     //required to compute the block sub-matrix
     for (int a = aBegin, b = bBegin;
@@ -289,17 +286,9 @@ __kernel void matrixMul(
         for (int k = 0; k < BLOCK_SIZE; ++k) {
 	    double r = 0.0; //residual of multiplication
             double x = TwoProductFMA(AS(ty, k), BS(k, tx), &r);
-            #ifdef NVIDIA
-                #pragma unroll
-            #endif
-            for(uint i = 0; i != NBFPE; ++i) {
-                double s; //residual of addition
-                sum[i] = Knuth2Sum(sum[i], x, &s);
-                x = s + r;
-		r = 0;
-            }
-            if(x != 0.0) {
-	        Accumulate(p_workingBase, x);
+	    Accumulate(p_workingBase, x);
+            if(r != 0.0) {
+	        Accumulate(p_workingBase, r);
             }
 	}
 
@@ -307,17 +296,8 @@ __kernel void matrixMul(
         //loading two new sub-matrices of A and B in the next iteration
         barrier(CLK_LOCAL_MEM_FENCE);
     }
-    //Flush to the accumulator
-#ifdef NVIDIA
-    #pragma unroll
-#endif
-    for(uint i = 0; i != NBFPE; ++i) {
-	Accumulate(p_workingBase, sum[i]);
-    }
 
-    //TODO: the first non-zero from rigth
     int c = uiWB * BLOCK_SIZE * by + BLOCK_SIZE * bx;
-    //C[c + uiWB * ty + tx] = sum[0];
     C[c + uiWB * ty + tx] = Round(p_workingBase);
 }
 

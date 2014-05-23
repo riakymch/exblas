@@ -317,7 +317,6 @@ __kernel void matrixMul(
 
     //TODO: the first non-zero from rigth
     int c = uiWB * BLOCK_SIZE * by + BLOCK_SIZE * bx;
-    //C[c + uiWB * ty + tx] = sum[0];
     C[c + uiWB * ty + tx] = Round(p_workingBase);
 }
 
