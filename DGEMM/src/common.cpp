@@ -18,8 +18,9 @@ cl_platform_id GetOCLPlatform(char name[])
   cl_int err = clGetPlatformIDs(10, pPlatforms, &uiPlatformsCount);
   cl_int ui_res = -1;
 
-  for (cl_int ui = 0; ui < (cl_int) uiPlatformsCount; ++ui)
-    {
+  for (cl_int ui = 0; ui < (cl_int) uiPlatformsCount; ++ui) {
+      err = clGetPlatformInfo(pPlatforms[ui], CL_PLATFORM_VERSION, 128 * sizeof(char), pPlatformName, NULL);
+      printf("platform version : %s\n", pPlatformName);	
       err = clGetPlatformInfo(pPlatforms[ui], CL_PLATFORM_NAME, 128 * sizeof(char), pPlatformName, NULL);
       if ( err != CL_SUCCESS )
 	{
