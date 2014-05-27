@@ -34,7 +34,7 @@ static const uint  VECTOR_NUMBER = 1;
 #ifdef AMD
 static char  compileOptions[256] = "-DBLOCK_SIZE=16";
 #else
-static char  compileOptions[256] = "-DBLOCK_SIZE=32 -DNVIDIA -cl-mad-enable -cl-fast-relaxed-math";
+static char  compileOptions[256] = "-DBLOCK_SIZE=32 -DNVIDIA -cl-mad-enable -cl-fast-relaxed-math -cl-nv-verbose";
 #endif
 
 
@@ -76,7 +76,7 @@ extern "C" cl_int initDGEMMNVIDIAGlobal(
     printf("...building program\n");
 	sprintf(compileOptions, "%s -DNBFPE=%d", compileOptions, NbFPE);
         ciErrNum = clBuildProgram(cpProgram, 0, NULL, compileOptions, NULL, NULL);
-        if (ciErrNum != CL_SUCCESS) {
+        //if (ciErrNum != CL_SUCCESS) {
             //printf("Error in clBuildProgram, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
 
             // Determine the reason for the error
@@ -84,8 +84,8 @@ extern "C" cl_int initDGEMMNVIDIAGlobal(
             clGetProgramBuildInfo(cpProgram, cdDevice, CL_PROGRAM_BUILD_LOG, sizeof(buildLog), &buildLog, NULL);
             printf("%s\n", buildLog);
 
-            return EXIT_FAILURE;
-        }
+        //    return EXIT_FAILURE;
+        //}
 
     printf("...creating DGEMM kernel:\n");
         ckMatrixMul = clCreateKernel(cpProgram, DGEMM_KERNEL, &ciErrNum);
