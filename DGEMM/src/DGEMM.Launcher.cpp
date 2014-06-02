@@ -29,7 +29,7 @@ static cl_program       cpProgram;            //OpenCL Superaccumulator program
 static cl_kernel        ckMatrixMul;
 static cl_command_queue cqDefaultCommandQue;  //Default command queue for Superaccumulator
 
-static const uint  VECTOR_NUMBER = 1;
+static const uint  VECTOR_NUMBER = 4;
 
 #ifdef AMD
 static char  compileOptions[256] = "-DBLOCK_SIZE=16";
@@ -150,8 +150,8 @@ extern "C" size_t DGEMM(
         cqCommandQueue = cqDefaultCommandQue;
 
     {
-        size_t NbThreadsPerWorkGroup[] = {BLOCK_SIZE, BLOCK_SIZE};
-	size_t widthB = d_B.width / VECTOR_NUMBER;
+        size_t NbThreadsPerWorkGroup[] = {BLOCK_SIZE, BLOCK_SIZE / VECTOR_NUMBER};
+	size_t widthB = d_B.width;
 	size_t heightA = d_A.height / VECTOR_NUMBER;
 	size_t TotalNbThreads[] = {widthB, heightA};
 	size_t neededLocalMemory = BLOCK_SIZE * BLOCK_SIZE * sizeof(cl_double);
