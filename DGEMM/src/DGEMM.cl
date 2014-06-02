@@ -19,8 +19,8 @@ __kernel void matrixMulKernel (
     __local data_t *Bs
 ) {
     //Block row and column
-    int blockRow = get_group_id(1);
     int blockCol = get_group_id(0);
+    int blockRow = get_group_id(1);
 
     //Each thread block computes one sub-matrix of C
     __global data_t* Csub = &C[m * BLOCK_SIZE * blockRow + BLOCK_SIZE * blockCol];
@@ -31,6 +31,12 @@ __kernel void matrixMulKernel (
     
     //Each thread computes one element of Csub
     data_t sum[4] = {0.0};
+  
+    //step
+    int step = 4;
+    #ifdef NVIDIA
+      step = step * 2;
+    #endif
 
     //Loop over all sub-matrices of A and B to compute Csub
     for (int i = 0; i < (m / BLOCK_SIZE); ++i) {
@@ -43,12 +49,12 @@ __kernel void matrixMulKernel (
 	//Load Asub and Bsub from device memory to shared memory
 	As[row * BLOCK_SIZE + col] = Asub[row * m + col];
 	Bs[row * BLOCK_SIZE + col] = Bsub[row * k + col];
-	As[(row + 4) * BLOCK_SIZE + col] = Asub[(row + 4) * m + col];
-	Bs[(row + 4) * BLOCK_SIZE + col] = Bsub[(row + 4) * k + col];
-	As[(row + 8) * BLOCK_SIZE + col] = Asub[(row + 8) * m + col];
-	Bs[(row + 8) * BLOCK_SIZE + col] = Bsub[(row + 8) * k + col];
-	As[(row + 12) * BLOCK_SIZE + col] = Asub[(row + 12) * m + col];
-	Bs[(row + 12) * BLOCK_SIZE + col] = Bsub[(row + 12) * k + col];
+	As[(row + step) * BLOCK_SIZE + col] = Asub[(row + step) * m + col];
+	Bs[(row + step) * BLOCK_SIZE + col] = Bsub[(row + step) * k + col];
+	As[(row + 2 * step) * BLOCK_SIZE + col] = Asub[(row + 2 * step) * m + col];
+	Bs[(row + 2 * step) * BLOCK_SIZE + col] = Bsub[(row + 2 * step) * k + col];
+	As[(row + 3 * step) * BLOCK_SIZE + col] = Asub[(row + 3 * step) * m + col];
+	Bs[(row + 3 * step) * BLOCK_SIZE + col] = Bsub[(row + 3 * step) * k + col];
 
 	//Synchronize to make sure that the sub-matrices are loaded before the computation starts
 	barrier(CLK_LOCAL_MEM_FENCE);
@@ -59,14 +65,14 @@ __kernel void matrixMulKernel (
         #endif
 	for (int i = 0; i < BLOCK_SIZE; ++i) {
 	    sum[0] = fma(As[row * BLOCK_SIZE + i], Bs[i * BLOCK_SIZE + col], sum[0]);
-	    sum[1] = fma(As[(row + 4) * BLOCK_SIZE + i], Bs[i * BLOCK_SIZE + col], sum[1]);
-	    sum[2] = fma(As[(row + 8) * BLOCK_SIZE + i], Bs[i * BLOCK_SIZE + col], sum[2]);
-	    sum[3] = fma(As[(row + 12) * BLOCK_SIZE + i], Bs[i * BLOCK_SIZE + col], sum[3]);
+	    sum[1] = fma(As[(row + step) * BLOCK_SIZE + i], Bs[i * BLOCK_SIZE + col], sum[1]);
+	    sum[2] = fma(As[(row + 2 * step) * BLOCK_SIZE + i], Bs[i * BLOCK_SIZE + col], sum[2]);
+	    sum[3] = fma(As[(row + 3 * step) * BLOCK_SIZE + i], Bs[i * BLOCK_SIZE + col], sum[3]);
 	}
 	Csub[row * m + col] = sum[0];
-	Csub[(row + 4) * m + col] = sum[1];
-	Csub[(row + 8) * m + col] = sum[2];
-	Csub[(row + 12) * m + col] = sum[3];
+	Csub[(row + step) * m + col] = sum[1];
+	Csub[(row + 2 * step) * m + col] = sum[2];
+	Csub[(row + 3 * step) * m + col] = sum[3];
     }
 }
 
