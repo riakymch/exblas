@@ -125,8 +125,8 @@ extern "C" size_t DGEMMNVIDIA(
 
     {
         size_t NbThreadsPerWorkGroup[] = {BLOCK_SIZE, BLOCK_SIZE / VECTOR_NUMBER};
-	size_t widthC = d_C.width;
 	size_t heightC = d_C.height / VECTOR_NUMBER;
+	size_t widthC = d_C.width;
 	size_t TotalNbThreads[] = {widthC, heightC};
 	size_t neededLocalMemory = BLOCK_SIZE * BLOCK_SIZE * sizeof(cl_double);
 
@@ -134,8 +134,8 @@ extern "C" size_t DGEMMNVIDIA(
         ciErrNum  = clSetKernelArg(ckMatrixMul, i++, sizeof(cl_mem),  (void *)&d_C.elements);
         ciErrNum |= clSetKernelArg(ckMatrixMul, i++, sizeof(cl_mem),  (void *)&d_A.elements);
         ciErrNum |= clSetKernelArg(ckMatrixMul, i++, sizeof(cl_mem),  (void *)&d_B.elements);
-        ciErrNum |= clSetKernelArg(ckMatrixMul, i++, sizeof(cl_int),  (void *)&d_A.width);
-        ciErrNum |= clSetKernelArg(ckMatrixMul, i++, sizeof(cl_int),  (void *)&d_B.width);
+        ciErrNum |= clSetKernelArg(ckMatrixMul, i++, sizeof(cl_int),  (void *)&d_C.height);
+        ciErrNum |= clSetKernelArg(ckMatrixMul, i++, sizeof(cl_int),  (void *)&d_C.width);
         ciErrNum |= clSetKernelArg(ckMatrixMul, i++, neededLocalMemory,  NULL);
         ciErrNum |= clSetKernelArg(ckMatrixMul, i++, neededLocalMemory,  NULL);
         if (ciErrNum != CL_SUCCESS) {

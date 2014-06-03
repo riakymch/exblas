@@ -76,7 +76,7 @@ __kernel void matrixMulKernel (
     }
 }
 
-__kernel void matrixMulKernelOld (
+__kernel void matrixMulKernel8 (
     __global data_t* C,
     __global data_t* A,
     __global data_t* B,
@@ -154,7 +154,7 @@ __kernel void matrixMulKernelOld (
     }
 }
 
-__kernel void matrixMulKernelSimple (
+__kernel void matrixMulKernel1 (
     __global data_t* C,
     __global data_t* A,
     __global data_t* B,
