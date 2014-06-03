@@ -23,14 +23,14 @@ typedef double data_t;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Matrix multiplication on the device: C = A * B
-// uiWA is A's width and uiWB is B's width
+// m is A's width and n is B's width
 ////////////////////////////////////////////////////////////////////////////////
 __kernel void matrixMul(
     __global data_t* C,
     __global data_t* A,
     __global data_t* B, 
-    int uiWA,
-    int uiWB,
+    int m,
+    int n,
     __local data_t* As,
     __local data_t* Bs
 ) {
@@ -43,10 +43,10 @@ __kernel void matrixMul(
     int ty = get_local_id(1);
 
     //Index of the first sub-matrix of A processed by the block
-    int aBegin = uiWA * BLOCK_SIZE * by;
+    int aBegin = m * BLOCK_SIZE * by;
 
     //Index of the last sub-matrix of A processed by the block
-    int aEnd   = aBegin + uiWA - 1;
+    int aEnd   = aBegin + m - 1;
 
     //Step size used to iterate through the sub-matrices of A
     int aStep  = BLOCK_SIZE;
@@ -55,7 +55,7 @@ __kernel void matrixMul(
     int bBegin = BLOCK_SIZE * bx;
 
     //Step size used to iterate through the sub-matrices of B
-    int bStep  = BLOCK_SIZE * uiWB;
+    int bStep  = BLOCK_SIZE * n;
 
     //sum is used to store the element of the block sub-matrix that is computed by the thread
     data_t sum[2] = {0.0};
@@ -72,10 +72,10 @@ __kernel void matrixMul(
              a += aStep, b += bStep) {
         //Load the matrices from device memory to shared memory; 
         //each thread loads one element of each matrix
-        AS(ty, tx) = A[a + uiWA * ty + tx];
-        BS(ty, tx) = B[b + uiWB * ty + tx];
-        AS(ty + step, tx) = A[a + uiWA * (ty + step) + tx];
-        BS(ty + step, tx) = B[b + uiWB * (ty + step) + tx];
+        AS(ty, tx) = A[a + m * ty + tx];
+        BS(ty, tx) = B[b + n * ty + tx];
+        AS(ty + step, tx) = A[a + m * (ty + step) + tx];
+        BS(ty + step, tx) = B[b + n * (ty + step) + tx];
 	
         //Synchronize to make sure the matrices are loaded
         barrier(CLK_LOCAL_MEM_FENCE);
@@ -95,17 +95,17 @@ __kernel void matrixMul(
         barrier(CLK_LOCAL_MEM_FENCE);
     }
 
-    int c = uiWB * BLOCK_SIZE * by + BLOCK_SIZE * bx;
-    C[c + uiWB * ty + tx] = sum[0];
-    C[c + uiWB * (ty + step) + tx] = sum[1];
+    int c = m * BLOCK_SIZE * by + BLOCK_SIZE * bx;
+    C[c + ty * m + tx] = sum[0];
+    C[c + (ty + step) * m + tx] = sum[1];
 }
 
 __kernel void matrixMul4(
     __global data_t* C,
     __global data_t* A,
     __global data_t* B, 
-    int uiWA,
-    int uiWB,
+    int m,
+    int n,
     __local data_t* As,
     __local data_t* Bs
 ) {
@@ -118,10 +118,10 @@ __kernel void matrixMul4(
     int ty = get_local_id(1);
 
     //Index of the first sub-matrix of A processed by the block
-    int aBegin = uiWA * BLOCK_SIZE * by;
+    int aBegin = m * BLOCK_SIZE * by;
 
     //Index of the last sub-matrix of A processed by the block
-    int aEnd   = aBegin + uiWA - 1;
+    int aEnd   = aBegin + m - 1;
 
     //Step size used to iterate through the sub-matrices of A
     int aStep  = BLOCK_SIZE;
@@ -130,7 +130,7 @@ __kernel void matrixMul4(
     int bBegin = BLOCK_SIZE * bx;
 
     //Step size used to iterate through the sub-matrices of B
-    int bStep  = BLOCK_SIZE * uiWB;
+    int bStep  = BLOCK_SIZE * n;
 
     //sum is used to store the element of the block sub-matrix that is computed by the thread
     data_t sum[4] = {0.0};
@@ -147,14 +147,14 @@ __kernel void matrixMul4(
              a += aStep, b += bStep) {
         //Load the matrices from device memory to shared memory; 
         //each thread loads one element of each matrix
-        AS(ty, tx) = A[a + uiWA * ty + tx];
-        BS(ty, tx) = B[b + uiWB * ty + tx];
-        AS(ty + step, tx) = A[a + uiWA * (ty + step) + tx];
-        BS(ty + step, tx) = B[b + uiWB * (ty + step) + tx];
-        AS(ty + 2 * step, tx) = A[a + uiWA * (ty + 2 * step) + tx];
-        BS(ty + 2 * step, tx) = B[b + uiWB * (ty + 2 * step) + tx];
-        AS(ty + 3 * step, tx) = A[a + uiWA * (ty + 3 * step) + tx];
-        BS(ty + 3 * step, tx) = B[b + uiWB * (ty + 3 * step) + tx];
+        AS(ty, tx) = A[a + m * ty + tx];
+        BS(ty, tx) = B[b + n * ty + tx];
+        AS(ty + step, tx) = A[a + m * (ty + step) + tx];
+        BS(ty + step, tx) = B[b + n * (ty + step) + tx];
+        AS(ty + 2 * step, tx) = A[a + m * (ty + 2 * step) + tx];
+        BS(ty + 2 * step, tx) = B[b + n * (ty + 2 * step) + tx];
+        AS(ty + 3 * step, tx) = A[a + m * (ty + 3 * step) + tx];
+        BS(ty + 3 * step, tx) = B[b + n * (ty + 3 * step) + tx];
 	
         //Synchronize to make sure the matrices are loaded
         barrier(CLK_LOCAL_MEM_FENCE);
@@ -176,19 +176,19 @@ __kernel void matrixMul4(
         barrier(CLK_LOCAL_MEM_FENCE);
     }
 
-    int c = uiWB * BLOCK_SIZE * by + BLOCK_SIZE * bx;
-    C[c + uiWB * ty + tx] = sum[0];
-    C[c + uiWB * (ty + step) + tx] = sum[1];
-    C[c + uiWB * (ty + 2 * step) + tx] = sum[2];
-    C[c + uiWB * (ty + 3 * step) + tx] = sum[3];
+    int c = n * BLOCK_SIZE * by + BLOCK_SIZE * bx;
+    C[c + n * ty + tx] = sum[0];
+    C[c + n * (ty + step) + tx] = sum[1];
+    C[c + n * (ty + 2 * step) + tx] = sum[2];
+    C[c + n * (ty + 3 * step) + tx] = sum[3];
 }
 
 __kernel void matrixMulOld(
     __global data_t* C,
     __global data_t* A,
     __global data_t* B, 
-    int uiWA,
-    int uiWB,
+    int m,
+    int n,
     __local data_t* As,
     __local data_t* Bs
 ) {
@@ -201,10 +201,10 @@ __kernel void matrixMulOld(
     int ty = get_local_id(1);
 
     //Index of the first sub-matrix of A processed by the block
-    int aBegin = uiWA * BLOCK_SIZE * by;
+    int aBegin = m * BLOCK_SIZE * by;
 
     //Index of the last sub-matrix of A processed by the block
-    int aEnd   = aBegin + uiWA - 1;
+    int aEnd   = aBegin + m - 1;
 
     //Step size used to iterate through the sub-matrices of A
     int aStep  = BLOCK_SIZE;
@@ -213,7 +213,7 @@ __kernel void matrixMulOld(
     int bBegin = BLOCK_SIZE * bx;
 
     //Step size used to iterate through the sub-matrices of B
-    int bStep  = BLOCK_SIZE * uiWB;
+    int bStep  = BLOCK_SIZE * n;
 
     //sum is used to store the element of the block sub-matrix that is computed by the thread
     data_t sum[1] = {0.0};
@@ -224,8 +224,8 @@ __kernel void matrixMulOld(
              a += aStep, b += bStep) {
         //Load the matrices from device memory to shared memory; 
         //each thread loads one element of each matrix
-        AS(ty, tx) = A[a + uiWA * ty + tx];
-        BS(ty, tx) = B[b + uiWB * ty + tx];
+        AS(ty, tx) = A[a + m * ty + tx];
+        BS(ty, tx) = B[b + n * ty + tx];
 	
         //Synchronize to make sure the matrices are loaded
         barrier(CLK_LOCAL_MEM_FENCE);
@@ -244,7 +244,7 @@ __kernel void matrixMulOld(
         barrier(CLK_LOCAL_MEM_FENCE);
     }
 
-    int c = uiWB * BLOCK_SIZE * by + BLOCK_SIZE * bx;
-    C[c + uiWB * ty + tx] = sum[0];
+    int c = n * BLOCK_SIZE * by + BLOCK_SIZE * bx;
+    C[c + n * ty + tx] = sum[0];
 }
 
