@@ -58,6 +58,89 @@ __kernel void matrixMul(
     int bStep  = BLOCK_SIZE * n;
 
     //sum is used to store the element of the block sub-matrix that is computed by the thread
+    data_t sum[4] = {0.0};
+
+    //step
+    int step = 4;
+    #ifdef NVIDIA
+      step = step * 2;
+    #endif
+
+    //Loop over all the sub-matrices of A and B required to compute the block sub-matrix
+    for (int a = aBegin, b = bBegin;
+             a <= aEnd;
+             a += aStep, b += bStep) {
+        //Load the matrices from device memory to shared memory; 
+        //each thread loads one element of each matrix
+        AS(ty, tx) = A[a + ty * m + tx];
+        BS(ty, tx) = B[b + ty * n + tx];
+        AS(ty + step, tx) = A[a + (ty + step) * m + tx];
+        BS(ty + step, tx) = B[b + (ty + step) * n + tx];
+        AS(ty + 2 * step, tx) = A[a + (ty + 2 * step) * m + tx];
+        BS(ty + 2 * step, tx) = B[b + (ty + 2 * step) * n + tx];
+        AS(ty + 3 * step, tx) = A[a + (ty + 3 * step) * m + tx];
+        BS(ty + 3 * step, tx) = B[b + (ty + 3 * step) * n + tx];
+	
+        //Synchronize to make sure the matrices are loaded
+        barrier(CLK_LOCAL_MEM_FENCE);
+
+        //Multiply the two matrices together;
+        //each thread computes one element of the block sub-matrix        
+        #ifdef NVIDIA
+          #pragma unroll
+        #endif
+        for (int k = 0; k < BLOCK_SIZE; ++k) {
+	    sum[0] = fma(AS(ty, k), BS(k, tx), sum[0]);
+	    sum[1] = fma(AS(ty + step, k), BS(k, tx), sum[1]);
+	    sum[2] = fma(AS(ty + 2 * step, k), BS(k, tx), sum[2]);
+	    sum[3] = fma(AS(ty + 3 * step, k), BS(k, tx), sum[3]);
+	}
+
+        //Synchronize to make sure that the preceding computation is done before 
+        //loading two new sub-matrices of A and B in the next iteration
+        barrier(CLK_LOCAL_MEM_FENCE);
+    }
+
+    int c = m * BLOCK_SIZE * by + BLOCK_SIZE * bx;
+    C[c + ty * m + tx] = sum[0];
+    C[c + (ty + step) * m + tx] = sum[1];
+    C[c + (ty + 2 * step) * m + tx] = sum[2];
+    C[c + (ty + 3 * step) * m + tx] = sum[3];
+}
+
+__kernel void matrixMul2(
+    __global data_t* C,
+    __global data_t* A,
+    __global data_t* B, 
+    int m,
+    int n,
+    __local data_t* As,
+    __local data_t* Bs
+) {
+    //Block index
+    int bx = get_group_id(0);
+    int by = get_group_id(1);
+
+    //Thread index
+    int tx = get_local_id(0);
+    int ty = get_local_id(1);
+
+    //Index of the first sub-matrix of A processed by the block
+    int aBegin = m * BLOCK_SIZE * by;
+
+    //Index of the last sub-matrix of A processed by the block
+    int aEnd   = aBegin + m - 1;
+
+    //Step size used to iterate through the sub-matrices of A
+    int aStep  = BLOCK_SIZE;
+
+    //Index of the first sub-matrix of B processed by the block
+    int bBegin = BLOCK_SIZE * bx;
+
+    //Step size used to iterate through the sub-matrices of B
+    int bStep  = BLOCK_SIZE * n;
+
+    //sum is used to store the element of the block sub-matrix that is computed by the thread
     data_t sum[2] = {0.0};
 
     //step
@@ -100,90 +183,7 @@ __kernel void matrixMul(
     C[c + (ty + step) * m + tx] = sum[1];
 }
 
-__kernel void matrixMul4(
-    __global data_t* C,
-    __global data_t* A,
-    __global data_t* B, 
-    int m,
-    int n,
-    __local data_t* As,
-    __local data_t* Bs
-) {
-    //Block index
-    int bx = get_group_id(0);
-    int by = get_group_id(1);
-
-    //Thread index
-    int tx = get_local_id(0);
-    int ty = get_local_id(1);
-
-    //Index of the first sub-matrix of A processed by the block
-    int aBegin = m * BLOCK_SIZE * by;
-
-    //Index of the last sub-matrix of A processed by the block
-    int aEnd   = aBegin + m - 1;
-
-    //Step size used to iterate through the sub-matrices of A
-    int aStep  = BLOCK_SIZE;
-
-    //Index of the first sub-matrix of B processed by the block
-    int bBegin = BLOCK_SIZE * bx;
-
-    //Step size used to iterate through the sub-matrices of B
-    int bStep  = BLOCK_SIZE * n;
-
-    //sum is used to store the element of the block sub-matrix that is computed by the thread
-    data_t sum[4] = {0.0};
-
-    //step
-    int step = 4;
-    #ifdef NVIDIA
-      step = step * 2;
-    #endif
-
-    //Loop over all the sub-matrices of A and B required to compute the block sub-matrix
-    for (int a = aBegin, b = bBegin;
-             a <= aEnd;
-             a += aStep, b += bStep) {
-        //Load the matrices from device memory to shared memory; 
-        //each thread loads one element of each matrix
-        AS(ty, tx) = A[a + m * ty + tx];
-        BS(ty, tx) = B[b + n * ty + tx];
-        AS(ty + step, tx) = A[a + m * (ty + step) + tx];
-        BS(ty + step, tx) = B[b + n * (ty + step) + tx];
-        AS(ty + 2 * step, tx) = A[a + m * (ty + 2 * step) + tx];
-        BS(ty + 2 * step, tx) = B[b + n * (ty + 2 * step) + tx];
-        AS(ty + 3 * step, tx) = A[a + m * (ty + 3 * step) + tx];
-        BS(ty + 3 * step, tx) = B[b + n * (ty + 3 * step) + tx];
-	
-        //Synchronize to make sure the matrices are loaded
-        barrier(CLK_LOCAL_MEM_FENCE);
-
-        //Multiply the two matrices together;
-        //each thread computes one element of the block sub-matrix        
-        #ifdef NVIDIA
-          #pragma unroll
-        #endif
-        for (int k = 0; k < BLOCK_SIZE; ++k) {
-	    sum[0] = fma(AS(ty, k), BS(k, tx), sum[0]);
-	    sum[1] = fma(AS(ty + step, k), BS(k, tx), sum[1]);
-	    sum[2] = fma(AS(ty + 2 * step, k), BS(k, tx), sum[2]);
-	    sum[3] = fma(AS(ty + 3 * step, k), BS(k, tx), sum[3]);
-	}
-
-        //Synchronize to make sure that the preceding computation is done before 
-        //loading two new sub-matrices of A and B in the next iteration
-        barrier(CLK_LOCAL_MEM_FENCE);
-    }
-
-    int c = n * BLOCK_SIZE * by + BLOCK_SIZE * bx;
-    C[c + n * ty + tx] = sum[0];
-    C[c + n * (ty + step) + tx] = sum[1];
-    C[c + n * (ty + 2 * step) + tx] = sum[2];
-    C[c + n * (ty + 3 * step) + tx] = sum[3];
-}
-
-__kernel void matrixMulOld(
+__kernel void matrixMul1(
     __global data_t* C,
     __global data_t* A,
     __global data_t* B, 

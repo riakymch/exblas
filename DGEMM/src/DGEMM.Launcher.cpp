@@ -15,7 +15,6 @@
 // OpenCL launcher for bitonic sort kernel
 ////////////////////////////////////////////////////////////////////////////////
 #define DGEMM_KERNEL "matrixMulKernel"
-//#define DGEMM_KERNEL "matrixMulKernelSimple"
 #ifdef AMD
   #define BLOCK_SIZE 16
 #else
