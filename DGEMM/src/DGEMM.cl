@@ -67,11 +67,11 @@ __kernel void matrixMulKernel (
 	    sum[2] = fma(As[(ty + 2 * step) * BLOCK_SIZE + k], Bs[k * BLOCK_SIZE + tx], sum[2]);
 	    sum[3] = fma(As[(ty + 3 * step) * BLOCK_SIZE + k], Bs[k * BLOCK_SIZE + tx], sum[3]);
 	}
-	Csub[ty * m + tx] = sum[0];
-	Csub[(ty + step) * m + tx] = sum[1];
-	Csub[(ty + 2 * step) * m + tx] = sum[2];
-	Csub[(ty + 3 * step) * m + tx] = sum[3];
     }
+    Csub[ty * m + tx] = sum[0];
+    Csub[(ty + step) * m + tx] = sum[1];
+    Csub[(ty + 2 * step) * m + tx] = sum[2];
+    Csub[(ty + 3 * step) * m + tx] = sum[3];
 }
 
 __kernel void matrixMulKernel8 (
