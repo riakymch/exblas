@@ -265,8 +265,13 @@ __kernel void matrixMul(
     //A superaccumulator that corresponds to a single value in the matrix C
     long p_workingBase[BIN_COUNT] = {0};
 
-    //Loop over all the sub-matrices of A and B
-    //required to compute the block sub-matrix
+    //step
+    int step = 4;
+    #ifdef NVIDIA
+      step = step * 2;
+    #endif
+
+    //Loop over all the sub-matrices of A and B required to compute the block sub-matrix
     for (int a = aBegin, b = bBegin;
              a <= aEnd;
              a += aStep, b += bStep) {
@@ -274,6 +279,12 @@ __kernel void matrixMul(
         //each thread loads one element of each matrix
         AS(ty, tx) = A[a + uiWA * ty + tx];
         BS(ty, tx) = B[b + uiWB * ty + tx];
+        AS(ty + step, tx) = A[a + (ty + step) * m + tx];
+        BS(ty + step, tx) = B[b + (ty + step) * n + tx];
+        AS(ty + 2 * step, tx) = A[a + (ty + 2 * step) * m + tx];
+        BS(ty + 2 * step, tx) = B[b + (ty + 2 * step) * n + tx];
+        AS(ty + 3 * step, tx) = A[a + (ty + 3 * step) * m + tx];
+        BS(ty + 3 * step, tx) = B[b + (ty + 3 * step) * n + tx];
 	
         //Synchronize to make sure the matrices are loaded
         barrier(CLK_LOCAL_MEM_FENCE);
@@ -286,6 +297,21 @@ __kernel void matrixMul(
         for (int k = 0; k < BLOCK_SIZE; ++k) {
 	    double r = 0.0; //residual of multiplication
             double x = TwoProductFMA(AS(ty, k), BS(k, tx), &r);
+	    Accumulate(p_workingBase, x);
+            if(r != 0.0) {
+	        Accumulate(p_workingBase, r);
+            }
+            x = TwoProductFMA(AS(ty + step, k), BS(k, tx), &r);
+	    Accumulate(p_workingBase, x);
+            if(r != 0.0) {
+	        Accumulate(p_workingBase, r);
+            }
+            x = TwoProductFMA(AS(ty + 2 * step, k), BS(k, tx), &r);
+	    Accumulate(p_workingBase, x);
+            if(r != 0.0) {
+	        Accumulate(p_workingBase, r);
+            }
+            x = TwoProductFMA(AS(ty + 3 * step, k), BS(k, tx), &r);
 	    Accumulate(p_workingBase, x);
             if(r != 0.0) {
 	        Accumulate(p_workingBase, r);

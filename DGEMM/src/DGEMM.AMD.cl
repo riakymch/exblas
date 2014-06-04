@@ -35,7 +35,7 @@ __kernel void mmmKernel_local(
     __global data_t *matrixC,
     __global data_t *matrixA,
     __global data_t *matrixB,
-    int widthA,
+    int widthC,
     __local data_t *blockA
 ) {
     int blockPos = get_local_id(0) + get_local_size(0) * (get_local_id(1) << TILEY_SHIFT);
@@ -47,7 +47,7 @@ __kernel void mmmKernel_local(
     data_t sum0 = (data_t)(0.0);
     data_t sum1 = (data_t)(0.0);
 
-    int temp = widthA / 2;
+    int temp = widthC / 2;
     //This loop runs for number of blocks of A in horizontal direction 
     for(int i = 0; i < (temp / get_local_size(0)); i++) {
         //Calculate global ids of threads from the particular block to load from matrix A depending on i
@@ -95,7 +95,7 @@ __kernel void mmmKernel_local(
         barrier(CLK_LOCAL_MEM_FENCE);
     }
     //Write 4 values to matrixC
-    matrixC[globalPos] = (data_t)(sum0);
+    matrixC[globalPos] = sum0;
     matrixC[globalPos +  get_global_size(0)] = sum1;
 }
 
