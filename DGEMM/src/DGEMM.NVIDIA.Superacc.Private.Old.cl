@@ -228,14 +228,14 @@ void Accumulate(long *sa, double x) {
 
 ///////////////////////////////////////////////////////////////////////////////
 // Matrix multiplication on the device: C = A * B
-// uiWA is A's width and uiWB is B's width
+// m is A's width and n is B's width
 ////////////////////////////////////////////////////////////////////////////////
 __kernel void matrixMul(
     __global data_t* C,
     __global data_t* A,
     __global data_t* B, 
-    int uiWA,
-    int uiWB,
+    int m,
+    int n,
     __local data_t* As,
     __local data_t* Bs
 ) {
@@ -248,10 +248,10 @@ __kernel void matrixMul(
     int ty = get_local_id(1);
 
     //Index of the first sub-matrix of A processed by the block
-    int aBegin = uiWA * BLOCK_SIZE * by;
+    int aBegin = m * BLOCK_SIZE * by;
 
     //Index of the last sub-matrix of A processed by the block
-    int aEnd   = aBegin + uiWA - 1;
+    int aEnd   = aBegin + m - 1;
 
     //Step size used to iterate through the sub-matrices of A
     int aStep  = BLOCK_SIZE;
@@ -260,10 +260,16 @@ __kernel void matrixMul(
     int bBegin = BLOCK_SIZE * bx;
 
     //Step size used to iterate through the sub-matrices of B
-    int bStep  = BLOCK_SIZE * uiWB;
+    int bStep  = BLOCK_SIZE * n;
 
     //A superaccumulator that corresponds to a single value in the matrix C
     long p_workingBase[BIN_COUNT] = {0};
+
+    //step
+    int step = 4;
+    #ifdef NVIDIA
+      step = step * 2;
+    #endif
 
     //Loop over all the sub-matrices of A and B required to compute the block sub-matrix
     for (int a = aBegin, b = bBegin;
@@ -271,8 +277,10 @@ __kernel void matrixMul(
              a += aStep, b += bStep) {
         //Load the matrices from device memory to shared memory;
         //each thread loads one element of each matrix
-        AS(ty, tx) = A[a + uiWA * ty + tx];
-        BS(ty, tx) = B[b + uiWB * ty + tx];
+        AS(ty, tx) = A[a + m * ty + tx];
+        BS(ty, tx) = B[b + n * ty + tx];
+        AS(ty + step, tx) = A[a + (ty + step) * m + tx];
+        BS(ty + step, tx) = B[b + (ty + step) * n + tx];
 	
         //Synchronize to make sure the matrices are loaded
         barrier(CLK_LOCAL_MEM_FENCE);
@@ -289,6 +297,11 @@ __kernel void matrixMul(
             if(r != 0.0) {
 	        Accumulate(p_workingBase, r);
             }
+            x = TwoProductFMA(AS(ty + step, k), BS(k, tx), &r);
+	    Accumulate(p_workingBase, x);
+            if(r != 0.0) {
+	        Accumulate(p_workingBase, r);
+            }
 	}
 
         //Synchronize to make sure that the preceding computation is done before 
@@ -296,7 +309,8 @@ __kernel void matrixMul(
         barrier(CLK_LOCAL_MEM_FENCE);
     }
 
-    int c = uiWB * BLOCK_SIZE * by + BLOCK_SIZE * bx;
-    C[c + uiWB * ty + tx] = Round(p_workingBase);
+    int c = m * BLOCK_SIZE * by + BLOCK_SIZE * bx;
+    C[c + ty * m + tx] = Round(p_workingBase);
+    C[c + (ty + step) * m + tx] = Round(p_workingBase);
 }
 

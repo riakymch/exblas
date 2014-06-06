@@ -9,10 +9,10 @@
  *
  */
 
-#pragma OPENCL EXTENSION cl_khr_fp64                   : enable
 #pragma OPENCL EXTENSION cl_khr_int64_base_atomics     : enable  // For 64 atomic operations
 #pragma OPENCL EXTENSION cl_khr_byte_addressable_store : enable
 #ifdef NVIDIA
+  #pragma OPENCL EXTENSION cl_khr_fp64                 : enable
   #pragma OPENCL EXTENSION cl_nv_pragma_unroll         : enable
 #endif
 
