@@ -292,8 +292,9 @@ int runDGEMM(const char* program_file){
 	double throughput = (perf / minTime) * 1e-9;
 	perf = 2.0 * d_A.width * d_B.width * d_A.height;
 	perf = (perf / minTime) * 1e-9;
-        printf("Alg = %u \t NbFPE = %u \t Range = %u \t NbElements = %u \t Size = %lu \t Time = %.8f s \t Throughput = %.4f GB/s\n\n", __alg, __nbfpe, __range, nbElements, d_C.width, minTime, throughput);
-        printf("Alg = %u \t NbFPE = %u \t Range = %u \t NbElements = %u \t Size = %lu \t Time = %.8f s \t Performance = %.4f GFLOPS\n\n", __alg, __nbfpe, __range, nbElements, d_C.width, minTime, perf);
+	printf("size = %u\n", d_C.width);
+        printf("Alg = %u \t NbFPE = %u \t Range = %u \t NbElements = %u \t Size = %u \t Time = %.8f s \t Throughput = %.4f GB/s\n\n", __alg, __nbfpe, __range, nbElements, d_C.width, minTime, throughput);
+        printf("Alg = %u \t NbFPE = %u \t Range = %u \t NbElements = %u \t Size = %u \t Time = %.8f s \t Performance = %.4f GFLOPS\n\n", __alg, __nbfpe, __range, nbElements, d_C.width, minTime, perf);
 #endif
 
         printf("Validating DGEMM OpenCL results...\n");
