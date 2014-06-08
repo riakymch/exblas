@@ -23,7 +23,7 @@ def readDataFromFileAll(filename, str1, str2):
             if line.find("NbFPE") != -1:
                 line = line.split();
                 #results.append([line[11], line[len(line) - 2]])
-                results.append([line[11], float(line[len(line) - 2])])
+                results.append([line[14], float(line[len(line) - 2])])
             else:
                 line = line.split();
                 #results.append([line[8], line[len(line) - 2]])
@@ -116,21 +116,18 @@ def plotNbElementsVSGbs(input, output):
     return
     
 def plotNbElementsVSGbsAll(input, output): 
-    mine = readDataFromFileAll(input, "Alg = 0", "Alg = 0")
-    amd = readDataFromFileAll(input, "Alg = 1", "Alg = 1")
-    nvidia = readDataFromFileAll(input, "Alg = 2", "Alg = 2")
+    #mine = readDataFromFileAll(input, "Alg = 0", "Alg = 0")
+    #amd = readDataFromFileAll(input, "Alg = 1", "Alg = 1")
+    #nvidia = readDataFromFileAll(input, "Alg = 2", "Alg = 2")
     sapr = readDataFromFileAll(input, "Alg = 3", "Alg = 3")
-    sagl = readDataFromFileAll(input, "Alg = 7", "Alg = 7")    
-    #fpe2 = readDataFromFileAll(input, "Alg = 2", "NbFPE = 2")
-    #fpe3 = readDataFromFileAll(input, "Alg = 2", "NbFPE = 3")
-    #fpe4 = readDataFromFileAll(input, "Alg = 2", "NbFPE = 4")
-#     fpe5 = readDataFromFileAll(input, "Alg = 2", "NbFPE = 5")
-#     fpe6 = readDataFromFileAll(input, "Alg = 2", "NbFPE = 6")
-#     fpe7 = readDataFromFileAll(input, "Alg = 2", "NbFPE = 7")
-    #fpe8 = readDataFromFileAll(input, "Alg = 2", "NbFPE = 8")  
-    #fpe4ee = readDataFromFileAll(input, "Alg = 4", "NbFPE = 4")
-    #fpe6ee = readDataFromFileAll(input, "Alg = 5", "NbFPE = 6")      
-    #fpe8ee = readDataFromFileAll(input, "Alg = 3", "NbFPE = 8")
+    fpepr2 = readDataFromFileAll(input, "Alg = 4", "NbFPE = 2")
+    fpepr3 = readDataFromFileAll(input, "Alg = 4", "NbFPE = 3")
+    fpepr4 = readDataFromFileAll(input, "Alg = 4", "NbFPE = 4")
+    fpepr5 = readDataFromFileAll(input, "Alg = 4", "NbFPE = 5")
+    fpepr6 = readDataFromFileAll(input, "Alg = 4", "NbFPE = 6")
+    fpepr7 = readDataFromFileAll(input, "Alg = 4", "NbFPE = 7")
+    fpepr8 = readDataFromFileAll(input, "Alg = 4", "NbFPE = 8")  
+    sagl = readDataFromFileAll(input, "Alg = 7", "Alg = 7")        
 
     # plot the results
     gp = Gnuplot.Gnuplot(persist=1)
@@ -143,7 +140,7 @@ def plotNbElementsVSGbsAll(input, output):
     gp('set output "| epstopdf --filter > ' + output + '"')
 
     # legend
-    gp('set key width -7. samplen 1.8')
+    gp('set key width 0. samplen 1.8')
     gp('set key top left')
 
     # margins
@@ -151,24 +148,21 @@ def plotNbElementsVSGbsAll(input, output):
     gp('set rmargin 2.5')
     gp('set lmargin 8.')
 
-    plotmine = Gnuplot.Data(mine, with_='lines lt 4 lw 4.0', title="Mine DGEMM")
-    plotamd = Gnuplot.Data(amd, with_='lines lt 8 lw 4.0', title="AMD DGEMM")
-    plotnvidia = Gnuplot.Data(nvidia, with_='lines lt 5 lw 4.0', title="AMD DGEMM")
-    plotsapr = Gnuplot.Data(sapr, with_='lines lt 1 lw 4.0', title="SuperaccPr")
-    plotsagl = Gnuplot.Data(sagl, with_='lines lt 2 lw 4.0', title="SuperaccGl")    
-    #plotfpe2 = Gnuplot.Data(fpe2, with_='lines lt 8 lw 4.0', title="Expansion 2")
-    #plotfpe3 = Gnuplot.Data(fpe3, with_='lines lt 5 lw 4.0', title="Expansion 3")
-    #plotfpe4 = Gnuplot.Data(fpe4, with_='lines lt 2 lw 4.0', title="Expansion 4")
-#     plotfpe5 = Gnuplot.Data(fpe5, with_='lines lt 6 lw 4.0', title="Expansion 5")
-#     plotfpe6 = Gnuplot.Data(fpe6, with_='lines lt 7 lw 4.0', title="Expansion 6")
-#     plotfpe7 = Gnuplot.Data(fpe7, with_='lines lt 0 lw 4.0', title="Expansion 7")
-    #plotfpe8 = Gnuplot.Data(fpe8, with_='lines lt 7 lw 4.0', title="Expansion 8")
-    #plotfpe4ee = Gnuplot.Data(fpe4ee, with_='lines lt 0 lw 4.0', title="Expansion 4 early-exit")
-    #plotfpe6ee = Gnuplot.Data(fpe6ee, with_='lines lt 3 lw 4.0', title="Expansion 6 early-exit")        
-    #plotfpe8ee = Gnuplot.Data(fpe8ee, with_='lines lt 9 lw 4.0', title="Expansion 8 early-exit")    
+    #plotmine = Gnuplot.Data(mine, with_='lines lt 4 lw 4.0', title="Mine DGEMM")
+    #plotamd = Gnuplot.Data(amd, with_='lines lt 8 lw 4.0', title="AMD DGEMM")
+    #plotnvidia = Gnuplot.Data(nvidia, with_='lines lt 5 lw 4.0', title="AMD DGEMM")
+    plotsapr = Gnuplot.Data(sapr, with_='lines lt 1 lw 4.0', title="SuperaccPr")  
+    plotfpepr2 = Gnuplot.Data(fpepr2, with_='lines lt 8 lw 4.0', title="FPEPr 2")
+    plotfpepr3 = Gnuplot.Data(fpepr3, with_='lines lt 5 lw 4.0', title="FPEPr 3")
+    plotfpepr4 = Gnuplot.Data(fpepr4, with_='lines lt 2 lw 4.0', title="FPEPr 4")
+    plotfpepr5 = Gnuplot.Data(fpepr5, with_='lines lt 6 lw 4.0', title="FPEPr 5")
+    plotfpepr6 = Gnuplot.Data(fpepr6, with_='lines lt 7 lw 4.0', title="FPEPr 6")
+    plotfpepr7 = Gnuplot.Data(fpepr7, with_='lines lt 0 lw 4.0', title="FPEPr 7")
+    plotfpepr8 = Gnuplot.Data(fpepr8, with_='lines lt 4 lw 4.0', title="FPEPr 8")
+    plotsagl = Gnuplot.Data(sagl, with_='lines lt 3 lw 4.0', title="SuperaccGl")        
     
-#     gp.plot(plotDDOT, plotSuperaccs, plotfpe2, plotfpe3, plotfpe4, plotfpe5, plotfpe6, plotfpe7, plotfpe8, plotfpe8ee)
-    gp.plot(plotmine, plotamd, plotnvidia, plotsapr, plotsagl)
+    #gp.plot(plotmine, plotamd, plotnvidia, plotsapr, plotsagl)
+    gp.plot(plotsapr, plotfpepr2, plotfpepr3, plotfpepr4, plotfpepr5, plotfpepr6, plotfpepr7, plotfpepr8, plotsagl)
     return
 
 def plotInputRangeVSGbs(input, output): 
