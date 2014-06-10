@@ -300,7 +300,6 @@ int runDGEMM(const char* program_file){
 	double throughput = (perf / minTime) * 1e-9;
 	perf = 2.0 * d_A.width * d_B.width * d_A.height;
 	perf = (perf / minTime) * 1e-9;
-	printf("size = %u\n", d_C.width);
         printf("Alg = %u \t NbFPE = %u \t Range = %u \t NbElements = %u \t Size = %u \t Time = %.8f s \t Throughput = %.4f GB/s\n\n", __alg, __nbfpe, __range, nbElements, d_C.width, minTime, throughput);
         printf("Alg = %u \t NbFPE = %u \t Range = %u \t NbElements = %u \t Size = %u \t Time = %.8f s \t Performance = %.4f GFLOPS\n\n", __alg, __nbfpe, __range, nbElements, d_C.width, minTime, perf);
 #endif
@@ -313,7 +312,7 @@ int runDGEMM(const char* program_file){
                     cleanUp(EXIT_FAILURE);
                 }
 
-            /*printf(" ...DGEMM on CPU\n");
+            printf(" ...DGEMM on CPU\n");
 		double *C_CPU;
                 C_CPU = (double *) calloc(__nbRowsC * __nbColumnsC, sizeof(double));
                 DGEMMCPU(C_CPU, (const double *)A, (const double *)B, __nbRowsC, __nbColumnsC, __nbRowsB);
@@ -328,7 +327,6 @@ int runDGEMM(const char* program_file){
 		//PassFailFlag = compareDGEMMWithMPFR((const double *)C_CPU, (const double *)A, (const double *)B, __nbRowsC, __nbColumnsC, __nbRowsB);
                 printf("//--------------------------------------------------------\n");
 		free(C_CPU);
-         */
 		
          //Release kernels and program
          printf("Shutting down...\n\n");

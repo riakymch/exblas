@@ -8,44 +8,6 @@
 //Data type used for input data fetches
 typedef double data_t;
 
-__kernel void matrixMulKernel (
-    __global data_t* C,
-    __global data_t* A,
-    __global data_t* B,
-    int m,
-    int n,
-    int k,
-    __local data_t *As,
-    __local data_t *Bs
-) {
-    //Block ty and txumn
-    int by = get_group_id(1);
-    int bx = get_group_id(0);
-
-    //Thread ty and txumn within Csub
-    int ty = get_local_id(1);
-    int tx = get_local_id(0);
-	
-    //Each thread computes one element of Csub
-    data_t Cvalue = 0.0;
-
-    //Load Asub and Bsub from device memory to shared memory
-    As[ty * BLOCK_SIZE + tx] = A[by * BLOCK_SIZE + tx];
-    Bs[ty * BLOCK_SIZE + tx] = B[ty * k + bx];
-
-    //Synchronize to make sure that the sub-matrices are loaded before the computation starts
-    barrier(CLK_LOCAL_MEM_FENCE);
-	
-    //Multiply As and Bs
-    #ifdef NVIDIA
-      #pragma unroll
-    #endif
-    for (int i = 0; i < BLOCK_SIZE; ++i) {
-        Cvalue += As[ty * BLOCK_SIZE + i] * Bs[i * BLOCK_SIZE + tx];
-    }
-    C[by * m + bx] = Cvalue;
-}
-
 /*__kernel void matrixMulKernel (
     __global data_t* C,
     __global data_t* A,
@@ -79,7 +41,7 @@ __kernel void matrixMulKernel (
     }
 }*/
 
-/*void saxpy(float a, float *b, float *c)
+void saxpy(float a, float *b, float *c)
 {
     c[0] += a*b[0];
     c[1] += a*b[1];
@@ -106,7 +68,7 @@ __kernel void matrixMulKernel (
     int m,
     int n,
     int k,
-    __local data_t *bs
+    __local data_t *Bs
 ) {
     const int inx = get_local_id(0);
     const int iny = get_local_id(1);
@@ -128,7 +90,7 @@ __kernel void matrixMulKernel (
         barrier(CLK_LOCAL_MEM_FENCE);
 
     	for (int i = 0; i < BLOCK_SIZE; i++, A += m)
-	    axpy(A[0], &bs[i * BLOCK_SIZE], c);
+	    axpy(A[0], &Bs[i * BLOCK_SIZE], c);
     
         B += BLOCK_SIZE * k;	
         barrier(CLK_LOCAL_MEM_FENCE);
@@ -136,4 +98,4 @@ __kernel void matrixMulKernel (
 
     for (int i = 0; i < BLOCK_SIZE; i++, C += m)
         C[0] += c[i];
-}*/
+}
