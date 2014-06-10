@@ -15,6 +15,7 @@ __kernel void matrixMulKernel (
     int m,
     int n,
     int k,
+    __local data_t *As,
     __local data_t *Bs
 ) {
     //Block ty and txumn
@@ -45,146 +46,94 @@ __kernel void matrixMulKernel (
     C[by * m + bx] = Cvalue;
 }
 
-__kernel void matrixMulKernel4 (
+/*__kernel void matrixMulKernel (
     __global data_t* C,
     __global data_t* A,
     __global data_t* B,
     int m,
     int n,
     int k,
-    __local data_t *As,
-    __local data_t *Bs
+    __local data_t *Bwrk
 ) {
-    //Block ty and txumn
-    int bx = get_group_id(0);
-    int by = get_group_id(1);
+    int l, j;
+    int i = get_group_id(0);
+    int iloc = get_local_id(0);
+    int nloc = get_local_size(0);
 
-    //Each thread block computes one sub-matrix of C
-    __global data_t* Csub = &C[m * BLOCK_SIZE * by + BLOCK_SIZE * bx];
+    data_t Awrk[1024];
+    data_t tmp;
 
-    //Thread ty and txumn within Csub
-    int tx = get_local_id(0);
-    int ty = get_local_id(1);
-    
-    //Each thread computes one element of Csub
-    data_t sum[4] = {0.0};
-  
-    //step
-    int step = 4;
-    #ifdef NVIDIA
-      step = step * 2;
-    #endif
+    if (i < m) {
+	for (l = 0; l < m; l++)
+ 	    Awrk[l] = A[i * m + l];
 
-    //Loop over all sub-matrices of A and B to compute Csub
-    for (int i = 0; i < (m / BLOCK_SIZE); ++i) {
-	//Sub-matrix Asub of A and Bsub of B
-        __global data_t* Asub = &A[m * BLOCK_SIZE * by + BLOCK_SIZE * i];
-	__global data_t* Bsub = &B[k * BLOCK_SIZE * i + BLOCK_SIZE * bx];
-
-	//Load Asub and Bsub from device memory to shared memory
-	As[ty * BLOCK_SIZE + tx] = Asub[ty * m + tx];
-	Bs[ty * BLOCK_SIZE + tx] = Bsub[ty * k + tx];
-	As[(ty + step) * BLOCK_SIZE + tx] = Asub[(ty + step) * m + tx];
-	Bs[(ty + step) * BLOCK_SIZE + tx] = Bsub[(ty + step) * k + tx];
-	As[(ty + 2 * step) * BLOCK_SIZE + tx] = Asub[(ty + 2 * step) * m + tx];
-	Bs[(ty + 2 * step) * BLOCK_SIZE + tx] = Bsub[(ty + 2 * step) * k + tx];
-	As[(ty + 3 * step) * BLOCK_SIZE + tx] = Asub[(ty + 3 * step) * m + tx];
-	Bs[(ty + 3 * step) * BLOCK_SIZE + tx] = Bsub[(ty + 3 * step) * k + tx];
-
-	//Synchronize to make sure that the sub-matrices are loaded before the computation starts
-	barrier(CLK_LOCAL_MEM_FENCE);
-	
-	//Multiply Asub and Bsub
-        #ifdef NVIDIA
-           #pragma unroll
-        #endif
-	for (int k = 0; k < BLOCK_SIZE; ++k) {
-	    sum[0] = fma(As[ty * BLOCK_SIZE + k], Bs[k * BLOCK_SIZE + tx], sum[0]);
-	    sum[1] = fma(As[(ty + step) * BLOCK_SIZE + k], Bs[k * BLOCK_SIZE + tx], sum[1]);
-	    sum[2] = fma(As[(ty + 2 * step) * BLOCK_SIZE + k], Bs[k * BLOCK_SIZE + tx], sum[2]);
-	    sum[3] = fma(As[(ty + 3 * step) * BLOCK_SIZE + k], Bs[k * BLOCK_SIZE + tx], sum[3]);
-	}
+        for (j = 0; j < m; j++) {
+  	    for (l = iloc; l < m; l+=nloc)
+ 	         Bwrk[l] = B[l * m + j];
+            barrier(CLK_LOCAL_MEM_FENCE);
+	    tmp = 0.0;
+            for (l = 0; l < m; l++)
+		tmp += Awrk[l] * Bwrk[l];
+	    C[i * m + j] = tmp;
+        }
     }
-    Csub[ty * m + tx] = sum[0];
-    Csub[(ty + step) * m + tx] = sum[1];
-    Csub[(ty + 2 * step) * m + tx] = sum[2];
-    Csub[(ty + 3 * step) * m + tx] = sum[3];
+}*/
+
+/*void saxpy(float a, float *b, float *c)
+{
+    c[0] += a*b[0];
+    c[1] += a*b[1];
+    c[2] += a*b[2];
+    c[3] += a*b[3];
+    c[4] += a*b[4];
+    c[5] += a*b[5];
+    c[6] += a*b[6];
+    c[7] += a*b[7];
+    c[8] += a*b[8];
+    c[9] += a*b[9];
+    c[10] += a*b[10];
+    c[11] += a*b[11];
+    c[12] += a*b[12];
+    c[13] += a*b[13];
+    c[14] += a*b[14];
+    c[15] += a*b[15];
 }
 
-__kernel void matrixMulKernel8 (
+__kernel void matrixMulKernel (
     __global data_t* C,
     __global data_t* A,
     __global data_t* B,
     int m,
     int n,
     int k,
-    __local data_t *As,
-    __local data_t *Bs
+    __local data_t *bs
 ) {
-    //Block ty and txumn
-    int by = get_group_id(1);
-    int bx = get_group_id(0);
-
-    //Each thread block computes one sub-matrix of C
-    __global data_t* Csub = &C[m * BLOCK_SIZE * by + BLOCK_SIZE * bx];
-
-    //Thread ty and txumn within Csub
-    int tx = get_local_id(0);
-    int ty = get_local_id(1);
-    
-    //Each thread computes one element of Csub
-    data_t sum[8] = {0.0};
-
-    //Loop over all sub-matrices of A and B to compute Csub
-    for (int i = 0; i < (m / BLOCK_SIZE); ++i) {
-	//Sub-matrix Asub of A
-        __global data_t* Asub = &A[m * BLOCK_SIZE * by + BLOCK_SIZE * i];
-
-	//Sub-matrix Bsub of B
-	__global data_t* Bsub = &B[k * BLOCK_SIZE * i + BLOCK_SIZE * bx];
-
-	//Load Asub and Bsub from device memory to shared memory
-	As[ty * BLOCK_SIZE + tx] = Asub[ty * m + tx];
-	Bs[ty * BLOCK_SIZE + tx] = Bsub[ty * k + tx];
-	As[(ty + 2) * BLOCK_SIZE + tx] = Asub[(ty + 2) * m + tx];
-	Bs[(ty + 2) * BLOCK_SIZE + tx] = Bsub[(ty + 2) * k + tx];
-	As[(ty + 4) * BLOCK_SIZE + tx] = Asub[(ty + 4) * m + tx];
-	Bs[(ty + 4) * BLOCK_SIZE + tx] = Bsub[(ty + 4) * k + tx];
-	As[(ty + 6) * BLOCK_SIZE + tx] = Asub[(ty + 6) * m + tx];
-	Bs[(ty + 6) * BLOCK_SIZE + tx] = Bsub[(ty + 6) * k + tx];
-	As[(ty + 8) * BLOCK_SIZE + tx] = Asub[(ty + 8) * m + tx];
-	Bs[(ty + 8) * BLOCK_SIZE + tx] = Bsub[(ty + 8) * k + tx];
-	As[(ty + 10) * BLOCK_SIZE + tx] = Asub[(ty + 10) * m + tx];
-	Bs[(ty + 10) * BLOCK_SIZE + tx] = Bsub[(ty + 10) * k + tx];
-	As[(ty + 12) * BLOCK_SIZE + tx] = Asub[(ty + 12) * m + tx];
-	Bs[(ty + 12) * BLOCK_SIZE + tx] = Bsub[(ty + 12) * k + tx];
-	As[(ty + 14) * BLOCK_SIZE + tx] = Asub[(ty + 14) * m + tx];
-	Bs[(ty + 14) * BLOCK_SIZE + tx] = Bsub[(ty + 14) * k + tx];
-
-	//Synchronize to make sure that the sub-matrices are loaded before the computation starts
-	barrier(CLK_LOCAL_MEM_FENCE);
+    const int inx = get_local_id(0);
+    const int iny = get_local_id(1);
+    const int ibx = get_group_id(0) * BLOCK_SIZE;
+    const int iby = get_group_id(1) * BLOCK_SIZE;
+    const int id = inx + iny * BLOCK_SIZE;
 	
-	//Multiply Asub and Bsub
-        #ifdef NVIDIA
-           #pragma unroll
-        #endif
-	for (int i = 0; i < BLOCK_SIZE; ++i) {
-	    sum[0] = fma(As[ty * BLOCK_SIZE + i], Bs[i * BLOCK_SIZE + tx], sum[0]);
-	    sum[1] = fma(As[(ty + 2) * BLOCK_SIZE + i], Bs[i * BLOCK_SIZE + tx], sum[1]);
-	    sum[2] = fma(As[(ty + 4) * BLOCK_SIZE + i], Bs[i * BLOCK_SIZE + tx], sum[2]);
-	    sum[3] = fma(As[(ty + 6) * BLOCK_SIZE + i], Bs[i * BLOCK_SIZE + tx], sum[3]);
-	    sum[4] = fma(As[(ty + 8) * BLOCK_SIZE + i], Bs[i * BLOCK_SIZE + tx], sum[4]);
-	    sum[5] = fma(As[(ty + 10) * BLOCK_SIZE + i], Bs[i * BLOCK_SIZE + tx], sum[5]);
-	    sum[6] = fma(As[(ty + 12) * BLOCK_SIZE + i], Bs[i * BLOCK_SIZE + tx], sum[6]);
-	    sum[7] = fma(As[(ty + 14) * BLOCK_SIZE + i], Bs[i * BLOCK_SIZE + tx], sum[7]);
-	}
-	Csub[ty * m + tx] = sum[0];
-	Csub[(ty + 2) * m + tx] = sum[1];
-	Csub[(ty + 4) * m + tx] = sum[2];
-	Csub[(ty + 6) * m + tx] = sum[3];
-	Csub[(ty + 8) * m + tx] = sum[4];
-	Csub[(ty + 10) * m + tx] = sum[5];
-	Csub[(ty + 12) * m + tx] = sum[6];
-	Csub[(ty + 14) * m + tx] = sum[7];
-    }
-}
+    //Load Asub and Bsub from device memory to shared memory
+    A += ibx + id;
+    B += iby + inx + iny * k;
+    C += ibx + id + iby * m;
+    const data_t *Blas = B + k * m;
+
+    data_t c[BLOCK_SIZE] = {0.0};
+
+    do {
+	for (int i = 0; i < BLOCK_SIZE; i += 4)
+	    Bs[(i + iny) * BLOCK_SIZE + inx] = B[i * m];
+        barrier(CLK_LOCAL_MEM_FENCE);
+
+    	for (int i = 0; i < BLOCK_SIZE; i++, A += m)
+	    axpy(A[0], &bs[i * BLOCK_SIZE], c);
+    
+        B += BLOCK_SIZE * k;	
+        barrier(CLK_LOCAL_MEM_FENCE);
+    } while (B < Blast);
+
+    for (int i = 0; i < BLOCK_SIZE; i++, C += m)
+        C[0] += c[i];
+}*/
