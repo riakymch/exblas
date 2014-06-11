@@ -267,8 +267,8 @@ __kernel void matrixMul(
     //A superaccumulator that corresponds to a single value in the matrix C
     int c = uiWB * BLOCK_SIZE * by + BLOCK_SIZE * bx;
     __global long *g_workingBase = Accus + (c + uiWB * ty + tx) * BIN_COUNT;
-    for (uint i = 0; i < BIN_COUNT; i++)
-        g_workingBase[i] = 0;
+    //for (uint i = 0; i < BIN_COUNT; i++)
+    //    g_workingBase[i] = 0;
 
     //for floating-point expansion
     double sum[NBFPE] = {0.0};
@@ -360,8 +360,8 @@ __kernel void matrixMul4Ex(
     //A superaccumulator that corresponds to a single value in the matrix C
     int c = uiWB * BLOCK_SIZE * by + BLOCK_SIZE * bx;
     __global long *g_workingBase = Accus + (c + uiWB * ty + tx) * BIN_COUNT;
-    for (uint i = 0; i < BIN_COUNT; i++)
-        g_workingBase[i] = 0;
+    //for (uint i = 0; i < BIN_COUNT; i++)
+    //    g_workingBase[i] = 0;
 
     //for floating-point expansion
     double sum[4] = {0.0};
@@ -473,8 +473,8 @@ __kernel void matrixMul8Ex(
     //A superaccumulator that corresponds to a single value in the matrix C
     int c = uiWB * BLOCK_SIZE * by + BLOCK_SIZE * bx;
     __global long *g_workingBase = Accus + (c + uiWB * ty + tx) * BIN_COUNT;
-    for (uint i = 0; i < BIN_COUNT; i++)
-        g_workingBase[i] = 0;
+    //for (uint i = 0; i < BIN_COUNT; i++)
+    //    g_workingBase[i] = 0;
 
     //for floating-point expansion
     double sum[8] = {0.0};
@@ -529,9 +529,9 @@ __kernel void matrixMul8Ex(
    	            }
 	        }
  	    }
-            /*if(x != 0.0) {
+            if(x != 0.0) {
 	        Accumulate(g_workingBase, x);
-            }*/
+            }
 
             sum[0] = KnuthTwoSum(sum[0], r, &s);
             r = s;
@@ -563,9 +563,9 @@ __kernel void matrixMul8Ex(
 	            }
    	        }
             }
-            /*if(r != 0.0) {
+            if(r != 0.0) {
 	        Accumulate(g_workingBase, r);
-            }*/
+            }
 	}
 
         //Synchronize to make sure that the preceding computation is done before 
@@ -573,7 +573,7 @@ __kernel void matrixMul8Ex(
         barrier(CLK_LOCAL_MEM_FENCE);
     }
     //Flush to the accumulator
-  /*  Accumulate(g_workingBase, sum[0]);
+    Accumulate(g_workingBase, sum[0]);
     Accumulate(g_workingBase, sum[1]);
     Accumulate(g_workingBase, sum[2]);
     Accumulate(g_workingBase, sum[3]);
@@ -581,7 +581,7 @@ __kernel void matrixMul8Ex(
     Accumulate(g_workingBase, sum[5]);
     Accumulate(g_workingBase, sum[6]);
     Accumulate(g_workingBase, sum[7]);
-*/
-    //C[c + uiWB * ty + tx] = Round(g_workingBase);
-    C[c + uiWB * ty + tx] = sum[0];
+
+    C[c + uiWB * ty + tx] = Round(g_workingBase);
+    //C[c + uiWB * ty + tx] = sum[0];
 }

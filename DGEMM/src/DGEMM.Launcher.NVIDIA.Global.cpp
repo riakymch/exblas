@@ -14,7 +14,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 // OpenCL launcher for bitonic sort kernel
 ////////////////////////////////////////////////////////////////////////////////
-#define DGEMM_KERNEL "matrixMul8Ex"
+#define DGEMM_KERNEL "matrixMul4Ex"
 #ifdef AMD
   #define BLOCK_SIZE 16
 #else
@@ -27,6 +27,7 @@ static char* cSources = NULL;                 // Buffer to hold source for compi
 static cl_program       cpProgram;            //OpenCL Superaccumulator program
 static cl_kernel        ckMatrixMul;
 static cl_command_queue cqDefaultCommandQue;  //Default command queue for Superaccumulator
+static bintype          *Accus;
 static cl_mem 		d_Accus;
 
 static const uint  VECTOR_NUMBER = 1;
@@ -93,12 +94,16 @@ extern "C" cl_int initDGEMMNVIDIAGlobal(
             return EXIT_FAILURE;
         }
 
-    printf("...allocating memory for a matrix of superaccumualtors\n");
-        size_t size = width * height * BIN_COUNT * sizeof(bintype);
-	printf("size = %d\n", size);
-        d_Accus = clCreateBuffer(cxGPUContext, CL_MEM_READ_WRITE, size, NULL, &ciErrNum);
+    printf("...allocating memory for a matrix of superaccumulators\n");
+        size_t size = width * height * BIN_COUNT;
+        // init superaccs on the host side
+        Accus = (bintype*) malloc(size * sizeof(bintype));
+	for (int i = 0; i < size; i++)
+	    Accus[i] = 0;
+        d_Accus = clCreateBuffer(cxGPUContext, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, size * sizeof(bintype), Accus, &ciErrNum);
+        //d_Accus = clCreateBuffer(cxGPUContext, CL_MEM_READ_WRITE, size * sizeof(bintype), NULL, &ciErrNum);
         if (ciErrNum != CL_SUCCESS) {
-            printf("Error in clCreateBuffer for d_C, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
+            printf("Error in clCreateBuffer for d_Accus, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
             return EXIT_FAILURE;
         }
 
@@ -114,6 +119,7 @@ extern "C" cl_int initDGEMMNVIDIAGlobal(
 extern "C" void closeDGEMMNVIDIAGlobal(void){
     cl_int ciErrNum;
 
+    free(Accus);
     if(d_Accus) 
 	clReleaseMemObject(d_Accus);
 
