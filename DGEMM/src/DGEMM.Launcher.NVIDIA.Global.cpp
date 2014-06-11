@@ -14,7 +14,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 // OpenCL launcher for bitonic sort kernel
 ////////////////////////////////////////////////////////////////////////////////
-#define DGEMM_KERNEL "matrixMul"
+#define DGEMM_KERNEL "matrixMul8Ex"
 #ifdef AMD
   #define BLOCK_SIZE 16
 #else
@@ -95,6 +95,7 @@ extern "C" cl_int initDGEMMNVIDIAGlobal(
 
     printf("...allocating memory for a matrix of superaccumualtors\n");
         size_t size = width * height * BIN_COUNT * sizeof(bintype);
+	printf("size = %d\n", size);
         d_Accus = clCreateBuffer(cxGPUContext, CL_MEM_READ_WRITE, size, NULL, &ciErrNum);
         if (ciErrNum != CL_SUCCESS) {
             printf("Error in clCreateBuffer for d_C, Line %u in file %s !!!\n\n", __LINE__, __FILE__);

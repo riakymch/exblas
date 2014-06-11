@@ -32,7 +32,7 @@ typedef double data_t;
 ////////////////////////////////////////////////////////////////////////////////
 // Auxiliary functions
 ////////////////////////////////////////////////////////////////////////////////
-double Knuth2Sum(double a, double b, double *s) {
+double KnuthTwoSum(double a, double b, double *s) {
     double r = a + b;
     double z = r - a;
     *s = (a - (r - z)) + (b - z);
@@ -266,10 +266,9 @@ __kernel void matrixMul(
 
     //A superaccumulator that corresponds to a single value in the matrix C
     int c = uiWB * BLOCK_SIZE * by + BLOCK_SIZE * bx;
-    /*__global long *g_workingBase = Accus + (c + uiWB * ty + tx) * BIN_COUNT;
+    __global long *g_workingBase = Accus + (c + uiWB * ty + tx) * BIN_COUNT;
     for (uint i = 0; i < BIN_COUNT; i++)
         g_workingBase[i] = 0;
-    */
 
     //for floating-point expansion
     double sum[NBFPE] = {0.0};
@@ -300,13 +299,13 @@ __kernel void matrixMul(
             #endif
             for(uint i = 0; i != NBFPE; ++i) {
                 double s; //residual of addition
-                sum[i] = Knuth2Sum(sum[i], x, &s);
+                sum[i] = KnuthTwoSum(sum[i], x, &s);
                 x = s;
 		r = 0;
             }
-            /*if(x != 0.0) {
+            if(x != 0.0) {
 	        Accumulate(g_workingBase, x);
-            }*/
+            }
 	}
 
         //Synchronize to make sure that the preceding computation is done before 
@@ -317,11 +316,272 @@ __kernel void matrixMul(
 #ifdef NVIDIA
     #pragma unroll
 #endif
-    /*for(uint i = 0; i != NBFPE; ++i) {
+    for(uint i = 0; i != NBFPE; ++i) {
     	Accumulate(g_workingBase, sum[i]);
-    }*/
+    }
 
+    C[c + uiWB * ty + tx] = Round(g_workingBase);
+    //C[c + uiWB * ty + tx] = sum[0];
+}
+
+__kernel void matrixMul4Ex(
+    __global long* Accus,
+    __global data_t* C,
+    __global data_t* A,
+    __global data_t* B, 
+    int uiWA,
+    int uiWB,
+    __local data_t* As,
+    __local data_t* Bs
+) {
+    //Block index
+    int bx = get_group_id(0);
+    int by = get_group_id(1);
+
+    //Thread index
+    int tx = get_local_id(0);
+    int ty = get_local_id(1);
+
+    //Index of the first sub-matrix of A processed by the block
+    int aBegin = uiWA * BLOCK_SIZE * by;
+
+    //Index of the last sub-matrix of A processed by the block
+    int aEnd   = aBegin + uiWA - 1;
+
+    //Step size used to iterate through the sub-matrices of A
+    int aStep  = BLOCK_SIZE;
+
+    //Index of the first sub-matrix of B processed by the block
+    int bBegin = BLOCK_SIZE * bx;
+
+    //Step size used to iterate through the sub-matrices of B
+    int bStep  = BLOCK_SIZE * uiWB;
+
+    //A superaccumulator that corresponds to a single value in the matrix C
+    int c = uiWB * BLOCK_SIZE * by + BLOCK_SIZE * bx;
+    __global long *g_workingBase = Accus + (c + uiWB * ty + tx) * BIN_COUNT;
+    for (uint i = 0; i < BIN_COUNT; i++)
+        g_workingBase[i] = 0;
+
+    //for floating-point expansion
+    double sum[4] = {0.0};
+
+    //Loop over all the sub-matrices of A and B
+    //required to compute the block sub-matrix
+    for (int a = aBegin, b = bBegin;
+             a <= aEnd;
+             a += aStep, b += bStep) {
+        //Load the matrices from device memory to shared memory;
+        //each thread loads one element of each matrix
+        AS(ty, tx) = A[a + uiWA * ty + tx];
+        BS(ty, tx) = B[b + uiWB * ty + tx];
+	
+        //Synchronize to make sure the matrices are loaded
+        barrier(CLK_LOCAL_MEM_FENCE);
+
+        //Multiply the two matrices together;
+        //each thread computes one element of the block sub-matrix
+        for (int k = 0; k < BLOCK_SIZE; ++k) {
+	    double r = 0.0; //residual of multiplication
+            double x = TwoProductFMA(AS(ty, k), BS(k, tx), &r);
+
+            double s; //residual of addition
+            sum[0] = KnuthTwoSum(sum[0], x, &s);
+            x = s;
+            if(x != 0.0) {
+                sum[1] = KnuthTwoSum(sum[1], x, &s);
+                x = s;
+                if(x != 0.0) {
+                    sum[2] = KnuthTwoSum(sum[2], x, &s);
+                    x = s;
+                    if(x != 0.0) {
+                        sum[3] = KnuthTwoSum(sum[3], x, &s);
+                        x = s;
+   	            }
+	        }
+ 	    }
+            if(x != 0.0) {
+	        Accumulate(g_workingBase, x);
+            }
+
+            sum[0] = KnuthTwoSum(sum[0], r, &s);
+            r = s;
+            if(r != 0.0) {
+                sum[1] = KnuthTwoSum(sum[1], r, &s);
+                r = s;
+                if(r != 0.0) {
+                    sum[2] = KnuthTwoSum(sum[2], r, &s);
+                    r = s;
+                    if(r != 0.0) {
+                        sum[3] = KnuthTwoSum(sum[3], r, &s);
+                        r = s;
+	            }
+   	        }
+            }
+            if(r != 0.0) {
+	        Accumulate(g_workingBase, r);
+            }
+	}
+
+        //Synchronize to make sure that the preceding computation is done before 
+        //loading two new sub-matrices of A and B in the next iteration
+        barrier(CLK_LOCAL_MEM_FENCE);
+    }
+    //Flush to the accumulator
+    Accumulate(g_workingBase, sum[0]);
+    Accumulate(g_workingBase, sum[1]);
+    Accumulate(g_workingBase, sum[2]);
+    Accumulate(g_workingBase, sum[3]);
+
+    C[c + uiWB * ty + tx] = Round(g_workingBase);
+    //C[c + uiWB * ty + tx] = sum[0];
+}
+
+__kernel void matrixMul8Ex(
+    __global long* Accus,
+    __global data_t* C,
+    __global data_t* A,
+    __global data_t* B, 
+    int uiWA,
+    int uiWB,
+    __local data_t* As,
+    __local data_t* Bs
+) {
+    //Block index
+    int bx = get_group_id(0);
+    int by = get_group_id(1);
+
+    //Thread index
+    int tx = get_local_id(0);
+    int ty = get_local_id(1);
+
+    //Index of the first sub-matrix of A processed by the block
+    int aBegin = uiWA * BLOCK_SIZE * by;
+
+    //Index of the last sub-matrix of A processed by the block
+    int aEnd   = aBegin + uiWA - 1;
+
+    //Step size used to iterate through the sub-matrices of A
+    int aStep  = BLOCK_SIZE;
+
+    //Index of the first sub-matrix of B processed by the block
+    int bBegin = BLOCK_SIZE * bx;
+
+    //Step size used to iterate through the sub-matrices of B
+    int bStep  = BLOCK_SIZE * uiWB;
+
+    //A superaccumulator that corresponds to a single value in the matrix C
+    int c = uiWB * BLOCK_SIZE * by + BLOCK_SIZE * bx;
+    __global long *g_workingBase = Accus + (c + uiWB * ty + tx) * BIN_COUNT;
+    for (uint i = 0; i < BIN_COUNT; i++)
+        g_workingBase[i] = 0;
+
+    //for floating-point expansion
+    double sum[8] = {0.0};
+
+    //Loop over all the sub-matrices of A and B
+    //required to compute the block sub-matrix
+    for (int a = aBegin, b = bBegin;
+             a <= aEnd;
+             a += aStep, b += bStep) {
+        //Load the matrices from device memory to shared memory;
+        //each thread loads one element of each matrix
+        AS(ty, tx) = A[a + uiWA * ty + tx];
+        BS(ty, tx) = B[b + uiWB * ty + tx];
+	
+        //Synchronize to make sure the matrices are loaded
+        barrier(CLK_LOCAL_MEM_FENCE);
+
+        //Multiply the two matrices together;
+        //each thread computes one element of the block sub-matrix
+        for (int k = 0; k < BLOCK_SIZE; ++k) {
+	    double r = 0.0; //residual of multiplication
+            double x = TwoProductFMA(AS(ty, k), BS(k, tx), &r);
+
+            double s; //residual of addition
+            sum[0] = KnuthTwoSum(sum[0], x, &s);
+            x = s;
+            if(x != 0.0) {
+                sum[1] = KnuthTwoSum(sum[1], x, &s);
+                x = s;
+                if(x != 0.0) {
+                    sum[2] = KnuthTwoSum(sum[2], x, &s);
+                    x = s;
+                    if(x != 0.0) {
+                        sum[3] = KnuthTwoSum(sum[3], x, &s);
+                        x = s;
+                        if(x != 0.0) {
+                            sum[4] = KnuthTwoSum(sum[4], x, &s);
+                            x = s;
+                            if(x != 0.0) {
+                                sum[5] = KnuthTwoSum(sum[5], x, &s);
+                                x = s;
+                                if(x != 0.0) {
+                                    sum[6] = KnuthTwoSum(sum[6], x, &s);
+                                    x = s;
+                                    if(x != 0.0) {
+                                        sum[7] = KnuthTwoSum(sum[7], x, &s);
+                                        x = s;
+  	                            }
+  	                        }
+	                    }
+	                }
+   	            }
+	        }
+ 	    }
+            /*if(x != 0.0) {
+	        Accumulate(g_workingBase, x);
+            }*/
+
+            sum[0] = KnuthTwoSum(sum[0], r, &s);
+            r = s;
+            if(r != 0.0) {
+                sum[1] = KnuthTwoSum(sum[1], r, &s);
+                r = s;
+                if(r != 0.0) {
+                    sum[2] = KnuthTwoSum(sum[2], r, &s);
+                    r = s;
+                    if(r != 0.0) {
+                        sum[3] = KnuthTwoSum(sum[3], r, &s);
+                        r = s;
+                        if(r != 0.0) {
+                            sum[4] = KnuthTwoSum(sum[4], r, &s);
+                            r = s;
+                            if(r != 0.0) {
+                                sum[5] = KnuthTwoSum(sum[5], r, &s);
+                                r = s;
+                                if(r != 0.0) {
+                                    sum[6] = KnuthTwoSum(sum[6], r, &s);
+                                    r = s;
+                                    if(r != 0.0) {
+                                        sum[7] = KnuthTwoSum(sum[7], r, &s);
+                                        r = s;
+   	                            }
+   	                        }
+   	                    }
+   	                }
+	            }
+   	        }
+            }
+            /*if(r != 0.0) {
+	        Accumulate(g_workingBase, r);
+            }*/
+	}
+
+        //Synchronize to make sure that the preceding computation is done before 
+        //loading two new sub-matrices of A and B in the next iteration
+        barrier(CLK_LOCAL_MEM_FENCE);
+    }
+    //Flush to the accumulator
+  /*  Accumulate(g_workingBase, sum[0]);
+    Accumulate(g_workingBase, sum[1]);
+    Accumulate(g_workingBase, sum[2]);
+    Accumulate(g_workingBase, sum[3]);
+    Accumulate(g_workingBase, sum[4]);
+    Accumulate(g_workingBase, sum[5]);
+    Accumulate(g_workingBase, sum[6]);
+    Accumulate(g_workingBase, sum[7]);
+*/
     //C[c + uiWB * ty + tx] = Round(g_workingBase);
     C[c + uiWB * ty + tx] = sum[0];
 }
-
