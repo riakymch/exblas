@@ -266,9 +266,10 @@ __kernel void matrixMul(
 
     //A superaccumulator that corresponds to a single value in the matrix C
     int c = uiWB * BLOCK_SIZE * by + BLOCK_SIZE * bx;
-    __global long *g_workingBase = Accus + (c + uiWB * ty + tx) * BIN_COUNT;
+    /*__global long *g_workingBase = Accus + (c + uiWB * ty + tx) * BIN_COUNT;
     for (uint i = 0; i < BIN_COUNT; i++)
         g_workingBase[i] = 0;
+    */
 
     //for floating-point expansion
     double sum[NBFPE] = {0.0};
@@ -303,9 +304,9 @@ __kernel void matrixMul(
                 x = s;
 		r = 0;
             }
-            if(x != 0.0) {
+            /*if(x != 0.0) {
 	        Accumulate(g_workingBase, x);
-            }
+            }*/
 	}
 
         //Synchronize to make sure that the preceding computation is done before 
@@ -316,12 +317,11 @@ __kernel void matrixMul(
 #ifdef NVIDIA
     #pragma unroll
 #endif
-    for(uint i = 0; i != NBFPE; ++i) {
+    /*for(uint i = 0; i != NBFPE; ++i) {
     	Accumulate(g_workingBase, sum[i]);
-    }
+    }*/
 
-    //TODO: the first non-zero from rigth
-    //C[c + uiWB * ty + tx] = sum[0];
-    C[c + uiWB * ty + tx] = Round(g_workingBase);
+    //C[c + uiWB * ty + tx] = Round(g_workingBase);
+    C[c + uiWB * ty + tx] = sum[0];
 }
 

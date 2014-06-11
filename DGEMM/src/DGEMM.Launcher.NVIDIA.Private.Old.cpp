@@ -47,7 +47,6 @@ extern "C" cl_int initDGEMMNVIDIAPrivate(
     const uint height
 ){
     cl_int ciErrNum;
-    size_t kernelLength;
 
     // Read the OpenCL kernel in from source file
     FILE *program_handle;
@@ -66,7 +65,7 @@ extern "C" cl_int initDGEMMNVIDIAPrivate(
     fclose(program_handle);
 
     printf("clCreateProgramWithSource...\n"); 
-        cpProgram = clCreateProgramWithSource(cxGPUContext, 1, (const char **)&cSources, &kernelLength, &ciErrNum);
+        cpProgram = clCreateProgramWithSource(cxGPUContext, 1, (const char **)&cSources, &szKernelLength, &ciErrNum);
         if (ciErrNum != CL_SUCCESS) {
             printf("Error in clCreateProgramWithSource, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
             return EXIT_FAILURE;

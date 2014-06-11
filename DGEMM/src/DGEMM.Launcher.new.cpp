@@ -44,7 +44,6 @@ extern "C" cl_int initDGEMMNew(
     const char* program_file
 ){
     cl_int ciErrNum;
-    size_t kernelLength;
 
     // Read the OpenCL kernel in from source file
     FILE *program_handle;
@@ -63,7 +62,7 @@ extern "C" cl_int initDGEMMNew(
     fclose(program_handle);
 
     printf("clCreateProgramWithSource...\n"); 
-        cpProgram = clCreateProgramWithSource(cxGPUContext, 1, (const char **)&cSources, &kernelLength, &ciErrNum);
+        cpProgram = clCreateProgramWithSource(cxGPUContext, 1, (const char **)&cSources, &szKernelLength, &ciErrNum);
         if (ciErrNum != CL_SUCCESS) {
             printf("Error in clCreateProgramWithSource, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
             return EXIT_FAILURE;
@@ -81,21 +80,6 @@ extern "C" cl_int initDGEMMNew(
 
         //    return EXIT_FAILURE;
         //}
-	
-    /*//Get the binary
-    size_t nb_devices, nbread;
-    ciErrNum = clGetProgramInfo(cpProgram, CL_PROGRAM_NUM_DEVICES, sizeof(size_t), &nb_devices, &nbread);// Return 1 devices
-    printf("nb_devices = %d\n", nb_devices);
-    size_t *np = new size_t[nb_devices];//Create size array
-    ciErrNum = clGetProgramInfo(cpProgram, CL_PROGRAM_BINARY_SIZES, sizeof(size_t)*nb_devices, np, &nbread);//Load in np the size of my binary  
-    char** bn = new char* [nb_devices]; //Create the binary array   
-    for(int i =0; i < nb_devices;i++)
-        bn[i] = new char[np[i]]; // I know... it's bad... but if i use new char[np[i]], i have a segfault... :/  
-    ciErrNum = clGetProgramInfo(cpProgram, CL_PROGRAM_BINARIES, sizeof(unsigned char *)*nb_devices, bn, &nbread); //Load the binary itself    
-    //printf("%s\n", bn[0]); //Print the first binary. But here, I have some curious characters  
-    FILE *fp = fopen("Superaccumulator.cl.bin", "wb");  
-    fwrite(bn[0], sizeof(bn[0]), np[0], fp); // Save the binary, but my file stay empty  
-    fclose(fp);*/
 
     printf("...creating DGEMM kernel:\n");
         ckMatrixMul = clCreateKernel(cpProgram, DGEMM_KERNEL, &ciErrNum);

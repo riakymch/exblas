@@ -14,7 +14,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 // OpenCL launcher for bitonic sort kernel
 ////////////////////////////////////////////////////////////////////////////////
-#define DGEMM_KERNEL "matrixMul"
+#define DGEMM_KERNEL "matrixMul1"
 #ifdef AMD
   #define BLOCK_SIZE 16
 #else
@@ -28,7 +28,7 @@ static cl_program       cpProgram;            //OpenCL Superaccumulator program
 static cl_kernel        ckMatrixMul;
 static cl_command_queue cqDefaultCommandQue;  //Default command queue for Superaccumulator
 
-static const uint  VECTOR_NUMBER = 4;
+static const uint  VECTOR_NUMBER = 1;
 
 #ifdef AMD
 static char  compileOptions[256] = "-DBLOCK_SIZE=16";
@@ -44,7 +44,6 @@ extern "C" cl_int initDGEMMNVIDIA(
     const char* program_file
 ){
     cl_int ciErrNum;
-    size_t kernelLength;
 
     // Read the OpenCL kernel in from source file
     FILE *program_handle;
@@ -63,7 +62,7 @@ extern "C" cl_int initDGEMMNVIDIA(
     fclose(program_handle);
 
     printf("clCreateProgramWithSource...\n"); 
-        cpProgram = clCreateProgramWithSource(cxGPUContext, 1, (const char **)&cSources, &kernelLength, &ciErrNum);
+        cpProgram = clCreateProgramWithSource(cxGPUContext, 1, (const char **)&cSources, &szKernelLength, &ciErrNum);
         if (ciErrNum != CL_SUCCESS) {
             printf("Error in clCreateProgramWithSource, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
             return EXIT_FAILURE;
