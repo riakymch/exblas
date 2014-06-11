@@ -92,29 +92,29 @@ int main(int argc, char **argv)
     printf("Starting with a matrices of %ix%ix%i double elements\n\n", __nbRowsC, __nbRowsB, __nbColumnsC); 
 
     if (__alg == 0)
-        runDGEMM("DGEMM.cl");
+        runDGEMM("../src/DGEMM.cl");
     else if (__alg == 1)
-        runDGEMM("DGEMM.AMD.cl");
+        runDGEMM("../src/DGEMM.AMD.cl");
     else if (__alg == 2)
-        runDGEMM("DGEMM.NVIDIA.cl");
+        runDGEMM("../src/DGEMM.NVIDIA.cl");
     else if (__alg == 30)
-        runDGEMM("DGEMM.NVIDIA.Superacc.Private.cl");
+        runDGEMM("../src/DGEMM.NVIDIA.Superacc.Private.cl");
     else if (__alg == 31)
-        runDGEMM("DGEMM.NVIDIA.FPE.Private.cl");
+        runDGEMM("../src/DGEMM.NVIDIA.FPE.Private.cl");
     else if (__alg == 40)
-        runDGEMM("DGEMM.NVIDIA.Superacc.Local.cl");
+        runDGEMM("../src/DGEMM.NVIDIA.Superacc.Local.cl");
     else if (__alg == 41)
-        runDGEMM("DGEMM.NVIDIA.FPE.Local.cl");
+        runDGEMM("../src/DGEMM.NVIDIA.FPE.Local.cl");
     else if (__alg == 50)
-        runDGEMM("DGEMM.NVIDIA.Superacc.Global.cl");
+        runDGEMM("../src/DGEMM.NVIDIA.Superacc.Global.cl");
     else if (__alg == 51)
-        runDGEMM("DGEMM.NVIDIA.FPE.Global.cl");
+        runDGEMM("../src/DGEMM.NVIDIA.FPE.Global.cl");
     else if (__alg == 52)
-        runDGEMM("DGEMM.NVIDIA.FPE.EX4.Global.cl");
+        runDGEMM("../src/DGEMM.NVIDIA.FPE.EX4.Global.cl");
     else if (__alg == 53)
-        runDGEMM("DGEMM.NVIDIA.FPE.EX8.Global.cl");
+        runDGEMM("../src/DGEMM.NVIDIA.FPE.EX8.Global.cl");
     else if (__alg == 6)
-        runDGEMM("DGEMM.new.cl");
+        runDGEMM("../src/DGEMM.new.cl");
 }
 
 int runDGEMM(const char* program_file){

@@ -46,7 +46,7 @@ double TwoProductFMA(double a, double b, double *d) {
 }
 
 // signedcarry in {-1, 0, 1}
-long xadd(long *sa, long x, uchar *of) {
+long xadd(__local long *sa, long x, uchar *of) {
     // OF and SF  -> carry=1
     // OF and !SF -> carry=-1
     // !OF        -> carry=0
@@ -81,7 +81,7 @@ double OddRoundSumNonnegative(double th, double tl) {
     return thdb.d;
 }
 
-int Normalize(long *accumulator, int *imin, int *imax) {
+int Normalize(__local long *accumulator, int *imin, int *imax) {
   if (*imin > *imax) {
     return 0;
   }
@@ -115,7 +115,7 @@ int Normalize(long *accumulator, int *imin, int *imax) {
   return carry_in < 0;
 }
 
-double Round(long *accumulator) {
+double Round(__local long *accumulator) {
   int imin = 0; 
   int imax = 38;
   int negative = Normalize(accumulator, &imin, &imax);
@@ -168,7 +168,7 @@ double Round(long *accumulator) {
 ////////////////////////////////////////////////////////////////////////////////
 // Main computation pass: compute partial accumulators
 ////////////////////////////////////////////////////////////////////////////////
-void AccumulateWord(long *sa, int i, long x) {
+void AccumulateWord(__local long *sa, int i, long x) {
   // With atomic accumulator updates
   // accumulation and carry propagation can happen in any order
   long carry = x;
@@ -203,7 +203,7 @@ void AccumulateWord(long *sa, int i, long x) {
   }
 }
 
-void Accumulate(long *sa, double x) {
+void Accumulate(__local long *sa, double x) {
   if (x == 0)
     return;
 
@@ -263,7 +263,8 @@ __kernel void matrixMul(
     int bStep  = BLOCK_SIZE * uiWB;
 
     //A superaccumulator that corresponds to a single value in the matrix C
-    long p_workingBase[BIN_COUNT] = {0};
+    __local long l_sa[BLOCK_SIZE * BLOCK_SIZE * BIN_COUNT] __attribute__((aligned(8)));
+    __local long *l_workingBase = l_sa + (ty * BLOCK_SIZE + tx);
 
     //for floating-point expansion
     double sum[NBFPE] = {0.0};
@@ -299,7 +300,7 @@ __kernel void matrixMul(
 		r = 0;
             }
             if(x != 0.0) {
-	        Accumulate(p_workingBase, x);
+	        Accumulate(l_workingBase, x);
             }
 	}
 
@@ -312,11 +313,11 @@ __kernel void matrixMul(
     #pragma unroll
 #endif
     for(uint i = 0; i != NBFPE; ++i) {
-	Accumulate(p_workingBase, sum[i]);
+	Accumulate(l_workingBase, sum[i]);
     }
 
     //TODO: the first non-zero from rigth
     int c = uiWB * BLOCK_SIZE * by + BLOCK_SIZE * bx;
-    C[c + uiWB * ty + tx] = Round(p_workingBase);
+    C[c + uiWB * ty + tx] = Round(l_workingBase);
 }
 
