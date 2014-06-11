@@ -271,7 +271,7 @@ __kernel void matrixMul(
     //    g_workingBase[i] = 0;
 
     //for floating-point expansion
-    double sum[NBFPE] = {0.0};
+    double sum[4] = {0.0};
 
     //Loop over all the sub-matrices of A and B
     //required to compute the block sub-matrix
@@ -288,23 +288,45 @@ __kernel void matrixMul(
 
         //Multiply the two matrices together;
         //each thread computes one element of the block sub-matrix
-        #ifdef NVIDIA
-          #pragma unroll
-        #endif
         for (int k = 0; k < BLOCK_SIZE; ++k) {
-	    double r; //residual of multiplication
+	    double r = 0.0; //residual of multiplication
             double x = TwoProductFMA(AS(ty, k), BS(k, tx), &r);
-            #ifdef NVIDIA
-                #pragma unroll
-            #endif
-            for(uint i = 0; i != NBFPE; ++i) {
-                double s; //residual of addition
-                sum[i] = KnuthTwoSum(sum[i], x, &s);
+
+            double s; //residual of addition
+            sum[0] = KnuthTwoSum(sum[0], x, &s);
+            x = s;
+            if(x != 0.0) {
+                sum[1] = KnuthTwoSum(sum[1], x, &s);
                 x = s;
-		r = 0;
-            }
+                if(x != 0.0) {
+                    sum[2] = KnuthTwoSum(sum[2], x, &s);
+                    x = s;
+                    if(x != 0.0) {
+                        sum[3] = KnuthTwoSum(sum[3], x, &s);
+                        x = s;
+   	            }
+	        }
+ 	    }
             if(x != 0.0) {
 	        Accumulate(g_workingBase, x);
+            }
+
+            sum[0] = KnuthTwoSum(sum[0], r, &s);
+            r = s;
+            if(r != 0.0) {
+                sum[1] = KnuthTwoSum(sum[1], r, &s);
+                r = s;
+                if(r != 0.0) {
+                    sum[2] = KnuthTwoSum(sum[2], r, &s);
+                    r = s;
+                    if(r != 0.0) {
+                        sum[3] = KnuthTwoSum(sum[3], r, &s);
+                        r = s;
+	            }
+   	        }
+            }
+            if(r != 0.0) {
+	        Accumulate(g_workingBase, r);
             }
 	}
 
@@ -313,12 +335,10 @@ __kernel void matrixMul(
         barrier(CLK_LOCAL_MEM_FENCE);
     }
     //Flush to the accumulator
-#ifdef NVIDIA
-    #pragma unroll
-#endif
-    for(uint i = 0; i != NBFPE; ++i) {
-    	Accumulate(g_workingBase, sum[i]);
-    }
+    Accumulate(g_workingBase, sum[0]);
+    Accumulate(g_workingBase, sum[1]);
+    Accumulate(g_workingBase, sum[2]);
+    Accumulate(g_workingBase, sum[3]);
 
     C[c + uiWB * ty + tx] = Round(g_workingBase);
     //C[c + uiWB * ty + tx] = sum[0];
