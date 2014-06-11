@@ -31,10 +31,10 @@ static uint __nbfpe      = 0;
 static uint __alg        = 0;
 
 static void __usage(int argc __attribute__((unused)), char **argv) {
-  fprintf(stderr, "Usage: %s [-m nbrows of C -n nbcolumns of C -k nbcolumns of B\n -r range -e nbfpe\n -a alg (0-mine, 1-amd, 2-nvidia, 3-sapr, 4-fpepr, 5-salo, 6-fpelo, 7-sagl, 8-fpegl, 9-fpee4gl, 10-fpee8gl, 11-new)] \n", argv[0]);
+  fprintf(stderr, "Usage: %s [-m nbrows of C -n nbcolumns of C -k nbcolumns of B\n -r range -e nbfpe\n -a alg (0-mine, 1-amd, 2-nvidia, 30-sapr, 31-fpepr, 40-salo, 41-fpelo, 50-sagl, 51-fpegl, 52-fpee4gl, 53-fpee8gl, 6-new)] \n", argv[0]);
   printf("       -?, -h:    Display this help and exit\n");
 }
-
+	
 static void __parse_args(int argc, char **argv) {
   int i;
 
@@ -65,7 +65,15 @@ static void __parse_args(int argc, char **argv) {
     __usage(argc, argv);
     exit(-1);
   }
-  if (__alg > 11) {
+  
+  int algs[]= {0,1,2,30,31,40,41,50,51,52,53,6};
+  int is_alg = 0;
+  for (i = 0; i < 11; i++)
+    if (algs[i] == __alg) {
+      is_alg = 1;
+      break;
+    }
+  if (!is_alg) {
     __usage(argc, argv);
     exit(-1);
   }
@@ -89,23 +97,23 @@ int main(int argc, char **argv)
         runDGEMM("DGEMM.AMD.cl");
     else if (__alg == 2)
         runDGEMM("DGEMM.NVIDIA.cl");
-    else if (__alg == 3)
+    else if (__alg == 30)
         runDGEMM("DGEMM.NVIDIA.Superacc.Private.cl");
-    else if (__alg == 4)
+    else if (__alg == 31)
         runDGEMM("DGEMM.NVIDIA.FPE.Private.cl");
-    else if (__alg == 5)
+    else if (__alg == 40)
         runDGEMM("DGEMM.NVIDIA.Superacc.Local.cl");
-    else if (__alg == 6)
+    else if (__alg == 41)
         runDGEMM("DGEMM.NVIDIA.FPE.Local.cl");
-    else if (__alg == 7)
+    else if (__alg == 50)
         runDGEMM("DGEMM.NVIDIA.Superacc.Global.cl");
-    else if (__alg == 8)
+    else if (__alg == 51)
         runDGEMM("DGEMM.NVIDIA.FPE.Global.cl");
-    else if (__alg == 9)
+    else if (__alg == 52)
         runDGEMM("DGEMM.NVIDIA.FPE.EX4.Global.cl");
-    else if (__alg == 10)
+    else if (__alg == 53)
         runDGEMM("DGEMM.NVIDIA.FPE.EX8.Global.cl");
-    else if (__alg == 11)
+    else if (__alg == 6)
         runDGEMM("DGEMM.new.cl");
 }
 
@@ -201,23 +209,23 @@ int runDGEMM(const char* program_file){
                 ciErrNum = initDGEMMAMD(cxGPUContext, cqCommandQueue, cdDevice, program_file);
             else if (__alg == 2)
                 ciErrNum = initDGEMMNVIDIA(cxGPUContext, cqCommandQueue, cdDevice, program_file);
-            else if (__alg == 3)
+            else if (__alg == 30)
                 ciErrNum = initDGEMMNVIDIAPrivate(cxGPUContext, cqCommandQueue, cdDevice, program_file, __nbfpe, __nbColumnsC, __nbRowsC);
-            else if (__alg == 4)
+            else if (__alg == 31)
                 ciErrNum = initDGEMMNVIDIAPrivate(cxGPUContext, cqCommandQueue, cdDevice, program_file, __nbfpe, __nbColumnsC, __nbRowsC);
-            else if (__alg == 5)
+            else if (__alg == 40)
                 ciErrNum = initDGEMMNVIDIAPrivate(cxGPUContext, cqCommandQueue, cdDevice, program_file, __nbfpe, __nbColumnsC, __nbRowsC);
-            else if (__alg == 6)
+            else if (__alg == 41)
                 ciErrNum = initDGEMMNVIDIAPrivate(cxGPUContext, cqCommandQueue, cdDevice, program_file, __nbfpe, __nbColumnsC, __nbRowsC);
-            else if (__alg == 7)
+            else if (__alg == 50)
                 ciErrNum = initDGEMMNVIDIAGlobal(cxGPUContext, cqCommandQueue, cdDevice, program_file, __nbfpe, __nbColumnsC, __nbRowsC);
-            else if (__alg == 8)
+            else if (__alg == 51)
                 ciErrNum = initDGEMMNVIDIAGlobal(cxGPUContext, cqCommandQueue, cdDevice, program_file, __nbfpe, __nbColumnsC, __nbRowsC);
-            else if (__alg == 9)
+            else if (__alg == 52)
                 ciErrNum = initDGEMMNVIDIAGlobal(cxGPUContext, cqCommandQueue, cdDevice, program_file, __nbfpe, __nbColumnsC, __nbRowsC);
-            else if (__alg == 10)
+            else if (__alg == 53)
                 ciErrNum = initDGEMMNVIDIAGlobal(cxGPUContext, cqCommandQueue, cdDevice, program_file, __nbfpe, __nbColumnsC, __nbRowsC);
-	    else if (__alg == 11)
+	    else if (__alg == 6)
                 ciErrNum = initDGEMMNew(cxGPUContext, cqCommandQueue, cdDevice, program_file);
             
             if (ciErrNum != CL_SUCCESS)
@@ -232,23 +240,23 @@ int runDGEMM(const char* program_file){
                 DGEMMAMD(NULL, d_C, d_A, d_B, &ciErrNum);
             else if (__alg == 2)
                 DGEMMNVIDIA(NULL, d_C, d_A, d_B, &ciErrNum);
-            else if (__alg == 3)
+            else if (__alg == 30)
                 DGEMMNVIDIAPrivate(NULL, d_C, d_A, d_B, &ciErrNum);
-            else if (__alg == 4)
+            else if (__alg == 31)
                 DGEMMNVIDIAPrivate(NULL, d_C, d_A, d_B, &ciErrNum);
-            else if (__alg == 5)
+            else if (__alg == 40)
                 DGEMMNVIDIAPrivate(NULL, d_C, d_A, d_B, &ciErrNum);
+            else if (__alg == 41)
+                DGEMMNVIDIAPrivate(NULL, d_C, d_A, d_B, &ciErrNum);
+            else if (__alg == 50)
+                DGEMMNVIDIAGlobal(NULL, d_C, d_A, d_B, &ciErrNum);
+            else if (__alg == 51)
+                DGEMMNVIDIAGlobal(NULL, d_C, d_A, d_B, &ciErrNum);
+            else if (__alg == 52)
+                DGEMMNVIDIAGlobal(NULL, d_C, d_A, d_B, &ciErrNum);
+            else if (__alg == 53)
+                DGEMMNVIDIAGlobal(NULL, d_C, d_A, d_B, &ciErrNum);
             else if (__alg == 6)
-                DGEMMNVIDIAPrivate(NULL, d_C, d_A, d_B, &ciErrNum);
-            else if (__alg == 7)
-                DGEMMNVIDIAGlobal(NULL, d_C, d_A, d_B, &ciErrNum);
-            else if (__alg == 8)
-                DGEMMNVIDIAGlobal(NULL, d_C, d_A, d_B, &ciErrNum);
-            else if (__alg == 9)
-                DGEMMNVIDIAGlobal(NULL, d_C, d_A, d_B, &ciErrNum);
-            else if (__alg == 10)
-                DGEMMNVIDIAGlobal(NULL, d_C, d_A, d_B, &ciErrNum);
-            else if (__alg == 11)
                 DGEMMNew(NULL, d_C, d_A, d_B, &ciErrNum);
 
             if (ciErrNum != CL_SUCCESS)
@@ -274,23 +282,23 @@ int runDGEMM(const char* program_file){
                 DGEMMAMD(NULL, d_C, d_A, d_B, &ciErrNum);
             else if (__alg == 2)
                 DGEMMNVIDIA(NULL, d_C, d_A, d_B, &ciErrNum);
-            else if (__alg == 3)
+            else if (__alg == 30)
                 DGEMMNVIDIAPrivate(NULL, d_C, d_A, d_B, &ciErrNum);
-            else if (__alg == 4)
+            else if (__alg == 31)
                 DGEMMNVIDIAPrivate(NULL, d_C, d_A, d_B, &ciErrNum);
-            else if (__alg == 5)
+            else if (__alg == 40)
                 DGEMMNVIDIAPrivate(NULL, d_C, d_A, d_B, &ciErrNum);
+            else if (__alg == 41)
+                DGEMMNVIDIAPrivate(NULL, d_C, d_A, d_B, &ciErrNum);
+            else if (__alg == 50)
+                DGEMMNVIDIAGlobal(NULL, d_C, d_A, d_B, &ciErrNum);
+            else if (__alg == 51)
+                DGEMMNVIDIAGlobal(NULL, d_C, d_A, d_B, &ciErrNum);
+            else if (__alg == 52)
+                DGEMMNVIDIAGlobal(NULL, d_C, d_A, d_B, &ciErrNum);
+            else if (__alg == 53)
+                DGEMMNVIDIAGlobal(NULL, d_C, d_A, d_B, &ciErrNum);
             else if (__alg == 6)
-                DGEMMNVIDIAPrivate(NULL, d_C, d_A, d_B, &ciErrNum);
-            else if (__alg == 7)
-                DGEMMNVIDIAGlobal(NULL, d_C, d_A, d_B, &ciErrNum);
-            else if (__alg == 8)
-                DGEMMNVIDIAGlobal(NULL, d_C, d_A, d_B, &ciErrNum);
-            else if (__alg == 9)
-                DGEMMNVIDIAGlobal(NULL, d_C, d_A, d_B, &ciErrNum);
-            else if (__alg == 10)
-                DGEMMNVIDIAGlobal(NULL, d_C, d_A, d_B, &ciErrNum);
-            else if (__alg == 11)
                 DGEMMNew(NULL, d_C, d_A, d_B, &ciErrNum);
 
             ciErrNum  = clEnqueueMarker(cqCommandQueue, &endMark);
@@ -353,23 +361,23 @@ int runDGEMM(const char* program_file){
                 closeDGEMMAMD();
             else if (__alg == 2)
                 closeDGEMMNVIDIA();
-            else if (__alg == 3)
+            else if (__alg == 30)
                 closeDGEMMNVIDIAPrivate();
-            else if (__alg == 4)
+            else if (__alg == 31)
                 closeDGEMMNVIDIAPrivate();
-            else if (__alg == 5)
+            else if (__alg == 40)
                 closeDGEMMNVIDIAPrivate();
-            else if (__alg == 6)
+            else if (__alg == 41)
                 closeDGEMMNVIDIAPrivate();
-            else if (__alg == 7)
+            else if (__alg == 50)
                 closeDGEMMNVIDIAGlobal();
-            else if (__alg == 8)
+            else if (__alg == 51)
                 closeDGEMMNVIDIAGlobal();
-            else if (__alg == 9)
+            else if (__alg == 52)
                 closeDGEMMNVIDIAGlobal();
-            else if (__alg == 10)
+            else if (__alg == 53)
                 closeDGEMMNVIDIAGlobal();
-            if (__alg == 11)
+            if (__alg == 6)
 		closeDGEMMNew();
     }
 
