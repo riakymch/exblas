@@ -229,15 +229,15 @@ void Accumulate(__global long *sa, double x) {
 
 ///////////////////////////////////////////////////////////////////////////////
 // Matrix multiplication on the device: C = A * B
-// uiWA is A's width and uiWB is B's width
+// m is A's width and n is B's width
 ////////////////////////////////////////////////////////////////////////////////
 __kernel void matrixMul(
     __global long* Accus,
     __global data_t* C,
     __global data_t* A,
     __global data_t* B, 
-    int uiWA,
-    int uiWB,
+    int m,
+    int n,
     __local data_t* As,
     __local data_t* Bs
 ) {
@@ -250,10 +250,10 @@ __kernel void matrixMul(
     int ty = get_local_id(1);
 
     //Index of the first sub-matrix of A processed by the block
-    int aBegin = uiWA * BLOCK_SIZE * by;
+    int aBegin = m * BLOCK_SIZE * by;
 
     //Index of the last sub-matrix of A processed by the block
-    int aEnd   = aBegin + uiWA - 1;
+    int aEnd   = aBegin + m - 1;
 
     //Step size used to iterate through the sub-matrices of A
     int aStep  = BLOCK_SIZE;
@@ -262,11 +262,11 @@ __kernel void matrixMul(
     int bBegin = BLOCK_SIZE * bx;
 
     //Step size used to iterate through the sub-matrices of B
-    int bStep  = BLOCK_SIZE * uiWB;
+    int bStep  = BLOCK_SIZE * n;
 
     //A superaccumulator that corresponds to a single value in the matrix C
-    int c = uiWB * BLOCK_SIZE * by + BLOCK_SIZE * bx;
-    __global long *g_workingBase = Accus + (c + uiWB * ty + tx) * BIN_COUNT;
+    int c = (m * by + bx) * BLOCK_SIZE;
+    __global long *g_workingBase = Accus + (c + n * ty + tx) * BIN_COUNT;
     //for (uint i = 0; i < BIN_COUNT; i++)
     //    g_workingBase[i] = 0;
 
@@ -280,8 +280,8 @@ __kernel void matrixMul(
              a += aStep, b += bStep) {
         //Load the matrices from device memory to shared memory;
         //each thread loads one element of each matrix
-        AS(ty, tx) = A[a + uiWA * ty + tx];
-        BS(ty, tx) = B[b + uiWB * ty + tx];
+        AS(ty, tx) = A[a + m * ty + tx];
+        BS(ty, tx) = B[b + n * ty + tx];
 	
         //Synchronize to make sure the matrices are loaded
         barrier(CLK_LOCAL_MEM_FENCE);
@@ -320,6 +320,6 @@ __kernel void matrixMul(
     	Accumulate(g_workingBase, sum[i]);
     }
 
-    C[c + uiWB * ty + tx] = Round(g_workingBase);
-    //C[c + uiWB * ty + tx] = sum[0];
+    C[c + n * ty + tx] = Round(g_workingBase);
+    //C[c + n * ty + tx] = sum[0];
 }

@@ -307,7 +307,7 @@ int runDGEMM(const char* program_file){
                     cleanUp(EXIT_FAILURE);
                 }
 
-             //printMatrix(C, d_C.width, d_C.height);
+            printMatrix(C, d_C.width, d_C.height);
             /*printf(" ...DGEMM on CPU\n");
 		double *C_CPU;
                 C_CPU = (double *) calloc(__nbRowsC * __nbColumnsC, sizeof(double));
@@ -323,7 +323,7 @@ int runDGEMM(const char* program_file){
 		//PassFailFlag = compareDGEMMWithMPFR((const double *)C_CPU, (const double *)A, (const double *)B, __nbRowsC, __nbColumnsC, __nbRowsB);
                 printf("//--------------------------------------------------------\n");
 		free(C_CPU);
-            */
+ */
 		
          //Release kernels and program
          printf("Shutting down...\n\n");
