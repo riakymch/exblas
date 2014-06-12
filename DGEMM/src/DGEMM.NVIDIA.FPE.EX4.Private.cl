@@ -46,12 +46,12 @@ double TwoProductFMA(double a, double b, double *d) {
 }
 
 // signedcarry in {-1, 0, 1}
-long xadd(__global long *sa, long x, uchar *of) {
+long xadd(long *sa, long x, uchar *of) {
     // OF and SF  -> carry=1
     // OF and !SF -> carry=-1
     // !OF        -> carry=0
     long y = *sa;
-    *sa = *sa + x; // since the value sa->accumulator[i] can be changed by another work item
+    *sa = *sa + x;
 
     // TODO: cover also underflow
     *of = 0;
@@ -81,7 +81,7 @@ double OddRoundSumNonnegative(double th, double tl) {
     return thdb.d;
 }
 
-int Normalize(__global long *accumulator, int *imin, int *imax) {
+int Normalize(long *accumulator, int *imin, int *imax) {
   if (*imin > *imax) {
     return 0;
   }
@@ -115,7 +115,7 @@ int Normalize(__global long *accumulator, int *imin, int *imax) {
   return carry_in < 0;
 }
 
-double Round(__global long *accumulator) {
+double Round(long *accumulator) {
   int imin = 0; 
   int imax = 38;
   int negative = Normalize(accumulator, &imin, &imax);
@@ -168,7 +168,7 @@ double Round(__global long *accumulator) {
 ////////////////////////////////////////////////////////////////////////////////
 // Main computation pass: compute partial accumulators
 ////////////////////////////////////////////////////////////////////////////////
-void AccumulateWord(__global long *sa, int i, long x) {
+void AccumulateWord(long *sa, int i, long x) {
   // With atomic accumulator updates
   // accumulation and carry propagation can happen in any order
   long carry = x;
@@ -203,7 +203,7 @@ void AccumulateWord(__global long *sa, int i, long x) {
   }
 }
 
-void Accumulate(__global long *sa, double x) {
+void Accumulate(long *sa, double x) {
   if (x == 0)
     return;
 
@@ -226,13 +226,11 @@ void Accumulate(__global long *sa, double x) {
   }
 }
 
-
 ///////////////////////////////////////////////////////////////////////////////
 // Matrix multiplication on the device: C = A * B
 // uiWA is A's width and uiWB is B's width
 ////////////////////////////////////////////////////////////////////////////////
 __kernel void matrixMul(
-    __global long* Accus,
     __global data_t* C,
     __global data_t* A,
     __global data_t* B, 
@@ -265,13 +263,10 @@ __kernel void matrixMul(
     int bStep  = BLOCK_SIZE * uiWB;
 
     //A superaccumulator that corresponds to a single value in the matrix C
-    int c = uiWB * BLOCK_SIZE * by + BLOCK_SIZE * bx;
-    __global long *g_workingBase = Accus + (c + uiWB * ty + tx) * BIN_COUNT;
-    //for (uint i = 0; i < BIN_COUNT; i++)
-    //    g_workingBase[i] = 0;
+    long p_workingBase[BIN_COUNT] = {0};
 
     //for floating-point expansion
-    double sum[NBFPE] = {0.0};
+    double sum[4] = {0.0};
 
     //Loop over all the sub-matrices of A and B
     //required to compute the block sub-matrix
@@ -294,17 +289,42 @@ __kernel void matrixMul(
         for (int k = 0; k < BLOCK_SIZE; ++k) {
 	    double r = 0.0; //residual of multiplication
             double x = TwoProductFMA(AS(ty, k), BS(k, tx), &r);
-            #ifdef NVIDIA
-                #pragma unroll
-            #endif
-            for(uint i = 0; i != NBFPE; ++i) {
-                double s; //residual of addition
-                sum[i] = KnuthTwoSum(sum[i], x, &s);
-                x = s + r;
-		r = 0;
-            }
+
+            double s; //residual of addition
+            sum[0] = KnuthTwoSum(sum[0], x, &s);
+            x = s;
             if(x != 0.0) {
-	        Accumulate(g_workingBase, x);
+                sum[1] = KnuthTwoSum(sum[1], x, &s);
+                x = s;
+                if(x != 0.0) {
+                    sum[2] = KnuthTwoSum(sum[2], x, &s);
+                    x = s;
+                    if(x != 0.0) {
+                        sum[3] = KnuthTwoSum(sum[3], x, &s);
+                        x = s;
+   	            }
+	        }
+ 	    }
+            if(x != 0.0) {
+	        Accumulate(p_workingBase, x);
+            }
+
+            sum[0] = KnuthTwoSum(sum[0], r, &s);
+            r = s;
+            if(r != 0.0) {
+                sum[1] = KnuthTwoSum(sum[1], r, &s);
+                r = s;
+                if(r != 0.0) {
+                    sum[2] = KnuthTwoSum(sum[2], r, &s);
+                    r = s;
+                    if(r != 0.0) {
+                        sum[3] = KnuthTwoSum(sum[3], r, &s);
+                        r = s;
+	            }
+   	        }
+            }
+            if(r != 0.0) {
+	        Accumulate(p_workingBase, r);
             }
 	}
 
@@ -313,13 +333,13 @@ __kernel void matrixMul(
         barrier(CLK_LOCAL_MEM_FENCE);
     }
     //Flush to the accumulator
-#ifdef NVIDIA
-    #pragma unroll
-#endif
-    for(uint i = 0; i != NBFPE; ++i) {
-    	Accumulate(g_workingBase, sum[i]);
-    }
+    Accumulate(p_workingBase, sum[0]);
+    Accumulate(p_workingBase, sum[1]);
+    Accumulate(p_workingBase, sum[2]);
+    Accumulate(p_workingBase, sum[3]);
 
-    C[c + uiWB * ty + tx] = Round(g_workingBase);
-    //C[c + uiWB * ty + tx] = sum[0];
+    //TODO: the first non-zero from rigth
+    int c = uiWB * BLOCK_SIZE * by + BLOCK_SIZE * bx;
+    C[c + uiWB * ty + tx] = Round(p_workingBase);
 }
+
