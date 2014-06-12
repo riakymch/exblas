@@ -137,10 +137,13 @@ int runDGEMM(const char* program_file){
 
     printf("Initializing OpenCL...\n");
         char platform_name[64];
-	char device_name[32];
+        char device_name[32];
 #ifdef AMD
         strcpy(platform_name, "AMD Accelerated Parallel Processing");
-	strcpy(device_name, "Tahiti");
+        strcpy(device_name, "Tahiti");
+#elif TESLA == 1
+        strcpy(platform_name, "NVIDIA CUDA");
+        strcpy(device_name, "Tesla M2090");
 #else
         strcpy(platform_name, "NVIDIA CUDA");
         strcpy(device_name, "Tesla K20c");
