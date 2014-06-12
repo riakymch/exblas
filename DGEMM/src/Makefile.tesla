@@ -14,7 +14,7 @@ CXXFLAGS=-Wall -W -O2 $(DEFINES:%=-D%) $(INCLUDE) -march=native -fabi-version=0 
 
 # NVIDIA
 PATH_TO_NVIDIA_INC=/usr/local/cuda/include/ -I$(HOME)/soft/lib/mpfr/include/ -I$(HOME)/soft/lib/gmp/include/
-PATH_TO_NVIDIA_LIB=/usr/lib/x86_64-linux-gnu/ -L/usr/local/cuda/lib64 -L$(HOME)/soft/lib/mpfr/lib/ -L$(HOME)/soft/lib/gmp/lib/ -lmpfr -lgmp -lOpenCL
+PATH_TO_NVIDIA_LIB=/usr/lib/x86_64-linux-gnu/ -L$(HOME)/soft/lib/mpfr/lib/ -L$(HOME)/soft/lib/gmp/lib/ -lmpfr -lgmp -lOpenCL
 
 all: $(EXE_NAME) 
 
