@@ -151,6 +151,7 @@ int runDGEMM(const char* program_file){
 #else
         strcpy(platform_name, "NVIDIA CUDA");
         strcpy(device_name, "Tesla K20c");
+	//strcpy(device_name, "Tesla C2050");
 #endif
         //setenv("CUDA_CACHE_DISABLE", "1", 1);
         cpPlatform = GetOCLPlatform(platform_name);
@@ -307,7 +308,7 @@ int runDGEMM(const char* program_file){
                     cleanUp(EXIT_FAILURE);
                 }
 
-            printMatrix(C, d_C.width, d_C.height);
+            //printMatrix(C, d_C.width, d_C.height);
             /*printf(" ...DGEMM on CPU\n");
 		double *C_CPU;
                 C_CPU = (double *) calloc(__nbRowsC * __nbColumnsC, sizeof(double));
