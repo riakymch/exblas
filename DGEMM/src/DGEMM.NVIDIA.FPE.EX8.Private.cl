@@ -266,7 +266,7 @@ __kernel void matrixMul(
     long p_workingBase[BIN_COUNT] = {0};
 
     //for floating-point expansion
-    double sum[4] = {0.0};
+    double sum[8] = {0.0};
 
     //Loop over all the sub-matrices of A and B
     //required to compute the block sub-matrix
@@ -323,7 +323,6 @@ __kernel void matrixMul(
  	    }
             if(x != 0.0) {
 	        Accumulate(p_workingBase, x);
-                flag = 1;
             }
 
             sum[0] = KnuthTwoSum(sum[0], r, &s);
