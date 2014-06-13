@@ -267,15 +267,16 @@ __kernel void matrixMul(
     //A superaccumulator that corresponds to a single value in the matrix C
     int c = (m * by + bx) * BLOCK_SIZE;
     __global long *g_workingBase = Accus + (c + n * ty + tx) * BIN_COUNT;
-    //for (uint i = 0; i < BIN_COUNT; i++)
-    //    g_workingBase[i] = 0;
+    for (uint i = 0; i < BIN_COUNT; i++)
+        g_workingBase[i] = 0;
 
     //for floating-point expansion
     double sum[8] = {0.0};
 
     //Loop over all the sub-matrices of A and B
     //required to compute the block sub-matrix
-    int flag = 0;
+    //TODO: flag should be 0, but need to add rounding for fpes
+    int flag = 1;
     for (int a = aBegin, b = bBegin;
              a <= aEnd;
              a += aStep, b += bStep) {

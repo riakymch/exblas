@@ -267,8 +267,8 @@ __kernel void matrixMul(
     //A superaccumulator that corresponds to a single value in the matrix C
     int c = (m * by + bx) * BLOCK_SIZE;
     __global long *g_workingBase = Accus + (c + n * ty + tx) * BIN_COUNT;
-    //for (uint i = 0; i < BIN_COUNT; i++)
-    //    g_workingBase[i] = 0;
+    for (uint i = 0; i < BIN_COUNT; i++)
+        g_workingBase[i] = 0;
 
     //for floating-point expansion
     double sum[4] = {0.0};
