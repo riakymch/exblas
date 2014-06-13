@@ -32,7 +32,7 @@ typedef double data_t;
 ////////////////////////////////////////////////////////////////////////////////
 // Auxiliary functions
 ////////////////////////////////////////////////////////////////////////////////
-double Knuth2Sum(double a, double b, double *s) {
+double KnuthTwoSum(double a, double b, double *s) {
     double r = a + b;
     double z = r - a;
     *s = (a - (r - z)) + (b - z);
@@ -266,7 +266,7 @@ __kernel void matrixMul(
     long p_workingBase[BIN_COUNT] = {0};
 
     //for floating-point expansion
-    double sum[NBFPE] = {0.0};
+    data_t sum[NBFPE] = {0.0};
 
     //Loop over all the sub-matrices of A and B
     //required to compute the block sub-matrix
@@ -294,7 +294,7 @@ __kernel void matrixMul(
             #endif
             for(uint i = 0; i != NBFPE; ++i) {
                 double s; //residual of addition
-                sum[i] = Knuth2Sum(sum[i], x, &s);
+                sum[i] = KnuthTwoSum(sum[i], x, &s);
                 x = s + r;
 		r = 0;
             }
