@@ -150,8 +150,8 @@ int runDGEMM(const char* program_file){
         strcpy(device_name, "Tesla M2090");
 #else
         strcpy(platform_name, "NVIDIA CUDA");
-        strcpy(device_name, "Tesla K20c");
-	//strcpy(device_name, "Tesla C2050");
+        //strcpy(device_name, "Tesla K20c");
+	strcpy(device_name, "Tesla C2050");
 #endif
         //setenv("CUDA_CACHE_DISABLE", "1", 1);
         cpPlatform = GetOCLPlatform(platform_name);
