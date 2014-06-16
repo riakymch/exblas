@@ -97,11 +97,12 @@ extern "C" cl_int initDGEMMNVIDIAGlobal(
     printf("...allocating memory for a matrix of superaccumulators\n");
         size_t size = width * height * BIN_COUNT;
         // init superaccs on the host side
-        Accus = (bintype*) malloc(size * sizeof(bintype));
+        /*Accus = (bintype*) malloc(size * sizeof(bintype));
 	for (int i = 0; i < size; i++)
 	    Accus[i] = 0;
         d_Accus = clCreateBuffer(cxGPUContext, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, size * sizeof(bintype), Accus, &ciErrNum);
-        //d_Accus = clCreateBuffer(cxGPUContext, CL_MEM_READ_WRITE, size * sizeof(bintype), NULL, &ciErrNum);
+        */
+        d_Accus = clCreateBuffer(cxGPUContext, CL_MEM_READ_WRITE, size * sizeof(bintype), NULL, &ciErrNum);
         if (ciErrNum != CL_SUCCESS) {
             printf("Error in clCreateBuffer for d_Accus, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
             return EXIT_FAILURE;

@@ -150,7 +150,8 @@ int runDGEMM(const char* program_file){
         strcpy(device_name, "Tesla M2090");
 #else
         strcpy(platform_name, "NVIDIA CUDA");
-        strcpy(device_name, "Tesla K20c");
+        //strcpy(device_name, "Tesla K20c");
+	strcpy(device_name, "Tesla C2050");
 #endif
         //setenv("CUDA_CACHE_DISABLE", "1", 1);
         cpPlatform = GetOCLPlatform(platform_name);
@@ -307,8 +308,8 @@ int runDGEMM(const char* program_file){
                     cleanUp(EXIT_FAILURE);
                 }
 
-             //printMatrix(C, d_C.width, d_C.height);
-            /*printf(" ...DGEMM on CPU\n");
+            //printMatrix(C, d_C.width, d_C.height);
+            printf(" ...DGEMM on CPU\n");
 		double *C_CPU;
                 C_CPU = (double *) calloc(__nbRowsC * __nbColumnsC, sizeof(double));
                 DGEMMCPU(C_CPU, (const double *)A, (const double *)B, __nbRowsC, __nbColumnsC, __nbRowsB);
@@ -323,7 +324,6 @@ int runDGEMM(const char* program_file){
 		//PassFailFlag = compareDGEMMWithMPFR((const double *)C_CPU, (const double *)A, (const double *)B, __nbRowsC, __nbColumnsC, __nbRowsB);
                 printf("//--------------------------------------------------------\n");
 		free(C_CPU);
-            */
 		
          //Release kernels and program
          printf("Shutting down...\n\n");

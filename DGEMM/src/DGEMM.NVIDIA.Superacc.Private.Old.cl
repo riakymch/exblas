@@ -309,7 +309,7 @@ __kernel void matrixMul(
         barrier(CLK_LOCAL_MEM_FENCE);
     }
 
-    int c = m * BLOCK_SIZE * by + BLOCK_SIZE * bx;
+    int c = (m * by + bx) * BLOCK_SIZE;
     C[c + ty * m + tx] = Round(p_workingBase);
     C[c + (ty + step) * m + tx] = Round(p_workingBase);
 }

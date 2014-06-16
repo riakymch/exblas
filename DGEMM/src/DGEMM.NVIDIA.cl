@@ -101,7 +101,7 @@ __kernel void matrixMul(
         barrier(CLK_LOCAL_MEM_FENCE);
     }
 
-    int c = m * BLOCK_SIZE * by + BLOCK_SIZE * bx;
+    int c = (m * by + bx) * BLOCK_SIZE;
     C[c + ty * m + tx] = sum[0];
     C[c + (ty + step) * m + tx] = sum[1];
     C[c + (ty + 2 * step) * m + tx] = sum[2];
