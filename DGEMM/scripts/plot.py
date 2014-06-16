@@ -30,6 +30,22 @@ def readDataFromFileAll(filename, str1, str2):
     f.close()
     return results
 
+def readDataFromFileAllOld(filename, str1, str2):
+    f = open(filename, 'r')
+
+    results = []
+    for line in f:
+        if line.find("Performance = ") != -1 and line.find(str1) != -1 and line.find(str2) != -1:
+            if line.find("NbFPE") != -1:
+                line = line.split();
+                results.append([line[11], float(line[len(line) - 2])])
+            else:
+                line = line.split();
+                results.append([line[11], float(line[len(line) - 2])])
+
+    f.close()
+    return results
+
 def readDataFromFileInputRange(filename, str):
     f = open(filename, 'r')
 											    
@@ -114,9 +130,11 @@ def plotNbElementsVSGbs(input, output):
     return
     
 def plotNbElementsVSGbsAll(input, output): 
-    #mine = readDataFromFileAll(input, "Alg = 0", "Alg = 0")
-    #amd = readDataFromFileAll(input, "Alg = 1", "Alg = 1")
-    #nvidia = readDataFromFileAll(input, "Alg = 2", "Alg = 2")
+    mine = readDataFromFileAllOld(input, "Alg = 0", "Alg = 0")
+    amd = readDataFromFileAllOld(input, "Alg = 1", "Alg = 1")
+    nvidia = readDataFromFileAllOld(input, "Alg = 2", "Alg = 2")
+    fpepr3 = readDataFromFileAll("../results/NbElements.VS.Gflops.AMD.2014.06.11.Round.dat", "Alg = 31", "NbFPE = 3")
+    fpegl4 = readDataFromFileAll("../results/NbElements.VS.Gflops.AMD.2014.06.11.Round.dat", "Alg = 51", "NbFPE = 4")
     #sapr = readDataFromFileAll(input, "Alg = 30", "Alg = 30")
     #fpepr2 = readDataFromFileAll(input, "Alg = 31", "NbFPE = 2")
     #fpepr3 = readDataFromFileAll(input, "Alg = 31", "NbFPE = 3")
@@ -124,7 +142,7 @@ def plotNbElementsVSGbsAll(input, output):
     #fpepr5 = readDataFromFileAll(input, "Alg = 31", "NbFPE = 5")
     #fpepr6 = readDataFromFileAll(input, "Alg = 31", "NbFPE = 6")
     #fpepr7 = readDataFromFileAll(input, "Alg = 31", "NbFPE = 7")
-    #fpepr8 = readDataFromFileAll(input, "Alg = 31", "NbFPE = 8")  
+    #fpepr8 = readDataFromFileAll(input, "Alg = 31", "NbFPE = 8")
     #fpelo2 = readDataFromFileAll(input, "Alg = 6", "NbFPE = 2")
     #fpelo3 = readDataFromFileAll(input, "Alg = 6", "NbFPE = 3")
     #fpelo4 = readDataFromFileAll(input, "Alg = 6", "NbFPE = 4")
@@ -132,23 +150,23 @@ def plotNbElementsVSGbsAll(input, output):
     #fpelo6 = readDataFromFileAll(input, "Alg = 6", "NbFPE = 6")
     #fpelo7 = readDataFromFileAll(input, "Alg = 6", "NbFPE = 7")
     #fpelo8 = readDataFromFileAll(input, "Alg = 6", "NbFPE = 8")          
-    sagl = readDataFromFileAll(input, "Alg = 50", "Alg = 50")
-    fpegl2 = readDataFromFileAll(input, "Alg = 51", "NbFPE = 2")
-    fpegl3 = readDataFromFileAll(input, "Alg = 51", "NbFPE = 3")
-    fpegl4 = readDataFromFileAll(input, "Alg = 51", "NbFPE = 4")
-    fpegl5 = readDataFromFileAll(input, "Alg = 51", "NbFPE = 5")
-    fpegl6 = readDataFromFileAll(input, "Alg = 51", "NbFPE = 6")
-    fpegl7 = readDataFromFileAll(input, "Alg = 51", "NbFPE = 7")
-    fpegl8 = readDataFromFileAll(input, "Alg = 51", "NbFPE = 8")
-    fpeexgl4 = readDataFromFileAll(input, "Alg = 52", "Alg = 52")
-    fpeexgl8 = readDataFromFileAll(input, "Alg = 53", "Alg = 53")
+    #sagl = readDataFromFileAll(input, "Alg = 50", "Alg = 50")
+    #fpegl2 = readDataFromFileAll(input, "Alg = 51", "NbFPE = 2")
+    #fpegl3 = readDataFromFileAll(input, "Alg = 51", "NbFPE = 3")
+    #fpegl4 = readDataFromFileAll(input, "Alg = 51", "NbFPE = 4")
+    #fpegl5 = readDataFromFileAll(input, "Alg = 51", "NbFPE = 5")
+    #fpegl6 = readDataFromFileAll(input, "Alg = 51", "NbFPE = 6")
+    #fpegl7 = readDataFromFileAll(input, "Alg = 51", "NbFPE = 7")
+    #fpegl8 = readDataFromFileAll(input, "Alg = 51", "NbFPE = 8")
+    #fpeexgl4 = readDataFromFileAll(input, "Alg = 52", "Alg = 52")
+    #fpeexgl8 = readDataFromFileAll(input, "Alg = 53", "Alg = 53")
 
     # plot the results
     gp = Gnuplot.Gnuplot(persist=1)
     gp('set terminal postscript eps color enhanced "Times" 26')
     gp('set grid noxtics noytics')
     gp('set xlabel "Matrix size (m = n = k)" font "Times, 26"')
-    gp('set ylabel "Gacc/s" font "Times, 26"')
+    gp('set ylabel "Gflops" font "Times, 26"')
     gp('set xrange [0:]')
     gp('set yrange [0:]')
     gp('set output "| epstopdf --filter > ' + output + '"')
@@ -162,9 +180,11 @@ def plotNbElementsVSGbsAll(input, output):
     gp('set rmargin 2.5')
     gp('set lmargin 8.')
 
-    #plotmine = Gnuplot.Data(mine, with_='lines lt 4 lw 4.0', title="Mine DGEMM")
-    #plotamd = Gnuplot.Data(amd, with_='lines lt 8 lw 4.0', title="AMD DGEMM")
-    #plotnvidia = Gnuplot.Data(nvidia, with_='lines lt 5 lw 4.0', title="AMD DGEMM")
+    plotmine = Gnuplot.Data(mine, with_='lines lt 4 lw 4.0', title="Mine DGEMM")
+    plotamd = Gnuplot.Data(amd, with_='lines lt 1 lw 4.0', title="AMD DGEMM")
+    plotnvidia = Gnuplot.Data(nvidia, with_='lines lt 8 lw 4.0', title="NVIDIA DGEMM")
+    plotfpe3 = Gnuplot.Data(fpepr3, with_='lines lt 5 lw 4.0', title="FPEPr 3")
+    plotfpe4 = Gnuplot.Data(fpegl4, with_='lines lt 2 lw 4.0', title="FPEGL 4")    
     #plotsa = Gnuplot.Data(sapr, with_='lines lt 1 lw 4.0', title="SuperaccPr")
     #plotfpe2 = Gnuplot.Data(fpepr2, with_='lines lt 8 lw 4.0', title="FPEPr 2")
     #plotfpe3 = Gnuplot.Data(fpepr3, with_='lines lt 5 lw 4.0', title="FPEPr 3")
@@ -180,20 +200,20 @@ def plotNbElementsVSGbsAll(input, output):
     #plotfpe6 = Gnuplot.Data(fpelo6, with_='lines lt 7 lw 4.0', title="FPELO 6")
     #plotfpe7 = Gnuplot.Data(fpelo7, with_='lines lt 0 lw 4.0', title="FPELO 7")
     #plotfpe8 = Gnuplot.Data(fpelo8, with_='lines lt 4 lw 4.0', title="FPELO 8")            
-    plotsa = Gnuplot.Data(sagl, with_='lines lt 3 lw 4.0', title="SuperaccGl")
-    plotfpe2 = Gnuplot.Data(fpegl2, with_='lines lt 8 lw 4.0', title="FPEGL 2")
-    plotfpe3 = Gnuplot.Data(fpegl3, with_='lines lt 5 lw 4.0', title="FPEGL 3")
-    plotfpe4 = Gnuplot.Data(fpegl4, with_='lines lt 2 lw 4.0', title="FPEGL 4")
-    plotfpe5 = Gnuplot.Data(fpegl5, with_='lines lt 6 lw 4.0', title="FPEGL 5")
-    plotfpe6 = Gnuplot.Data(fpegl6, with_='lines lt 7 lw 4.0', title="FPEGL 6")
-    plotfpe7 = Gnuplot.Data(fpegl7, with_='lines lt 0 lw 4.0', title="FPEGL 7")
-    plotfpe8 = Gnuplot.Data(fpegl8, with_='lines lt 4 lw 4.0', title="FPEGL 8")
-    plotfpe4ex = Gnuplot.Data(fpeexgl4, with_='lines lt 9 lw 4.0', title="FPEEXGL 4")
-    plotfpe8ex = Gnuplot.Data(fpeexgl8, with_='lines lt 1 lw 4.0', title="FPEEXGL 8")    
+    #plotsa = Gnuplot.Data(sagl, with_='lines lt 3 lw 4.0', title="SuperaccGl")
+    #plotfpe2 = Gnuplot.Data(fpegl2, with_='lines lt 8 lw 4.0', title="FPEGL 2")
+    #plotfpe3 = Gnuplot.Data(fpegl3, with_='lines lt 5 lw 4.0', title="FPEGL 3")
+    #plotfpe4 = Gnuplot.Data(fpegl4, with_='lines lt 2 lw 4.0', title="FPEGL 4")
+    #plotfpe5 = Gnuplot.Data(fpegl5, with_='lines lt 6 lw 4.0', title="FPEGL 5")
+    #plotfpe6 = Gnuplot.Data(fpegl6, with_='lines lt 7 lw 4.0', title="FPEGL 6")
+    #plotfpe7 = Gnuplot.Data(fpegl7, with_='lines lt 0 lw 4.0', title="FPEGL 7")
+    #plotfpe8 = Gnuplot.Data(fpegl8, with_='lines lt 4 lw 4.0', title="FPEGL 8")
+    #plotfpe4ex = Gnuplot.Data(fpeexgl4, with_='lines lt 9 lw 4.0', title="FPEEXGL 4")
+    #plotfpe8ex = Gnuplot.Data(fpeexgl8, with_='lines lt 1 lw 4.0', title="FPEEXGL 8")
     
-    #gp.plot(plotmine, plotamd, plotnvidia, plotsapr, plotsagl)
+    gp.plot(plotmine, plotamd, plotnvidia, plotfpe3, plotfpe4)
     #gp.plot(plotsa, plotfpe2, plotfpe3, plotfpe4, plotfpe5, plotfpe6, plotfpe7, plotfpe8)
-    gp.plot(plotsa, plotfpe2, plotfpe3, plotfpe4, plotfpe5, plotfpe6, plotfpe7, plotfpe8, plotfpe4ex, plotfpe8ex)
+    #gp.plot(plotsa, plotfpe2, plotfpe3, plotfpe4, plotfpe5, plotfpe6, plotfpe7, plotfpe8, plotfpe4ex, plotfpe8ex)
     return
 
 def plotInputRangeVSGbs(input, output): 
@@ -285,7 +305,7 @@ def plotInputRangeVSGbsAll(input, output):
     gp('set terminal postscript eps color enhanced "Times" 26')
     gp('set grid noxtics noytics')
     gp('set xlabel "Dynamic range (bits)" font "Times, 26"')
-    gp('set ylabel "Gacc/s" font "Times, 26"')
+    gp('set ylabel "Gflops" font "Times, 26"')
     #gp('set format x "1e+%.0f"')    
     #gp('set xrange [1:3.3e150]')
     #gp('set xrange [1:1.0e40]')
