@@ -14,7 +14,7 @@ CXXFLAGS=-Wall -W -O2 $(DEFINES:%=-D%) $(INCLUDE) -march=native -fabi-version=0 
 
 # AMD
 PATH_TO_AMD_INC=/opt/sdks/amd/current/include/ -I$(HOME)/soft/lib/mpfr/include/ -I$(HOME)/soft/lib/gmp/include/
-PATH_TO_AMD_LIB=/usr/lib/ -L$(HOME)/soft/lib/mpfr/lib/ -L$(HOME)/soft/lib/gmp/lib/ -lmpfr -lgmp -lOpenCL
+PATH_TO_AMD_LIB=/usr/lib/ -lOpenCL -L$(HOME)/soft/lib/mpfr/lib/ -lmpfr -L$(HOME)/soft/lib/gmp/lib/ -lgmp
 
 all: $(EXE_NAME)
 
