@@ -230,19 +230,17 @@ void Accumulate(long *sa, double x) {
 // Matrix multiplication on the device: C = A * B
 // m is A's width and n is B's width
 ////////////////////////////////////////////////////////////////////////////////
-__kernel void matrixMul(
+void DGEMM(
     __global data_t* C,
     __global data_t* A,
     __global data_t* B, 
     int m,
     int n,
     __local data_t* As,
-    __local data_t* Bs
+    __local data_t* Bs,
+    int bx,
+    int by
 ) {
-    //Block index
-    int bx = get_group_id(0);
-    int by = get_group_id(1);
-
     //Thread index
     int tx = get_local_id(0);
     int ty = get_local_id(1);
@@ -318,5 +316,27 @@ __kernel void matrixMul(
     //TODO: the first non-zero from rigth
     int c = (m * by + bx) * BLOCK_SIZE;
     C[c + n * ty + tx] = Round(p_workingBase);
+}
+
+__kernel void matrixMul(
+    __global data_t* C,
+    __global data_t* A,
+    __global data_t* B, 
+    int m,
+    int n,
+    __local data_t* As,
+    __local data_t* Bs
+) {
+    //Block index
+    int bx = get_group_id(0);
+    int by = get_group_id(1);
+
+    int bdimx = n / BLOCK_SIZE;
+    int bdimy = m / BLOCK_SIZE;
+    int bsizex = get_num_groups(0);
+    int bsizey = get_num_groups(1);
+    for (int j = by; j < bdimy; j += bsizey)
+        for (int i = bx; i < bdimx; i += bsizex)
+            DGEMM(C, A, B, m, n, As, Bs, i, j);
 }
 

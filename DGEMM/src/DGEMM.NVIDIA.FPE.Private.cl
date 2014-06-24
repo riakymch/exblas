@@ -243,26 +243,6 @@ __kernel void matrixMul(
     int bx = get_group_id(0);
     int by = get_group_id(1);
 
-    int bdimx = n / BLOCK_SIZE;
-    int bdimy = m / BLOCK_SIZE;
-    int bsizex = get_num_groups(0);
-    int bsizey = get_num_groups(1);
-    for (int i = bx; i < bdimx; i += bsizex)
-        for (int j = by; j < bdimy; j += bsizey)
-            DGEMM(C, A, B, m, n, As, Bs, i, j);
-}
-
-void DGEMM(
-    __global data_t* C,
-    __global data_t* A,
-    __global data_t* B, 
-    int m,
-    int n,
-    __local data_t* As,
-    __local data_t* Bs,
-    int bx,
-    int by
-) {
     //Thread index
     int tx = get_local_id(0);
     int ty = get_local_id(1);

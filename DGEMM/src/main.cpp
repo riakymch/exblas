@@ -29,10 +29,17 @@ static uint __nbRowsB    = 0;
 static uint __range      = 0;
 static uint __nbfpe      = 0;
 static uint __alg        = 0;
+static uint __multi      = 1;
 
 static void __usage(int argc __attribute__((unused)), char **argv) {
-  fprintf(stderr, "Usage: %s [-m nbrows of C -n nbcolumns of C -k nbcolumns of B\n -r range -e nbfpe\n -a alg (0-mine, 1-amd, 2-nvidia, 30-sapr, 31-fpepr, 32-fpee4pr, 33-fpee8pr, 34-fpeprmulti, 40-salo, 41-fpelo, 50-sagl, 51-fpegl, 52-fpee4gl, 53-fpee8gl, 54-fpeglmulti, 6-new)] \n", argv[0]);
-  printf("       -?, -h:    Display this help and exit\n");
+  fprintf(stderr, "Usage:\n  %s [-m nbrows of C,\n", argv[0]);
+  printf("              -n nbcolumns of C,\n");
+  printf("              -k nbcolumns of B,\n");
+  printf("              -r range,\n");
+  printf("              -e nbfpe,\n");
+  printf("              -a alg (0-mine, 1-amd, 2-nvidia, 30-sapr, 31-fpepr, 32-fpee4pr, 33-fpee8pr, 34-fpeprmulti, 40-salo, 41-fpelo, 50-sagl, 51-fpegl, 52-fpee4gl, 53-fpee8gl, 54-fpeglmulti, 6-new),\n");
+  printf("              -ml multi-values] \n");
+  printf("  -?, -h:    Display this help and exit\n");
 }
 	
 static void __parse_args(int argc, char **argv) {
@@ -51,6 +58,8 @@ static void __parse_args(int argc, char **argv) {
       __nbfpe = atoi(argv[++i]);
     } if ((strcmp(argv[i], "-a") == 0)) {
       __alg = atoi(argv[++i]);
+    } if ((strcmp(argv[i], "-ml") == 0)) {
+      __multi = atoi(argv[++i]);
     } else if ((strcmp(argv[i], "-h") || strcmp(argv[i], "-?")) == 0) {
       __usage(argc, argv);
       exit(-1);
@@ -222,7 +231,7 @@ int runDGEMM(const char* program_file){
             else if (__alg == 2)
                 ciErrNum = initDGEMMNVIDIA(cxGPUContext, cqCommandQueue, cdDevice, program_file);
             else if (((__alg >= 30) && (__alg <= 34)) || (__alg == 40) || (__alg == 41))
-                ciErrNum = initDGEMMNVIDIAPrivate(cxGPUContext, cqCommandQueue, cdDevice, program_file, __nbfpe, __nbColumnsC, __nbRowsC);
+                ciErrNum = initDGEMMNVIDIAPrivate(cxGPUContext, cqCommandQueue, cdDevice, program_file, __nbfpe);
             else if ((__alg >= 50) && (__alg <= 54))
                 ciErrNum = initDGEMMNVIDIAGlobal(cxGPUContext, cqCommandQueue, cdDevice, program_file, __nbfpe, __nbColumnsC, __nbRowsC);
 	    else if (__alg == 6)
@@ -241,9 +250,9 @@ int runDGEMM(const char* program_file){
             else if (__alg == 2)
                 DGEMMNVIDIA(NULL, d_C, d_A, d_B, &ciErrNum);
             else if (((__alg >= 30) && (__alg <= 34)) || (__alg == 40) || (__alg == 41))
-                DGEMMNVIDIAPrivate(NULL, d_C, d_A, d_B, &ciErrNum);
+                DGEMMNVIDIAPrivate(NULL, d_C, d_A, d_B, &ciErrNum, __multi);
             else if ((__alg >= 50) && (__alg <= 54))
-                DGEMMNVIDIAGlobal(NULL, d_C, d_A, d_B, &ciErrNum);
+                DGEMMNVIDIAGlobal(NULL, d_C, d_A, d_B, &ciErrNum, __multi);
             else if (__alg == 6)
                 DGEMMNew(NULL, d_C, d_A, d_B, &ciErrNum);
 
@@ -271,9 +280,9 @@ int runDGEMM(const char* program_file){
             else if (__alg == 2)
                 DGEMMNVIDIA(NULL, d_C, d_A, d_B, &ciErrNum);
             else if (((__alg >= 30) && (__alg <= 34)) || (__alg == 40) || (__alg == 41))
-                DGEMMNVIDIAPrivate(NULL, d_C, d_A, d_B, &ciErrNum);
+                DGEMMNVIDIAPrivate(NULL, d_C, d_A, d_B, &ciErrNum, __multi);
             else if ((__alg >= 50) && (__alg <= 54))
-                DGEMMNVIDIAGlobal(NULL, d_C, d_A, d_B, &ciErrNum);
+                DGEMMNVIDIAGlobal(NULL, d_C, d_A, d_B, &ciErrNum, __multi);
             else if (__alg == 6)
                 DGEMMNew(NULL, d_C, d_A, d_B, &ciErrNum);
 

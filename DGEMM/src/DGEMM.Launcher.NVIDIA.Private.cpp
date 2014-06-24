@@ -34,15 +34,12 @@ static char  compileOptions[256] = "-DBLOCK_SIZE=16 -DUSE_KNUTH";
 static char  compileOptions[256] = "-DBLOCK_SIZE=32 -DUSE_KNUTH -DNVIDIA -cl-mad-enable -cl-fast-relaxed-math -cl-nv-verbose";
 #endif
 
-
 extern "C" cl_int initDGEMMNVIDIAPrivate(
     cl_context cxGPUContext, 
     cl_command_queue cqParamCommandQue, 
     cl_device_id cdDevice,
     const char* program_file,
-    const uint NbFPE,
-    const uint width,
-    const uint height
+    const uint NbFPE
 ){
     cl_int ciErrNum;
 
@@ -117,7 +114,8 @@ extern "C" size_t DGEMMNVIDIAPrivate(
     Matrix d_C,
     const Matrix d_A,
     const Matrix d_B,
-    cl_int *ciErrNumRes
+    cl_int *ciErrNumRes,
+    const int multi
 ){
     cl_int ciErrNum;
 
@@ -126,7 +124,7 @@ extern "C" size_t DGEMMNVIDIAPrivate(
 
     {
         size_t NbThreadsPerWorkGroup[] = {BLOCK_SIZE, BLOCK_SIZE};
-	size_t TotalNbThreads[] = {d_C.width / 4, d_C.height / 4};
+	size_t TotalNbThreads[] = {(size_t)(d_C.width / multi), (size_t)(d_C.height / multi)};
 	size_t neededLocalMemory = BLOCK_SIZE * BLOCK_SIZE * sizeof(cl_double);
 
 	cl_int i = 0;

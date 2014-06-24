@@ -155,9 +155,7 @@ extern "C" cl_int initDGEMMNVIDIAPrivate(
     cl_command_queue cqParamCommandQue,
     cl_device_id cdDevice,
     const char* program_file,
-    const uint NbFPE,
-    const uint width,
-    const uint height
+    const uint NbFPE
 );
 
 extern "C" void closeDGEMM(
@@ -221,7 +219,8 @@ extern "C" size_t DGEMMNVIDIAGlobal(
     Matrix d_mC,
     const Matrix d_mA,
     const Matrix d_mB,
-    cl_int *ciErrNum
+    cl_int *ciErrNum,
+    const int multi
 );
 
 extern "C" size_t DGEMMNVIDIAPrivate(
@@ -229,7 +228,8 @@ extern "C" size_t DGEMMNVIDIAPrivate(
     Matrix d_mC,
     const Matrix d_mA,
     const Matrix d_mB,
-    cl_int *ciErrNum
+    cl_int *ciErrNum,
+    const int multi
 );
 
 
