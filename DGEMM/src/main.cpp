@@ -324,7 +324,6 @@ int runDGEMM(const char* program_file){
                 printf("//--------------------------------------------------------\n");
 		//Compare the GPU to the CPU results
 		PassFailFlag = compare((const double *) C_CPU, (const double *) C, __nbRowsC * __nbColumnsC, 1e-16);
-                 
 		//PassFailFlag = compareDGEMMWithMPFR((const double *)C_CPU, (const double *)A, (const double *)B, __nbRowsC, __nbColumnsC, __nbRowsB);
                 printf("//--------------------------------------------------------\n");
 		free(C_CPU);
