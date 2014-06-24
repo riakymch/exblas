@@ -120,7 +120,7 @@ double Round(long *accumulator) {
   }
   if (negative) {
     //Skip ones
-    for (; accumulator[i] == ((1 << digits) - 1) && i >= imin; --i) {
+    for (; accumulator[i] == ((1L << digits) - 1) && i >= imin; --i) {
     }
   }
   if (i < 0) {
@@ -128,7 +128,7 @@ double Round(long *accumulator) {
     return 0.;
   }
 
-  long hiword = negative ? (1 << digits) - accumulator[i] : accumulator[i];
+  long hiword = negative ? (1L << digits) - accumulator[i] : accumulator[i];
   double rounded = (double) hiword;
   double hi = ldexp(rounded, (i - f_words) * digits);
   if (i == 0) {
@@ -140,10 +140,10 @@ double Round(long *accumulator) {
   //Compute sticky
   long sticky = 0;
   for (int j = imin; j != i - 1; ++j) {
-    sticky |= negative ? (1 << digits) - accumulator[j] : accumulator[j];
+    sticky |= negative ? (1L << digits) - accumulator[j] : accumulator[j];
   }
 
-  long loword = negative ? (1 << digits) - accumulator[i - 1] : accumulator[i - 1];
+  long loword = negative ? (1L << digits) - accumulator[i - 1] : accumulator[i - 1];
   loword |= !!sticky;
   double lo = ldexp((double) loword, (i - 1 - f_words) * digits);
 

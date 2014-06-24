@@ -127,7 +127,7 @@ double Round(__global long *accumulator) {
   }
   if (negative) {
     //Skip ones
-    for (; accumulator[i] == ((1 << digits) - 1) && i >= imin; --i) {
+    for (; accumulator[i] == ((1L << digits) - 1) && i >= imin; --i) {
     }
   }
   if (i < 0) {
@@ -135,7 +135,7 @@ double Round(__global long *accumulator) {
     return 0.;
   }
 
-  long hiword = negative ? (1 << digits) - accumulator[i] : accumulator[i];
+  long hiword = negative ? (1L << digits) - accumulator[i] : accumulator[i];
   double rounded = (double) hiword;
   double hi = ldexp(rounded, (i - f_words) * digits);
   if (i == 0) {
@@ -147,10 +147,10 @@ double Round(__global long *accumulator) {
   //Compute sticky
   long sticky = 0;
   for (int j = imin; j != i - 1; ++j) {
-    sticky |= negative ? (1 << digits) - accumulator[j] : accumulator[j];
+    sticky |= negative ? (1L << digits) - accumulator[j] : accumulator[j];
   }
 
-  long loword = negative ? (1 << digits) - accumulator[i - 1] : accumulator[i - 1];
+  long loword = negative ? (1L << digits) - accumulator[i - 1] : accumulator[i - 1];
   loword |= !!sticky;
   double lo = ldexp((double) loword, (i - 1 - f_words) * digits);
 
@@ -231,20 +231,18 @@ void Accumulate(__global long *sa, double x) {
 // Matrix multiplication on the device: C = A * B
 // m is A's width and n is B's width
 ////////////////////////////////////////////////////////////////////////////////
-__kernel void matrixMul(
-    __global long* Accus,
+void DGEMM(
+    __global long* g_workingBase,
     __global data_t* C,
     __global data_t* A,
     __global data_t* B, 
     int m,
     int n,
     __local data_t* As,
-    __local data_t* Bs
+    __local data_t* Bs,
+    int bx,
+    int by
 ) {
-    //Block index
-    int bx = get_group_id(0);
-    int by = get_group_id(1);
-
     //Thread index
     int tx = get_local_id(0);
     int ty = get_local_id(1);
@@ -263,12 +261,6 @@ __kernel void matrixMul(
 
     //Step size used to iterate through the sub-matrices of B
     int bStep  = BLOCK_SIZE * n;
-
-    //A superaccumulator that corresponds to a single value in the matrix C
-    int c = (m * by + bx) * BLOCK_SIZE;
-    __global long *g_workingBase = Accus + (c + n * ty + tx) * BIN_COUNT;
-    for (uint i = 0; i < BIN_COUNT; i++)
-        g_workingBase[i] = 0;
 
     //for floating-point expansion
     double sum[NBFPE] = {0.0};
@@ -320,6 +312,42 @@ __kernel void matrixMul(
     	Accumulate(g_workingBase, sum[i]);
     }
 
+    int c = (m * by + bx) * BLOCK_SIZE;
     C[c + n * ty + tx] = Round(g_workingBase);
-    //C[c + n * ty + tx] = sum[0];
 }
+
+__kernel void matrixMul(
+    __global long* Accus,
+    __global data_t* C,
+    __global data_t* A,
+    __global data_t* B, 
+    int m,
+    int n,
+    __local data_t* As,
+    __local data_t* Bs
+) {
+    //Thread index
+    int tx = get_local_id(0);
+    int ty = get_local_id(1);
+
+    //Block index
+    int bx = get_group_id(0);
+    int by = get_group_id(1);
+
+    int bdimx = n / BLOCK_SIZE;
+    int bdimy = m / BLOCK_SIZE;
+    int bsizex = get_num_groups(0);
+    int bsizey = get_num_groups(1);
+
+    //A superaccumulator that corresponds to a single value in the matrix C
+    int c = (bsizey * BLOCK_SIZE * by + bx) * BLOCK_SIZE;
+    __global long *g_workingBase = Accus + (c + bsizex * BLOCK_SIZE * ty + tx) * BIN_COUNT;
+
+    for (int i = bx; i < bdimx; i += bsizex)
+        for (int j = by; j < bdimy; j += bsizey) {
+            for (uint l = 0; l < BIN_COUNT; l++)
+                g_workingBase[l] = 0;
+            DGEMM(g_workingBase, C, A, B, m, n, As, Bs, i, j);
+        }
+}
+
