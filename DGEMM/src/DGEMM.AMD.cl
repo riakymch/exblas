@@ -31,7 +31,7 @@ typedef double2 data_t;
  * Output tile size : 2x2 = Each thread computes 16 double values
  * Required global threads = (widthC / 2, heightC / 2)
 */
-__kernel void mmmKernel_local(
+__kernel void mmmKernel(
     __global data_t *matrixC,
     __global data_t *matrixA,
     __global data_t *matrixB,
