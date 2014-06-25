@@ -147,7 +147,8 @@ extern "C" cl_int initDGEMMNVIDIAGlobal(
     const char* program_file,
     const uint NbFPE,
     const uint width,
-    const uint height
+    const uint height,
+    const int multi
 );
 
 extern "C" cl_int initDGEMMNVIDIAPrivate(

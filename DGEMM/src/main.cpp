@@ -233,7 +233,7 @@ int runDGEMM(const char* program_file){
             else if (((__alg >= 30) && (__alg <= 34)) || (__alg == 40) || (__alg == 41))
                 ciErrNum = initDGEMMNVIDIAPrivate(cxGPUContext, cqCommandQueue, cdDevice, program_file, __nbfpe);
             else if ((__alg >= 50) && (__alg <= 54))
-                ciErrNum = initDGEMMNVIDIAGlobal(cxGPUContext, cqCommandQueue, cdDevice, program_file, __nbfpe, __nbColumnsC, __nbRowsC);
+                ciErrNum = initDGEMMNVIDIAGlobal(cxGPUContext, cqCommandQueue, cdDevice, program_file, __nbfpe, __nbColumnsC, __nbRowsC, __multi);
 	    else if (__alg == 6)
                 ciErrNum = initDGEMMNew(cxGPUContext, cqCommandQueue, cdDevice, program_file);
             

@@ -241,12 +241,10 @@ void DGEMM(
     __local data_t* As,
     __local data_t* Bs,
     int bx,
-    int by
+    int by,
+    int tx,
+    int ty
 ) {
-    //Thread index
-    int tx = get_local_id(0);
-    int ty = get_local_id(1);
-
     //Index of the first sub-matrix of A processed by the block
     int aBegin = m * BLOCK_SIZE * by;
 
@@ -343,11 +341,17 @@ __kernel void matrixMul(
     int c = (bsizey * BLOCK_SIZE * by + bx) * BLOCK_SIZE;
     __global long *g_workingBase = Accus + (c + bsizex * BLOCK_SIZE * ty + tx) * BIN_COUNT;
 
-    for (int i = bx; i < bdimx; i += bsizex)
+    for (int j = by; j < bdimy; j += bsizey) {
+        for (uint l = 0; l < BIN_COUNT; l++)
+            g_workingBase[l] = 0;
+        DGEMM(g_workingBase, C, A, B, m, n, As, Bs, bx, j, tx, ty);
+    }
+    /*for (int i = bx; i < bdimx; i += bsizex)
         for (int j = by; j < bdimy; j += bsizey) {
             for (uint l = 0; l < BIN_COUNT; l++)
                 g_workingBase[l] = 0;
-            DGEMM(g_workingBase, C, A, B, m, n, As, Bs, i, j);
+            DGEMM(g_workingBase, C, A, B, m, n, As, Bs, i, j, tx, ty);
         }
+    */
 }
 

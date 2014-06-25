@@ -46,7 +46,8 @@ extern "C" cl_int initDGEMMNVIDIAGlobal(
     const char* program_file,
     const uint NbFPE,
     const uint width,
-    const uint height
+    const uint height,
+    const int multi
 ){
     cl_int ciErrNum;
 
@@ -95,7 +96,7 @@ extern "C" cl_int initDGEMMNVIDIAGlobal(
         }
 
     printf("...allocating memory for a matrix of superaccumulators\n");
-        size_t size = width * height * BIN_COUNT;
+        size_t size = (width * height * BIN_COUNT) / multi;
         // init superaccs on the host side
         /*Accus = (bintype*) malloc(size * sizeof(bintype));
 	for (int i = 0; i < size; i++)
@@ -151,7 +152,7 @@ extern "C" size_t DGEMMNVIDIAGlobal(
         size_t NbThreadsPerWorkGroup[] = {BLOCK_SIZE, BLOCK_SIZE / VECTOR_NUMBER};
 	size_t heightC = d_C.height / VECTOR_NUMBER;
 	size_t widthC = d_C.width;
-	size_t TotalNbThreads[] = {widthC / multi, heightC / multi};
+	size_t TotalNbThreads[] = {widthC, heightC / multi};
 	size_t neededLocalMemory = BLOCK_SIZE * BLOCK_SIZE * sizeof(cl_double);
 
 	cl_int i = 0;
