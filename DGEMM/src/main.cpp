@@ -158,6 +158,9 @@ int runDGEMM(const char* program_file){
 #ifdef AMD
         strcpy(platform_name, "AMD Accelerated Parallel Processing");
         strcpy(device_name, "Tahiti");
+#elif ETERNITY == 1
+        strcpy(platform_name, "AMD Accelerated Parallel Processing");
+        strcpy(device_name, "Devastator");
 #elif TESLA == 1
         strcpy(platform_name, "NVIDIA CUDA");
         strcpy(device_name, "Tesla M2090");
