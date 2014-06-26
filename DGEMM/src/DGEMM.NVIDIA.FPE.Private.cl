@@ -266,7 +266,7 @@ __kernel void matrixMul(
     long p_workingBase[BIN_COUNT] = {0};
 
     //for floating-point expansion
-    data_t sum[NBFPE] = {0.0};
+    double sum[NBFPE] = {0.0};
 
     //Loop over all the sub-matrices of A and B
     //required to compute the block sub-matrix
@@ -277,7 +277,7 @@ __kernel void matrixMul(
         //each thread loads one element of each matrix
         AS(ty, tx) = A[a + m * ty + tx];
         BS(ty, tx) = B[b + n * ty + tx];
-	
+
         //Synchronize to make sure the matrices are loaded
         barrier(CLK_LOCAL_MEM_FENCE);
 
@@ -287,21 +287,21 @@ __kernel void matrixMul(
           #pragma unroll
         #endif
         for (int k = 0; k < BLOCK_SIZE; ++k) {
-	    double r = 0.0; //residual of multiplication
+            double r = 0.0; //residual of multiplication
             double x = TwoProductFMA(AS(ty, k), BS(k, tx), &r);
             #ifdef NVIDIA
                 #pragma unroll
             #endif
             for(uint i = 0; i != NBFPE; ++i) {
                 double s; //residual of addition
-                sum[i] = KnuthTwoSum(sum[i], x, &s);
+                sum[i] = KnuthTwoSum(sum[i], x, &s); //Issues on Tesla
                 x = s + r;
-		r = 0;
+                r = 0.0;
             }
             if(x != 0.0) {
-	        Accumulate(p_workingBase, x);
+                Accumulate(p_workingBase, x);
             }
-	}
+    }
 
         //Synchronize to make sure that the preceding computation is done before 
         //loading two new sub-matrices of A and B in the next iteration

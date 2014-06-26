@@ -16,8 +16,6 @@
   #pragma OPENCL EXTENSION cl_nv_pragma_unroll         : enable
 #endif
 
-typedef double data_t;
-
 #define BIN_COUNT      39
 #define K              8                    // High-radix carry-save bits
 #define digits         56
@@ -33,7 +31,7 @@ typedef double data_t;
 // Auxiliary functions
 ////////////////////////////////////////////////////////////////////////////////
 double KnuthTwoSum(double a, double b, double *s) {
-    double r = a + b;
+    double r = 0.0; //a + b;
     double z = r - a;
     *s = (a - (r - z)) + (b - z);
     return r;
@@ -233,13 +231,13 @@ void Accumulate(__global long *sa, double x) {
 ////////////////////////////////////////////////////////////////////////////////
 __kernel void matrixMul(
     __global long* Accus,
-    __global data_t* C,
-    __global data_t* A,
-    __global data_t* B, 
+    __global double* C,
+    __global double* A,
+    __global double* B, 
     int m,
     int n,
-    __local data_t* As,
-    __local data_t* Bs
+    __local double* As,
+    __local double* Bs
 ) {
     //Block index
     int bx = get_group_id(0);
@@ -298,10 +296,10 @@ __kernel void matrixMul(
                 #pragma unroll
             #endif
             for(uint i = 0; i != NBFPE; ++i) {
-                double s; //residual of addition
-                sum[i] = KnuthTwoSum(sum[i], x, &s);
+                double s = 0.0; //residual of addition
+                sum[i] = KnuthTwoSum(sum[i], x, &s);//Issues on Tesla
                 x = s + r;
-		r = 0;
+		r = 0.0;
             }
             if(x != 0.0) {
 	        Accumulate(g_workingBase, x);

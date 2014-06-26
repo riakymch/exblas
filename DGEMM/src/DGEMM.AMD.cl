@@ -82,7 +82,7 @@ __kernel void mmmKernel(
 
             sum1.x = fma(tempA1.x, tempB0.x, sum1.x);
             sum1.x = fma(tempA1.y, tempB1.x, sum1.x);
-            sum1.y = fma(tempA1.x, tempB0.y, sum1.y);
+            sum1.y = fma(tempA1.x, tempB0.y, sum1.y); //Problem on Tesla
             sum1.y = fma(tempA1.y, tempB1.y, sum1.y);
 		
             /*//old
