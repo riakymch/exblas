@@ -30,8 +30,6 @@ static cl_command_queue cqDefaultCommandQue;  //Default command queue for Supera
 static bintype          *Accus;
 static cl_mem 		d_Accus;
 
-static const uint  VECTOR_NUMBER = 1;
-
 #ifdef AMD
 static char  compileOptions[256] = "-DBLOCK_SIZE=16";
 #else
@@ -96,7 +94,8 @@ extern "C" cl_int initDGEMMNVIDIAGlobal(
         }
 
     printf("...allocating memory for a matrix of superaccumulators\n");
-        size_t size = (width * height * BIN_COUNT) / multi;
+        size_t size = (width * height) / multi;
+        size = size * BIN_COUNT;
         // init superaccs on the host side
         /*Accus = (bintype*) malloc(size * sizeof(bintype));
 	for (int i = 0; i < size; i++)
@@ -149,8 +148,8 @@ extern "C" size_t DGEMMNVIDIAGlobal(
         cqCommandQueue = cqDefaultCommandQue;
 
     {
-        size_t NbThreadsPerWorkGroup[] = {BLOCK_SIZE, BLOCK_SIZE / VECTOR_NUMBER};
-	size_t heightC = d_C.height / VECTOR_NUMBER;
+        size_t NbThreadsPerWorkGroup[] = {BLOCK_SIZE, BLOCK_SIZE};
+	size_t heightC = d_C.height;
 	size_t widthC = d_C.width;
 	size_t TotalNbThreads[] = {widthC, heightC / multi};
 	size_t neededLocalMemory = BLOCK_SIZE * BLOCK_SIZE * sizeof(cl_double);
