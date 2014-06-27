@@ -119,7 +119,7 @@ int runDDOT(const char* program_file){
 	char device_name[32];
 #ifdef AMD
         strcpy(platform_name, "AMD Accelerated Parallel Processing");
-	strcpy(device_name, "Tahiti");
+	strcpy(device_name, "Devastator");
 #else
         strcpy(platform_name, "NVIDIA CUDA");
         strcpy(device_name, "Tesla K20c");
@@ -298,7 +298,7 @@ int runDDOTSimple(const char* program_file){
 	char device_name[32];
 #ifdef AMD
         strcpy(platform_name, "AMD Accelerated Parallel Processing");
-	strcpy(device_name, "Tahiti");
+	strcpy(device_name, "Devastator");
 #else
         strcpy(platform_name, "NVIDIA CUDA");
         strcpy(device_name, "Tesla K20c");
