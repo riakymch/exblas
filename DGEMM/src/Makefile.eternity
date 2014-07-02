@@ -10,11 +10,11 @@ HEADERS =
 INCLUDE = -I$(PATH_TO_NVIDIA_INC) -I$(PATH_TO_APPLE_INC) 
 COMPILERFLAGS = -c -Wall -g -O2 -Wshorten-64-to-32
 CXX = g++
-CXXFLAGS=-Wall -W -O2 $(DEFINES:%=-D%) $(INCLUDE) -march=native -fabi-version=0 -masm=att -DGPU_PROFILING=1 -DETERNITY=1
+CXXFLAGS=-Wall -W -O2 $(DEFINES:%=-D%) $(INCLUDE) -march=native -fabi-version=0 -masm=att -DGPU_PROFILING=1 -DETERNITY=1 -DAMD
 
 # AMD
 PATH_TO_AMD_INC=/opt/sdks/amd/current/include/ -I$(HOME)/soft/lib/mpfr/include/ -I$(HOME)/soft/lib/gmp/include/
-PATH_TO_AMD_LIB=/opt/sdks/amd/current/lib/x86_64/ -lOpenCL -L$(HOME)/soft/lib/mpfr/lib/ -lmpfr -L$(HOME)/soft/lib/gmp/lib/ -lgmp
+PATH_TO_AMD_LIB=/usr/lib/ -lOpenCL -L$(HOME)/soft/lib/mpfr/lib/ -lmpfr -L$(HOME)/soft/lib/gmp/lib/ -lgmp
 
 all: $(EXE_NAME)
 
