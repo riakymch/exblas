@@ -56,6 +56,9 @@ cl_device_id GetOCLDevice(cl_platform_id pPlatform, char name[])
 
   for (cl_int ui = 0; ui < (cl_int) uiNumDevices; ++ui)
     {
+      //cl_int compute_units;
+      //err = clGetDeviceInfo(dDevices[ui], CL_DEVICE_MAX_COMPUTE_UNITS, sizeof(cl_int), &compute_units, NULL);
+      //printf("compute_units = %d\n", compute_units);
       err = clGetDeviceInfo(dDevices[ui], CL_DEVICE_NAME, 128 * sizeof(char), dDeviceName, NULL);
       if ( err != CL_SUCCESS )
 	{
