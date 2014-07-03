@@ -25,23 +25,19 @@ typedef double data_t;
 // Matrix multiplication on the device: C = A * B
 // m is A's width and n is B's width
 ////////////////////////////////////////////////////////////////////////////////
-__kernel void matrixMul(
+void DGEMM(
     __global data_t* C,
     __global data_t* A,
     __global data_t* B, 
     int m,
     int n,
     __local data_t* As,
-    __local data_t* Bs
+    __local data_t* Bs,
+    int bx,
+    int by,
+    int tx,
+    int ty
 ) {
-    //Block index
-    int bx = get_group_id(0);
-    int by = get_group_id(1);
-
-    //Thread index
-    int tx = get_local_id(0);
-    int ty = get_local_id(1);
-
     //Index of the first sub-matrix of A processed by the block
     int aBegin = m * BLOCK_SIZE * by;
 
@@ -108,7 +104,7 @@ __kernel void matrixMul(
     C[c + (ty + 3 * step) * m + tx] = sum[3];
 }
 
-__kernel void matrixMul8(
+__kernel void DGEMM8(
     __global data_t* C,
     __global data_t* A,
     __global data_t* B, 
@@ -207,7 +203,7 @@ __kernel void matrixMul8(
     C[c + (ty + 7 * step) * m + tx] = sum[7];
 }
 
-__kernel void matrixMul2(
+__kernel void DGEMM2(
     __global data_t* C,
     __global data_t* A,
     __global data_t* B, 
@@ -282,23 +278,19 @@ __kernel void matrixMul2(
     C[c + (ty + step) * m + tx] = sum[1];
 }
 
-__kernel void matrixMul1(
+void DGEMM1(
     __global data_t* C,
     __global data_t* A,
     __global data_t* B, 
     int m,
     int n,
     __local data_t* As,
-    __local data_t* Bs
+    __local data_t* Bs,  
+    int bx,
+    int by,
+    int tx,
+    int ty
 ) {
-    //Block index
-    int bx = get_group_id(0);
-    int by = get_group_id(1);
-
-    //Thread index
-    int tx = get_local_id(0);
-    int ty = get_local_id(1);
-
     //Index of the first sub-matrix of A processed by the block
     int aBegin = m * BLOCK_SIZE * by;
 
@@ -347,3 +339,29 @@ __kernel void matrixMul1(
     C[c + n * ty + tx] = sum[0];
 }
 
+__kernel void matrixMul(
+    __global data_t* C,
+    __global data_t* A,
+    __global data_t* B, 
+    int m,
+    int n,
+    __local data_t* As,
+    __local data_t* Bs
+) {
+    //Thread index
+    int tx = get_local_id(0);
+    int ty = get_local_id(1);
+
+    //Block index
+    int bx = get_group_id(0);
+    int by = get_group_id(1);
+
+    int bdimx = n / BLOCK_SIZE;
+    int bdimy = m / BLOCK_SIZE;
+    int bsizex = get_num_groups(0);
+    int bsizey = get_num_groups(1);
+
+    for (int i = bx; i < bdimx; i += bsizex)
+        for (int j = by; j < bdimy; j += bsizey)
+            DGEMM1(C, A, B, m, n, As, Bs, i, j, tx, ty);
+}
