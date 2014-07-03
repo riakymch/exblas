@@ -164,6 +164,9 @@ int runDGEMM(const char* program_file){
 #elif TESLA == 1
         strcpy(platform_name, "NVIDIA CUDA");
         strcpy(device_name, "Tesla M2090");
+#elif C2050 == 1
+        strcpy(platform_name, "NVIDIA CUDA");
+        strcpy(device_name, "Tesla C2050");
 #else
         strcpy(platform_name, "NVIDIA CUDA");
         strcpy(device_name, "Tesla K20c");
