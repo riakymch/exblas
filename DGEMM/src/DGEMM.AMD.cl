@@ -31,7 +31,7 @@ typedef double2 data_t;
  * Output tile size : 2x2 = Each thread computes 16 double values
  * Required global threads = (widthC / 2, heightC / 2)
 */
-__kernel void mmmKernel(
+void DGEMM(
     __global data_t *matrixC,
     __global data_t *matrixA,
     __global data_t *matrixB,
@@ -99,3 +99,27 @@ __kernel void mmmKernel(
     matrixC[globalPos +  get_global_size(0)] = sum1;
 }
 
+__kernel void matrixMul(
+    __global data_t* C,
+    __global data_t* A,
+    __global data_t* B, 
+    int m,
+    __local data_t* As
+) {
+    //Thread index
+    int tx = get_local_id(0);
+    int ty = get_local_id(1);
+
+    //Block index
+    int bx = get_group_id(0);
+    int by = get_group_id(1);
+
+    int bdimx = m / BLOCK_SIZE;
+    int bdimy = m / BLOCK_SIZE;
+    int bsizex = get_num_groups(0);
+    int bsizey = get_num_groups(1);
+
+    for (int i = bx; i < bdimx; i += bsizex)
+        for (int j = by; j < bdimy; j += bsizey)
+            DGEMM(C, A, B, m, As);
+}

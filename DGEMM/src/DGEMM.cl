@@ -212,5 +212,4 @@ __kernel void matrixMul(
     for (int i = bx; i < bdimx; i += bsizex)
         for (int j = by; j < bdimy; j += bsizey)
             DGEMM(C, A, B, m, n, k, As, Bs, i, j, tx, ty);
-    //DGEMM(C, A, B, m, n, k, As, Bs, bx, by, tx, ty);
 }
