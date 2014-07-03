@@ -8,7 +8,7 @@
 //Data type used for input data fetches
 typedef double data_t;
 
-__kernel void matrixMulKernel (
+void DGEMM (
     __global data_t* C,
     __global data_t* A,
     __global data_t* B,
@@ -16,19 +16,15 @@ __kernel void matrixMulKernel (
     int n,
     int k,
     __local data_t *As,
-    __local data_t *Bs
+    __local data_t *Bs,
+    int bx,
+    int by,
+    int tx,
+    int ty
 ) {
-    //Block ty and txumn
-    int bx = get_group_id(0);
-    int by = get_group_id(1);
-
     //Each thread block computes one sub-matrix of C
     __global data_t* Csub = &C[m * BLOCK_SIZE * by + BLOCK_SIZE * bx];
 
-    //Thread ty and txumn within Csub
-    int tx = get_local_id(0);
-    int ty = get_local_id(1);
-    
     //Each thread computes one element of Csub
     data_t sum[4] = {0.0};
   
@@ -74,7 +70,7 @@ __kernel void matrixMulKernel (
     Csub[(ty + 3 * step) * m + tx] = sum[3];
 }
 
-__kernel void matrixMulKernel8 (
+__kernel void DGEMM8 (
     __global data_t* C,
     __global data_t* A,
     __global data_t* B,
@@ -152,7 +148,7 @@ __kernel void matrixMulKernel8 (
     }
 }
 
-__kernel void matrixMulKernel1 (
+__kernel void DGEMM1 (
     __global data_t* C,
     __global data_t* A,
     __global data_t* B,
@@ -188,4 +184,33 @@ __kernel void matrixMulKernel1 (
         Cvalue += As[ty * BLOCK_SIZE + i] * Bs[i * BLOCK_SIZE + tx];
     }
     C[by * m + bx] = Cvalue;
+}
+
+__kernel void matrixMul(
+    __global data_t* C,
+    __global data_t* A,
+    __global data_t* B, 
+    int m,
+    int n,
+    int k,
+    __local data_t* As,
+    __local data_t* Bs
+) {
+    //Thread index
+    int tx = get_local_id(0);
+    int ty = get_local_id(1);
+
+    //Block index
+    int bx = get_group_id(0);
+    int by = get_group_id(1);
+
+    int bdimx = n / BLOCK_SIZE;
+    int bdimy = m / BLOCK_SIZE;
+    int bsizex = get_num_groups(0);
+    int bsizey = get_num_groups(1);
+
+    for (int i = bx; i < bdimx; i += bsizex)
+        for (int j = by; j < bdimy; j += bsizey)
+            DGEMM(C, A, B, m, n, k, As, Bs, i, j, tx, ty);
+    //DGEMM(C, A, B, m, n, k, As, Bs, bx, by, tx, ty);
 }

@@ -14,7 +14,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 // OpenCL launcher for bitonic sort kernel
 ////////////////////////////////////////////////////////////////////////////////
-#define DGEMM_KERNEL "matrixMulKernel"
+#define DGEMM_KERNEL "matrixMul"
 #ifdef AMD
   #define BLOCK_SIZE 16
 #else
@@ -134,9 +134,7 @@ extern "C" size_t DGEMM(
 
     {
         size_t NbThreadsPerWorkGroup[] = {BLOCK_SIZE, BLOCK_SIZE / VECTOR_NUMBER};
-	size_t heightC = d_C.height / VECTOR_NUMBER;
-	size_t widthC = d_C.width;
-	size_t TotalNbThreads[] = {widthC, heightC};
+	size_t TotalNbThreads[] = {2048, 2048 / VECTOR_NUMBER};
 	size_t neededLocalMemory = BLOCK_SIZE * BLOCK_SIZE * sizeof(cl_double);
 
 	cl_int i = 0;
