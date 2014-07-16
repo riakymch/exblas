@@ -57,6 +57,10 @@ cl_device_id GetOCLDevice(
     char name[]
 );
 
+cl_device_id GetOCLDevice(
+    cl_platform_id pPlatform
+);
+
 void initVectorWithRandomData(
     double *data,
     int size
