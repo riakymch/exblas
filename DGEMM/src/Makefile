@@ -7,7 +7,7 @@ OBJECTS := ${SOURCES:.c=.o}
 OBJECTS := ${OBJECTS:.cpp=.o}
 
 HEADERS = 
-INCLUDE = -I$(PATH_TO_NVIDIA_INC) -I$(PATH_TO_APPLE_INC) 
+INCLUDE = -I$(PATH_TO_AMD_INC) -I$(PATH_TO_NVIDIA_INC) 
 COMPILERFLAGS = -c -Wall -g -O2 -Wshorten-64-to-32
 CXX = g++
 
@@ -15,7 +15,7 @@ all: amd apple intel nvidia
 
 is_64=$(shell s=`uname -m`; if (echo $$s | grep x86_64 > /dev/null); then echo 1; fi)
 
-CXXFLAGS=-Wall -W -O2 $(DEFINES:%=-D%) $(INCLUDE) -march=native -fabi-version=0 -fopenmp -DGPU_PROFILING=1
+CXXFLAGS=-Wall -W -O2 $(DEFINES:%=-D%) $(INCLUDE) -march=native -fabi-version=0 -DGPU_PROFILING=1
 
 # AMD
 PATH_TO_AMD_INC=/opt/sdks/amd/current/include/ -I$(HOME)/soft/lib/mpfr/include/ -I$(HOME)/soft/lib/gmp/include/
@@ -41,7 +41,7 @@ intel:  $(join $(EXE_NAME),.intel)
 nvidia: $(join $(EXE_NAME),.nvidia)
 
 %.amd:$(OBJECTS)
-	$(CXX) $(CXXFLAGS) -masm=att -I$(PATH_TO_AMD_INC) -L$(PATH_TO_AMD_LIB) -Wl,-rpath,$(PATH_TO_AMD_LIB)  -o $@ $(OBJECTS)
+	$(CXX) $(CXXFLAGS) -masm=att -DAMD -DTAHITI=1 -I$(PATH_TO_AMD_INC) -Wl,-rpath,$(PATH_TO_AMD_LIB)  -o $@ $(OBJECTS) -L$(PATH_TO_AMD_LIB)
 
 %.apple:$(OBJECTS)
 	$(CXX) $(CXXFLAGS) -I$(PATH_TO_APPLE_INC) -L$(PATH_TO_APPLE_LIB) -Wl,-rpath,$(PATH_TO_APPLE_LIB) -framework opencl -o $@ $(OBJECTS)
@@ -53,7 +53,7 @@ nvidia: $(join $(EXE_NAME),.nvidia)
 	$(CXX) $(CXXFLAGS) -masm=intel -I$(PATH_TO_NVIDIA_INC) -Wl,-rpath,$(PATH_TO_NVIDIA_LIB) -o $@ $(OBJECTS) -L$(PATH_TO_NVIDIA_LIB)
 
 %.o : %.cpp
-	$(CXX) $(CXXFLAGS) -I$(PATH_TO_NVIDIA_INC) -Wl,-rpath,$(PATH_TO_NVIDIA_LIB) -c $< -L$(PATH_TO_NVIDIA_LIB)
+	$(CXX) $(CXXFLAGS) -I$(PATH_TO_AMD_INC) -I$(PATH_TO_AMD_INC) -Wl,-rpath,$(PATH_TO_AMD_LIB):$(PATH_TO_AMD_LIB) -c $< -L$(PATH_TO_AMD_LIB) -L$(PATH_TO_AMD_LIB)
 
 clean:
 	rm -f main.out.amd *.apple *.intel main.out.nvidia *.o
