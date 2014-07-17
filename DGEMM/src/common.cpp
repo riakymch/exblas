@@ -81,6 +81,34 @@ cl_device_id GetOCLDevice(cl_platform_id pPlatform, char name[])
   }
 }
 
+cl_device_id GetOCLDevice(cl_platform_id pPlatform)
+{
+  printf("clGetDeviceIDs...\n"); 
+
+  cl_device_id dDevices[10] = { 0 };
+  char name[128] = { 0 };
+  char dDeviceName[128] = { 0 };
+
+  cl_uint uiNumDevices = 0;
+  cl_int err = clGetDeviceIDs(pPlatform, CL_DEVICE_TYPE_GPU, 10, dDevices, &uiNumDevices);
+  cl_int uiRes = -1;
+
+  for (cl_int ui = 0; ui < (cl_int) uiNumDevices; ++ui) {
+      err = clGetDeviceInfo(dDevices[ui], CL_DEVICE_NAME, 128 * sizeof(char), dDeviceName, NULL);
+      if ( err != CL_SUCCESS ) {
+	  printf("ERROR: Failed to retreive platform vendor name.\n");
+	  return NULL;
+      }
+
+      printf("### Device[%i] : %s\n", ui, dDeviceName);
+      if (ui == 0)
+	strcpy(name, dDeviceName);
+  }
+  printf("### Using Device : %s\n", name);
+
+  return dDevices[0];
+}
+
 inline double randDouble(int emin, int emax, int neg_ratio)
 {
     // Uniform mantissa
