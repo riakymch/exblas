@@ -1,0 +1,2314 @@
+Starting with a matrices of 256x256x256 double elements
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 4.2.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : GeForce GTX 580
+### Device[1] : GeForce GTX 580
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Global.cl)...
+clCreateProgramWithSource...
+...building program
+
+
+...creating DGEMM kernel:
+...allocating memory for a matrix of superaccumulators
+Running OpenCL DGEMM with 196608 elements...
+
+Alg = 51 	 NbFPE = 2 	 Range = 1 	 NbElements = 196608 	 Size = 256 	 Time = 0.05244691 s 	 Throughput = 0.0300 GB/s
+
+Alg = 51 	 NbFPE = 2 	 Range = 1 	 NbElements = 196608 	 Size = 256 	 Time = 0.05244691 s 	 Performance = 0.6398 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+error = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 512x512x512 double elements
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 4.2.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : GeForce GTX 580
+### Device[1] : GeForce GTX 580
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Global.cl)...
+clCreateProgramWithSource...
+...building program
+
+
+...creating DGEMM kernel:
+...allocating memory for a matrix of superaccumulators
+Running OpenCL DGEMM with 786432 elements...
+
+Alg = 51 	 NbFPE = 2 	 Range = 1 	 NbElements = 786432 	 Size = 512 	 Time = 0.40571856 s 	 Throughput = 0.0155 GB/s
+
+Alg = 51 	 NbFPE = 2 	 Range = 1 	 NbElements = 786432 	 Size = 512 	 Time = 0.40571856 s 	 Performance = 0.6616 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+error = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 768x768x768 double elements
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 4.2.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : GeForce GTX 580
+### Device[1] : GeForce GTX 580
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Global.cl)...
+clCreateProgramWithSource...
+...building program
+
+
+...creating DGEMM kernel:
+...allocating memory for a matrix of superaccumulators
+Running OpenCL DGEMM with 1769472 elements...
+
+Alg = 51 	 NbFPE = 2 	 Range = 1 	 NbElements = 1769472 	 Size = 768 	 Time = 1.35440854 s 	 Throughput = 0.0105 GB/s
+
+Alg = 51 	 NbFPE = 2 	 Range = 1 	 NbElements = 1769472 	 Size = 768 	 Time = 1.35440854 s 	 Performance = 0.6689 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+error = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 1024x1024x1024 double elements
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 4.2.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : GeForce GTX 580
+### Device[1] : GeForce GTX 580
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Global.cl)...
+clCreateProgramWithSource...
+...building program
+
+
+...creating DGEMM kernel:
+...allocating memory for a matrix of superaccumulators
+Running OpenCL DGEMM with 3145728 elements...
+
+Alg = 51 	 NbFPE = 2 	 Range = 1 	 NbElements = 3145728 	 Size = 1024 	 Time = 3.17150074 s 	 Throughput = 0.0079 GB/s
+
+Alg = 51 	 NbFPE = 2 	 Range = 1 	 NbElements = 3145728 	 Size = 1024 	 Time = 3.17150074 s 	 Performance = 0.6771 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+error = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 1280x1280x1280 double elements
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 4.2.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : GeForce GTX 580
+### Device[1] : GeForce GTX 580
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Global.cl)...
+clCreateProgramWithSource...
+...building program
+
+
+...creating DGEMM kernel:
+...allocating memory for a matrix of superaccumulators
+Running OpenCL DGEMM with 4915200 elements...
+
+Alg = 51 	 NbFPE = 2 	 Range = 1 	 NbElements = 4915200 	 Size = 1280 	 Time = 6.15271024 s 	 Throughput = 0.0064 GB/s
+
+Alg = 51 	 NbFPE = 2 	 Range = 1 	 NbElements = 4915200 	 Size = 1280 	 Time = 6.15271024 s 	 Performance = 0.6817 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+error = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 1536x1536x1536 double elements
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 4.2.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : GeForce GTX 580
+### Device[1] : GeForce GTX 580
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Global.cl)...
+clCreateProgramWithSource...
+...building program
+
+
+...creating DGEMM kernel:
+...allocating memory for a matrix of superaccumulators
+Running OpenCL DGEMM with 7077888 elements...
+
+Alg = 51 	 NbFPE = 2 	 Range = 1 	 NbElements = 7077888 	 Size = 1536 	 Time = 10.56897734 s 	 Throughput = 0.0054 GB/s
+
+Alg = 51 	 NbFPE = 2 	 Range = 1 	 NbElements = 7077888 	 Size = 1536 	 Time = 10.56897734 s 	 Performance = 0.6858 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+error = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 1792x1792x1792 double elements
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 4.2.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : GeForce GTX 580
+### Device[1] : GeForce GTX 580
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Global.cl)...
+clCreateProgramWithSource...
+...building program
+
+
+...creating DGEMM kernel:
+...allocating memory for a matrix of superaccumulators
+Running OpenCL DGEMM with 9633792 elements...
+
+Alg = 51 	 NbFPE = 2 	 Range = 1 	 NbElements = 9633792 	 Size = 1792 	 Time = 16.74715594 s 	 Throughput = 0.0046 GB/s
+
+Alg = 51 	 NbFPE = 2 	 Range = 1 	 NbElements = 9633792 	 Size = 1792 	 Time = 16.74715594 s 	 Performance = 0.6872 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+error = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 2048x2048x2048 double elements
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 4.2.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : GeForce GTX 580
+### Device[1] : GeForce GTX 580
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Global.cl)...
+clCreateProgramWithSource...
+...building program
+
+
+...creating DGEMM kernel:
+...allocating memory for a matrix of superaccumulators
+Running OpenCL DGEMM with 12582912 elements...
+
+Alg = 51 	 NbFPE = 2 	 Range = 1 	 NbElements = 12582912 	 Size = 2048 	 Time = 24.88298611 s 	 Throughput = 0.0040 GB/s
+
+Alg = 51 	 NbFPE = 2 	 Range = 1 	 NbElements = 12582912 	 Size = 2048 	 Time = 24.88298611 s 	 Performance = 0.6904 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+error = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 256x256x256 double elements
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 4.2.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : GeForce GTX 580
+### Device[1] : GeForce GTX 580
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Global.cl)...
+clCreateProgramWithSource...
+...building program
+
+
+...creating DGEMM kernel:
+...allocating memory for a matrix of superaccumulators
+Running OpenCL DGEMM with 196608 elements...
+
+Alg = 51 	 NbFPE = 3 	 Range = 1 	 NbElements = 196608 	 Size = 256 	 Time = 0.05244470 s 	 Throughput = 0.0300 GB/s
+
+Alg = 51 	 NbFPE = 3 	 Range = 1 	 NbElements = 196608 	 Size = 256 	 Time = 0.05244470 s 	 Performance = 0.6398 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+error = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 512x512x512 double elements
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 4.2.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : GeForce GTX 580
+### Device[1] : GeForce GTX 580
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Global.cl)...
+clCreateProgramWithSource...
+...building program
+
+
+...creating DGEMM kernel:
+...allocating memory for a matrix of superaccumulators
+Running OpenCL DGEMM with 786432 elements...
+
+Alg = 51 	 NbFPE = 3 	 Range = 1 	 NbElements = 786432 	 Size = 512 	 Time = 0.40573482 s 	 Throughput = 0.0155 GB/s
+
+Alg = 51 	 NbFPE = 3 	 Range = 1 	 NbElements = 786432 	 Size = 512 	 Time = 0.40573482 s 	 Performance = 0.6616 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+error = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 768x768x768 double elements
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 4.2.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : GeForce GTX 580
+### Device[1] : GeForce GTX 580
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Global.cl)...
+clCreateProgramWithSource...
+...building program
+
+
+...creating DGEMM kernel:
+...allocating memory for a matrix of superaccumulators
+Running OpenCL DGEMM with 1769472 elements...
+
+Alg = 51 	 NbFPE = 3 	 Range = 1 	 NbElements = 1769472 	 Size = 768 	 Time = 1.35426717 s 	 Throughput = 0.0105 GB/s
+
+Alg = 51 	 NbFPE = 3 	 Range = 1 	 NbElements = 1769472 	 Size = 768 	 Time = 1.35426717 s 	 Performance = 0.6690 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+error = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 1024x1024x1024 double elements
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 4.2.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : GeForce GTX 580
+### Device[1] : GeForce GTX 580
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Global.cl)...
+clCreateProgramWithSource...
+...building program
+
+
+...creating DGEMM kernel:
+...allocating memory for a matrix of superaccumulators
+Running OpenCL DGEMM with 3145728 elements...
+
+Alg = 51 	 NbFPE = 3 	 Range = 1 	 NbElements = 3145728 	 Size = 1024 	 Time = 3.17161277 s 	 Throughput = 0.0079 GB/s
+
+Alg = 51 	 NbFPE = 3 	 Range = 1 	 NbElements = 3145728 	 Size = 1024 	 Time = 3.17161277 s 	 Performance = 0.6771 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+error = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 1280x1280x1280 double elements
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 4.2.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : GeForce GTX 580
+### Device[1] : GeForce GTX 580
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Global.cl)...
+clCreateProgramWithSource...
+...building program
+
+
+...creating DGEMM kernel:
+...allocating memory for a matrix of superaccumulators
+Running OpenCL DGEMM with 4915200 elements...
+
+Alg = 51 	 NbFPE = 3 	 Range = 1 	 NbElements = 4915200 	 Size = 1280 	 Time = 6.15302394 s 	 Throughput = 0.0064 GB/s
+
+Alg = 51 	 NbFPE = 3 	 Range = 1 	 NbElements = 4915200 	 Size = 1280 	 Time = 6.15302394 s 	 Performance = 0.6817 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+error = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 1536x1536x1536 double elements
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 4.2.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : GeForce GTX 580
+### Device[1] : GeForce GTX 580
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Global.cl)...
+clCreateProgramWithSource...
+...building program
+
+
+...creating DGEMM kernel:
+...allocating memory for a matrix of superaccumulators
+Running OpenCL DGEMM with 7077888 elements...
+
+Alg = 51 	 NbFPE = 3 	 Range = 1 	 NbElements = 7077888 	 Size = 1536 	 Time = 10.57109181 s 	 Throughput = 0.0054 GB/s
+
+Alg = 51 	 NbFPE = 3 	 Range = 1 	 NbElements = 7077888 	 Size = 1536 	 Time = 10.57109181 s 	 Performance = 0.6856 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+error = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 1792x1792x1792 double elements
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 4.2.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : GeForce GTX 580
+### Device[1] : GeForce GTX 580
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Global.cl)...
+clCreateProgramWithSource...
+...building program
+
+
+...creating DGEMM kernel:
+...allocating memory for a matrix of superaccumulators
+Running OpenCL DGEMM with 9633792 elements...
+
+Alg = 51 	 NbFPE = 3 	 Range = 1 	 NbElements = 9633792 	 Size = 1792 	 Time = 16.75350957 s 	 Throughput = 0.0046 GB/s
+
+Alg = 51 	 NbFPE = 3 	 Range = 1 	 NbElements = 9633792 	 Size = 1792 	 Time = 16.75350957 s 	 Performance = 0.6870 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+error = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 2048x2048x2048 double elements
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 4.2.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : GeForce GTX 580
+### Device[1] : GeForce GTX 580
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Global.cl)...
+clCreateProgramWithSource...
+...building program
+
+
+...creating DGEMM kernel:
+...allocating memory for a matrix of superaccumulators
+Running OpenCL DGEMM with 12582912 elements...
+
+Alg = 51 	 NbFPE = 3 	 Range = 1 	 NbElements = 12582912 	 Size = 2048 	 Time = 24.88182813 s 	 Throughput = 0.0040 GB/s
+
+Alg = 51 	 NbFPE = 3 	 Range = 1 	 NbElements = 12582912 	 Size = 2048 	 Time = 24.88182813 s 	 Performance = 0.6905 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+error = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 256x256x256 double elements
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 4.2.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : GeForce GTX 580
+### Device[1] : GeForce GTX 580
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Global.cl)...
+clCreateProgramWithSource...
+...building program
+
+ptxas info    : Compiling entry function 'matrixMul' for 'sm_20'
+ptxas info    : Function properties for matrixMul
+ 0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 32 registers, 64 bytes cmem[0], 8 bytes cmem[16]
+...creating DGEMM kernel:
+...allocating memory for a matrix of superaccumulators
+Running OpenCL DGEMM with 196608 elements...
+
+Alg = 51 	 NbFPE = 4 	 Range = 1 	 NbElements = 196608 	 Size = 256 	 Time = 0.05246925 s 	 Throughput = 0.0300 GB/s
+
+Alg = 51 	 NbFPE = 4 	 Range = 1 	 NbElements = 196608 	 Size = 256 	 Time = 0.05246925 s 	 Performance = 0.6395 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+error = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 512x512x512 double elements
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 4.2.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : GeForce GTX 580
+### Device[1] : GeForce GTX 580
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Global.cl)...
+clCreateProgramWithSource...
+...building program
+
+
+...creating DGEMM kernel:
+...allocating memory for a matrix of superaccumulators
+Running OpenCL DGEMM with 786432 elements...
+
+Alg = 51 	 NbFPE = 4 	 Range = 1 	 NbElements = 786432 	 Size = 512 	 Time = 0.40569891 s 	 Throughput = 0.0155 GB/s
+
+Alg = 51 	 NbFPE = 4 	 Range = 1 	 NbElements = 786432 	 Size = 512 	 Time = 0.40569891 s 	 Performance = 0.6617 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+error = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 768x768x768 double elements
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 4.2.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : GeForce GTX 580
+### Device[1] : GeForce GTX 580
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Global.cl)...
+clCreateProgramWithSource...
+...building program
+
+
+...creating DGEMM kernel:
+...allocating memory for a matrix of superaccumulators
+Running OpenCL DGEMM with 1769472 elements...
+
+Alg = 51 	 NbFPE = 4 	 Range = 1 	 NbElements = 1769472 	 Size = 768 	 Time = 1.35454310 s 	 Throughput = 0.0105 GB/s
+
+Alg = 51 	 NbFPE = 4 	 Range = 1 	 NbElements = 1769472 	 Size = 768 	 Time = 1.35454310 s 	 Performance = 0.6688 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+error = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 1024x1024x1024 double elements
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 4.2.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : GeForce GTX 580
+### Device[1] : GeForce GTX 580
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Global.cl)...
+clCreateProgramWithSource...
+...building program
+
+
+...creating DGEMM kernel:
+...allocating memory for a matrix of superaccumulators
+Running OpenCL DGEMM with 3145728 elements...
+
+Alg = 51 	 NbFPE = 4 	 Range = 1 	 NbElements = 3145728 	 Size = 1024 	 Time = 3.17279997 s 	 Throughput = 0.0079 GB/s
+
+Alg = 51 	 NbFPE = 4 	 Range = 1 	 NbElements = 3145728 	 Size = 1024 	 Time = 3.17279997 s 	 Performance = 0.6768 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+error = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 1280x1280x1280 double elements
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 4.2.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : GeForce GTX 580
+### Device[1] : GeForce GTX 580
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Global.cl)...
+clCreateProgramWithSource...
+...building program
+
+
+...creating DGEMM kernel:
+...allocating memory for a matrix of superaccumulators
+Running OpenCL DGEMM with 4915200 elements...
+
+Alg = 51 	 NbFPE = 4 	 Range = 1 	 NbElements = 4915200 	 Size = 1280 	 Time = 6.15365568 s 	 Throughput = 0.0064 GB/s
+
+Alg = 51 	 NbFPE = 4 	 Range = 1 	 NbElements = 4915200 	 Size = 1280 	 Time = 6.15365568 s 	 Performance = 0.6816 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+error = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 1536x1536x1536 double elements
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 4.2.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : GeForce GTX 580
+### Device[1] : GeForce GTX 580
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Global.cl)...
+clCreateProgramWithSource...
+...building program
+
+
+...creating DGEMM kernel:
+...allocating memory for a matrix of superaccumulators
+Running OpenCL DGEMM with 7077888 elements...
+
+Alg = 51 	 NbFPE = 4 	 Range = 1 	 NbElements = 7077888 	 Size = 1536 	 Time = 10.57222477 s 	 Throughput = 0.0054 GB/s
+
+Alg = 51 	 NbFPE = 4 	 Range = 1 	 NbElements = 7077888 	 Size = 1536 	 Time = 10.57222477 s 	 Performance = 0.6855 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+error = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 1792x1792x1792 double elements
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 4.2.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : GeForce GTX 580
+### Device[1] : GeForce GTX 580
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Global.cl)...
+clCreateProgramWithSource...
+...building program
+
+
+...creating DGEMM kernel:
+...allocating memory for a matrix of superaccumulators
+Running OpenCL DGEMM with 9633792 elements...
+
+Alg = 51 	 NbFPE = 4 	 Range = 1 	 NbElements = 9633792 	 Size = 1792 	 Time = 16.75463021 s 	 Throughput = 0.0046 GB/s
+
+Alg = 51 	 NbFPE = 4 	 Range = 1 	 NbElements = 9633792 	 Size = 1792 	 Time = 16.75463021 s 	 Performance = 0.6869 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+error = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 2048x2048x2048 double elements
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 4.2.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : GeForce GTX 580
+### Device[1] : GeForce GTX 580
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Global.cl)...
+clCreateProgramWithSource...
+...building program
+
+
+...creating DGEMM kernel:
+...allocating memory for a matrix of superaccumulators
+Running OpenCL DGEMM with 12582912 elements...
+
+Alg = 51 	 NbFPE = 4 	 Range = 1 	 NbElements = 12582912 	 Size = 2048 	 Time = 24.89571578 s 	 Throughput = 0.0040 GB/s
+
+Alg = 51 	 NbFPE = 4 	 Range = 1 	 NbElements = 12582912 	 Size = 2048 	 Time = 24.89571578 s 	 Performance = 0.6901 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+error = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 256x256x256 double elements
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 4.2.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : GeForce GTX 580
+### Device[1] : GeForce GTX 580
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Global.cl)...
+clCreateProgramWithSource...
+...building program
+
+ptxas info    : Compiling entry function 'matrixMul' for 'sm_20'
+ptxas info    : Function properties for matrixMul
+ 0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 32 registers, 64 bytes cmem[0], 8 bytes cmem[16]
+...creating DGEMM kernel:
+...allocating memory for a matrix of superaccumulators
+Running OpenCL DGEMM with 196608 elements...
+
+Alg = 51 	 NbFPE = 5 	 Range = 1 	 NbElements = 196608 	 Size = 256 	 Time = 0.05244522 s 	 Throughput = 0.0300 GB/s
+
+Alg = 51 	 NbFPE = 5 	 Range = 1 	 NbElements = 196608 	 Size = 256 	 Time = 0.05244522 s 	 Performance = 0.6398 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+error = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 512x512x512 double elements
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 4.2.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : GeForce GTX 580
+### Device[1] : GeForce GTX 580
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Global.cl)...
+clCreateProgramWithSource...
+...building program
+
+
+...creating DGEMM kernel:
+...allocating memory for a matrix of superaccumulators
+Running OpenCL DGEMM with 786432 elements...
+
+Alg = 51 	 NbFPE = 5 	 Range = 1 	 NbElements = 786432 	 Size = 512 	 Time = 0.40599302 s 	 Throughput = 0.0155 GB/s
+
+Alg = 51 	 NbFPE = 5 	 Range = 1 	 NbElements = 786432 	 Size = 512 	 Time = 0.40599302 s 	 Performance = 0.6612 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+error = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 768x768x768 double elements
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 4.2.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : GeForce GTX 580
+### Device[1] : GeForce GTX 580
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Global.cl)...
+clCreateProgramWithSource...
+...building program
+
+
+...creating DGEMM kernel:
+...allocating memory for a matrix of superaccumulators
+Running OpenCL DGEMM with 1769472 elements...
+
+Alg = 51 	 NbFPE = 5 	 Range = 1 	 NbElements = 1769472 	 Size = 768 	 Time = 1.35456138 s 	 Throughput = 0.0105 GB/s
+
+Alg = 51 	 NbFPE = 5 	 Range = 1 	 NbElements = 1769472 	 Size = 768 	 Time = 1.35456138 s 	 Performance = 0.6688 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+error = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 1024x1024x1024 double elements
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 4.2.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : GeForce GTX 580
+### Device[1] : GeForce GTX 580
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Global.cl)...
+clCreateProgramWithSource...
+...building program
+
+
+...creating DGEMM kernel:
+...allocating memory for a matrix of superaccumulators
+Running OpenCL DGEMM with 3145728 elements...
+
+Alg = 51 	 NbFPE = 5 	 Range = 1 	 NbElements = 3145728 	 Size = 1024 	 Time = 3.17315168 s 	 Throughput = 0.0079 GB/s
+
+Alg = 51 	 NbFPE = 5 	 Range = 1 	 NbElements = 3145728 	 Size = 1024 	 Time = 3.17315168 s 	 Performance = 0.6768 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+error = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 1280x1280x1280 double elements
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 4.2.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : GeForce GTX 580
+### Device[1] : GeForce GTX 580
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Global.cl)...
+clCreateProgramWithSource...
+...building program
+
+
+...creating DGEMM kernel:
+...allocating memory for a matrix of superaccumulators
+Running OpenCL DGEMM with 4915200 elements...
+
+Alg = 51 	 NbFPE = 5 	 Range = 1 	 NbElements = 4915200 	 Size = 1280 	 Time = 6.15545261 s 	 Throughput = 0.0064 GB/s
+
+Alg = 51 	 NbFPE = 5 	 Range = 1 	 NbElements = 4915200 	 Size = 1280 	 Time = 6.15545261 s 	 Performance = 0.6814 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+error = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 1536x1536x1536 double elements
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 4.2.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : GeForce GTX 580
+### Device[1] : GeForce GTX 580
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Global.cl)...
+clCreateProgramWithSource...
+...building program
+
+
+...creating DGEMM kernel:
+...allocating memory for a matrix of superaccumulators
+Running OpenCL DGEMM with 7077888 elements...
+
+Alg = 51 	 NbFPE = 5 	 Range = 1 	 NbElements = 7077888 	 Size = 1536 	 Time = 10.57575683 s 	 Throughput = 0.0054 GB/s
+
+Alg = 51 	 NbFPE = 5 	 Range = 1 	 NbElements = 7077888 	 Size = 1536 	 Time = 10.57575683 s 	 Performance = 0.6853 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+error = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 1792x1792x1792 double elements
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 4.2.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : GeForce GTX 580
+### Device[1] : GeForce GTX 580
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Global.cl)...
+clCreateProgramWithSource...
+...building program
+
+
+...creating DGEMM kernel:
+...allocating memory for a matrix of superaccumulators
+Running OpenCL DGEMM with 9633792 elements...
+
+Alg = 51 	 NbFPE = 5 	 Range = 1 	 NbElements = 9633792 	 Size = 1792 	 Time = 16.75699622 s 	 Throughput = 0.0046 GB/s
+
+Alg = 51 	 NbFPE = 5 	 Range = 1 	 NbElements = 9633792 	 Size = 1792 	 Time = 16.75699622 s 	 Performance = 0.6868 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+error = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 2048x2048x2048 double elements
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 4.2.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : GeForce GTX 580
+### Device[1] : GeForce GTX 580
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Global.cl)...
+clCreateProgramWithSource...
+...building program
+
+
+...creating DGEMM kernel:
+...allocating memory for a matrix of superaccumulators
+Running OpenCL DGEMM with 12582912 elements...
+
+Alg = 51 	 NbFPE = 5 	 Range = 1 	 NbElements = 12582912 	 Size = 2048 	 Time = 24.89086733 s 	 Throughput = 0.0040 GB/s
+
+Alg = 51 	 NbFPE = 5 	 Range = 1 	 NbElements = 12582912 	 Size = 2048 	 Time = 24.89086733 s 	 Performance = 0.6902 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+error = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 256x256x256 double elements
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 4.2.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : GeForce GTX 580
+### Device[1] : GeForce GTX 580
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Global.cl)...
+clCreateProgramWithSource...
+...building program
+
+ptxas info    : Compiling entry function 'matrixMul' for 'sm_20'
+ptxas info    : Function properties for matrixMul
+ 0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 32 registers, 64 bytes cmem[0], 8 bytes cmem[16]
+...creating DGEMM kernel:
+...allocating memory for a matrix of superaccumulators
+Running OpenCL DGEMM with 196608 elements...
+
+Alg = 51 	 NbFPE = 6 	 Range = 1 	 NbElements = 196608 	 Size = 256 	 Time = 0.05237296 s 	 Throughput = 0.0300 GB/s
+
+Alg = 51 	 NbFPE = 6 	 Range = 1 	 NbElements = 196608 	 Size = 256 	 Time = 0.05237296 s 	 Performance = 0.6407 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+error = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 512x512x512 double elements
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 4.2.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : GeForce GTX 580
+### Device[1] : GeForce GTX 580
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Global.cl)...
+clCreateProgramWithSource...
+...building program
+
+
+...creating DGEMM kernel:
+...allocating memory for a matrix of superaccumulators
+Running OpenCL DGEMM with 786432 elements...
+
+Alg = 51 	 NbFPE = 6 	 Range = 1 	 NbElements = 786432 	 Size = 512 	 Time = 0.40598838 s 	 Throughput = 0.0155 GB/s
+
+Alg = 51 	 NbFPE = 6 	 Range = 1 	 NbElements = 786432 	 Size = 512 	 Time = 0.40598838 s 	 Performance = 0.6612 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+error = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 768x768x768 double elements
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 4.2.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : GeForce GTX 580
+### Device[1] : GeForce GTX 580
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Global.cl)...
+clCreateProgramWithSource...
+...building program
+
+
+...creating DGEMM kernel:
+...allocating memory for a matrix of superaccumulators
+Running OpenCL DGEMM with 1769472 elements...
+
+Alg = 51 	 NbFPE = 6 	 Range = 1 	 NbElements = 1769472 	 Size = 768 	 Time = 1.35484602 s 	 Throughput = 0.0104 GB/s
+
+Alg = 51 	 NbFPE = 6 	 Range = 1 	 NbElements = 1769472 	 Size = 768 	 Time = 1.35484602 s 	 Performance = 0.6687 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+error = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 1024x1024x1024 double elements
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 4.2.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : GeForce GTX 580
+### Device[1] : GeForce GTX 580
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Global.cl)...
+clCreateProgramWithSource...
+...building program
+
+
+...creating DGEMM kernel:
+...allocating memory for a matrix of superaccumulators
+Running OpenCL DGEMM with 3145728 elements...
+
+Alg = 51 	 NbFPE = 6 	 Range = 1 	 NbElements = 3145728 	 Size = 1024 	 Time = 3.17324422 s 	 Throughput = 0.0079 GB/s
+
+Alg = 51 	 NbFPE = 6 	 Range = 1 	 NbElements = 3145728 	 Size = 1024 	 Time = 3.17324422 s 	 Performance = 0.6767 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+error = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 1280x1280x1280 double elements
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 4.2.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : GeForce GTX 580
+### Device[1] : GeForce GTX 580
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Global.cl)...
+clCreateProgramWithSource...
+...building program
+
+
+...creating DGEMM kernel:
+...allocating memory for a matrix of superaccumulators
+Running OpenCL DGEMM with 4915200 elements...
+
+Alg = 51 	 NbFPE = 6 	 Range = 1 	 NbElements = 4915200 	 Size = 1280 	 Time = 6.15455642 s 	 Throughput = 0.0064 GB/s
+
+Alg = 51 	 NbFPE = 6 	 Range = 1 	 NbElements = 4915200 	 Size = 1280 	 Time = 6.15455642 s 	 Performance = 0.6815 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+error = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 1536x1536x1536 double elements
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 4.2.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : GeForce GTX 580
+### Device[1] : GeForce GTX 580
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Global.cl)...
+clCreateProgramWithSource...
+...building program
+
+
+...creating DGEMM kernel:
+...allocating memory for a matrix of superaccumulators
+Running OpenCL DGEMM with 7077888 elements...
+
+Alg = 51 	 NbFPE = 6 	 Range = 1 	 NbElements = 7077888 	 Size = 1536 	 Time = 10.57759197 s 	 Throughput = 0.0054 GB/s
+
+Alg = 51 	 NbFPE = 6 	 Range = 1 	 NbElements = 7077888 	 Size = 1536 	 Time = 10.57759197 s 	 Performance = 0.6852 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+error = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 1792x1792x1792 double elements
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 4.2.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : GeForce GTX 580
+### Device[1] : GeForce GTX 580
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Global.cl)...
+clCreateProgramWithSource...
+...building program
+
+
+...creating DGEMM kernel:
+...allocating memory for a matrix of superaccumulators
+Running OpenCL DGEMM with 9633792 elements...
+
+Alg = 51 	 NbFPE = 6 	 Range = 1 	 NbElements = 9633792 	 Size = 1792 	 Time = 16.75959050 s 	 Throughput = 0.0046 GB/s
+
+Alg = 51 	 NbFPE = 6 	 Range = 1 	 NbElements = 9633792 	 Size = 1792 	 Time = 16.75959050 s 	 Performance = 0.6867 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+error = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 2048x2048x2048 double elements
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 4.2.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : GeForce GTX 580
+### Device[1] : GeForce GTX 580
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Global.cl)...
+clCreateProgramWithSource...
+...building program
+
+
+...creating DGEMM kernel:
+...allocating memory for a matrix of superaccumulators
+Running OpenCL DGEMM with 12582912 elements...
+
+Alg = 51 	 NbFPE = 6 	 Range = 1 	 NbElements = 12582912 	 Size = 2048 	 Time = 24.88543757 s 	 Throughput = 0.0040 GB/s
+
+Alg = 51 	 NbFPE = 6 	 Range = 1 	 NbElements = 12582912 	 Size = 2048 	 Time = 24.88543757 s 	 Performance = 0.6904 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+error = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 256x256x256 double elements
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 4.2.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : GeForce GTX 580
+### Device[1] : GeForce GTX 580
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Global.cl)...
+clCreateProgramWithSource...
+...building program
+
+ptxas info    : Compiling entry function 'matrixMul' for 'sm_20'
+ptxas info    : Function properties for matrixMul
+ 0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 32 registers, 64 bytes cmem[0], 8 bytes cmem[16]
+...creating DGEMM kernel:
+...allocating memory for a matrix of superaccumulators
+Running OpenCL DGEMM with 196608 elements...
+
+Alg = 51 	 NbFPE = 7 	 Range = 1 	 NbElements = 196608 	 Size = 256 	 Time = 0.05242035 s 	 Throughput = 0.0300 GB/s
+
+Alg = 51 	 NbFPE = 7 	 Range = 1 	 NbElements = 196608 	 Size = 256 	 Time = 0.05242035 s 	 Performance = 0.6401 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+error = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 512x512x512 double elements
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 4.2.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : GeForce GTX 580
+### Device[1] : GeForce GTX 580
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Global.cl)...
+clCreateProgramWithSource...
+...building program
+
+
+...creating DGEMM kernel:
+...allocating memory for a matrix of superaccumulators
+Running OpenCL DGEMM with 786432 elements...
+
+Alg = 51 	 NbFPE = 7 	 Range = 1 	 NbElements = 786432 	 Size = 512 	 Time = 0.40604938 s 	 Throughput = 0.0155 GB/s
+
+Alg = 51 	 NbFPE = 7 	 Range = 1 	 NbElements = 786432 	 Size = 512 	 Time = 0.40604938 s 	 Performance = 0.6611 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+error = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 768x768x768 double elements
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 4.2.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : GeForce GTX 580
+### Device[1] : GeForce GTX 580
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Global.cl)...
+clCreateProgramWithSource...
+...building program
+
+
+...creating DGEMM kernel:
+...allocating memory for a matrix of superaccumulators
+Running OpenCL DGEMM with 1769472 elements...
+
+Alg = 51 	 NbFPE = 7 	 Range = 1 	 NbElements = 1769472 	 Size = 768 	 Time = 1.35514480 s 	 Throughput = 0.0104 GB/s
+
+Alg = 51 	 NbFPE = 7 	 Range = 1 	 NbElements = 1769472 	 Size = 768 	 Time = 1.35514480 s 	 Performance = 0.6685 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+error = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 1024x1024x1024 double elements
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 4.2.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : GeForce GTX 580
+### Device[1] : GeForce GTX 580
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Global.cl)...
+clCreateProgramWithSource...
+...building program
+
+
+...creating DGEMM kernel:
+...allocating memory for a matrix of superaccumulators
+Running OpenCL DGEMM with 3145728 elements...
+
+Alg = 51 	 NbFPE = 7 	 Range = 1 	 NbElements = 3145728 	 Size = 1024 	 Time = 3.17363555 s 	 Throughput = 0.0079 GB/s
+
+Alg = 51 	 NbFPE = 7 	 Range = 1 	 NbElements = 3145728 	 Size = 1024 	 Time = 3.17363555 s 	 Performance = 0.6767 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+error = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 1280x1280x1280 double elements
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 4.2.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : GeForce GTX 580
+### Device[1] : GeForce GTX 580
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Global.cl)...
+clCreateProgramWithSource...
+...building program
+
+
+...creating DGEMM kernel:
+...allocating memory for a matrix of superaccumulators
+Running OpenCL DGEMM with 4915200 elements...
+
+Alg = 51 	 NbFPE = 7 	 Range = 1 	 NbElements = 4915200 	 Size = 1280 	 Time = 6.15588896 s 	 Throughput = 0.0064 GB/s
+
+Alg = 51 	 NbFPE = 7 	 Range = 1 	 NbElements = 4915200 	 Size = 1280 	 Time = 6.15588896 s 	 Performance = 0.6813 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+error = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 1536x1536x1536 double elements
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 4.2.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : GeForce GTX 580
+### Device[1] : GeForce GTX 580
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Global.cl)...
+clCreateProgramWithSource...
+...building program
+
+
+...creating DGEMM kernel:
+...allocating memory for a matrix of superaccumulators
+Running OpenCL DGEMM with 7077888 elements...
+
+Alg = 51 	 NbFPE = 7 	 Range = 1 	 NbElements = 7077888 	 Size = 1536 	 Time = 10.57641795 s 	 Throughput = 0.0054 GB/s
+
+Alg = 51 	 NbFPE = 7 	 Range = 1 	 NbElements = 7077888 	 Size = 1536 	 Time = 10.57641795 s 	 Performance = 0.6853 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+error = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 1792x1792x1792 double elements
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 4.2.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : GeForce GTX 580
+### Device[1] : GeForce GTX 580
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Global.cl)...
+clCreateProgramWithSource...
+...building program
+
+
+...creating DGEMM kernel:
+...allocating memory for a matrix of superaccumulators
+Running OpenCL DGEMM with 9633792 elements...
+
+Alg = 51 	 NbFPE = 7 	 Range = 1 	 NbElements = 9633792 	 Size = 1792 	 Time = 16.75969795 s 	 Throughput = 0.0046 GB/s
+
+Alg = 51 	 NbFPE = 7 	 Range = 1 	 NbElements = 9633792 	 Size = 1792 	 Time = 16.75969795 s 	 Performance = 0.6867 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+error = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 2048x2048x2048 double elements
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 4.2.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : GeForce GTX 580
+### Device[1] : GeForce GTX 580
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Global.cl)...
+clCreateProgramWithSource...
+...building program
+
+
+...creating DGEMM kernel:
+...allocating memory for a matrix of superaccumulators
+Running OpenCL DGEMM with 12582912 elements...
+
+Alg = 51 	 NbFPE = 7 	 Range = 1 	 NbElements = 12582912 	 Size = 2048 	 Time = 24.89885066 s 	 Throughput = 0.0040 GB/s
+
+Alg = 51 	 NbFPE = 7 	 Range = 1 	 NbElements = 12582912 	 Size = 2048 	 Time = 24.89885066 s 	 Performance = 0.6900 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+error = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 256x256x256 double elements
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 4.2.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : GeForce GTX 580
+### Device[1] : GeForce GTX 580
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Global.cl)...
+clCreateProgramWithSource...
+...building program
+
+ptxas info    : Compiling entry function 'matrixMul' for 'sm_20'
+ptxas info    : Function properties for matrixMul
+ 0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 32 registers, 64 bytes cmem[0], 8 bytes cmem[16]
+...creating DGEMM kernel:
+...allocating memory for a matrix of superaccumulators
+Running OpenCL DGEMM with 196608 elements...
+
+Alg = 51 	 NbFPE = 8 	 Range = 1 	 NbElements = 196608 	 Size = 256 	 Time = 0.05230112 s 	 Throughput = 0.0301 GB/s
+
+Alg = 51 	 NbFPE = 8 	 Range = 1 	 NbElements = 196608 	 Size = 256 	 Time = 0.05230112 s 	 Performance = 0.6416 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+error = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 512x512x512 double elements
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 4.2.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : GeForce GTX 580
+### Device[1] : GeForce GTX 580
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Global.cl)...
+clCreateProgramWithSource...
+...building program
+
+
+...creating DGEMM kernel:
+...allocating memory for a matrix of superaccumulators
+Running OpenCL DGEMM with 786432 elements...
+
+Alg = 51 	 NbFPE = 8 	 Range = 1 	 NbElements = 786432 	 Size = 512 	 Time = 0.40618349 s 	 Throughput = 0.0155 GB/s
+
+Alg = 51 	 NbFPE = 8 	 Range = 1 	 NbElements = 786432 	 Size = 512 	 Time = 0.40618349 s 	 Performance = 0.6609 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+error = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 768x768x768 double elements
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 4.2.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : GeForce GTX 580
+### Device[1] : GeForce GTX 580
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Global.cl)...
+clCreateProgramWithSource...
+...building program
+
+
+...creating DGEMM kernel:
+...allocating memory for a matrix of superaccumulators
+Running OpenCL DGEMM with 1769472 elements...
+
+Alg = 51 	 NbFPE = 8 	 Range = 1 	 NbElements = 1769472 	 Size = 768 	 Time = 1.35518819 s 	 Throughput = 0.0104 GB/s
+
+Alg = 51 	 NbFPE = 8 	 Range = 1 	 NbElements = 1769472 	 Size = 768 	 Time = 1.35518819 s 	 Performance = 0.6685 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+error = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 1024x1024x1024 double elements
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 4.2.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : GeForce GTX 580
+### Device[1] : GeForce GTX 580
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Global.cl)...
+clCreateProgramWithSource...
+...building program
+
+
+...creating DGEMM kernel:
+...allocating memory for a matrix of superaccumulators
+Running OpenCL DGEMM with 3145728 elements...
+
+Alg = 51 	 NbFPE = 8 	 Range = 1 	 NbElements = 3145728 	 Size = 1024 	 Time = 3.17418550 s 	 Throughput = 0.0079 GB/s
+
+Alg = 51 	 NbFPE = 8 	 Range = 1 	 NbElements = 3145728 	 Size = 1024 	 Time = 3.17418550 s 	 Performance = 0.6765 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+error = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 1280x1280x1280 double elements
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 4.2.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : GeForce GTX 580
+### Device[1] : GeForce GTX 580
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Global.cl)...
+clCreateProgramWithSource...
+...building program
+
+
+...creating DGEMM kernel:
+...allocating memory for a matrix of superaccumulators
+Running OpenCL DGEMM with 4915200 elements...
+
+Alg = 51 	 NbFPE = 8 	 Range = 1 	 NbElements = 4915200 	 Size = 1280 	 Time = 6.15559952 s 	 Throughput = 0.0064 GB/s
+
+Alg = 51 	 NbFPE = 8 	 Range = 1 	 NbElements = 4915200 	 Size = 1280 	 Time = 6.15559952 s 	 Performance = 0.6814 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+error = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 1536x1536x1536 double elements
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 4.2.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : GeForce GTX 580
+### Device[1] : GeForce GTX 580
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Global.cl)...
+clCreateProgramWithSource...
+...building program
+
+
+...creating DGEMM kernel:
+...allocating memory for a matrix of superaccumulators
+Running OpenCL DGEMM with 7077888 elements...
+
+Alg = 51 	 NbFPE = 8 	 Range = 1 	 NbElements = 7077888 	 Size = 1536 	 Time = 10.57724723 s 	 Throughput = 0.0054 GB/s
+
+Alg = 51 	 NbFPE = 8 	 Range = 1 	 NbElements = 7077888 	 Size = 1536 	 Time = 10.57724723 s 	 Performance = 0.6852 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+error = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 1792x1792x1792 double elements
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 4.2.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : GeForce GTX 580
+### Device[1] : GeForce GTX 580
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Global.cl)...
+clCreateProgramWithSource...
+...building program
+
+
+...creating DGEMM kernel:
+...allocating memory for a matrix of superaccumulators
+Running OpenCL DGEMM with 9633792 elements...
+
+Alg = 51 	 NbFPE = 8 	 Range = 1 	 NbElements = 9633792 	 Size = 1792 	 Time = 16.77066154 s 	 Throughput = 0.0046 GB/s
+
+Alg = 51 	 NbFPE = 8 	 Range = 1 	 NbElements = 9633792 	 Size = 1792 	 Time = 16.77066154 s 	 Performance = 0.6863 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+error = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 2048x2048x2048 double elements
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 4.2.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : GeForce GTX 580
+### Device[1] : GeForce GTX 580
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Global.cl)...
+clCreateProgramWithSource...
+...building program
+
+
+...creating DGEMM kernel:
+...allocating memory for a matrix of superaccumulators
+Running OpenCL DGEMM with 12582912 elements...
+
+Alg = 51 	 NbFPE = 8 	 Range = 1 	 NbElements = 12582912 	 Size = 2048 	 Time = 24.90371776 s 	 Throughput = 0.0040 GB/s
+
+Alg = 51 	 NbFPE = 8 	 Range = 1 	 NbElements = 12582912 	 Size = 2048 	 Time = 24.90371776 s 	 Performance = 0.6899 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+error = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 256x256x256 double elements
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 4.2.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : GeForce GTX 580
+### Device[1] : GeForce GTX 580
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.Superacc.Private.cl)...
+clCreateProgramWithSource...
+...building program
+
+ptxas info    : Compiling entry function 'matrixMul' for 'sm_20'
+ptxas info    : Function properties for matrixMul
+ 312 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 32 registers, 60 bytes cmem[0], 8 bytes cmem[16]
+...creating DGEMM kernel:
+Running OpenCL DGEMM with 196608 elements...
+
+Alg = 30 	 NbFPE = 0 	 Range = 1 	 NbElements = 196608 	 Size = 256 	 Time = 0.00701126 s 	 Throughput = 0.2243 GB/s
+
+Alg = 30 	 NbFPE = 0 	 Range = 1 	 NbElements = 196608 	 Size = 256 	 Time = 0.00701126 s 	 Performance = 4.7858 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+error = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 512x512x512 double elements
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 4.2.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : GeForce GTX 580
+### Device[1] : GeForce GTX 580
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.Superacc.Private.cl)...
+clCreateProgramWithSource...
+...building program
+
+
+...creating DGEMM kernel:
+Running OpenCL DGEMM with 786432 elements...
+
+Alg = 30 	 NbFPE = 0 	 Range = 1 	 NbElements = 786432 	 Size = 512 	 Time = 0.05394931 s 	 Throughput = 0.1166 GB/s
+
+Alg = 30 	 NbFPE = 0 	 Range = 1 	 NbElements = 786432 	 Size = 512 	 Time = 0.05394931 s 	 Performance = 4.9757 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+error = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 768x768x768 double elements
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 4.2.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : GeForce GTX 580
+### Device[1] : GeForce GTX 580
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.Superacc.Private.cl)...
+clCreateProgramWithSource...
+...building program
+
+
+...creating DGEMM kernel:
+Running OpenCL DGEMM with 1769472 elements...
+
+Alg = 30 	 NbFPE = 0 	 Range = 1 	 NbElements = 1769472 	 Size = 768 	 Time = 0.17697930 s 	 Throughput = 0.0800 GB/s
+
+Alg = 30 	 NbFPE = 0 	 Range = 1 	 NbElements = 1769472 	 Size = 768 	 Time = 0.17697930 s 	 Performance = 5.1191 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+error = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 1024x1024x1024 double elements
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 4.2.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : GeForce GTX 580
+### Device[1] : GeForce GTX 580
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.Superacc.Private.cl)...
+clCreateProgramWithSource...
+...building program
+
+
+...creating DGEMM kernel:
+Running OpenCL DGEMM with 3145728 elements...
+
+Alg = 30 	 NbFPE = 0 	 Range = 1 	 NbElements = 3145728 	 Size = 1024 	 Time = 0.41665037 s 	 Throughput = 0.0604 GB/s
+
+Alg = 30 	 NbFPE = 0 	 Range = 1 	 NbElements = 3145728 	 Size = 1024 	 Time = 0.41665037 s 	 Performance = 5.1542 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+error = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 1280x1280x1280 double elements
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 4.2.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : GeForce GTX 580
+### Device[1] : GeForce GTX 580
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.Superacc.Private.cl)...
+clCreateProgramWithSource...
+...building program
+
+
+...creating DGEMM kernel:
+Running OpenCL DGEMM with 4915200 elements...
+
+Alg = 30 	 NbFPE = 0 	 Range = 1 	 NbElements = 4915200 	 Size = 1280 	 Time = 0.80846646 s 	 Throughput = 0.0486 GB/s
+
+Alg = 30 	 NbFPE = 0 	 Range = 1 	 NbElements = 4915200 	 Size = 1280 	 Time = 0.80846646 s 	 Performance = 5.1880 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+error = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 1536x1536x1536 double elements
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 4.2.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : GeForce GTX 580
+### Device[1] : GeForce GTX 580
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.Superacc.Private.cl)...
+clCreateProgramWithSource...
+...building program
+
+
+...creating DGEMM kernel:
+Running OpenCL DGEMM with 7077888 elements...
+
+Alg = 30 	 NbFPE = 0 	 Range = 1 	 NbElements = 7077888 	 Size = 1536 	 Time = 1.39376976 s 	 Throughput = 0.0406 GB/s
+
+Alg = 30 	 NbFPE = 0 	 Range = 1 	 NbElements = 7077888 	 Size = 1536 	 Time = 1.39376976 s 	 Performance = 5.2001 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+error = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 1792x1792x1792 double elements
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 4.2.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : GeForce GTX 580
+### Device[1] : GeForce GTX 580
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.Superacc.Private.cl)...
+clCreateProgramWithSource...
+...building program
+
+
+...creating DGEMM kernel:
+Running OpenCL DGEMM with 9633792 elements...
+
+Alg = 30 	 NbFPE = 0 	 Range = 1 	 NbElements = 9633792 	 Size = 1792 	 Time = 2.20564963 s 	 Throughput = 0.0349 GB/s
+
+Alg = 30 	 NbFPE = 0 	 Range = 1 	 NbElements = 9633792 	 Size = 1792 	 Time = 2.20564963 s 	 Performance = 5.2180 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+error = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 2048x2048x2048 double elements
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 4.2.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : GeForce GTX 580
+### Device[1] : GeForce GTX 580
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.Superacc.Private.cl)...
+clCreateProgramWithSource...
+...building program
+
+
+...creating DGEMM kernel:
+Running OpenCL DGEMM with 12582912 elements...
+
+Alg = 30 	 NbFPE = 0 	 Range = 1 	 NbElements = 12582912 	 Size = 2048 	 Time = 3.28747344 s 	 Throughput = 0.0306 GB/s
+
+Alg = 30 	 NbFPE = 0 	 Range = 1 	 NbElements = 12582912 	 Size = 2048 	 Time = 3.28747344 s 	 Performance = 5.2259 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+error = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
