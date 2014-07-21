@@ -148,10 +148,6 @@ void init_fpuniform(double *array, int size, int range, int emax)
     for(int i = 0; i != size; ++i) {
         array[i] = 1.0 + double(rand()) / double(RAND_MAX);
     }*/
-    /*//simple case for tests only
-    for(int i = 0; i != size; i++) {
-        array[i] = 1.1;
-    }*/
 }
 
 void print2Superaccumulators(bintype *binCPU, bintype *binGPU) {
