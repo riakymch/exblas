@@ -16,17 +16,14 @@
 ////////////////////////////////////////////////////////////////////////////////
 #define DDOT_KERNEL          "DDOT"
 #define DDOT_COMPLETE_KERNEL "DDOTComplete"
-#define DDOT_ROUND_KERNEL    "DDOTRound"
 
 static size_t szKernelLength;		       // Byte size of kernel code
 static char* cSources = NULL;                  // Buffer to hold source for compilation
 
 static cl_program       cpProgram;             //OpenCL program
 static cl_kernel        ckKernel, ckComplete;
-static cl_kernel        ckRound;
 static cl_command_queue cqDefaultCommandQue;   //Default command queue
 static cl_mem           d_PartialSuperaccs;
-static cl_mem           d_Superacc;
 
 static const uint  PARTIAL_SUPERACCS_COUNT    = 2048;
 static const uint  WORKGROUP_SIZE             = 256;
@@ -98,19 +95,9 @@ extern "C" cl_int initDDOT(
             printf("Error in clCreateKernel: DDOTComplete, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
             return EXIT_FAILURE;
         }
-        ckRound = clCreateKernel(cpProgram, DDOT_ROUND_KERNEL, &ciErrNum);
-        if (ciErrNum != CL_SUCCESS) {
-            printf("Error in clCreateKernel: DDOTRound, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
-            return EXIT_FAILURE;
-        }
 
     printf("...allocating internal buffer\n");
         d_PartialSuperaccs = clCreateBuffer(cxGPUContext, CL_MEM_READ_WRITE, PARTIAL_SUPERACCS_COUNT * BIN_COUNT * sizeof(cl_long), NULL, &ciErrNum);
-        if (ciErrNum != CL_SUCCESS) {
-            printf("Error in clCreateBuffer, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
-            return EXIT_FAILURE;
-        }
-        d_Superacc = clCreateBuffer(cxGPUContext, CL_MEM_READ_WRITE, BIN_COUNT * sizeof(cl_long), NULL, &ciErrNum);
         if (ciErrNum != CL_SUCCESS) {
             printf("Error in clCreateBuffer, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
             return EXIT_FAILURE;
@@ -129,10 +116,8 @@ extern "C" void closeDDOT(void){
     cl_int ciErrNum;
 
     ciErrNum = clReleaseMemObject(d_PartialSuperaccs);
-    ciErrNum |= clReleaseMemObject(d_Superacc);
     ciErrNum |= clReleaseKernel(ckKernel);
     ciErrNum |= clReleaseKernel(ckComplete);
-    ciErrNum |= clReleaseKernel(ckRound);
     ciErrNum |= clReleaseProgram(cpProgram);
     if (ciErrNum != CL_SUCCESS) {
         printf("Error in closeReduction(), Line %u in file %s !!!\n\n", __LINE__, __FILE__);
@@ -192,7 +177,7 @@ extern "C" size_t DDOT(
         NbThreadsPerWorkGroup = MERGE_WORKGROUP_SIZE;
         TotalNbThreads = BIN_COUNT * NbThreadsPerWorkGroup;
 
-        ciErrNum  = clSetKernelArg(ckComplete, 0, sizeof(cl_mem),  (void *)&d_Superacc);
+        ciErrNum  = clSetKernelArg(ckComplete, 0, sizeof(cl_mem),  (void *)&d_res);
         ciErrNum |= clSetKernelArg(ckComplete, 1, sizeof(cl_mem),  (void *)&d_PartialSuperaccs);
         ciErrNum |= clSetKernelArg(ckComplete, 2, sizeof(cl_uint), (void *)&PARTIAL_SUPERACCS_COUNT);
         if (ciErrNum != CL_SUCCESS) {
@@ -202,25 +187,6 @@ extern "C" size_t DDOT(
         }
 
         ciErrNum = clEnqueueNDRangeKernel(cqCommandQueue, ckComplete, 1, NULL, &TotalNbThreads, &NbThreadsPerWorkGroup, 0, NULL, NULL);
-        if (ciErrNum != CL_SUCCESS) {
-            printf("Error in clEnqueueNDRangeKernel, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
-	    *ciErrNumRes = EXIT_FAILURE;
-            return 0;
-        }
-    }
-    {
-        NbThreadsPerWorkGroup = MERGE_WORKGROUP_SIZE;
-        TotalNbThreads = NbThreadsPerWorkGroup;
-
-        ciErrNum  = clSetKernelArg(ckRound, 0, sizeof(cl_mem),  (void *)&d_res);
-        ciErrNum |= clSetKernelArg(ckRound, 1, sizeof(cl_mem),  (void *)&d_Superacc);
-        if (ciErrNum != CL_SUCCESS) {
-            printf("Error in clSetKernelArg, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
-	    *ciErrNumRes = EXIT_FAILURE;
-            return 0;
-        }
-
-        ciErrNum = clEnqueueNDRangeKernel(cqCommandQueue, ckRound, 1, NULL, &TotalNbThreads, &NbThreadsPerWorkGroup, 0, NULL, NULL);
         if (ciErrNum != CL_SUCCESS) {
             printf("Error in clEnqueueNDRangeKernel, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
 	    *ciErrNumRes = EXIT_FAILURE;

@@ -69,7 +69,7 @@ double OddRoundSumNonnegative(double th, double tl) {
     return thdb.d;
 }
 
-int Normalize(__global long *accumulator, int *imin, int *imax) {
+int Normalize(__local long *accumulator, int *imin, int *imax) {
   if (*imin > *imax) {
     return 0;
   }
@@ -103,7 +103,7 @@ int Normalize(__global long *accumulator, int *imin, int *imax) {
   return carry_in < 0;
 }
 
-double Round(__global long *accumulator) {
+double Round(__local long *accumulator) {
   int imin = 0; 
   int imax = 38;
   int negative = Normalize(accumulator, &imin, &imax);
@@ -120,7 +120,7 @@ double Round(__global long *accumulator) {
   }
   if (i < 0) {
     //TODO: should we preserve sign of zero?
-    return 0.;
+    return 0.0;
   }
 
   long hiword = negative ? (1 << digits) - accumulator[i] : accumulator[i];
@@ -292,7 +292,7 @@ void DDOT(
 ////////////////////////////////////////////////////////////////////////////////
 __kernel __attribute__((reqd_work_group_size(MERGE_WORKGROUP_SIZE, 1, 1)))
 void DDOTComplete(
-    __global long *d_Superacc,
+    __global double *d_Res,
     __global long *d_PartialSuperaccs,
     const uint NbPartialSuperaccs
 ){
@@ -321,19 +321,7 @@ void DDOTComplete(
             l_Data[lid] += l_Data[lid + stride];
     }
     
-    if(lid == 0)
-        d_Superacc[gid] = l_Data[0];
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// Round the results
-////////////////////////////////////////////////////////////////////////////////
-__kernel __attribute__((reqd_work_group_size(MERGE_WORKGROUP_SIZE, 1, 1)))
-void DDOTRound(
-    __global double *d_res,
-    __global long *d_Superacc
-){
-    uint pos = get_local_id(0);
-    if (pos == 0)
-	d_res[0] = Round(d_Superacc);
+    if(lid == 0) {
+        d_Res[0] = Round(l_Data);
+    }
 }
