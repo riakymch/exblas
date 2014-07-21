@@ -30,7 +30,10 @@ static uint __nbfpe      = 0;
 static uint __alg        = 0;
 
 static void __usage(int argc __attribute__((unused)), char **argv) {
-  fprintf(stderr, "Usage: %s [-n number of elements -r range -e nbfpe -a alg (0-ddot, 1-acc, 2-fpe, 3-fpeex8, 4-fpeex4, 5-fpeex6)] \n", argv[0]);
+  fprintf(stderr, "Usage: %s [-n number of elements,\n", argv[0]);
+  printf("                -r range,\n"); 
+  printf("                -e nbfpe,\n");
+  printf("                -a alg (0-ddot, 1-acc, 2-fpe, 3-fpeex8, 4-fpeex4, 5-fpeex6)] \n");
   printf("       -?, -h:    Display this help and exit\n");
 }
 
@@ -116,13 +119,10 @@ int runDDOT(const char* program_file){
 
     printf("Initializing OpenCL...\n");
         char platform_name[64];
-	char device_name[32];
 #ifdef AMD
         strcpy(platform_name, "AMD Accelerated Parallel Processing");
-	strcpy(device_name, "Devastator");
 #else
         strcpy(platform_name, "NVIDIA CUDA");
-        strcpy(device_name, "Tesla K20c");
 #endif
         //setenv("CUDA_CACHE_DISABLE", "1", 1);
         cpPlatform = GetOCLPlatform(platform_name);
@@ -132,9 +132,9 @@ int runDDOT(const char* program_file){
         }
 
         //Get a GPU device
-        cdDevice = GetOCLDevice(cpPlatform, device_name);
+        cdDevice = GetOCLDevice(cpPlatform);
         if (cdDevice == NULL) {
-            printf("ERROR: Failed to find the device '%s' ...\n", device_name);
+            printf("Error in clGetDeviceIDs, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
             return -1;
         }
 

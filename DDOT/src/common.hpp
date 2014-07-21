@@ -50,6 +50,10 @@ cl_platform_id GetOCLPlatform(
 );
 
 cl_device_id GetOCLDevice(
+    cl_platform_id pPlatform
+);
+
+cl_device_id GetOCLDevice(
     cl_platform_id pPlatform,
     char name[]
 );
