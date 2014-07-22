@@ -69,7 +69,7 @@ double OddRoundSumNonnegative(double th, double tl) {
     return thdb.d;
 }
 
-int Normalize(__local long *accumulator, int *imin, int *imax) {
+int Normalize(__global long *accumulator, int *imin, int *imax) {
   if (*imin > *imax) {
     return 0;
   }
@@ -96,14 +96,14 @@ int Normalize(__local long *accumulator, int *imin, int *imax) {
   }
   *imax = i - 1;
 
-  if (carry_in != 0 && carry_in != -1) {
+  if ((carry_in != 0) && (carry_in != -1)) {
     //TODO: handle overflow
     //status = Overflow;
   }
   return carry_in < 0;
 }
 
-double Round(__local long *accumulator) {
+double Round(__global long *accumulator) {
   int imin = 0; 
   int imax = 38;
   int negative = Normalize(accumulator, &imin, &imax);
@@ -227,7 +227,6 @@ void DDOT(
     __local long *l_workingBase = l_sa + (get_local_id(0) & (WARP_COUNT - 1));
 
     //Initialize accumulators
-    //TODO: optimize
     if (get_local_id(0) < WARP_COUNT) {
         for (uint i = 0; i < BIN_COUNT; i++)
            l_workingBase[i * WARP_COUNT] = 0;
@@ -293,6 +292,7 @@ void DDOT(
 __kernel __attribute__((reqd_work_group_size(MERGE_WORKGROUP_SIZE, 1, 1)))
 void DDOTComplete(
     __global double *d_Res,
+    __global long *d_Superacc,
     __global long *d_PartialSuperaccs,
     const uint NbPartialSuperaccs
 ){
@@ -322,6 +322,8 @@ void DDOTComplete(
     }
     
     if(lid == 0) {
-        d_Res[0] = Round(l_Data);
+        d_Superacc[gid] = l_Data[0];
+        barrier(CLK_LOCAL_MEM_FENCE);
+        d_Res[0] = Round(d_Superacc);
     }
 }
