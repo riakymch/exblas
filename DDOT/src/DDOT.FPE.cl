@@ -291,7 +291,7 @@ void DDOT(
 ////////////////////////////////////////////////////////////////////////////////
 __kernel __attribute__((reqd_work_group_size(MERGE_WORKGROUP_SIZE, 1, 1)))
 void DDOTComplete(
-    __global double *d_Res,
+    //__global double *d_Res,
     __global long *d_Superacc,
     __global long *d_PartialSuperaccs,
     const uint NbPartialSuperaccs
@@ -323,7 +323,7 @@ void DDOTComplete(
     
     if(lid == 0) {
         d_Superacc[gid] = l_Data[0];
-        barrier(CLK_LOCAL_MEM_FENCE);
-        d_Res[0] = Round(d_Superacc);
+        //barrier(CLK_LOCAL_MEM_FENCE);
+        //d_Res[0] = Round(d_Superacc);
     }
 }

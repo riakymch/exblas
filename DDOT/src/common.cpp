@@ -52,7 +52,6 @@ cl_device_id GetOCLDevice(cl_platform_id pPlatform)
 
   cl_uint uiNumDevices = 0;
   cl_int err = clGetDeviceIDs(pPlatform, CL_DEVICE_TYPE_GPU, 10, dDevices, &uiNumDevices);
-  cl_int uiRes = -1;
 
   for (cl_int ui = 0; ui < (cl_int) uiNumDevices; ++ui) {
       err = clGetDeviceInfo(dDevices[ui], CL_DEVICE_NAME, 128 * sizeof(char), dDeviceName, NULL);
@@ -182,62 +181,30 @@ extern "C" mpfr_t *ddotWithMPFR(double *h_a, double *h_b, int size) {
     mpfr_add(*sum, *sum, ddot, MPFR_RNDN);
   }
 
-  mpfr_exp_t exp_ptr;
-  char *sum_str = mpfr_get_str(NULL, &exp_ptr, 10, 52, *sum, MPFR_RNDD);
-  printf("\tSum MPFR (52)      : %s \t e%d\n", sum_str, (int)exp_ptr);
-  mpfr_free_str(sum_str);
-  
-
-  sum_str = mpfr_get_str(NULL, &exp_ptr, 10, 2098, *sum, MPFR_RNDD);
-  printf ("\tSum MPFR (2098)    : %s\n", sum_str);
-  mpfr_free_str(sum_str);
   mpfr_free_cache();
 
   return sum;
 }
 
-extern "C" double roundMPFR(double *data, int size) {
-  mpfr_t result;
-  double result_d;
-  int i;
-
-  mpfr_init2(result, 2098);
-  mpfr_set_d(result, 0.0, MPFR_RNDN);
-
-  for (i = 0; i < size; i++)
-    mpfr_add_d(result, result, data[i], MPFR_RNDN);
-
-  result_d = mpfr_get_d(result, MPFR_RNDN);
-  mpfr_clear(result);
-  mpfr_free_cache();
-
-  printf("MPFR Sum: %a \n", result_d);
-  return result_d;
-}
-
-extern "C" bool compareRoundedResults(mpfr_t *ddot_mpfr, double ddot_rounded) {
-  double rounded_mpfr = mpfr_get_d(*ddot_mpfr, MPFR_RNDD);
-  printf("\tRounded value of MPFR: %.17g\n", rounded_mpfr);
-  printf("\tRounded value of DDOT: %.17g\n", ddot_rounded);
+extern "C" bool CompareWithMPFR(mpfr_t *res_mpfr, double res_rounded) {
+  double rounded_mpfr = mpfr_get_d(*res_mpfr, MPFR_RNDD);
+  printf("GPU Parallel DDOT: %.17g\n", res_rounded);
+  printf("Rounded value of MPFR: %.17g\n", rounded_mpfr);
 
   //Compare the results with MPFR using native functions
-  bool ddot_cmp = false;
-  double r = 0.0;
-  double x = KnuthTwoSum(rounded_mpfr, -ddot_rounded, &r);
-  printf("\tx = %.17g \t r = %.17g\n", x, r);
-  //if (rounded_mpfr == ddot_rounded){
-  if ((fabs(x) < 1e-16) && (fabs(r) < 1e-16)) {
-      printf("Results MATCH the results of MPFR\n\n");
-      ddot_cmp = true;
+  bool res_cmp = false;
+  if (rounded_mpfr == res_rounded){
+      printf("\t The result is EXACT -- matches the MPFR algorithm!\n\n");
+      res_cmp = true;
   } else {
-      printf("Results DO NOT MATCH the results of MPFR\n\n");
+      printf("\t The result is WRONG -- does not match the MPFR algorithm!\n\n");
   }
 
-  mpfr_clear(*ddot_mpfr);
-  free(ddot_mpfr);
+  mpfr_clear(*res_mpfr);
+  free(res_mpfr);
   mpfr_free_cache();
 
-  return ddot_cmp;
+  return res_cmp;
 }
 
 extern "C" double KnuthTwoSum(double a, double b, double *s) {

@@ -38,7 +38,7 @@ static char  compileOptions[256] = "-DWARP_SIZE=16 -DWORKGROUP_SIZE=256 -DMERGE_
 #endif
 
 
-extern "C" cl_int initDDOTSimple(
+extern "C" cl_int initDDOTStandard(
     cl_context cxGPUContext, 
     cl_command_queue cqParamCommandQue, 
     cl_device_id cdDevice,
@@ -110,7 +110,7 @@ extern "C" cl_int initDDOTSimple(
     return EXIT_SUCCESS;
 }
 
-extern "C" void closeDDOTSimple(void){
+extern "C" void closeDDOTStandard(void){
     cl_int ciErrNum;
 
     ciErrNum = clReleaseMemObject(d_PartialSum);
@@ -135,7 +135,7 @@ inline uint iSnapDown(uint a, uint b){
     return a - a % b;
 }
 
-extern "C" size_t DDOTSimple(
+extern "C" size_t DDOTStandard(
     cl_command_queue cqCommandQueue,
     cl_mem d_res,
     const cl_mem d_a,

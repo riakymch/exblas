@@ -86,7 +86,7 @@ extern "C" cl_int initDDOT(
     const uint NbFPE
 );
 
-extern "C" cl_int initDDOTSimple(
+extern "C" cl_int initDDOTStandard(
     cl_context cxGPUContext,
     cl_command_queue cqParamCommandQue,
     cl_device_id cdDevice,
@@ -97,7 +97,7 @@ extern "C" void closeDDOT(
     void
 );
 
-extern "C" void closeDDOTSimple(
+extern "C" void closeDDOTStandard(
     void
 );
 
@@ -110,7 +110,7 @@ extern "C" size_t DDOT(
     cl_int *ciErrNum
 );
 
-extern "C" size_t DDOTSimple(
+extern "C" size_t DDOTStandard(
     cl_command_queue cqCommandQueue,
     cl_mem d_res,
     const cl_mem d_a,
@@ -127,14 +127,9 @@ extern "C" mpfr_t *ddotWithMPFR(
     double *h_b,
     int size);
 
-extern "C" double roundMPFR(
-    double *data,
-    int size
-);
-
-extern "C" bool compareRoundedResults(
-    mpfr_t *ddot_mpfr,
-    double ddot_rounded
+extern "C" bool CompareWithMPFR(
+    mpfr_t *res_mpfr,
+    double res_rounded
 );
 
 extern "C" double roundKahan(
@@ -158,6 +153,6 @@ extern "C" double KnuthTwoSum(
 // Executable functions from main.cpp
 ////////////////////////////////////////////////////////////////////////////////
 int runDDOT(const char*);
-int runDDOTSimple(const char*);
+int runDDOTStandard(const char*);
 
 #endif

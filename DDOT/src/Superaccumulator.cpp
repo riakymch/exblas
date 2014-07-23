@@ -18,17 +18,10 @@ Superaccumulator::Superaccumulator(int64_t *acc, int e_bits, int f_bits) :
       K(8), digits(64 - K), deltaScale(double(1ull << digits)),
       f_words((f_bits + digits - 1) / digits),   // Round up
       e_words((e_bits + digits - 1) / digits),
-      imin(0), imax(0),
+      imin(f_words + e_words - 1), imax(0),
       status(Exact), overflow_counter((1ll << K) - 1) {
-  for (int i = 0; i < f_words + e_words; ++i) {
+  for (int i = 0; i < f_words + e_words; ++i)
     accumulator.push_back(acc[i]);
-    //to find imin
-    if ((acc[i] != 0) && (imin == 0))
-	imin = i;
-    //to find imax
-    if ((acc[i] == 0) && (imin != 0) && (imax == 0))
-	imax = i - 1;
-  }
 }
 
 void Superaccumulator::AccumulateWord(int64_t x, int i) {
@@ -179,9 +172,6 @@ void Superaccumulator::Accumulate(Superaccumulator & other) {
 }
 
 double Superaccumulator::Round() {
-  //TODO: a small fix for numbers of the same exp -- Round did not work well
-  imin = 0;
-  imax = 38;
   // BUG for negative numbers
   assert(digits >= 52);
   //printf("imin=%d, imax=%d\n", imin, imax);
@@ -335,32 +325,34 @@ bool Superaccumulator::CompareSuperaccumulatorWithMPFR(mpfr_t *res_mpfr) {
     mpfr_add_d(result, result, xscaled, MPFR_RNDN);
   }
 
+  char *res = mpfr_get_str(NULL, &exp_ptr, 10, 2098, *res_mpfr, MPFR_RNDD);
   char *res_str = mpfr_get_str(NULL, &exp_ptr, 10, 2098, result, MPFR_RNDD);
+  printf("\tSum MPFR (2098)    : %s\n", res);
   printf("\tSum Superaccumulator (2098) : %s\n", res_str);
+  mpfr_free_str(res);
+  mpfr_free_str(res_str);
 
-  /*
-  //Compare the results with MPFR using strings
-  if (strcmp(res_mpfr, res) == 0)
-    printf("\t The result is EXACT -- matches the MPFR algorithm!!!\n");
-  else {
-    printf("\t The result is WRONG -- does not match the MPFR algorithm!!!\n");
-    for (int i = 0; i < 2098; i++)
-      if (res[i] != res_mpfr[i]) {
-        printf("[%d] %c \t %c\n", i, res[i], res_mpfr[i]);
-        break;
-      }
-  }*/
   //Compare the results with MPFR using native functions
   bool res_cmp = false;
   int cmp = mpfr_cmp(*res_mpfr, result);
   if (cmp == 0){
-      printf("Superaccumulator matches the results of MPFR\n\n");
+      printf("\t The result is EXACT -- matches the MPFR algorithm!\n\n");
       res_cmp = true;
   } else {
-      printf("Superaccumulator does NOT match the results of MPFR\n\n");
+      printf("\t The result is WRONG -- does not match the MPFR algorithm!\n\n");
   }
 
-  mpfr_free_str(res_str);
+  double rounded_mpfr = mpfr_get_d(*res_mpfr, MPFR_RNDD);
+  double rounded_sum = mpfr_get_d(result, MPFR_RNDD);
+  printf("Rounded value of MPFR: %.17g\n", rounded_mpfr);
+  printf("Rounded value of superaccumulator: %.17g\n", rounded_sum);
+  if (rounded_mpfr == rounded_sum){
+      printf("\t The result is EXACT -- matches the MPFR algorithm!\n\n");
+      res_cmp = true;
+  } else {
+      printf("\t The result is WRONG -- does not match the MPFR algorithm!\n\n");
+  }
+
   mpfr_clear(result);
   mpfr_free_cache();
 

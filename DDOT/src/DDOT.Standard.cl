@@ -5,25 +5,22 @@
   #pragma OPENCL EXTENSION cl_nv_pragma_unroll         : enable
 #endif
 
-//Data type used for input data fetches
-typedef double data_t;
-
 
 ////////////////////////////////////////////////////////////////////////////////
 // Main computation pass: compute partial reductions
 ////////////////////////////////////////////////////////////////////////////////
 __kernel __attribute__((reqd_work_group_size(WORKGROUP_SIZE, 1, 1)))
 void DDOT(
-    __global data_t *d_PartialSuperaccs,
-    __global data_t *d_a,
-    __global data_t *d_b,
+    __global double *d_PartialSuperaccs,
+    __global double *d_a,
+    __global double *d_b,
     const uint NbElements
 ){
-    __local data_t l_sa[WORKGROUP_SIZE] __attribute__((aligned(8)));
+    __local double l_sa[WORKGROUP_SIZE] __attribute__((aligned(8)));
     uint lid = get_local_id(0);
 
     // Each work-item accumulates as many elements as necessary into local variable "sum"
-    data_t sum = 0.0;
+    double sum = 0.0;
     #ifdef NVIDIA
         #pragma unroll
     #endif
@@ -62,15 +59,15 @@ void DDOT(
 ////////////////////////////////////////////////////////////////////////////////
 __kernel __attribute__((reqd_work_group_size(MERGE_WORKGROUP_SIZE, 1, 1)))
 void DDOTComplete(
-    __global data_t *d_Superacc,
-    __global data_t *d_PartialSuperaccs,
+    __global double *d_Superacc,
+    __global double *d_PartialSuperaccs,
     uint NbElements
 ){
-    __local data_t l_Data[MERGE_WORKGROUP_SIZE];
+    __local double l_Data[MERGE_WORKGROUP_SIZE];
     uint lid = get_local_id(0);
     uint gid = get_group_id(0);
 
-    data_t sum = 0.0;
+    double sum = 0.0;
     #ifdef NVIDIA
         #pragma unroll
     #endif
