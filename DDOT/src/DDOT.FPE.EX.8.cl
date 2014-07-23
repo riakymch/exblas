@@ -227,7 +227,6 @@ void DDOT(
     __local long *l_workingBase = l_sa + (get_local_id(0) & (WARP_COUNT - 1));
 
     //Initialize accumulators
-    //TODO: optimize
     if (get_local_id(0) < WARP_COUNT) {
         for (uint i = 0; i < BIN_COUNT; i++)
            l_workingBase[i * WARP_COUNT] = 0;
