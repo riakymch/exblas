@@ -29,6 +29,8 @@ PATH_TO_AMD_LIB=/usr/lib/ -lOpenCL -L$(MPFR_HOME)/lib/ -lmpfr -L$(GMP_HOME)/lib/
 # NVIDIA
 PATH_TO_NVIDIA_INC=/usr/local/cuda/include/ -I$(MPFR_HOME)/include/ -I$(GMP_HOME)/include/
 PATH_TO_NVIDIA_LIB=/usr/lib -lOpenCL -L/usr/local/cuda/lib64 -L$(MPFR_HOME)/lib/ -lmpfr -L$(GMP_HOME)/lib/ -lgmp
+#for ics machine
+PATH_TO_NVIDIA_LIB+=-L$(MPFR_HOME)/lib64/ -L$(GMP_HOME)/lib64/
 
 amd:    $(join $(EXE_NAME),.amd)
 nvidia: $(join $(EXE_NAME),.nvidia)
