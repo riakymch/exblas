@@ -96,7 +96,7 @@ int Normalize(__global long *accumulator, int *imin, int *imax) {
   }
   *imax = i - 1;
 
-  if (carry_in != 0 && carry_in != -1) {
+  if ((carry_in != 0) && (carry_in != -1)) {
     //TODO: handle overflow
     //status = Overflow;
   }
@@ -120,7 +120,7 @@ double Round(__global long *accumulator) {
   }
   if (i < 0) {
     //TODO: should we preserve sign of zero?
-    return 0.;
+    return 0.0;
   }
 
   long hiword = negative ? (1 << digits) - accumulator[i] : accumulator[i];
@@ -227,7 +227,6 @@ void DDOT(
     __local long *l_workingBase = l_sa + (get_local_id(0) & (WARP_COUNT - 1));
 
     //Initialize accumulators
-    //TODO: optimize
     if (get_local_id(0) < WARP_COUNT) {
         for (uint i = 0; i < BIN_COUNT; i++)
            l_workingBase[i * WARP_COUNT] = 0;
@@ -292,6 +291,7 @@ void DDOT(
 ////////////////////////////////////////////////////////////////////////////////
 __kernel __attribute__((reqd_work_group_size(MERGE_WORKGROUP_SIZE, 1, 1)))
 void DDOTComplete(
+    //__global double *d_Res,
     __global long *d_Superacc,
     __global long *d_PartialSuperaccs,
     const uint NbPartialSuperaccs
@@ -321,19 +321,9 @@ void DDOTComplete(
             l_Data[lid] += l_Data[lid + stride];
     }
     
-    if(lid == 0)
+    if(lid == 0) {
         d_Superacc[gid] = l_Data[0];
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// Round the results
-////////////////////////////////////////////////////////////////////////////////
-__kernel __attribute__((reqd_work_group_size(MERGE_WORKGROUP_SIZE, 1, 1)))
-void DDOTRound(
-    __global double *d_res,
-    __global long *d_Superacc
-){
-    uint pos = get_local_id(0);
-    if (pos == 0)
-	d_res[0] = Round(d_Superacc);
+        //barrier(CLK_LOCAL_MEM_FENCE);
+        //d_Res[0] = Round(d_Superacc);
+    }
 }

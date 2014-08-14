@@ -42,6 +42,33 @@ cl_platform_id GetOCLPlatform(char name[])
   }
 }
 
+cl_device_id GetOCLDevice(cl_platform_id pPlatform)
+{
+  printf("clGetDeviceIDs...\n"); 
+
+  cl_device_id dDevices[10] = { 0 };
+  char name[128] = { 0 };
+  char dDeviceName[128] = { 0 };
+
+  cl_uint uiNumDevices = 0;
+  cl_int err = clGetDeviceIDs(pPlatform, CL_DEVICE_TYPE_GPU, 10, dDevices, &uiNumDevices);
+
+  for (cl_int ui = 0; ui < (cl_int) uiNumDevices; ++ui) {
+      err = clGetDeviceInfo(dDevices[ui], CL_DEVICE_NAME, 128 * sizeof(char), dDeviceName, NULL);
+      if ( err != CL_SUCCESS ) {
+	  printf("ERROR: Failed to retreive platform vendor name.\n");
+	  return NULL;
+      }
+
+      printf("### Device[%i] : %s\n", ui, dDeviceName);
+      if (ui == 0)
+	strcpy(name, dDeviceName);
+  }
+  printf("### Using Device : %s\n", name);
+
+  return dDevices[0];
+}
+
 cl_device_id GetOCLDevice(cl_platform_id pPlatform, char name[])
 {
   printf("clGetDeviceIDs...\n"); 
@@ -107,23 +134,15 @@ double min(double arr[], int size) {
 
 void init_fpuniform(double *array, int size, int range, int emax)
 {
-    //Generate numbers on several bins starting from emax
+    /*//Generate numbers on several bins starting from emax
     for(int i = 0; i != size; ++i) {
         //array[i] = randDouble(emax-range, emax, 1);
         array[i] = randDouble(0, range, 1);
-    }
-    /*//Generate nubers on an interval [0, 1]
-    for(int i = 0; i != size; ++i) {
-        array[i] = double(rand()) / double(RAND_MAX);
     }*/
-    /*//Generate numbers on an interval [1, 2]
+    //Generate numbers on an interval [1, 2]
     for(int i = 0; i != size; ++i) {
         array[i] = 1.0 + double(rand()) / double(RAND_MAX);
-    }*/
-    /*//simple case for tests only
-    for(int i = 0; i != size; i++) {
-        array[i] = 1.1;
-    }*/
+    }
 }
 
 void print2Superaccumulators(bintype *binCPU, bintype *binGPU) {
@@ -162,62 +181,30 @@ extern "C" mpfr_t *ddotWithMPFR(double *h_a, double *h_b, int size) {
     mpfr_add(*sum, *sum, ddot, MPFR_RNDN);
   }
 
-  mpfr_exp_t exp_ptr;
-  char *sum_str = mpfr_get_str(NULL, &exp_ptr, 10, 52, *sum, MPFR_RNDD);
-  printf("\tSum MPFR (52)      : %s \t e%d\n", sum_str, (int)exp_ptr);
-  mpfr_free_str(sum_str);
-  
-
-  sum_str = mpfr_get_str(NULL, &exp_ptr, 10, 2098, *sum, MPFR_RNDD);
-  printf ("\tSum MPFR (2098)    : %s\n", sum_str);
-  mpfr_free_str(sum_str);
   mpfr_free_cache();
 
   return sum;
 }
 
-extern "C" double roundMPFR(double *data, int size) {
-  mpfr_t result;
-  double result_d;
-  int i;
-
-  mpfr_init2(result, 2098);
-  mpfr_set_d(result, 0.0, MPFR_RNDN);
-
-  for (i = 0; i < size; i++)
-    mpfr_add_d(result, result, data[i], MPFR_RNDN);
-
-  result_d = mpfr_get_d(result, MPFR_RNDN);
-  mpfr_clear(result);
-  mpfr_free_cache();
-
-  printf("MPFR Sum: %a \n", result_d);
-  return result_d;
-}
-
-extern "C" bool compareRoundedResults(mpfr_t *ddot_mpfr, double ddot_rounded) {
-  double rounded_mpfr = mpfr_get_d(*ddot_mpfr, MPFR_RNDD);
-  printf("\tRounded value of MPFR: %.17g\n", rounded_mpfr);
-  printf("\tRounded value of DDOT: %.17g\n", ddot_rounded);
+extern "C" bool CompareWithMPFR(mpfr_t *res_mpfr, double res_rounded) {
+  double rounded_mpfr = mpfr_get_d(*res_mpfr, MPFR_RNDD);
+  printf("GPU Parallel DDOT: %.17g\n", res_rounded);
+  printf("Rounded value of MPFR: %.17g\n", rounded_mpfr);
 
   //Compare the results with MPFR using native functions
-  bool ddot_cmp = false;
-  double r = 0.0;
-  double x = KnuthTwoSum(rounded_mpfr, -ddot_rounded, &r);
-  printf("\tx = %.17g \t r = %.17g\n", x, r);
-  //if (rounded_mpfr == ddot_rounded){
-  if ((fabs(x) < 1e-16) && (fabs(r) < 1e-16)) {
-      printf("Results MATCH the results of MPFR\n\n");
-      ddot_cmp = true;
+  bool res_cmp = false;
+  if (rounded_mpfr == res_rounded){
+      printf("\t The result is EXACT -- matches the MPFR algorithm!\n\n");
+      res_cmp = true;
   } else {
-      printf("Results DO NOT MATCH the results of MPFR\n\n");
+      printf("\t The result is WRONG -- does not match the MPFR algorithm!\n\n");
   }
 
-  mpfr_clear(*ddot_mpfr);
-  free(ddot_mpfr);
+  mpfr_clear(*res_mpfr);
+  free(res_mpfr);
   mpfr_free_cache();
 
-  return ddot_cmp;
+  return res_cmp;
 }
 
 extern "C" double KnuthTwoSum(double a, double b, double *s) {

@@ -154,10 +154,23 @@ int runDGEMM(const char* program_file){
 
     printf("Initializing OpenCL...\n");
         char platform_name[64];
+        char device_name[32];
 #ifdef AMD
         strcpy(platform_name, "AMD Accelerated Parallel Processing");
+        strcpy(device_name, "Tahiti");
+#elif ETERNITY == 1
+        strcpy(platform_name, "AMD Accelerated Parallel Processing");
+        strcpy(device_name, "Devastator");
+#elif TESLA == 1
+        strcpy(platform_name, "NVIDIA CUDA");
+        strcpy(device_name, "Tesla M2090");
+#elif C2050 == 1
+        strcpy(platform_name, "NVIDIA CUDA");
+        strcpy(device_name, "Tesla C2050");
 #else
         strcpy(platform_name, "NVIDIA CUDA");
+        strcpy(device_name, "Tesla K20c");
+	//strcpy(device_name, "Tesla C2050");
 #endif
         //setenv("CUDA_CACHE_DISABLE", "1", 1);
         cpPlatform = GetOCLPlatform(platform_name);
@@ -167,9 +180,9 @@ int runDGEMM(const char* program_file){
         }
 
         //Get a GPU device
-        cdDevice = GetOCLDevice(cpPlatform);
+        cdDevice = GetOCLDevice(cpPlatform, device_name);
         if (cdDevice == NULL) {
-            printf("Error in clGetDeviceIDs, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
+            printf("ERROR: Failed to find the device '%s' ...\n", device_name);
             return -1;
         }
 
