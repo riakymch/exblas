@@ -46,7 +46,7 @@ void Superaccumulator::AccumulateWord(int64_t x, int i) {
         carry = (oldword + carry) >> digits;    // Arithmetic shift
         bool s = oldword > 0;
         carrybit = (s ? 1ll << K : -1ll << K);
-        
+
         // Cancel carry-save bits
         //accumulator[i] -= (carry << digits);
         xadd(accumulator[i], (int64_t) -(carry << digits), overflow);
@@ -57,7 +57,7 @@ void Superaccumulator::AccumulateWord(int64_t x, int i) {
             carrybit *= 2;
         }
         // overflow only when S=?
-        
+
         carry += carrybit;
 
         ++i;
@@ -71,14 +71,14 @@ void Superaccumulator::AccumulateWord(int64_t x, int i) {
 
 void Superaccumulator::Accumulate(double x) {
     if(x == 0) return;
-    
+
     // TODO: get exponent right for subnormals
     // TODO: specials (+inf, -inf, NaN)
-    
+
     int e = exponent(x);
     int exp_word = e / digits;  // Word containing MSbit
     int iup = exp_word + f_words;
-    
+
     //double inputScale = exp2i(-digits * exp_word);
     //double xscaled = x * inputScale;
     double xscaled = myldexp(x, -digits * exp_word);
@@ -95,7 +95,7 @@ void Superaccumulator::Accumulate(double x) {
         double xrounded = myrint(xscaled);
         int64_t xint = myllrint(xscaled);
         AccumulateWord(xint, i);
-        
+
         xscaled -= xrounded;
         xscaled *= deltaScale;
     }

@@ -18,7 +18,7 @@ struct Superaccumulator
 {
     Superaccumulator(int e_bits = 1023, int f_bits = 1023 + 52);
     Superaccumulator(int64_t *acc, int e_bits = 1023, int f_bits = 1023 + 52);
-    
+
     void Accumulate(int64_t x, int exp);
     void Accumulate(double x);
     void Accumulate(Superaccumulator & other);   // May modify (normalize) other member
@@ -53,7 +53,7 @@ private:
     std::vector<int64_t> accumulator;   // Mutable: Normalization does (should) not change externally-visible state
     int imin, imax;
     Status status;
-    
+
     int64_t overflow_counter;
 };
 

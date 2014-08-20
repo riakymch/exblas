@@ -9,8 +9,8 @@ double DDOT_CPU(
     const unsigned int n
 ) {
     double res = 0.0;
-    for(unsigned int i = 0; i < n; i++) {
-	res += a[i] * b[i];
-    }
+    for(unsigned int i = 0; i < n; i++)
+        res += a[i] * b[i];
+
     return res;
 }

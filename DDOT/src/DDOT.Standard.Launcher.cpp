@@ -17,7 +17,7 @@
 #define DDOT_KERNEL          "DDOT"
 #define DDOT_COMPLETE_KERNEL "DDOTComplete"
 
-static size_t szKernelLength;		       //Byte size of kernel code
+static size_t szKernelLength;                  //Byte size of kernel code
 static char* cSources = NULL;                  //Buffer to hold source for compilation
 
 static cl_program       cpProgram;             //OpenCL Reduction program
@@ -159,14 +159,14 @@ extern "C" size_t DDOTStandard(
         ciErrNum |= clSetKernelArg(ckKernel, 3, sizeof(cl_uint), (void *)&NbElements);
         if (ciErrNum != CL_SUCCESS) {
             printf("Error in clSetKernelArg, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
-	    *ciErrNumRes = EXIT_FAILURE;
+            *ciErrNumRes = EXIT_FAILURE;
             return 0;
         }
 
         ciErrNum = clEnqueueNDRangeKernel(cqCommandQueue, ckKernel, 1, NULL, &TotalNbThreads, &NbThreadsPerWorkGroup, 0, NULL, NULL);
         if (ciErrNum != CL_SUCCESS) {
             printf("Error in clEnqueueNDRangeKernel, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
-	    *ciErrNumRes = EXIT_FAILURE;
+            *ciErrNumRes = EXIT_FAILURE;
             return 0;
         }
     }
@@ -179,14 +179,14 @@ extern "C" size_t DDOTStandard(
         ciErrNum |= clSetKernelArg(ckComplete, 2, sizeof(cl_uint), (void *)&PARTIAL_SUMMATION_COUNT);
         if (ciErrNum != CL_SUCCESS) {
             printf("Error in clSetKernelArg, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
-	    *ciErrNumRes = EXIT_FAILURE;
+            *ciErrNumRes = EXIT_FAILURE;
             return 0;
         }
 
         ciErrNum = clEnqueueNDRangeKernel(cqCommandQueue, ckComplete, 1, NULL, &TotalNbThreads, &NbThreadsPerWorkGroup, 0, NULL, NULL);
         if (ciErrNum != CL_SUCCESS) {
             printf("Error in clEnqueueNDRangeKernel, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
-	    *ciErrNumRes = EXIT_FAILURE;
+            *ciErrNumRes = EXIT_FAILURE;
             return 0;
         }
     }

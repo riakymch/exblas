@@ -27,9 +27,9 @@
 
 inline uint64_t rdtsc()
 {
-	uint32_t hi, lo;
-	asm volatile ("rdtsc" : "=a"(lo), "=d"(hi));
-	return lo | ((uint64_t)hi << 32);
+    uint32_t hi, lo;
+    asm volatile ("rdtsc" : "=a"(lo), "=d"(hi));
+    return lo | ((uint64_t)hi << 32);
 }
 
 
@@ -112,7 +112,7 @@ inline double myldexp(double x, int e)
         double d;
         uint64_t i;
     } caster;
-    
+
     caster.d = x;
     caster.i += (uint64_t)e << 52;
     return caster.d;
@@ -125,7 +125,7 @@ inline double exp2i(int e)
         double d;
         uint64_t i;
     } caster;
-    
+
     caster.i = (uint64_t)(e + 0x3ff) << 52;
     return caster.d;
 }

@@ -236,8 +236,8 @@ void DDOT(
     //Read data from global memory and scatter it to sub-accumulators
     double a[8] = {0.0};
     for(uint pos = get_global_id(0); pos < NbElements; pos += get_global_size(0)){
-	double r = 0.0;
-	data_t x = TwoProductFMA(d_a[pos], d_b[pos], &r);
+        double r = 0.0;
+        data_t x = TwoProductFMA(d_a[pos], d_b[pos], &r);
 
         double s;
         a[0] = KnuthTwoSum(a[0], x, &s);
@@ -263,17 +263,17 @@ void DDOT(
                                 if(x != 0.0) {
                                     a[7] = KnuthTwoSum(a[7], x, &s);
                                     x = s;
- 	                        }
- 	                    }
-	                }
-	            }
-	        }
-	    }
-	}
-        if(x != 0.0) 
-	    Accumulate(l_workingBase, x);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        if(x != 0.0)
+            Accumulate(l_workingBase, x);
 
-	//if (r != 0.0) { // without it is better for the performance, especially on nvidia
+        //if (r != 0.0) { // without it is better for the performance, especially on nvidia
             //double s;
             a[0] = KnuthTwoSum(a[0], r, &s);
             r = s;
@@ -298,16 +298,16 @@ void DDOT(
                                     if(r != 0.0) {
                                         a[7] = KnuthTwoSum(a[7], r, &s);
                                         r = s;
-   	                            }
-   	                        }
-   	                    }
-   	                }
-	            }
-   	        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
             }
             if(r != 0.0)
-	        Accumulate(l_workingBase, r);
-	//}
+                Accumulate(l_workingBase, r);
+        //}
     }
     //Flush to the accumulator
     Accumulate(l_workingBase, a[0]);
@@ -329,7 +329,7 @@ void DDOT(
             sum += l_sa[pos * WARP_COUNT + i];
         }
         barrier(CLK_LOCAL_MEM_FENCE);
-	
+
         d_PartialSuperaccs[get_group_id(0) * BIN_COUNT + pos] = sum;
     }
 }
@@ -367,7 +367,7 @@ void DDOTComplete(
         if(lid < stride)
             l_Data[lid] += l_Data[lid + stride];
     }
-    
+
     if(lid == 0)
         d_Superacc[gid] = l_Data[0];
 }
@@ -382,5 +382,5 @@ void DDOTRound(
 ){
     uint pos = get_local_id(0);
     if (pos == 0)
-	d_res[0] = Round(d_Superacc);
+        d_res[0] = Round(d_Superacc);
 }
