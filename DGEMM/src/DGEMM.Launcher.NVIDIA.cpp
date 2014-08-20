@@ -21,7 +21,7 @@
   #define BLOCK_SIZE 32
 #endif
 
-static size_t szKernelLength;	              // Byte size of kernel code
+static size_t szKernelLength;                 // Byte size of kernel code
 static char* cSources = NULL;                 // Buffer to hold source for compilation
 
 static cl_program       cpProgram;            //OpenCL Superaccumulator program

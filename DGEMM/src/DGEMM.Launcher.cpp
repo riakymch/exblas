@@ -110,16 +110,6 @@ extern "C" void closeDGEMM(void){
 ////////////////////////////////////////////////////////////////////////////////
 // OpenCL launchers for Superaccumulator / mergeSuperaccumulators kernels
 ////////////////////////////////////////////////////////////////////////////////
-//Round a / b to nearest higher integer value
-inline uint iDivUp(uint a, uint b){
-    return (a % b != 0) ? (a / b + 1) : (a / b);
-}
-
-//Snap a to nearest lower multiple of b
-inline uint iSnapDown(uint a, uint b){
-    return a - a % b;
-}
-
 extern "C" size_t DGEMM(
     cl_command_queue cqCommandQueue,
     Matrix d_C,
