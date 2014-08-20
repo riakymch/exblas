@@ -32,43 +32,43 @@ static uint __nbfpe      = 0;
 static uint __alg        = 0;
 
 static void __usage(int argc __attribute__((unused)), char **argv) {
-  fprintf(stderr, "Usage: %s [-n number of elements,\n", argv[0]);
-  printf("                -r range,\n"); 
-  printf("                -e nbfpe,\n");
-  printf("                -a alg (0-ddot, 1-acc, 2-fpe, 3-fpeex8, 4-fpeex4, 5-fpeex6)] \n");
-  printf("       -?, -h:    Display this help and exit\n");
+    fprintf(stderr, "Usage: %s [-n number of elements,\n", argv[0]);
+    printf("                -r range,\n"); 
+    printf("                -e nbfpe,\n");
+    printf("                -a alg (0-ddot, 1-acc, 2-fpe, 3-fpeex8, 4-fpeex4, 5-fpeex6)] \n");
+    printf("       -?, -h:    Display this help and exit\n");
 }
 
 static void __parse_args(int argc, char **argv) {
-  int i;
+    int i;
 
-  for (i = 1; i < argc; i++) {
-    if ((strcmp(argv[i], "-n") == 0)) {
-      __nbElements = atoi(argv[++i]);
-    } if ((strcmp(argv[i], "-r") == 0)) {
-      __range = atoi(argv[++i]);
-    } if ((strcmp(argv[i], "-e") == 0)) {
-      __nbfpe = atoi(argv[++i]);
-    } if ((strcmp(argv[i], "-a") == 0)) {
-      __alg = atoi(argv[++i]);
-    } else if ((strcmp(argv[i], "-h") || strcmp(argv[i], "-?")) == 0) {
-      __usage(argc, argv);
-      exit(-1);
-    } else if (argv[i][0] == '-') {
-      fprintf(stderr, "Unknown option %s\n", argv[i]);
-      __usage(argc, argv);
-      exit(-1);
+    for (i = 1; i < argc; i++) {
+        if ((strcmp(argv[i], "-n") == 0)) {
+             __nbElements = atoi(argv[++i]);
+        } if ((strcmp(argv[i], "-r") == 0)) {
+            __range = atoi(argv[++i]);
+        } if ((strcmp(argv[i], "-e") == 0)) {
+            __nbfpe = atoi(argv[++i]);
+        } if ((strcmp(argv[i], "-a") == 0)) {
+            __alg = atoi(argv[++i]);
+        } else if ((strcmp(argv[i], "-h") || strcmp(argv[i], "-?")) == 0) {
+            __usage(argc, argv);
+            exit(-1);
+        } else if (argv[i][0] == '-') {
+            fprintf(stderr, "Unknown option %s\n", argv[i]);
+            __usage(argc, argv);
+            exit(-1);
+        }
     }
-  }
 
-  if (__nbElements <= 0) {
-    __usage(argc, argv);
-    exit(-1);
-  }
-  if (__alg > 5) {
-    __usage(argc, argv);
-    exit(-1);
-  }
+    if (__nbElements <= 0) {
+        __usage(argc, argv);
+        exit(-1);
+    }
+    if (__alg > 5) {
+        __usage(argc, argv);
+        exit(-1);
+    }
 }
 
 int cleanUp (
@@ -90,13 +90,13 @@ int main(int argc, char **argv)
     } else if (__alg == 2) {
         runDDOT("../src/DDOT.FPE.cl");
     } else if (__alg == 3) {
-	__nbfpe = 8;
+        __nbfpe = 8;
         runDDOT("../src/DDOT.FPE.EX.8.cl");
     } else if (__alg == 4) {
-	__nbfpe = 4;
+        __nbfpe = 4;
         runDDOT("../src/DDOT.FPE.EX.4.cl");
     } else if (__alg == 5) {
-	__nbfpe = 6;
+        __nbfpe = 6;
         runDDOT("../src/DDOT.FPE.EX.6.cl");
     }
 }
@@ -112,9 +112,9 @@ int runDDOT(const char* program_file){
             printf("ERROR: could not allocate memory with posix_memalign!\n");
             exit(1);
         }
-	h_Superacc = (bintype *) malloc(BIN_COUNT * sizeof(bintype));
+        h_Superacc = (bintype *) malloc(BIN_COUNT * sizeof(bintype));
 
-	// init data
+        // init data
         int emax = E_BITS - log2(__nbElements);// use log in order to stay within [emin, emax]
         init_fpuniform((double *) h_a, __nbElements, __range, emax);
         init_fpuniform((double *) h_b, __nbElements, __range, emax);
@@ -155,13 +155,13 @@ int runDDOT(const char* program_file){
         }
 
     printf("Allocating OpenCL memory...\n\n");
-	size_t size = __nbElements * sizeof(cl_double);
-	d_a = clCreateBuffer(cxGPUContext, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, size, h_a, &ciErrNum);
+        size_t size = __nbElements * sizeof(cl_double);
+        d_a = clCreateBuffer(cxGPUContext, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, size, h_a, &ciErrNum);
         if (ciErrNum != CL_SUCCESS) {
             printf("Error in clCreateBuffer for d_a, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
             cleanUp(EXIT_FAILURE);
         }
-	d_b = clCreateBuffer(cxGPUContext, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, size, h_b, &ciErrNum);
+        d_b = clCreateBuffer(cxGPUContext, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, size, h_b, &ciErrNum);
         if (ciErrNum != CL_SUCCESS) {
             printf("Error in clCreateBuffer for d_b, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
             cleanUp(EXIT_FAILURE);
@@ -171,10 +171,10 @@ int runDDOT(const char* program_file){
             printf("Error in clCreateBuffer for d_Superacc, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
             cleanUp(EXIT_FAILURE);
         }
-    {
+
         printf("Initializing OpenCL DDOT...\n");
             ciErrNum = initDDOT(cxGPUContext, cqCommandQueue, cdDevice, program_file, __nbfpe);
-            
+
             if (ciErrNum != CL_SUCCESS)
                 cleanUp(EXIT_FAILURE);
 
@@ -186,7 +186,7 @@ int runDDOT(const char* program_file){
                 cleanUp(EXIT_FAILURE);
 
 #ifdef GPU_PROFILING
-	double gpuTime[NUM_ITER];
+        double gpuTime[NUM_ITER];
         cl_event startMark, endMark;
 
         for(uint iter = 0; iter < NUM_ITER; iter++) {
@@ -217,11 +217,11 @@ int runDDOT(const char* program_file){
             gpuTime[iter] = 1.0e-9 * ((unsigned long)endTime - (unsigned long)startTime); // / (double)NUM_ITER;
         }
 
-	double minTime = min(gpuTime, NUM_ITER);
-	double throughput = 2.0 * __nbElements * sizeof(double);
-	throughput = (throughput / minTime) * 1e-9;
-	double perf = 2.0 * __nbElements;
-	perf = (perf / minTime) * 1e-9;
+        double minTime = min(gpuTime, NUM_ITER);
+        double throughput = 2.0 * __nbElements * sizeof(double);
+        throughput = (throughput / minTime) * 1e-9;
+        double perf = 2.0 * __nbElements;
+        perf = (perf / minTime) * 1e-9;
         printf("Alg = %u \t NbFPE = %u \t Range = %u \t NbElements = %u \t Size = %lu \t Time = %.8f s \t Throughput = %.4f GB/s\n\n", __alg, __nbfpe, __range, __nbElements, __nbElements * sizeof(double), minTime, throughput);
         printf("Alg = %u \t NbFPE = %u \t Range = %u \t NbElements = %u \t Size = %lu \t Time = %.8f s \t Performance = %.4f GFLOPS\n\n", __alg, __nbfpe, __range, __nbElements, __nbElements * sizeof(double), minTime, perf);
 #endif
@@ -238,37 +238,36 @@ int runDDOT(const char* program_file){
             /*printf(" ...SupersuperaccCPU()\n");
                 Superaccumulator superaccCPU(E_BITS, F_BITS);
                 for (uint i = 0; i < __nbElements; i++) {
-		    double r = 0.0;
-		    double x = TwoProductFMA(((double *) h_a)[i], ((double *) h_b)[i], &r);
+                    double r = 0.0;
+                    double x = TwoProductFMA(((double *) h_a)[i], ((double *) h_b)[i], &r);
                     superaccCPU.Accumulate(x);
                     superaccCPU.Accumulate(r);
                 }
-	        double roundedCPU = superaccCPU.Round();*/
+                double roundedCPU = superaccCPU.Round();*/
 
             printf(" ...comparing the results\n");
                 printf("//--------------------------------------------------------\n");
-	        mpfr_t *ddot_mpfr = ddotWithMPFR((double *) h_a, (double *) h_b, __nbElements);
+                mpfr_t *ddot_mpfr = ddotWithMPFR((double *) h_a, (double *) h_b, __nbElements);
                 PassFailFlag = superaccGPU.CompareSuperaccumulatorWithMPFR(ddot_mpfr);
 
-	        //printf("[CPU] Rounded value of the compuation: %.17g\n", roundedCPU);
-	        //printf("[GPU] Rounded value of the compuation: %.17g\n", h_res);
+                //printf("[CPU] Rounded value of the compuation: %.17g\n", roundedCPU);
+                //printf("[GPU] Rounded value of the compuation: %.17g\n", h_res);
                 printf("//--------------------------------------------------------\n");
-            
+
         //Release kernels and program
         printf("Shutting down...\n\n");
             closeDDOT();
-    }
 
     // pass or fail
     if (PassFailFlag)
-	printf("[DDOT] test results...\tPASSED\n\n");
+        printf("[DDOT] test results...\tPASSED\n\n");
     else
-	printf("[DDOT] test results...\tFAILED\n\n");
+        printf("[DDOT] test results...\tFAILED\n\n");
 
-    cleanUp(EXIT_SUCCESS);
+    return cleanUp(EXIT_SUCCESS);
 }
 
-int runDDOTStandard(const char* program_file){
+int runDDOTStandard(const char* program_file) {
     cl_int ciErrNum;
     int PassFailFlag = 1;
 
@@ -280,7 +279,7 @@ int runDDOTStandard(const char* program_file){
             exit(1);
         }
 
-	// init data
+        // init data
         int emax = E_BITS - log2(__nbElements);// use log in order to stay within [emin, emax]
         init_fpuniform((double *) h_a, __nbElements, __range, emax);
         init_fpuniform((double *) h_b, __nbElements, __range, emax);
@@ -321,26 +320,26 @@ int runDDOTStandard(const char* program_file){
         }
 
     printf("Allocating OpenCL memory...\n\n");
-	size_t size = __nbElements * sizeof(cl_double);
-	d_a = clCreateBuffer(cxGPUContext, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, size, h_a, &ciErrNum);
+        size_t size = __nbElements * sizeof(cl_double);
+        d_a = clCreateBuffer(cxGPUContext, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, size, h_a, &ciErrNum);
         if (ciErrNum != CL_SUCCESS) {
             printf("Error in clCreateBuffer for d_a, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
             cleanUp(EXIT_FAILURE);
         }
-	d_b = clCreateBuffer(cxGPUContext, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, size, h_b, &ciErrNum);
+        d_b = clCreateBuffer(cxGPUContext, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, size, h_b, &ciErrNum);
         if (ciErrNum != CL_SUCCESS) {
             printf("Error in clCreateBuffer for d_b, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
             cleanUp(EXIT_FAILURE);
         }
-	d_res = clCreateBuffer(cxGPUContext, CL_MEM_READ_WRITE, sizeof(cl_double), NULL, &ciErrNum);
+        d_res = clCreateBuffer(cxGPUContext, CL_MEM_READ_WRITE, sizeof(cl_double), NULL, &ciErrNum);
         if (ciErrNum != CL_SUCCESS) {
             printf("Error in clCreateBuffer for d_res, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
             cleanUp(EXIT_FAILURE);
         }
-    {
+
         printf("Initializing OpenCL DDOT...\n");
             ciErrNum = initDDOTStandard(cxGPUContext, cqCommandQueue, cdDevice, program_file);
-            
+
             if (ciErrNum != CL_SUCCESS)
                 cleanUp(EXIT_FAILURE);
 
@@ -351,7 +350,7 @@ int runDDOTStandard(const char* program_file){
                 cleanUp(EXIT_FAILURE);
 
 #ifdef GPU_PROFILING
-	double gpuTime[NUM_ITER];
+        double gpuTime[NUM_ITER];
         cl_event startMark, endMark;
 
         for(uint iter = 0; iter < NUM_ITER; iter++) {
@@ -382,11 +381,11 @@ int runDDOTStandard(const char* program_file){
             gpuTime[iter] = 1.0e-9 * ((unsigned long)endTime - (unsigned long)startTime); // / (double)NUM_ITER;
         }
 
-	double minTime = min(gpuTime, NUM_ITER);
-	double throughput = 2.0 * __nbElements * sizeof(double);
-	throughput = (throughput / minTime) * 1e-9;
-	double perf = 2.0 * __nbElements;
-	perf = (perf / minTime) * 1e-9;
+        double minTime = min(gpuTime, NUM_ITER);
+        double throughput = 2.0 * __nbElements * sizeof(double);
+        throughput = (throughput / minTime) * 1e-9;
+        double perf = 2.0 * __nbElements;
+        perf = (perf / minTime) * 1e-9;
         printf("Alg = %u \t Range = %u \t NbElements = %u \t Size = %lu \t Time = %.8f s \t Throughput = %.4f GB/s\n\n", __alg, __range, __nbElements, __nbElements * sizeof(double), minTime, throughput);
         printf("Alg = %u \t Range = %u \t NbElements = %u \t Size = %lu \t Time = %.8f s \t Performance = %.4f GFLOPS\n\n", __alg, __range, __nbElements, __nbElements * sizeof(double), minTime, perf);
 #endif
@@ -398,44 +397,43 @@ int runDDOTStandard(const char* program_file){
                     printf("Error in clEnqueueReadBuffer Line %u in file %s !!!\n\n", __LINE__, __FILE__);
                     cleanUp(EXIT_FAILURE);
                 }
-		
+
             printf(" ...comparing the results\n");
                 printf("//--------------------------------------------------------\n");
-	        mpfr_t *ddot_mpfr = ddotWithMPFR((double *) h_a, (double *) h_b, __nbElements);
+                mpfr_t *ddot_mpfr = ddotWithMPFR((double *) h_a, (double *) h_b, __nbElements);
                 PassFailFlag = CompareWithMPFR(ddot_mpfr, h_res);
 
          //Release kernels and program
          printf("Shutting down...\n\n");
              closeDDOTStandard();
-    }
 
     // pass or fail
     if (PassFailFlag)
-	printf("[DDOT] test results...\tPASSED\n\n");
+        printf("[DDOT] test results...\tPASSED\n\n");
     else
-	printf("[DDOT] test results...\tFAILED\n\n");
+        printf("[DDOT] test results...\tFAILED\n\n");
 
-    cleanUp(EXIT_SUCCESS);
+    return cleanUp(EXIT_SUCCESS);
 }
+
 int cleanUp (int exitCode) {
     //Release other OpenCL Objects
     if(d_a) 
-	clReleaseMemObject(d_a);
+        clReleaseMemObject(d_a);
     if(d_b) 
-	clReleaseMemObject(d_b);
+        clReleaseMemObject(d_b);
     if(d_Superacc) 
-	clReleaseMemObject(d_Superacc);
+        clReleaseMemObject(d_Superacc);
     if(cqCommandQueue) 
-	clReleaseCommandQueue(cqCommandQueue);
+        clReleaseCommandQueue(cqCommandQueue);
     if(cxGPUContext) 
-	clReleaseContext(cxGPUContext);
+        clReleaseContext(cxGPUContext);
 
     //Release host buffers
     free(h_a);
     free(h_b);
     if(h_Superacc)
         free(h_Superacc);
-    
+
     return exitCode;
 }
-
