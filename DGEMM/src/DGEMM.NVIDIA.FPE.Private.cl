@@ -301,7 +301,7 @@ __kernel void matrixMul(
             if(x != 0.0) {
                 Accumulate(p_workingBase, x);
             }
-    }
+        }
 
         //Synchronize to make sure that the preceding computation is done before 
         //loading two new sub-matrices of A and B in the next iteration
@@ -312,7 +312,7 @@ __kernel void matrixMul(
     #pragma unroll
 #endif
     for(uint i = 0; i != NBFPE; ++i) {
-	Accumulate(p_workingBase, sum[i]);
+        Accumulate(p_workingBase, sum[i]);
     }
 
     //TODO: the first non-zero from rigth

@@ -26,7 +26,7 @@ typedef double2 data_t;
 #define TILEY       2
 #define TILEY_SHIFT 1
 
-/* 
+/*
  * Matrix A is cached into local memory block
  * Output tile size : 2x2 = Each thread computes 16 double values
  * Required global threads = (widthC / 2, heightC / 2)
@@ -39,7 +39,7 @@ __kernel void DGEMM(
     __local data_t *blockA
 ) {
     int blockPos = get_local_id(0) + get_local_size(0) * (get_local_id(1) << TILEY_SHIFT);
-    
+
     //Position of thread will be according to the number of values it writes i.e TILE size
     int globalPos =  get_global_id(0) + (get_global_id(1) << TILEY_SHIFT) * get_global_size(0);
 
@@ -54,7 +54,7 @@ __kernel void DGEMM(
         int globalPosA = i * get_local_size(0) + get_local_id(0) + (get_global_id(1) << TILEY_SHIFT) * temp;
 
         //Load values in blockA from matrixA
-        blockA[blockPos] =		       matrixA[globalPosA];
+        blockA[blockPos] = matrixA[globalPosA];
         blockA[blockPos + get_local_size(0)] = matrixA[globalPosA + temp];
 
         barrier(CLK_LOCAL_MEM_FENCE);
@@ -74,7 +74,7 @@ __kernel void DGEMM(
             //Load corresponding values from matrixB, access pattern = linear from global memory
             data_t tempB0 = matrixB[globalPosB  + j *  get_global_size(0)]; //Should be localId.x * (TILEX / 2)
             data_t tempB1 = matrixB[globalPosB  + (j + 1) * get_global_size(0)];
-    
+
             sum0.x = fma(tempA0.x, tempB0.x, sum0.x);
             sum0.x = fma(tempA0.y, tempB1.x, sum0.x);
             sum0.y = fma(tempA0.x, tempB0.y, sum0.y);
@@ -84,13 +84,6 @@ __kernel void DGEMM(
             sum1.x = fma(tempA1.y, tempB1.x, sum1.x);
             sum1.y = fma(tempA1.x, tempB0.y, sum1.y); //Problem on Tesla
             sum1.y = fma(tempA1.y, tempB1.y, sum1.y);
-		
-            /*//old
-            sum0.x += tempA0.x * tempB0.x + tempA0.y * tempB1.x;
-            sum0.y += tempA0.x * tempB0.y + tempA0.y * tempB1.y;
-
-            sum1.x += tempA1.x * tempB0.x + tempA1.y * tempB1.x;
-            sum1.y += tempA1.x * tempB0.y + tempA1.y * tempB1.y;*/
         }
         barrier(CLK_LOCAL_MEM_FENCE);
     }
@@ -102,7 +95,7 @@ __kernel void DGEMM(
 __kernel void matrixMul(
     __global data_t* C,
     __global data_t* A,
-    __global data_t* B, 
+    __global data_t* B,
     int m,
     __local data_t* As
 ) {

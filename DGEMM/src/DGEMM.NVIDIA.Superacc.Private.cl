@@ -211,7 +211,7 @@ void Accumulate(long *sa, double x) {
   for (i = iup; xscaled != 0; --i) {
     double xrounded = rint(xscaled);
     long xint = (long) xrounded;
- 
+
     AccumulateWord(sa, i, xint);
 
     xscaled -= xrounded;
@@ -226,7 +226,7 @@ void Accumulate(long *sa, double x) {
 __kernel void matrixMul(
     __global data_t* C,
     __global data_t* A,
-    __global data_t* B, 
+    __global data_t* B,
     int m,
     int n,
     __local data_t* As,
@@ -266,7 +266,7 @@ __kernel void matrixMul(
         //each thread loads one element of each matrix
         AS(ty, tx) = A[a + m * ty + tx];
         BS(ty, tx) = B[b + n * ty + tx];
-	
+
         //Synchronize to make sure the matrices are loaded
         barrier(CLK_LOCAL_MEM_FENCE);
 
@@ -276,13 +276,12 @@ __kernel void matrixMul(
           #pragma unroll
         #endif
         for (int k = 0; k < BLOCK_SIZE; ++k) {
-	    double r = 0.0; //residual of multiplication
+            double r = 0.0; //residual of multiplication
             double x = TwoProductFMA(AS(ty, k), BS(k, tx), &r);
-	    Accumulate(p_workingBase, x);
-            if(r != 0.0) {
-	        Accumulate(p_workingBase, r);
-            }
-	}
+            Accumulate(p_workingBase, x);
+            if(r != 0.0)
+                Accumulate(p_workingBase, r);
+        }
 
         //Synchronize to make sure that the preceding computation is done before 
         //loading two new sub-matrices of A and B in the next iteration
