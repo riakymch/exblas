@@ -22,7 +22,7 @@
   #define BLOCK_SIZE 32
 #endif
 
-static size_t szKernelLength;	              // Byte size of kernel code
+static size_t szKernelLength;                 // Byte size of kernel code
 static char* cSources = NULL;                 // Buffer to hold source for compilation
 
 static cl_program       cpProgram;            //OpenCL Superaccumulator program
@@ -125,10 +125,10 @@ extern "C" size_t DGEMMAMD(
 
     {
         size_t NbThreadsPerWorkGroup[] = {BLOCK_SIZE, BLOCK_SIZE};
-	size_t TotalNbThreads[] = {2048 / VECTOR_NUMBER, 2048 / VECTOR_NUMBER};
-	size_t neededLocalMemory = (BLOCK_SIZE * VECTOR_NUMBER) * (BLOCK_SIZE * VECTOR_NUMBER) * sizeof(cl_double);
+        size_t TotalNbThreads[] = {2048 / VECTOR_NUMBER, 2048 / VECTOR_NUMBER};
+        size_t neededLocalMemory = (BLOCK_SIZE * VECTOR_NUMBER) * (BLOCK_SIZE * VECTOR_NUMBER) * sizeof(cl_double);
 
-	cl_int i = 0;
+        cl_int i = 0;
         ciErrNum  = clSetKernelArg(ckMatrixMul, i++, sizeof(cl_mem),  (void *)&d_C.elements);
         ciErrNum |= clSetKernelArg(ckMatrixMul, i++, sizeof(cl_mem),  (void *)&d_A.elements);
         ciErrNum |= clSetKernelArg(ckMatrixMul, i++, sizeof(cl_mem),  (void *)&d_B.elements);
@@ -136,16 +136,17 @@ extern "C" size_t DGEMMAMD(
         ciErrNum |= clSetKernelArg(ckMatrixMul, i++, neededLocalMemory,  NULL);
         if (ciErrNum != CL_SUCCESS) {
             printf("Error in clSetKernelArg, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
-	    *ciErrNumRes = EXIT_FAILURE;
+            *ciErrNumRes = EXIT_FAILURE;
             return 0;
         }
 
         ciErrNum = clEnqueueNDRangeKernel(cqCommandQueue, ckMatrixMul, 2, NULL, TotalNbThreads, NbThreadsPerWorkGroup, 0, 0, 0);
         if (ciErrNum != CL_SUCCESS) {
             printf("Error in clEnqueueNDRangeKernel, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
-	    *ciErrNumRes = EXIT_FAILURE;
+            *ciErrNumRes = EXIT_FAILURE;
             return 0;
         }
     }
+
     return EXIT_SUCCESS;
 }

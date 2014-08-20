@@ -28,7 +28,7 @@ static cl_program       cpProgram;            //OpenCL Superaccumulator program
 static cl_kernel        ckMatrixMul;
 static cl_command_queue cqDefaultCommandQue;  //Default command queue for Superaccumulator
 static bintype          *Accus;
-static cl_mem 		d_Accus;
+static cl_mem           d_Accus;
 
 #ifdef AMD
 static char  compileOptions[256] = "-DBLOCK_SIZE=16";
@@ -73,7 +73,7 @@ extern "C" cl_int initDGEMMNVIDIAGlobal(
         }
 
     printf("...building program\n");
-	sprintf(compileOptions, "%s -DNBFPE=%d", compileOptions, NbFPE);
+        sprintf(compileOptions, "%s -DNBFPE=%d", compileOptions, NbFPE);
         ciErrNum = clBuildProgram(cpProgram, 0, NULL, compileOptions, NULL, NULL);
         //if (ciErrNum != CL_SUCCESS) {
             //printf("Error in clBuildProgram, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
@@ -98,8 +98,8 @@ extern "C" cl_int initDGEMMNVIDIAGlobal(
         size = size * BIN_COUNT;
         // init superaccs on the host side
         /*Accus = (bintype*) malloc(size * sizeof(bintype));
-	for (int i = 0; i < size; i++)
-	    Accus[i] = 0;
+        for (int i = 0; i < size; i++)
+            Accus[i] = 0;
         d_Accus = clCreateBuffer(cxGPUContext, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, size * sizeof(bintype), Accus, &ciErrNum);
         */
         d_Accus = clCreateBuffer(cxGPUContext, CL_MEM_READ_WRITE, size * sizeof(bintype), NULL, &ciErrNum);
@@ -122,7 +122,7 @@ extern "C" void closeDGEMMNVIDIAGlobal(void){
 
     free(Accus);
     if(d_Accus) 
-	clReleaseMemObject(d_Accus);
+        clReleaseMemObject(d_Accus);
 
     ciErrNum = clReleaseKernel(ckMatrixMul);
     ciErrNum |= clReleaseProgram(cpProgram);
@@ -149,12 +149,12 @@ extern "C" size_t DGEMMNVIDIAGlobal(
 
     {
         size_t NbThreadsPerWorkGroup[] = {BLOCK_SIZE, BLOCK_SIZE};
-	size_t heightC = d_C.height;
-	size_t widthC = d_C.width;
-	size_t TotalNbThreads[] = {widthC, heightC / multi};
-	size_t neededLocalMemory = BLOCK_SIZE * BLOCK_SIZE * sizeof(cl_double);
+        size_t heightC = d_C.height;
+        size_t widthC = d_C.width;
+        size_t TotalNbThreads[] = {widthC, heightC / multi};
+        size_t neededLocalMemory = BLOCK_SIZE * BLOCK_SIZE * sizeof(cl_double);
 
-	cl_int i = 0;
+        cl_int i = 0;
         ciErrNum  = clSetKernelArg(ckMatrixMul, i++, sizeof(cl_mem),  (void *)&d_Accus);
         ciErrNum |= clSetKernelArg(ckMatrixMul, i++, sizeof(cl_mem),  (void *)&d_C.elements);
         ciErrNum |= clSetKernelArg(ckMatrixMul, i++, sizeof(cl_mem),  (void *)&d_A.elements);
@@ -165,17 +165,18 @@ extern "C" size_t DGEMMNVIDIAGlobal(
         ciErrNum |= clSetKernelArg(ckMatrixMul, i++, neededLocalMemory,  NULL);
         if (ciErrNum != CL_SUCCESS) {
             printf("Error in clSetKernelArg, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
-	    *ciErrNumRes = EXIT_FAILURE;
+            *ciErrNumRes = EXIT_FAILURE;
             return 0;
         }
 
         ciErrNum = clEnqueueNDRangeKernel(cqCommandQueue, ckMatrixMul, 2, NULL, TotalNbThreads, NbThreadsPerWorkGroup, 0, 0, 0);
         if (ciErrNum != CL_SUCCESS) {
             printf("Error in clEnqueueNDRangeKernel, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
-	    *ciErrNumRes = EXIT_FAILURE;
+            *ciErrNumRes = EXIT_FAILURE;
             return 0;
         }
     }
+
     return EXIT_SUCCESS;
 }
 
