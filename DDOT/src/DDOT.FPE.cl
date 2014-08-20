@@ -13,7 +13,7 @@ typedef double data_t;
 #define K          8                    //High-radix carry-save bits
 #define digits     56
 #define deltaScale 72057594037927936.0  //Assumes K > 0
-#define f_words    20 
+#define f_words    20
 #define TSAFE      0
 
 
@@ -247,8 +247,8 @@ void DDOT(
             a[i] = KnuthTwoSum(a[i], x, &s);
             x = s;
         }
-        if(x != 0.0) 
-        Accumulate(l_workingBase, x);
+        if(x != 0.0)
+            Accumulate(l_workingBase, x);
 
         //if (r != 0.0) { // without it is better for the performance, especially on nvidia
             #ifdef NVIDIA

@@ -22,7 +22,7 @@ typedef double data_t;
 #define K              8                    // High-radix carry-save bits
 #define digits         56
 #define deltaScale     72057594037927936.0  // Assumes K>0
-#define f_words        20 
+#define f_words        20
 #define TSAFE          0
 
 #define AS(i, j) As[j + i * BLOCK_SIZE]
@@ -288,7 +288,9 @@ __kernel void matrixMul(
         #endif
         for (int k = 0; k < BLOCK_SIZE; ++k) {
             double r = 0.0; //residual of multiplication
-            double x = TwoProductFMA(AS(ty, k), BS(k, tx), &r);
+            //double x = TwoProductFMA(AS(ty, k), BS(k, tx), &r);
+
+            double x = AS(ty, k) * BS(k, tx);
             #ifdef NVIDIA
                 #pragma unroll
             #endif
@@ -298,9 +300,8 @@ __kernel void matrixMul(
                 x = s + r;
                 r = 0.0;
             }
-            if(x != 0.0) {
+            if(x != 0.0)
                 Accumulate(p_workingBase, x);
-            }
         }
 
         //Synchronize to make sure that the preceding computation is done before 
@@ -311,9 +312,9 @@ __kernel void matrixMul(
 #ifdef NVIDIA
     #pragma unroll
 #endif
-    for(uint i = 0; i != NBFPE; ++i) {
+    for(uint i = 0; i != NBFPE; ++i)
         Accumulate(p_workingBase, sum[i]);
-    }
+    barrier(CLK_LOCAL_MEM_FENCE);
 
     //TODO: the first non-zero from rigth
     int c = (m * by + bx) * BLOCK_SIZE;
