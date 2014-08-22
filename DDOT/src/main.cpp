@@ -17,7 +17,7 @@
 // Variables used in the program 
 ////////////////////////////////////////////////////////////////////////////////
 cl_platform_id    cpPlatform;      //OpenCL platform
-cl_device_id      cdDevice;        //OpenCL device list    
+cl_device_id      cdDevice;        //OpenCL device list
 cl_context        cxGPUContext;    //OpenCL context
 cl_command_queue  cqCommandQueue;  //OpenCL command que
 cl_mem            d_a, d_b, d_res; //OpenCL memory buffer objects
@@ -35,7 +35,7 @@ static void __usage(int argc __attribute__((unused)), char **argv) {
     fprintf(stderr, "Usage: %s [-n number of elements,\n", argv[0]);
     printf("                -r range,\n"); 
     printf("                -e nbfpe,\n");
-    printf("                -a alg (0-ddot, 1-acc, 2-fpe, 3-fpeex8, 4-fpeex4, 5-fpeex6)] \n");
+    printf("                -a alg (0-ddot, 1-acc, 2-fpe, 3-fpeex4, 4-fpeex6, 5-fpeex8)] \n");
     printf("       -?, -h:    Display this help and exit\n");
 }
 
@@ -91,13 +91,13 @@ int main(int argc, char **argv)
         runDDOT("../src/DDOT.FPE.cl");
     } else if (__alg == 3) {
         __nbfpe = 8;
-        runDDOT("../src/DDOT.FPE.EX.8.cl");
+        runDDOT("../src/DDOT.FPE.EX.4.cl");
     } else if (__alg == 4) {
         __nbfpe = 4;
-        runDDOT("../src/DDOT.FPE.EX.4.cl");
+        runDDOT("../src/DDOT.FPE.EX.6.cl");
     } else if (__alg == 5) {
         __nbfpe = 6;
-        runDDOT("../src/DDOT.FPE.EX.6.cl");
+        runDDOT("../src/DDOT.FPE.EX.8.cl");
     }
 }
 
