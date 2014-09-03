@@ -28,7 +28,7 @@ typedef double4 data_t;
 #define TILEY_SHIFT 2
 
 
-/* 
+/*
  * Matrix A is cached into local memory block
  * Output tile size : 4x4 = Each thread computes 16 double values
  * Required global threads = (widthC / 4, heightC / 4)
@@ -41,7 +41,7 @@ __kernel void mmmKernel_local(
     __local data_t *blockA
 ) {
     int blockPos = get_local_id(0) + get_local_size(0) * (get_local_id(1) << TILEY_SHIFT);
-    
+
     /* Position of thread will be according to the number of values it writes i.e TILE size */
     int globalPos =  get_global_id(0) + (get_global_id(1) << TILEY_SHIFT) * get_global_size(0);
 
@@ -60,10 +60,10 @@ __kernel void mmmKernel_local(
         int globalPosA = i * get_local_size(0) + get_local_id(0) + (get_global_id(1) << TILEY_SHIFT) * temp;
 
         /* Load values in blockA from matrixA */
-        blockA[blockPos] =				matrixA[globalPosA];
-        blockA[blockPos + get_local_size(0)] =		matrixA[globalPosA + temp];
-        blockA[blockPos + 2 * get_local_size(0)] =	matrixA[globalPosA + 2 * temp];
-        blockA[blockPos + 3 * get_local_size(0)] =	matrixA[globalPosA + 3 * temp];
+        blockA[blockPos] = matrixA[globalPosA];
+        blockA[blockPos + get_local_size(0)] = matrixA[globalPosA + temp];
+        blockA[blockPos + 2 * get_local_size(0)] = matrixA[globalPosA + 2 * temp];
+        blockA[blockPos + 3 * get_local_size(0)] = matrixA[globalPosA + 3 * temp];
 
         barrier(CLK_LOCAL_MEM_FENCE);
 
@@ -87,7 +87,7 @@ __kernel void mmmKernel_local(
             data_t tempB1 = matrixB[globalPosB  + (j + 1) * get_global_size(0)];
             data_t tempB2 = matrixB[globalPosB  + (j + 2) * get_global_size(0)];
             data_t tempB3 = matrixB[globalPosB  + (j + 3) * get_global_size(0)];
-    
+
             sum0.x += tempA0.x * tempB0.x + tempA0.y * tempB1.x + tempA0.z * tempB2.x + tempA0.w * tempB3.x;
             sum0.y += tempA0.x * tempB0.y + tempA0.y * tempB1.y + tempA0.z * tempB2.y + tempA0.w * tempB3.y;
             sum0.z += tempA0.x * tempB0.z + tempA0.y * tempB1.z + tempA0.z * tempB2.z + tempA0.w * tempB3.z;
@@ -177,5 +177,3 @@ __kernel void mmmKernel(
     matrixC[pos.x + ((pos.y <<  TILEY_SHIFT) + 2) * widthB] = sum2;
     matrixC[pos.x + ((pos.y <<  TILEY_SHIFT) + 3) * widthB] = sum3;
 }
-
-

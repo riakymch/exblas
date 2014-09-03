@@ -31,7 +31,7 @@ typedef double2 data_t;
  * Output tile size : 2x2 = Each thread computes 16 double values
  * Required global threads = (widthC / 2, heightC / 2)
 */
-__kernel void DGEMM(
+void DGEMM(
     __global data_t *matrixC,
     __global data_t *matrixA,
     __global data_t *matrixB,
@@ -48,7 +48,7 @@ __kernel void DGEMM(
     data_t sum1 = (data_t)(0.0);
 
     int temp = widthC / 2;
-    //This loop runs for number of blocks of A in horizontal direction 
+    //This loop runs for number of blocks of A in horizontal direction
     for(int i = 0; i < (temp / get_local_size(0)); i++) {
         //Calculate global ids of threads from the particular block to load from matrix A depending on i
         int globalPosA = i * get_local_size(0) + get_local_id(0) + (get_global_id(1) << TILEY_SHIFT) * temp;
@@ -75,7 +75,8 @@ __kernel void DGEMM(
             data_t tempB0 = matrixB[globalPosB  + j *  get_global_size(0)]; //Should be localId.x * (TILEX / 2)
             data_t tempB1 = matrixB[globalPosB  + (j + 1) * get_global_size(0)];
 
-            sum0.x = fma(tempA0.x, tempB0.x, sum0.x);
+            //problem on ics gpu
+            /*sum0.x = fma(tempA0.x, tempB0.x, sum0.x);
             sum0.x = fma(tempA0.y, tempB1.x, sum0.x);
             sum0.y = fma(tempA0.x, tempB0.y, sum0.y);
             sum0.y = fma(tempA0.y, tempB1.y, sum0.y);
@@ -83,11 +84,11 @@ __kernel void DGEMM(
             sum1.x = fma(tempA1.x, tempB0.x, sum1.x);
             sum1.x = fma(tempA1.y, tempB1.x, sum1.x);
             sum1.y = fma(tempA1.x, tempB0.y, sum1.y); //Problem on Tesla
-            sum1.y = fma(tempA1.y, tempB1.y, sum1.y);
+            sum1.y = fma(tempA1.y, tempB1.y, sum1.y);*/
         }
         barrier(CLK_LOCAL_MEM_FENCE);
     }
-    //Write 4 values to matrixC
+    //Write 2 values to matrixC
     matrixC[globalPos] = sum0;
     matrixC[globalPos +  get_global_size(0)] = sum1;
 }

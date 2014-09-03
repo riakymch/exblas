@@ -14,8 +14,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 // OpenCL launcher for bitonic sort kernel
 ////////////////////////////////////////////////////////////////////////////////
-//#define DGEMM_KERNEL "matrixMul"
-#define DGEMM_KERNEL "DGEMM"
+#define DGEMM_KERNEL "matrixMul"
 #ifdef AMD
   #define BLOCK_SIZE 16
 #else
@@ -124,9 +123,11 @@ extern "C" size_t DGEMMAMD(
         cqCommandQueue = cqDefaultCommandQue;
 
     {
-        size_t NbThreadsPerWorkGroup[] = {(size_t) (BLOCK_SIZE), (size_t) (BLOCK_SIZE)};
-        size_t TotalNbThreads[] = {(size_t) (512 / VECTOR_NUMBER), (size_t) (512 / VECTOR_NUMBER)};
-        size_t neededLocalMemory = (BLOCK_SIZE / VECTOR_NUMBER) * (BLOCK_SIZE / VECTOR_NUMBER) * sizeof(cl_double);
+        size_t NbThreadsPerWorkGroup[] = {(size_t) (BLOCK_SIZE / VECTOR_NUMBER), (size_t) (BLOCK_SIZE / VECTOR_NUMBER)};
+        //size_t TotalNbThreads[] = {(size_t) (512 / VECTOR_NUMBER), (size_t) (512 / VECTOR_NUMBER)};
+        size_t TotalNbThreads[] = {(size_t) 512, (size_t) 512};
+        //size_t neededLocalMemory = (BLOCK_SIZE / VECTOR_NUMBER) * (BLOCK_SIZE / VECTOR_NUMBER) * sizeof(cl_double);
+        size_t neededLocalMemory = BLOCK_SIZE * BLOCK_SIZE * sizeof(cl_double);
 
         cl_int i = 0;
         ciErrNum  = clSetKernelArg(ckMatrixMul, i++, sizeof(cl_mem),  (void *)&d_C.elements);
