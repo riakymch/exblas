@@ -26,22 +26,22 @@ typedef double data_t;
     data_t tmp;
 
     if (i < m) {
-	for (l = 0; l < m; l++)
- 	    Awrk[l] = A[i * m + l];
+        for (l = 0; l < m; l++)
+            Awrk[l] = A[i * m + l];
 
         for (j = 0; j < m; j++) {
-  	    for (l = iloc; l < m; l+=nloc)
- 	         Bwrk[l] = B[l * m + j];
+            for (l = iloc; l < m; l+=nloc)
+                Bwrk[l] = B[l * m + j];
             barrier(CLK_LOCAL_MEM_FENCE);
-	    tmp = 0.0;
+            tmp = 0.0;
             for (l = 0; l < m; l++)
-		tmp += Awrk[l] * Bwrk[l];
-	    C[i * m + j] = tmp;
+                tmp += Awrk[l] * Bwrk[l];
+            C[i * m + j] = tmp;
         }
     }
 }*/
 
-void saxpy(float a, float *b, float *c)
+void saxpy(data_t a, __local data_t *b, data_t *c)
 {
     c[0] += a*b[0];
     c[1] += a*b[1];
@@ -75,26 +75,27 @@ __kernel void matrixMulKernel (
     const int ibx = get_group_id(0) * BLOCK_SIZE;
     const int iby = get_group_id(1) * BLOCK_SIZE;
     const int id = inx + iny * BLOCK_SIZE;
-	
+
     //Load Asub and Bsub from device memory to shared memory
     A += ibx + id;
     B += iby + inx + iny * k;
     C += ibx + id + iby * m;
-    const data_t *Blas = B + k * m;
+    const data_t *Blas;
+    Blas = B + k * m;
 
     data_t c[BLOCK_SIZE] = {0.0};
 
     do {
-	for (int i = 0; i < BLOCK_SIZE; i += 4)
-	    Bs[(i + iny) * BLOCK_SIZE + inx] = B[i * m];
+        for (int i = 0; i < BLOCK_SIZE; i += 4)
+            Bs[(i + iny) * BLOCK_SIZE + inx] = B[i * m];
         barrier(CLK_LOCAL_MEM_FENCE);
 
-    	for (int i = 0; i < BLOCK_SIZE; i++, A += m)
-	    axpy(A[0], &Bs[i * BLOCK_SIZE], c);
-    
-        B += BLOCK_SIZE * k;	
+        for (int i = 0; i < BLOCK_SIZE; i++, A += m)
+            saxpy(A[0], &Bs[i * BLOCK_SIZE], c);
+
+        B += BLOCK_SIZE * k;
         barrier(CLK_LOCAL_MEM_FENCE);
-    } while (B < Blast);
+    } while (B < Blas);
 
     for (int i = 0; i < BLOCK_SIZE; i++, C += m)
         C[0] += c[i];

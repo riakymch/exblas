@@ -37,7 +37,7 @@ static void __usage(int argc __attribute__((unused)), char **argv) {
     printf("              -k nbcolumns of B,\n");
     printf("              -r range,\n");
     printf("              -e nbfpe,\n");
-    printf("              -a alg (0-mine, 1-amd, 2-nvidia, 30-sapr, 31-fpepr, 32-fpee4pr, 33-fpee8pr, 34-fpeprmulti, 40-salo, 41-fpelo, 50-sagl, 51-fpegl, 52-fpee4gl, 53-fpee8gl, 54-fpeglmulti, 6-new),\n");
+    printf("              -a alg (0-mine, 1-amd, 2-nvidia, 30-pr-sa, 31-pr-fpe, 32-pr-fpe-ex-4, 33-pr-fpe-ex-8, 34-pr-fpe-multi, 40-lo-sa, 41-lo-fpe, 50-gl-sa, 51-gl-fpe, 52-gl-fpe-ex-4, 53-gl-fpe-ex-8, 54-gl-fpe-multi, 6-new),\n");
     printf("              -ml multi-values] \n");
     printf("  -?, -h:    Display this help and exit\n");
 }

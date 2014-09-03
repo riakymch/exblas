@@ -418,15 +418,15 @@ int runDDOTStandard(const char* program_file) {
 
 int cleanUp (int exitCode) {
     //Release other OpenCL Objects
-    if(d_a) 
+    if(d_a)
         clReleaseMemObject(d_a);
-    if(d_b) 
+    if(d_b)
         clReleaseMemObject(d_b);
-    if(d_Superacc) 
+    if(d_Superacc)
         clReleaseMemObject(d_Superacc);
-    if(cqCommandQueue) 
+    if(cqCommandQueue)
         clReleaseCommandQueue(cqCommandQueue);
-    if(cxGPUContext) 
+    if(cxGPUContext)
         clReleaseContext(cxGPUContext);
 
     //Release host buffers
