@@ -70,16 +70,16 @@ extern "C" cl_int initDGEMMNVIDIA(
 
     printf("...building program\n");
         ciErrNum = clBuildProgram(cpProgram, 0, NULL, compileOptions, NULL, NULL);
-        //if (ciErrNum != CL_SUCCESS) {
+        if (ciErrNum != CL_SUCCESS) {
             //printf("Error in clBuildProgram, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
 
             // Determine the reason for the error
-            char buildLog[4096]; // 16384
+            char buildLog[4096];
             clGetProgramBuildInfo(cpProgram, cdDevice, CL_PROGRAM_BUILD_LOG, sizeof(buildLog), &buildLog, NULL);
             printf("%s\n", buildLog);
 
-        //    return EXIT_FAILURE;
-        //}
+            // return EXIT_FAILURE;
+        }
 
     printf("...creating DGEMM kernel:\n");
         ckMatrixMul = clCreateKernel(cpProgram, DGEMM_KERNEL, &ciErrNum);

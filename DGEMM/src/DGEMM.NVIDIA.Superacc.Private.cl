@@ -75,86 +75,84 @@ double OddRoundSumNonnegative(double th, double tl) {
 }
 
 int Normalize(long *accumulator, int *imin, int *imax) {
-  if (*imin > *imax) {
-    return 0;
-  }
-  long carry_in = accumulator[*imin] >> digits;
-  accumulator[*imin] -= carry_in << digits;
-  int i;
-  // Sign-extend all the way
-  for (i = *imin + 1; i < BIN_COUNT; ++i) {
+    if (*imin > *imax)
+        return 0;
+
+    long carry_in = accumulator[*imin] >> digits;
+    accumulator[*imin] -= carry_in << digits;
+    int i;
+    // Sign-extend all the way
+    for (i = *imin + 1; i < BIN_COUNT; ++i) {
 #if 1
-    long carry_out = accumulator[i] >> digits;    // Arithmetic shift
-    accumulator[i] += carry_in - (carry_out << digits);
+        long carry_out = accumulator[i] >> digits;    // Arithmetic shift
+        accumulator[i] += carry_in - (carry_out << digits);
 #else
-    // BUGGY
-    // get carry of accumulator[i] + carry_in
-    unsigned char overflow;
-    long oldword = xadd(&accumulator[i], carry_in, &overflow);
-    int s = oldword > 0;
-    long carrybit = (s ? 1ll << K : -1ll << K);
+        // BUGGY
+        // get carry of accumulator[i] + carry_in
+        unsigned char overflow;
+        long oldword = xadd(&accumulator[i], carry_in, &overflow);
+        int s = oldword > 0;
+        long carrybit = (s ? 1ll << K : -1ll << K);
 
-    long carry_out = (accumulator[i] >> digits) + carrybit;// Arithmetic shift
-    accumulator[i] -= carry_out << digits;
+        long carry_out = (accumulator[i] >> digits) + carrybit;// Arithmetic shift
+        accumulator[i] -= carry_out << digits;
 #endif
-    carry_in = carry_out;
-  }
-  *imax = i - 1;
+        carry_in = carry_out;
+    }
+    *imax = i - 1;
 
-  if (carry_in != 0 && carry_in != -1) {
-    //TODO: handle overflow
-    //status = Overflow;
-  }
-  return carry_in < 0;
+    if ((carry_in != 0) && (carry_in != -1)) {
+        //TODO: handle overflow
+        //status = Overflow;
+    }
+
+    return carry_in < 0;
 }
 
 double Round(long *accumulator) {
-  int imin = 0; 
-  int imax = 38;
-  int negative = Normalize(accumulator, &imin, &imax);
+    int imin = 0;
+    int imax = 38;
+    int negative = Normalize(accumulator, &imin, &imax);
 
-  //Find leading word
-  int i;
-  //Skip zeroes
-  for (i = imax; accumulator[i] == 0 && i >= imin; --i) {
-  }
-  if (negative) {
-    //Skip ones
-    for (; accumulator[i] == ((1L << digits) - 1) && i >= imin; --i) {
+    //Find leading word
+    int i;
+    //Skip zeroes
+    for (i = imax; accumulator[i] == 0 && i >= imin; --i) {
     }
-  }
-  if (i < 0) {
-    //TODO: should we preserve sign of zero?
-    return 0.;
-  }
+    if (negative) {
+        //Skip ones
+        for (; accumulator[i] == ((1 << digits) - 1) && i >= imin; --i) {
+        }
+    }
+    if (i < 0)
+        //TODO: should we preserve sign of zero?
+        return 0.0;
 
-  long hiword = negative ? (1L << digits) - accumulator[i] : accumulator[i];
-  double rounded = (double) hiword;
-  double hi = ldexp(rounded, (i - f_words) * digits);
-  if (i == 0) {
-    return negative ? -hi : hi;  // Correct rounding achieved
-  }
-  hiword -= (long) rint(rounded);
-  double mid = ldexp((double) hiword, (i - f_words) * digits);
+    long hiword = negative ? (1 << digits) - accumulator[i] : accumulator[i];
+    double rounded = (double) hiword;
+    double hi = ldexp(rounded, (i - f_words) * digits);
+    if (i == 0)
+        return negative ? -hi : hi;  // Correct rounding achieved
+    hiword -= (long) rint(rounded);
+    double mid = ldexp((double) hiword, (i - f_words) * digits);
 
-  //Compute sticky
-  long sticky = 0;
-  for (int j = imin; j != i - 1; ++j) {
-    sticky |= negative ? (1L << digits) - accumulator[j] : accumulator[j];
-  }
+    //Compute sticky
+    long sticky = 0;
+    for (int j = imin; j != i - 1; ++j)
+        sticky |= negative ? (1 << digits) - accumulator[j] : accumulator[j];
 
-  long loword = negative ? (1L << digits) - accumulator[i - 1] : accumulator[i - 1];
-  loword |= !!sticky;
-  double lo = ldexp((double) loword, (i - 1 - f_words) * digits);
+    long loword = negative ? (1 << digits) - accumulator[i - 1] : accumulator[i - 1];
+    loword |= !!sticky;
+    double lo = ldexp((double) loword, (i - 1 - f_words) * digits);
 
-  //Now add3(hi, mid, lo)
-  //No overlap, we have already normalized
-  if (mid != 0) {
-    lo = OddRoundSumNonnegative(mid, lo);
-  }
-  //Final rounding
-  hi = hi + lo;
-  return negative ? -hi : hi;
+    //Now add3(hi, mid, lo)
+    //No overlap, we have already normalized
+    if (mid != 0)
+        lo = OddRoundSumNonnegative(mid, lo);
+
+    //Final rounding
+    hi = hi + lo;
+    return negative ? -hi : hi;
 }
 
 
@@ -162,61 +160,59 @@ double Round(long *accumulator) {
 // Main computation pass: compute partial accumulators
 ////////////////////////////////////////////////////////////////////////////////
 void AccumulateWord(long *sa, int i, long x) {
-  // With atomic accumulator updates
-  // accumulation and carry propagation can happen in any order
-  long carry = x;
-  long carrybit;
-  uchar overflow;
-  long oldword = xadd(&sa[i], x, &overflow);
+    // With atomic accumulator updates
+    // accumulation and carry propagation can happen in any order
+    long carry = x;
+    long carrybit;
+    uchar overflow;
+    long oldword = xadd(&sa[i], x, &overflow);
 
-  // To propagate over- or underflow
-  while (overflow) {
-    // Carry or borrow
-    // oldword has sign S
-    // x has sign S
-    // accumulator[i] has sign !S (just after update)
-    // carry has sign !S
-    // carrybit has sign S
-    carry = (oldword + carry) >> digits;
-    bool s = oldword > 0;
-    carrybit = (s ? 1l << K : -1l << K);
+    // To propagate over- or underflow
+    while (overflow) {
+        // Carry or borrow
+        // oldword has sign S
+        // x has sign S
+        // accumulator[i] has sign !S (just after update)
+        // carry has sign !S
+        // carrybit has sign S
+        carry = (oldword + carry) >> digits;
+        bool s = oldword > 0;
+        carrybit = (s ? 1l << K : -1l << K);
 
-    // Cancel carry-save bits
-    xadd(&sa[i], (long) -(carry << digits), &overflow);
-    if (TSAFE && (s ^ overflow)) {
-      carrybit *= 2;
+        // Cancel carry-save bits
+        xadd(&sa[i], (long) -(carry << digits), &overflow);
+        if (TSAFE && (s ^ overflow))
+            carrybit *= 2;
+        carry += carrybit;
+
+        ++i;
+        if (i >= BIN_COUNT)
+            return;
+        oldword = xadd(&sa[i], carry, &overflow);
     }
-    carry += carrybit;
-
-    ++i;
-    if (i >= BIN_COUNT) {
-      return;
-    }
-    oldword = xadd(&sa[i], carry, &overflow);
-  }
 }
 
 void Accumulate(long *sa, double x) {
-  if (x == 0)
-    return;
+    if (x == 0)
+        return;
 
-  int e;
-  frexp(x, &e);
-  int exp_word = e / digits;  // Word containing MSbit
-  int iup = exp_word + f_words;
+    int e;
+    frexp(x, &e);
+    int exp_word = e / digits;  // Word containing MSbit
+    int iup = exp_word + f_words;
 
-  double xscaled = ldexp(x, -digits * exp_word);
+    double xscaled = ldexp(x, -digits * exp_word);
 
-  int i;
-  for (i = iup; xscaled != 0; --i) {
-    double xrounded = rint(xscaled);
-    long xint = (long) xrounded;
+    int i;
+    for (i = iup; xscaled != 0; --i) {
+        double xrounded = rint(xscaled);
+        long xint = (long) xrounded;
 
-    AccumulateWord(sa, i, xint);
+        AccumulateWord(sa, i, xint);
 
-    xscaled -= xrounded;
-    xscaled *= deltaScale;
-  }
+        xscaled -= xrounded;
+        xscaled *= deltaScale;
+    }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
