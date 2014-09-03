@@ -70,7 +70,7 @@ extern "C" cl_int initDGEMM(
 
     printf("...building Superaccumulator program\n");
         ciErrNum = clBuildProgram(cpProgram, 0, NULL, compileOptions, NULL, NULL);
-        //if (ciErrNum != CL_SUCCESS) {
+        /*//if (ciErrNum != CL_SUCCESS) {
             //printf("Error in clBuildProgram, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
 
             // Determine the reason for the error
@@ -79,7 +79,7 @@ extern "C" cl_int initDGEMM(
             printf("%s\n", buildLog);
 
         //    return EXIT_FAILURE;
-        //}
+        //}*/
 
     printf("...creating DGEMM kernel:\n");
         ckMatrixMul = clCreateKernel(cpProgram, DGEMM_KERNEL, &ciErrNum);
@@ -123,8 +123,8 @@ extern "C" size_t DGEMM(
         cqCommandQueue = cqDefaultCommandQue;
 
     {
-        size_t NbThreadsPerWorkGroup[] = {BLOCK_SIZE, BLOCK_SIZE / VECTOR_NUMBER};
-        size_t TotalNbThreads[] = {2048, 2048 / VECTOR_NUMBER};
+        size_t NbThreadsPerWorkGroup[] = {(size_t) (BLOCK_SIZE), (size_t) (BLOCK_SIZE / VECTOR_NUMBER)};
+        size_t TotalNbThreads[] = {(size_t) (1024), (size_t)(1024 / VECTOR_NUMBER)};
         size_t neededLocalMemory = BLOCK_SIZE * BLOCK_SIZE * sizeof(cl_double);
 
         cl_int i = 0;
