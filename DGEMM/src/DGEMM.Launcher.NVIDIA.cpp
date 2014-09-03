@@ -123,8 +123,8 @@ extern "C" size_t DGEMMNVIDIA(
         cqCommandQueue = cqDefaultCommandQue;
 
     {
-        size_t NbThreadsPerWorkGroup[] = {BLOCK_SIZE, BLOCK_SIZE / VECTOR_NUMBER};
-        size_t TotalNbThreads[] = {512, 512 / VECTOR_NUMBER};
+        size_t NbThreadsPerWorkGroup[] = {(size_t) (BLOCK_SIZE), (size_t) (BLOCK_SIZE / VECTOR_NUMBER)};
+        size_t TotalNbThreads[] = {(size_t) (512), (size_t) (512 / VECTOR_NUMBER)};
         size_t neededLocalMemory = BLOCK_SIZE * BLOCK_SIZE * sizeof(cl_double);
 
         cl_int i = 0;

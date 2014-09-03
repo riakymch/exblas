@@ -76,23 +76,23 @@ void DGEMM(
         BS(ty + 2 * step, tx) = B[b + (ty + 2 * step) * n + tx];
         AS(ty + 3 * step, tx) = A[a + (ty + 3 * step) * m + tx];
         BS(ty + 3 * step, tx) = B[b + (ty + 3 * step) * n + tx];
-	
+
         //Synchronize to make sure the matrices are loaded
         barrier(CLK_LOCAL_MEM_FENCE);
 
         //Multiply the two matrices together;
-        //each thread computes one element of the block sub-matrix        
+        //each thread computes one element of the block sub-matrix
         #ifdef NVIDIA
           #pragma unroll
         #endif
         for (int k = 0; k < BLOCK_SIZE; ++k) {
-	    sum[0] = fma(AS(ty, k), BS(k, tx), sum[0]);
-	    sum[1] = fma(AS(ty + step, k), BS(k, tx), sum[1]);
-	    sum[2] = fma(AS(ty + 2 * step, k), BS(k, tx), sum[2]);
-	    sum[3] = fma(AS(ty + 3 * step, k), BS(k, tx), sum[3]);
-	}
+            sum[0] = fma(AS(ty, k), BS(k, tx), sum[0]);
+            sum[1] = fma(AS(ty + step, k), BS(k, tx), sum[1]);
+            sum[2] = fma(AS(ty + 2 * step, k), BS(k, tx), sum[2]);
+            sum[3] = fma(AS(ty + 3 * step, k), BS(k, tx), sum[3]);
+        }
 
-        //Synchronize to make sure that the preceding computation is done before 
+        //Synchronize to make sure that the preceding computation is done before
         //loading two new sub-matrices of A and B in the next iteration
         barrier(CLK_LOCAL_MEM_FENCE);
     }
@@ -107,7 +107,7 @@ void DGEMM(
 __kernel void DGEMM8(
     __global data_t* C,
     __global data_t* A,
-    __global data_t* B, 
+    __global data_t* B,
     int m,
     int n,
     __local data_t* As,
@@ -167,25 +167,25 @@ __kernel void DGEMM8(
         BS(ty + 6 * step, tx) = B[b + (ty + 6 * step) * n + tx];
         AS(ty + 7 * step, tx) = A[a + (ty + 7 * step) * m + tx];
         BS(ty + 7 * step, tx) = B[b + (ty + 7 * step) * n + tx];
-	
+
         //Synchronize to make sure the matrices are loaded
         barrier(CLK_LOCAL_MEM_FENCE);
 
         //Multiply the two matrices together;
-        //each thread computes one element of the block sub-matrix        
+        //each thread computes one element of the block sub-matrix
         #ifdef NVIDIA
           #pragma unroll
         #endif
         for (int k = 0; k < BLOCK_SIZE; ++k) {
-	    sum[0] = fma(AS(ty, k), BS(k, tx), sum[0]);
-	    sum[1] = fma(AS(ty + step, k), BS(k, tx), sum[1]);
-	    sum[2] = fma(AS(ty + 2 * step, k), BS(k, tx), sum[2]);
-	    sum[3] = fma(AS(ty + 3 * step, k), BS(k, tx), sum[3]);
-	    sum[4] = fma(AS(ty + 4 * step, k), BS(k, tx), sum[4]);
-	    sum[5] = fma(AS(ty + 5 * step, k), BS(k, tx), sum[5]);
-	    sum[6] = fma(AS(ty + 6 * step, k), BS(k, tx), sum[6]);
-	    sum[7] = fma(AS(ty + 7 * step, k), BS(k, tx), sum[7]);
-	}
+            sum[0] = fma(AS(ty, k), BS(k, tx), sum[0]);
+            sum[1] = fma(AS(ty + step, k), BS(k, tx), sum[1]);
+            sum[2] = fma(AS(ty + 2 * step, k), BS(k, tx), sum[2]);
+            sum[3] = fma(AS(ty + 3 * step, k), BS(k, tx), sum[3]);
+            sum[4] = fma(AS(ty + 4 * step, k), BS(k, tx), sum[4]);
+            sum[5] = fma(AS(ty + 5 * step, k), BS(k, tx), sum[5]);
+            sum[6] = fma(AS(ty + 6 * step, k), BS(k, tx), sum[6]);
+            sum[7] = fma(AS(ty + 7 * step, k), BS(k, tx), sum[7]);
+        }
 
         //Synchronize to make sure that the preceding computation is done before 
         //loading two new sub-matrices of A and B in the next iteration
@@ -206,7 +206,7 @@ __kernel void DGEMM8(
 __kernel void DGEMM2(
     __global data_t* C,
     __global data_t* A,
-    __global data_t* B, 
+    __global data_t* B,
     int m,
     int n,
     __local data_t* As,
@@ -248,25 +248,25 @@ __kernel void DGEMM2(
     for (int a = aBegin, b = bBegin;
              a <= aEnd;
              a += aStep, b += bStep) {
-        //Load the matrices from device memory to shared memory; 
+        //Load the matrices from device memory to shared memory;
         //each thread loads one element of each matrix
         AS(ty, tx) = A[a + m * ty + tx];
         BS(ty, tx) = B[b + n * ty + tx];
         AS(ty + step, tx) = A[a + m * (ty + step) + tx];
         BS(ty + step, tx) = B[b + n * (ty + step) + tx];
-	
+
         //Synchronize to make sure the matrices are loaded
         barrier(CLK_LOCAL_MEM_FENCE);
 
         //Multiply the two matrices together;
-        //each thread computes one element of the block sub-matrix        
+        //each thread computes one element of the block sub-matrix
         #ifdef NVIDIA
           #pragma unroll
         #endif
         for (int k = 0; k < BLOCK_SIZE; ++k) {
-	    sum[0] = fma(AS(ty, k), BS(k, tx), sum[0]);
-	    sum[1] = fma(AS(ty + step, k), BS(k, tx), sum[1]);
-	}
+            sum[0] = fma(AS(ty, k), BS(k, tx), sum[0]);
+            sum[1] = fma(AS(ty + step, k), BS(k, tx), sum[1]);
+        }
 
         //Synchronize to make sure that the preceding computation is done before 
         //loading two new sub-matrices of A and B in the next iteration
@@ -281,11 +281,11 @@ __kernel void DGEMM2(
 void DGEMM1(
     __global data_t* C,
     __global data_t* A,
-    __global data_t* B, 
+    __global data_t* B,
     int m,
     int n,
     __local data_t* As,
-    __local data_t* Bs,  
+    __local data_t* Bs,
     int bx,
     int by,
     int tx,
@@ -317,20 +317,19 @@ void DGEMM1(
         //each thread loads one element of each matrix
         AS(ty, tx) = A[a + m * ty + tx];
         BS(ty, tx) = B[b + n * ty + tx];
-	
+
         //Synchronize to make sure the matrices are loaded
         barrier(CLK_LOCAL_MEM_FENCE);
 
         //Multiply the two matrices together;
-        //each thread computes one element of the block sub-matrix        
+        //each thread computes one element of the block sub-matrix
         #ifdef NVIDIA
           #pragma unroll
         #endif
-        for (int k = 0; k < BLOCK_SIZE; ++k) {
-	    sum[0] = fma(AS(ty, k), BS(k, tx), sum[0]);
-	}
+        for (int k = 0; k < BLOCK_SIZE; ++k)
+            sum[0] = fma(AS(ty, k), BS(k, tx), sum[0]);
 
-        //Synchronize to make sure that the preceding computation is done before 
+        //Synchronize to make sure that the preceding computation is done before
         //loading two new sub-matrices of A and B in the next iteration
         barrier(CLK_LOCAL_MEM_FENCE);
     }
@@ -342,7 +341,7 @@ void DGEMM1(
 __kernel void matrixMul(
     __global data_t* C,
     __global data_t* A,
-    __global data_t* B, 
+    __global data_t* B,
     int m,
     int n,
     __local data_t* As,

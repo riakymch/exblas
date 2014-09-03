@@ -39,8 +39,8 @@ static char  compileOptions[256] = "-DBLOCK_SIZE=32 -DNVIDIA -cl-mad-enable -cl-
 
 
 extern "C" cl_int initDGEMMAMD(
-    cl_context cxGPUContext, 
-    cl_command_queue cqParamCommandQue, 
+    cl_context cxGPUContext,
+    cl_command_queue cqParamCommandQue,
     cl_device_id cdDevice,
     const char* program_file
 ){
@@ -124,8 +124,8 @@ extern "C" size_t DGEMMAMD(
         cqCommandQueue = cqDefaultCommandQue;
 
     {
-        size_t NbThreadsPerWorkGroup[] = {BLOCK_SIZE, BLOCK_SIZE};
-        size_t TotalNbThreads[] = {512 / VECTOR_NUMBER, 512 / VECTOR_NUMBER};
+        size_t NbThreadsPerWorkGroup[] = {(size_t) (BLOCK_SIZE), (size_t) (BLOCK_SIZE)};
+        size_t TotalNbThreads[] = {(size_t) (512 / VECTOR_NUMBER), (size_t) (512 / VECTOR_NUMBER)};
         size_t neededLocalMemory = (BLOCK_SIZE / VECTOR_NUMBER) * (BLOCK_SIZE / VECTOR_NUMBER) * sizeof(cl_double);
 
         cl_int i = 0;
