@@ -22,7 +22,7 @@ typedef double data_t;
 #define K              8                    // High-radix carry-save bits
 #define digits         56
 #define deltaScale     72057594037927936.0  // Assumes K>0
-#define f_words        20 
+#define f_words        20
 #define TSAFE          0
 
 #define AS(i, j) As[j + i * BLOCK_SIZE]
@@ -169,7 +169,7 @@ void AccumulateWord(long *sa, int i, long x) {
   uchar overflow;
   long oldword = xadd(&sa[i], x, &overflow);
 
-  // To propagate over- or underflow 
+  // To propagate over- or underflow
   while (overflow) {
     // Carry or borrow
     // oldword has sign S

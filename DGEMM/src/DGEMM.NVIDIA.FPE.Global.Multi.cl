@@ -22,7 +22,7 @@ typedef double data_t;
 #define K              8                    // High-radix carry-save bits
 #define digits         56
 #define deltaScale     72057594037927936.0  // Assumes K>0
-#define f_words        20 
+#define f_words        20
 #define TSAFE          0
 
 #define AS(i, j) As[j + i * BLOCK_SIZE]
@@ -116,7 +116,7 @@ int Normalize(__global long *accumulator, int *imin, int *imax) {
 }
 
 double Round(__global long *accumulator) {
-  int imin = 0; 
+  int imin = 0;
   int imax = 38;
   int negative = Normalize(accumulator, &imin, &imax);
 
@@ -176,7 +176,7 @@ void AccumulateWord(__global long *sa, int i, long x) {
   uchar overflow;
   long oldword = xadd(&sa[i], x, &overflow);
 
-  // To propagate over- or underflow 
+  // To propagate over- or underflow
   while (overflow) {
     // Carry or borrow
     // oldword has sign S
@@ -218,7 +218,7 @@ void Accumulate(__global long *sa, double x) {
   for (i = iup; xscaled != 0; --i) {
     double xrounded = rint(xscaled);
     long xint = (long) xrounded;
- 
+
     AccumulateWord(sa, i, xint);
 
     xscaled -= xrounded;
@@ -235,7 +235,7 @@ void DGEMM(
     __global long* g_workingBase,
     __global data_t* C,
     __global data_t* A,
-    __global data_t* B, 
+    __global data_t* B,
     int m,
     int n,
     __local data_t* As,
@@ -272,7 +272,7 @@ void DGEMM(
         //each thread loads one element of each matrix
         AS(ty, tx) = A[a + m * ty + tx];
         BS(ty, tx) = B[b + n * ty + tx];
-	
+
         //Synchronize to make sure the matrices are loaded
         barrier(CLK_LOCAL_MEM_FENCE);
 
@@ -282,7 +282,7 @@ void DGEMM(
           #pragma unroll
         #endif
         for (int k = 0; k < BLOCK_SIZE; ++k) {
-	    double r = 0.0; //residual of multiplication
+            double r = 0.0; //residual of multiplication
             double x = TwoProductFMA(AS(ty, k), BS(k, tx), &r);
             #ifdef NVIDIA
                 #pragma unroll
@@ -291,12 +291,11 @@ void DGEMM(
                 double s; //residual of addition
                 sum[i] = KnuthTwoSum(sum[i], x, &s);
                 x = s + r;
-		r = 0;
+                r = 0;
             }
-            if(x != 0.0) {
-	        Accumulate(g_workingBase, x);
-            }
-	}
+            if(x != 0.0)
+                Accumulate(g_workingBase, x);
+        }
 
         //Synchronize to make sure that the preceding computation is done before 
         //loading two new sub-matrices of A and B in the next iteration
@@ -306,9 +305,8 @@ void DGEMM(
 #ifdef NVIDIA
     #pragma unroll
 #endif
-    for(uint i = 0; i != NBFPE; ++i) {
-    	Accumulate(g_workingBase, sum[i]);
-    }
+    for(uint i = 0; i != NBFPE; ++i)
+        Accumulate(g_workingBase, sum[i]);
 
     int c = (m * by + bx) * BLOCK_SIZE;
     C[c + n * ty + tx] = Round(g_workingBase);
@@ -318,7 +316,7 @@ __kernel void matrixMul(
     __global long* Accus,
     __global data_t* C,
     __global data_t* A,
-    __global data_t* B, 
+    __global data_t* B,
     int m,
     int n,
     __local data_t* As,

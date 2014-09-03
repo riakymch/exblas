@@ -314,19 +314,18 @@ int runDGEMM(const char* program_file){
                     cleanUp(EXIT_FAILURE);
                 }
 
-            //printMatrix(C, d_C.width, d_C.height);
             printf(" ...DGEMM on CPU\n");
                 double *C_CPU;
                 C_CPU = (double *) calloc(__nbRowsC * __nbColumnsC, sizeof(double));
                 DGEMMCPU(C_CPU, (const double *)A, (const double *)B, __nbRowsC, __nbColumnsC, __nbRowsB);
-                //printMatrix(C, d_C.width, d_C.height);
-                //printMatrix(C_CPU, d_C.width, d_C.height);
+                /*printMatrix(C, d_C.width, d_C.height);
+                printf("\n");
+                printMatrix(C_CPU, d_C.width, d_C.height);*/
 
             printf(" ...comparing the results\n");
                 printf("//--------------------------------------------------------\n");
-                //Compare the GPU to the CPU results
                 PassFailFlag = compare((const double *) C_CPU, (const double *) C, __nbRowsC * __nbColumnsC, 1e-16);
-                //PassFailFlag = compareDGEMMWithMPFR((const double *)C_CPU, (const double *)A, (const double *)B, __nbRowsC, __nbColumnsC, __nbRowsB);
+                //PassFailFlag = compareDGEMMWithMPFR((const double *)C, (const double *)A, (const double *)B, __nbRowsC, __nbColumnsC, __nbRowsB, 1e-16);
                 printf("//--------------------------------------------------------\n");
                 free(C_CPU);
 

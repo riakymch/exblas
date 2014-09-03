@@ -176,7 +176,7 @@ void AccumulateWord(long *sa, int i, long x) {
   uchar overflow;
   long oldword = xadd(&sa[i], x, &overflow);
 
-  // To propagate over- or underflow 
+  // To propagate over- or underflow
   while (overflow) {
     // Carry or borrow
     // oldword has sign S
@@ -233,7 +233,7 @@ void Accumulate(long *sa, double x) {
 __kernel void matrixMul(
     __global data_t* C,
     __global data_t* A,
-    __global data_t* B, 
+    __global data_t* B,
     int m,
     int n,
     __local data_t* As,

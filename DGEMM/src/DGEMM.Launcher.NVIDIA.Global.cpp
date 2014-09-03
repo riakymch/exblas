@@ -21,7 +21,7 @@
   #define BLOCK_SIZE 32
 #endif
 
-static size_t szKernelLength;	              // Byte size of kernel code
+static size_t szKernelLength;                 // Byte size of kernel code
 static char* cSources = NULL;                 // Buffer to hold source for compilation
 
 static cl_program       cpProgram;            //OpenCL Superaccumulator program
@@ -38,8 +38,8 @@ static char  compileOptions[256] = "-DBLOCK_SIZE=32 -DNVIDIA -cl-mad-enable -cl-
 
 
 extern "C" cl_int initDGEMMNVIDIAGlobal(
-    cl_context cxGPUContext, 
-    cl_command_queue cqParamCommandQue, 
+    cl_context cxGPUContext,
+    cl_command_queue cqParamCommandQue,
     cl_device_id cdDevice,
     const char* program_file,
     const uint NbFPE,
@@ -121,7 +121,7 @@ extern "C" void closeDGEMMNVIDIAGlobal(void){
     cl_int ciErrNum;
 
     free(Accus);
-    if(d_Accus) 
+    if(d_Accus)
         clReleaseMemObject(d_Accus);
 
     ciErrNum = clReleaseKernel(ckMatrixMul);

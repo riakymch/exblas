@@ -21,7 +21,7 @@ void DGEMMCPU(
     const uint z
 );
 
-int compare(
+extern "C" bool compare(
     const double *ref_dgemm,
     const double *dgemm,
     const uint length,
@@ -34,7 +34,8 @@ extern "C" bool compareDGEMMWithMPFR(
     const double *h_b,
     const uint m,
     const uint n,
-    const uint k 
+    const uint k,
+    const double epsilon
 );
 
 void printMatrix(
@@ -42,4 +43,5 @@ void printMatrix(
     const uint m,
     const uint n
 );
+
 #endif

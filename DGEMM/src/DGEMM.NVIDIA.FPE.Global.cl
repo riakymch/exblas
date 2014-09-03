@@ -20,7 +20,7 @@
 #define K              8                    // High-radix carry-save bits
 #define digits         56
 #define deltaScale     72057594037927936.0  // Assumes K>0
-#define f_words        20 
+#define f_words        20
 #define TSAFE          0
 
 #define AS(i, j) As[j + i * BLOCK_SIZE]
@@ -174,7 +174,7 @@ void AccumulateWord(__global long *sa, int i, long x) {
   uchar overflow;
   long oldword = xadd(&sa[i], x, &overflow);
 
-  // To propagate over- or underflow 
+  // To propagate over- or underflow
   while (overflow) {
     // Carry or borrow
     // oldword has sign S
@@ -216,7 +216,7 @@ void Accumulate(__global long *sa, double x) {
   for (i = iup; xscaled != 0; --i) {
     double xrounded = rint(xscaled);
     long xint = (long) xrounded;
- 
+
     AccumulateWord(sa, i, xint);
 
     xscaled -= xrounded;
@@ -233,7 +233,7 @@ __kernel void matrixMul(
     __global long* Accus,
     __global double* C,
     __global double* A,
-    __global double* B, 
+    __global double* B,
     int m,
     int n,
     __local double* As,
@@ -280,7 +280,7 @@ __kernel void matrixMul(
         //each thread loads one element of each matrix
         AS(ty, tx) = A[a + m * ty + tx];
         BS(ty, tx) = B[b + n * ty + tx];
-	
+
         //Synchronize to make sure the matrices are loaded
         barrier(CLK_LOCAL_MEM_FENCE);
 
@@ -290,7 +290,7 @@ __kernel void matrixMul(
           #pragma unroll
         #endif
         for (int k = 0; k < BLOCK_SIZE; ++k) {
-	    double r = 0.0; //residual of multiplication
+            double r = 0.0; //residual of multiplication
             double x = TwoProductFMA(AS(ty, k), BS(k, tx), &r);
             #ifdef NVIDIA
                 #pragma unroll
@@ -299,12 +299,11 @@ __kernel void matrixMul(
                 double s = 0.0; //residual of addition
                 sum[i] = KnuthTwoSum(sum[i], x, &s);//Issues on Tesla
                 x = s + r;
-		r = 0.0;
+                r = 0.0;
             }
-            if(x != 0.0) {
-	        Accumulate(g_workingBase, x);
-            }
-	}
+            if(x != 0.0)
+                Accumulate(g_workingBase, x);
+        }
 
         //Synchronize to make sure that the preceding computation is done before 
         //loading two new sub-matrices of A and B in the next iteration
@@ -314,10 +313,10 @@ __kernel void matrixMul(
 #ifdef NVIDIA
     #pragma unroll
 #endif
-    for(uint i = 0; i != NBFPE; ++i) {
-    	Accumulate(g_workingBase, sum[i]);
-    }
+    for(uint i = 0; i != NBFPE; ++i)
+        Accumulate(g_workingBase, sum[i]);
 
     C[c + n * ty + tx] = Round(g_workingBase);
     //C[c + n * ty + tx] = sum[0];
 }
+

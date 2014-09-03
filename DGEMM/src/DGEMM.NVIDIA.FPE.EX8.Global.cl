@@ -22,7 +22,7 @@ typedef double data_t;
 #define K              8                    // High-radix carry-save bits
 #define digits         56
 #define deltaScale     72057594037927936.0  // Assumes K>0
-#define f_words        20 
+#define f_words        20
 #define TSAFE          0
 
 #define AS(i, j) As[j + i * BLOCK_SIZE]
@@ -116,7 +116,7 @@ int Normalize(__global long *accumulator, int *imin, int *imax) {
 }
 
 double Round(__global long *accumulator) {
-  int imin = 0; 
+  int imin = 0;
   int imax = 38;
   int negative = Normalize(accumulator, &imin, &imax);
 
@@ -218,7 +218,7 @@ void Accumulate(__global long *sa, double x) {
   for (i = iup; xscaled != 0; --i) {
     double xrounded = rint(xscaled);
     long xint = (long) xrounded;
- 
+
     AccumulateWord(sa, i, xint);
 
     xscaled -= xrounded;
@@ -235,7 +235,7 @@ __kernel void matrixMul(
     __global long* Accus,
     __global data_t* C,
     __global data_t* A,
-    __global data_t* B, 
+    __global data_t* B,
     int m,
     int n,
     __local data_t* As,
@@ -284,14 +284,14 @@ __kernel void matrixMul(
         //each thread loads one element of each matrix
         AS(ty, tx) = A[a + m * ty + tx];
         BS(ty, tx) = B[b + n * ty + tx];
-	
+
         //Synchronize to make sure the matrices are loaded
         barrier(CLK_LOCAL_MEM_FENCE);
 
         //Multiply the two matrices together;
         //each thread computes one element of the block sub-matrix
         for (int k = 0; k < BLOCK_SIZE; ++k) {
-	    double r = 0.0; //residual of multiplication
+            double r = 0.0; //residual of multiplication
             double x = TwoProductFMA(AS(ty, k), BS(k, tx), &r);
 
             double s; //residual of addition
@@ -318,15 +318,15 @@ __kernel void matrixMul(
                                     if(x != 0.0) {
                                         sum[7] = KnuthTwoSum(sum[7], x, &s);
                                         x = s;
-  	                            }
-  	                        }
-	                    }
-	                }
-   	            }
-	        }
- 	    }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
             if(x != 0.0) {
-	        Accumulate(g_workingBase, x);
+                Accumulate(g_workingBase, x);
                 flag = 1;
             }
 
@@ -353,18 +353,18 @@ __kernel void matrixMul(
                                     if(r != 0.0) {
                                         sum[7] = KnuthTwoSum(sum[7], r, &s);
                                         r = s;
-   	                            }
-   	                        }
-   	                    }
-   	                }
-	            }
-   	        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
             }
             if(r != 0.0) {
-	        Accumulate(g_workingBase, r);
+                Accumulate(g_workingBase, r);
                 flag = 1;
             }
-	}
+        }
 
         //Synchronize to make sure that the preceding computation is done before 
         //loading two new sub-matrices of A and B in the next iteration
@@ -384,3 +384,4 @@ __kernel void matrixMul(
     } else
         C[c + n * ty + tx] = sum[0];
 }
+
