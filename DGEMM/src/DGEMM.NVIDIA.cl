@@ -345,12 +345,20 @@ __kernel void matrixMul(
     int m,
     int n,
     __local data_t* As,
+    __local data_t* Bs
 ) {
-    int inx = get_local_id(0);
-    int iny = get_local_id(1);
-    int ibx = get_group_id(0) * 64;
-    int iby = get_group_id(1) * 16;
-    id = inx + iny * 16;
+    //Thread index
+    int tx = get_local_id(0);
+    int ty = get_local_id(1);
+
+    //Block index
+    int bx = get_group_id(0);
+    int by = get_group_id(1);
+
+    int bdimx = n / BLOCK_SIZE;
+    int bdimy = m / BLOCK_SIZE;
+    int bsizex = get_num_groups(0);
+    int bsizey = get_num_groups(1);
 
     for (int i = bx; i < bdimx; i += bsizex)
         for (int j = by; j < bdimy; j += bsizey)
