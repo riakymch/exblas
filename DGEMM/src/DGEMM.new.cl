@@ -1,3 +1,6 @@
+/*
+ * Vasily Volkov's code modified for OpenCL
+ */
 
 #pragma OPENCL EXTENSION cl_khr_byte_addressable_store : enable
 #ifdef NVIDIA
@@ -7,39 +10,6 @@
 
 //Data type used for input data fetches
 typedef double data_t;
-
-/*__kernel void matrixMulKernel (
-    __global data_t* C,
-    __global data_t* A,
-    __global data_t* B,
-    int m,
-    int n,
-    int k,
-    __local data_t *Bwrk
-) {
-    int l, j;
-    int i = get_group_id(0);
-    int iloc = get_local_id(0);
-    int nloc = get_local_size(0);
-
-    data_t Awrk[1024];
-    data_t tmp;
-
-    if (i < m) {
-        for (l = 0; l < m; l++)
-            Awrk[l] = A[i * m + l];
-
-        for (j = 0; j < m; j++) {
-            for (l = iloc; l < m; l+=nloc)
-                Bwrk[l] = B[l * m + j];
-            barrier(CLK_LOCAL_MEM_FENCE);
-            tmp = 0.0;
-            for (l = 0; l < m; l++)
-                tmp += Awrk[l] * Bwrk[l];
-            C[i * m + j] = tmp;
-        }
-    }
-}*/
 
 void saxpy(data_t a, __local data_t *b, data_t *c)
 {
@@ -67,36 +37,39 @@ __kernel void matrixMulKernel (
     __global data_t* B,
     int m,
     int n,
-    int k,
-    __local data_t *Bs
+    int k
 ) {
     const int inx = get_local_id(0);
     const int iny = get_local_id(1);
-    const int ibx = get_group_id(0) * BLOCK_SIZE;
-    const int iby = get_group_id(1) * BLOCK_SIZE;
-    const int id = inx + iny * BLOCK_SIZE;
+    const int ibx = get_group_id(0) * 64;
+    const int iby = get_group_id(1) * 16;
+    const int id = inx + iny * 16;
 
     //Load Asub and Bsub from device memory to shared memory
     A += ibx + id;
-    B += iby + inx + iny * k;
+    B += inx + (iby + iny) * k;
     C += ibx + id + iby * m;
-    const data_t *Blas;
-    Blas = B + k * m;
+    data_t *Blas = B + k;
 
-    data_t c[BLOCK_SIZE] = {0.0};
+    data_t c[64] = {0.0};
+
+    __local data_t bs[16][17];
 
     do {
-        for (int i = 0; i < BLOCK_SIZE; i += 4)
-            Bs[(i + iny) * BLOCK_SIZE + inx] = B[i * m];
+        #pragma unroll
+        for (int i = 0; i < 16; i += 4)
+            bs[inx][iny + i] = B[i * m];
         barrier(CLK_LOCAL_MEM_FENCE);
 
-        for (int i = 0; i < BLOCK_SIZE; i++, A += m)
-            saxpy(A[0], &Bs[i * BLOCK_SIZE], c);
+        #pragma unroll
+        for (int i = 0; i < 16; i++, A += m)
+            saxpy(A[0], &bs[i][0], c);
 
-        B += BLOCK_SIZE * k;
+        B += 16;
         barrier(CLK_LOCAL_MEM_FENCE);
     } while (B < Blas);
 
-    for (int i = 0; i < BLOCK_SIZE; i++, C += m)
+    for (int i = 0; i < 16; i++, C += m)
         C[0] += c[i];
 }
+

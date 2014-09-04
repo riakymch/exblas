@@ -16,12 +16,16 @@
 ////////////////////////////////////////////////////////////////////////////////
 #define DGEMM_KERNEL "matrixMulKernel"
 #ifdef AMD
-  #define BLOCK_SIZE 16
+  #define BM 64
+  #define BK 16
+  #define BN 16
 #else
-  #define BLOCK_SIZE 32
+  #define BM 64
+  #define BK 16
+  #define BN 16
 #endif
 
-static size_t szKernelLength;	              // Byte size of kernel code
+static size_t szKernelLength;                 // Byte size of kernel code
 static char* cSources = NULL;                 // Buffer to hold source for compilation
 
 static cl_program       cpProgram;            //OpenCL Superaccumulator program
@@ -31,15 +35,15 @@ static cl_command_queue cqDefaultCommandQue;  //Default command queue for Supera
 static const uint  VECTOR_NUMBER = 1;
 
 #ifdef AMD
-static char  compileOptions[256] = "-DBLOCK_SIZE=16";
+static char  compileOptions[256] = "-DBM=64 -DBK=16 -DBN=16";
 #else
-static char  compileOptions[256] = "-DBLOCK_SIZE=32 -DNVIDIA -cl-mad-enable -cl-fast-relaxed-math -cl-nv-verbose";
+static char  compileOptions[256] = "-DBM=64 -DBK=16 -DBN=16 -DNVIDIA -cl-mad-enable -cl-fast-relaxed-math -cl-nv-verbose";
 #endif
 
 
 extern "C" cl_int initDGEMMNew(
-    cl_context cxGPUContext, 
-    cl_command_queue cqParamCommandQue, 
+   cl_context cxGPUContext,
+    cl_command_queue cqParamCommandQue,
     cl_device_id cdDevice,
     const char* program_file
 ){
@@ -61,7 +65,7 @@ extern "C" cl_int initDGEMMNew(
     ciErrNum = fread(cSources, sizeof(char), szKernelLength, program_handle);
     fclose(program_handle);
 
-    printf("clCreateProgramWithSource...\n"); 
+    printf("clCreateProgramWithSource...\n");
         cpProgram = clCreateProgramWithSource(cxGPUContext, 1, (const char **)&cSources, &szKernelLength, &ciErrNum);
         if (ciErrNum != CL_SUCCESS) {
             printf("Error in clCreateProgramWithSource, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
@@ -133,10 +137,8 @@ extern "C" size_t DGEMMNew(
         cqCommandQueue = cqDefaultCommandQue;
 
     {
-        size_t NbThreadsPerWorkGroup[] = {BLOCK_SIZE, BLOCK_SIZE / VECTOR_NUMBER};
-        size_t heightC = d_C.height / VECTOR_NUMBER;
-        size_t widthC = d_C.width;
-        size_t TotalNbThreads[] = {widthC, heightC};
+        size_t NbThreadsPerWorkGroup[] = {16, 4};
+        size_t TotalNbThreads[] = {d_C.height / 64, d_C.height / 16};
         size_t neededLocalMemory = BLOCK_SIZE * BLOCK_SIZE * sizeof(cl_double);
 
         cl_int i = 0;
@@ -146,7 +148,6 @@ extern "C" size_t DGEMMNew(
         ciErrNum |= clSetKernelArg(ckMatrixMul, i++, sizeof(cl_int),  (void *)&d_C.height);
         ciErrNum |= clSetKernelArg(ckMatrixMul, i++, sizeof(cl_int),  (void *)&d_C.width);
         ciErrNum |= clSetKernelArg(ckMatrixMul, i++, sizeof(cl_int),  (void *)&d_A.width);
-        ciErrNum |= clSetKernelArg(ckMatrixMul, i++, neededLocalMemory,  NULL);
         if (ciErrNum != CL_SUCCESS) {
             printf("Error in clSetKernelArg, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
             *ciErrNumRes = EXIT_FAILURE;

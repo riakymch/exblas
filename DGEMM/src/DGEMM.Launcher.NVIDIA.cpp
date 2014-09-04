@@ -16,9 +16,13 @@
 ////////////////////////////////////////////////////////////////////////////////
 #define DGEMM_KERNEL "matrixMul"
 #ifdef AMD
-  #define BLOCK_SIZE 16
+  #define BM 64
+  #define BK 16
+  #define BN 16
 #else
-  #define BLOCK_SIZE 32
+  #define BM 64
+  #define BK 16
+  #define BN 16
 #endif
 
 static size_t szKernelLength;                 // Byte size of kernel code
@@ -31,9 +35,9 @@ static cl_command_queue cqDefaultCommandQue;  //Default command queue for Supera
 static const uint  VECTOR_NUMBER = 1;
 
 #ifdef AMD
-static char  compileOptions[256] = "-DBLOCK_SIZE=16";
+static char  compileOptions[256] = "-DBM=64 -DBK=16 -DBN=16";
 #else
-static char  compileOptions[256] = "-DBLOCK_SIZE=32 -DNVIDIA -cl-mad-enable -cl-fast-relaxed-math -cl-nv-verbose";
+static char  compileOptions[256] = "-DBM=64 -DBK=16 -DBN=16 -DNVIDIA -cl-mad-enable -cl-fast-relaxed-math -cl-nv-verbose";
 #endif
 
 
@@ -123,9 +127,9 @@ extern "C" size_t DGEMMNVIDIA(
         cqCommandQueue = cqDefaultCommandQue;
 
     {
-        size_t NbThreadsPerWorkGroup[] = {(size_t) (BLOCK_SIZE), (size_t) (BLOCK_SIZE / VECTOR_NUMBER)};
-        size_t TotalNbThreads[] = {(size_t) (512), (size_t) (512 / VECTOR_NUMBER)};
-        size_t neededLocalMemory = BLOCK_SIZE * BLOCK_SIZE * sizeof(cl_double);
+        size_t NbThreadsPerWorkGroup[] = {(size_t) (BM), (size_t) (BM)};
+        size_t TotalNbThreads[] = {(size_t) (d_C.height / BM), (size_t) (d_C.width / BN)};
+        size_t neededLocalMemory = BK * BN * sizeof(cl_double);
 
         cl_int i = 0;
         ciErrNum  = clSetKernelArg(ckMatrixMul, i++, sizeof(cl_mem),  (void *)&d_C.elements);
@@ -133,7 +137,6 @@ extern "C" size_t DGEMMNVIDIA(
         ciErrNum |= clSetKernelArg(ckMatrixMul, i++, sizeof(cl_mem),  (void *)&d_B.elements);
         ciErrNum |= clSetKernelArg(ckMatrixMul, i++, sizeof(cl_int),  (void *)&d_C.height);
         ciErrNum |= clSetKernelArg(ckMatrixMul, i++, sizeof(cl_int),  (void *)&d_C.width);
-        ciErrNum |= clSetKernelArg(ckMatrixMul, i++, neededLocalMemory,  NULL);
         ciErrNum |= clSetKernelArg(ckMatrixMul, i++, neededLocalMemory,  NULL);
         if (ciErrNum != CL_SUCCESS) {
             printf("Error in clSetKernelArg, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
