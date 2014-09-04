@@ -39,7 +39,36 @@ __kernel void matrixMulKernel (
     int n,
     int k
 ) {
-    const int inx = get_local_id(0);
+    const int tx = get_local_id(0);
+    const int ty = get_local_id(1);
+    const int bx = get_group_id(0);
+    const int by = get_group_id(1);
+
+    //Load Asub and Bsub from device memory to shared memory
+    A += bx * m + id;
+    B += inx + (iby + iny) * k;
+    C += ibx + id + iby * m;
+
+    data_t c[64] = {0.0};
+
+    __local data_t bs[16][17];
+
+    for (int j = 0; j < k; j += 16, B += 16) {
+        #pragma unroll
+        for (int i = 0; i < 16; i += 4)
+            bs[inx][iny + i] = B[i * m];
+        barrier(CLK_LOCAL_MEM_FENCE);
+
+        #pragma unroll
+        for (int i = 0; i < 16; i++, A += m)
+            saxpy(A[0], &bs[i][0], c);
+        barrier(CLK_LOCAL_MEM_FENCE);
+    }
+
+    for (int i = 0; i < 16; i++, C += m)
+        C[0] = c[i];
+
+    /*const int inx = get_local_id(0);
     const int iny = get_local_id(1);
     const int ibx = get_group_id(0) * 64;
     const int iby = get_group_id(1) * 16;
@@ -49,13 +78,12 @@ __kernel void matrixMulKernel (
     A += ibx + id;
     B += inx + (iby + iny) * k;
     C += ibx + id + iby * m;
-    data_t *Blas = B + k;
 
     data_t c[64] = {0.0};
 
     __local data_t bs[16][17];
 
-    do {
+    for (int j = 0; j < k; j += 16, B += 16) {
         #pragma unroll
         for (int i = 0; i < 16; i += 4)
             bs[inx][iny + i] = B[i * m];
@@ -64,12 +92,10 @@ __kernel void matrixMulKernel (
         #pragma unroll
         for (int i = 0; i < 16; i++, A += m)
             saxpy(A[0], &bs[i][0], c);
-
-        B += 16;
         barrier(CLK_LOCAL_MEM_FENCE);
-    } while (B < Blas);
+    }
 
     for (int i = 0; i < 16; i++, C += m)
-        C[0] += c[i];
+        C[0] = c[i];*/
 }
 

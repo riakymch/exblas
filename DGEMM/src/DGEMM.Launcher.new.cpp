@@ -19,10 +19,12 @@
   #define BM 64
   #define BK 16
   #define BN 16
+  #define BLOCK_SIZE 16
 #else
   #define BM 64
   #define BK 16
   #define BN 16
+  #define BLOCK_SIZE 32
 #endif
 
 static size_t szKernelLength;                 // Byte size of kernel code
@@ -137,9 +139,10 @@ extern "C" size_t DGEMMNew(
         cqCommandQueue = cqDefaultCommandQue;
 
     {
-        size_t NbThreadsPerWorkGroup[] = {16, 4};
-        size_t TotalNbThreads[] = {d_C.height / 64, d_C.height / 16};
-        size_t neededLocalMemory = BLOCK_SIZE * BLOCK_SIZE * sizeof(cl_double);
+        size_t NbThreadsPerWorkGroup[] = {(size_t) (16), (size_t) (16)};
+        size_t TotalNbThreads[] = {(size_t) (512), (size_t) (512)};
+        //size_t NbThreadsPerWorkGroup[] = {(size_t) (BLOCK_SIZE), (size_t) (BLOCK_SIZE)};
+        //size_t TotalNbThreads[] = {(size_t) (d_C.height / 64), (size_t) (d_C.height / 16)};
 
         cl_int i = 0;
         ciErrNum  = clSetKernelArg(ckMatrixMul, i++, sizeof(cl_mem),  (void *)&d_C.elements);
