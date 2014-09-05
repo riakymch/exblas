@@ -39,10 +39,10 @@ __kernel void matrixMulKernel (
     int n,
     int k
 ) {
-    const int tx = get_local_id(0);
-    const int ty = get_local_id(1);
-    const int bx = get_group_id(0);
-    const int by = get_group_id(1);
+    /*int tx = get_local_id(0);
+    int ty = get_local_id(1);
+    int bx = get_group_id(0);
+    int by = get_group_id(1);
 
     //Load Asub and Bsub from device memory to shared memory
     A += bx * m + id;
@@ -66,27 +66,28 @@ __kernel void matrixMulKernel (
     }
 
     for (int i = 0; i < 16; i++, C += m)
-        C[0] = c[i];
+        C[0] = c[i];*/
 
-    /*const int inx = get_local_id(0);
-    const int iny = get_local_id(1);
-    const int ibx = get_group_id(0) * 64;
-    const int iby = get_group_id(1) * 16;
-    const int id = inx + iny * 16;
+    int inx = get_local_id(0);
+    int iny = get_local_id(1);
+    int ibx = get_group_id(0) * 16;
+    int iby = get_group_id(1) * 16;
+    int id  = inx + iny * 16;
 
     //Load Asub and Bsub from device memory to shared memory
     A += ibx + id;
     B += inx + (iby + iny) * k;
     C += ibx + id + iby * m;
 
-    data_t c[64] = {0.0};
+    data_t c[16] = {0.0};
 
     __local data_t bs[16][17];
 
     for (int j = 0; j < k; j += 16, B += 16) {
         #pragma unroll
-        for (int i = 0; i < 16; i += 4)
-            bs[inx][iny + i] = B[i * m];
+        //for (int i = 0; i < 16; i += 4) // only for 16x4 threads per block
+        //    bs[inx][iny + i] = B[i * k];
+        bs[inx][iny] = B[0];
         barrier(CLK_LOCAL_MEM_FENCE);
 
         #pragma unroll
@@ -96,6 +97,6 @@ __kernel void matrixMulKernel (
     }
 
     for (int i = 0; i < 16; i++, C += m)
-        C[0] = c[i];*/
+        C[0] = c[i];
 }
 
