@@ -139,8 +139,8 @@ extern "C" size_t DGEMMNew(
         cqCommandQueue = cqDefaultCommandQue;
 
     {
-        size_t NbThreadsPerWorkGroup[] = {(size_t) (16), (size_t) (16)};
-        size_t TotalNbThreads[] = {(size_t) (512), (size_t) (512)};
+        size_t NbThreadsPerWorkGroup[] = {(size_t) (16), (size_t) (4)};
+        size_t TotalNbThreads[] = {(size_t) (d_C.width / 4), (size_t) (d_C.height / 4)};
         //size_t NbThreadsPerWorkGroup[] = {(size_t) (BLOCK_SIZE), (size_t) (BLOCK_SIZE)};
         //size_t TotalNbThreads[] = {(size_t) (d_C.height / 64), (size_t) (d_C.height / 16)};
 
