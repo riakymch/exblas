@@ -14,8 +14,8 @@ void DGEMMCPU(
     const uint n,
     const uint k
 ) {
-    for(uint i = 0; i < m; i++)
-        for(uint j = 0; j < n; j++) {
+    for(uint j = 0; j < n; j++)
+        for(uint i = 0; i < m; i++) {
             double sum = 0.0;
             for(uint l = 0; l < k; l++)
                 sum += A[i * k + l] * B[l * n + j];
