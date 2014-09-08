@@ -101,7 +101,13 @@ __kernel void matrixMul(
     __global data_t* Csub = &C[n * BLOCK_SIZE * by + BLOCK_SIZE * bx];
 
     //Each thread computes one element of Csub
-    data_t sum = 0.0;
+    data_t sum[4] = {0.0};
+
+    //step
+    int step = 4;
+    #ifdef NVIDIA
+      step = step * 2;
+    #endif
 
     //Loop over all sub-matrices of A and B to compute Csub
     for (int i = 0; i < (k / BLOCK_SIZE); ++i) {
@@ -112,6 +118,12 @@ __kernel void matrixMul(
         //Load Asub and Bsub from device memory to shared memory
         As[ty * BLOCK_SIZE + tx] = Asub[ty * k + tx];
         Bs[ty * BLOCK_SIZE + tx] = Bsub[ty * n + tx];
+        As[(ty + step) * BLOCK_SIZE + tx] = Asub[(ty + step) * m + tx];
+        Bs[(ty + step) * BLOCK_SIZE + tx] = Bsub[(ty + step) * k + tx];
+        As[(ty + 2 * step) * BLOCK_SIZE + tx] = Asub[(ty + 2 * step) * m + tx];
+        Bs[(ty + 2 * step) * BLOCK_SIZE + tx] = Bsub[(ty + 2 * step) * k + tx];
+        As[(ty + 3 * step) * BLOCK_SIZE + tx] = Asub[(ty + 3 * step) * m + tx];
+        Bs[(ty + 3 * step) * BLOCK_SIZE + tx] = Bsub[(ty + 3 * step) * k + tx];
 
         //Synchronize to make sure that the sub-matrices are loaded before the computation starts
         barrier(CLK_LOCAL_MEM_FENCE);
@@ -120,11 +132,18 @@ __kernel void matrixMul(
         #ifdef NVIDIA
            #pragma unroll
         #endif
-        for (int l = 0; l < BLOCK_SIZE; ++l)
-            sum = fma(As[ty * BLOCK_SIZE + l], Bs[l * BLOCK_SIZE + tx], sum);
+        for (int k = 0; k < BLOCK_SIZE; ++k) {
+            sum[0] = fma(As[ty * BLOCK_SIZE + k], Bs[k * BLOCK_SIZE + tx], sum[0]);
+            sum[1] = fma(As[(ty + step) * BLOCK_SIZE + k], Bs[k * BLOCK_SIZE + tx], sum[1]);
+            sum[2] = fma(As[(ty + 2 * step) * BLOCK_SIZE + k], Bs[k * BLOCK_SIZE + tx], sum[2]);
+            sum[3] = fma(As[(ty + 3 * step) * BLOCK_SIZE + k], Bs[k * BLOCK_SIZE + tx], sum[3]);
+        }
 
         barrier(CLK_LOCAL_MEM_FENCE);
     }
-    Csub[ty * n + tx] = sum;
+    Csub[ty * n + tx] = sum[0];
+    Csub[(ty + step) * n + tx] = sum[1];
+    Csub[(ty + 2 * step) * n + tx] = sum[2];
+    Csub[(ty + 3 * step) * n + tx] = sum[3];
 }
 
