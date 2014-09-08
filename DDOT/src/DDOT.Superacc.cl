@@ -27,7 +27,7 @@ double TwoProductFMA(double a, double b, double *d) {
 }
 
 // signedcarry in {-1, 0, 1}
-long xadd(__local volatile long *sa, long x, __local uchar *of) {
+long xadd(__local volatile long *sa, long x, uchar *of) {
     // OF and SF  -> carry=1
     // OF and !SF -> carry=-1
     // !OF        -> carry=0
@@ -35,11 +35,11 @@ long xadd(__local volatile long *sa, long x, __local uchar *of) {
     long z = y + x; // since the value sa->accumulator[i] can be changed by another work item
 
     // TODO: cover also underflow
+    *of = 0;
     if(x > 0 && y > 0 && z < 0)
         *of = 1;
     if(x < 0 && y < 0 && z > 0)
         *of = 1;
-    *of = 0;
 
     return y;
 }
@@ -147,17 +147,18 @@ double Round(__global long *accumulator) {
 ////////////////////////////////////////////////////////////////////////////////
 // Main computation pass: compute partial accumulators
 ////////////////////////////////////////////////////////////////////////////////
-void AccumulateWord(__local volatile long *sa, int i, long x, __local uchar *overflows) {
+void AccumulateWord(__local volatile long *sa, int i, long x) {
     // With atomic accumulator updates
     // accumulation and carry propagation can happen in any order,
     // as long as addition is atomic
     // only constraint is: never forget an overflow bit
+    uchar overflow;
     long carry = x;
     long carrybit;
-    long oldword = xadd(&sa[i * WARP_COUNT], x, &overflows[get_local_id(0) / WARP_COUNT]);
+    long oldword = xadd(&sa[i * WARP_COUNT], x, &overflow);
 
-    // To propagate over- or underflow 
-    while (overflows[get_local_id(0) / WARP_COUNT]) {
+    // To propagate over- or underflow
+    while (overflow) {
         // Carry or borrow
         // oldword has sign S
         // x has sign S
@@ -169,19 +170,19 @@ void AccumulateWord(__local volatile long *sa, int i, long x, __local uchar *ove
         carrybit = (s ? 1l << K : -1l << K);
 
         // Cancel carry-save bits
-        xadd(&sa[i * WARP_COUNT], (long) -(carry << digits), &overflows[get_local_id(0) / WARP_COUNT]);
-        if (TSAFE && (s ^ overflows[get_local_id(0) / WARP_COUNT]))
+        xadd(&sa[i * WARP_COUNT], (long) -(carry << digits), &overflow);
+        if (TSAFE && (s ^ overflow))
             carrybit *= 2;
         carry += carrybit;
 
         ++i;
         if (i >= BIN_COUNT)
             return;
-        oldword = xadd(&sa[i * WARP_COUNT], carry, &overflows[get_local_id(0) / WARP_COUNT]);
+        oldword = xadd(&sa[i * WARP_COUNT], carry, &overflow);
     }
 }
 
-void Accumulate(__local volatile long *sa, double x, __local uchar *overflows) {
+void Accumulate(__local volatile long *sa, double x) {
     if (x == 0)
         return;
 
@@ -197,7 +198,7 @@ void Accumulate(__local volatile long *sa, double x, __local uchar *overflows) {
         double xrounded = rint(xscaled);
         long xint = (long) xrounded;
 
-        AccumulateWord(sa, i, xint, overflows);
+        AccumulateWord(sa, i, xint);
 
         xscaled -= xrounded;
         xscaled *= deltaScale;
@@ -217,10 +218,6 @@ void DDOT(
     //Initialize accumulators
     for (uint i = 0; i < BIN_COUNT; i++)
         l_workingBase[i * WARP_COUNT] = 0;
-
-    //overflow flags
-    __local uchar overflows[WARP_COUNT];
-    overflows[get_local_id(0) / WARP_COUNT] = 0;
     barrier(CLK_LOCAL_MEM_FENCE);
 
     //Read data from global memory and scatter it to sub-accumulators
@@ -230,9 +227,10 @@ void DDOT(
     for(uint pos = get_global_id(0); pos < NbElements; pos += get_global_size(0)){
         double r = 0.0;
         data_t x = TwoProductFMA(d_a[pos], d_b[pos], &r);
-        Accumulate(l_workingBase, x, overflows);
+
+        Accumulate(l_workingBase, x);
         if (r != 0.0)
-            Accumulate(l_workingBase, r, overflows);
+            Accumulate(l_workingBase, r);
     }
     barrier(CLK_LOCAL_MEM_FENCE);
 

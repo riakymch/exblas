@@ -292,17 +292,28 @@ __kernel void matrixMul(
         for (int k = 0; k < BLOCK_SIZE; ++k) {
             double r = 0.0; //residual of multiplication
             double x = TwoProductFMA(AS(ty, k), BS(k, tx), &r);
+
             #ifdef NVIDIA
                 #pragma unroll
             #endif
             for(uint i = 0; i != NBFPE; ++i) {
                 double s = 0.0; //residual of addition
                 sum[i] = KnuthTwoSum(sum[i], x, &s);//Issues on Tesla
-                x = s + r;
-                r = 0.0;
+                x = s;
             }
             if(x != 0.0)
                 Accumulate(g_workingBase, x);
+
+            #ifdef NVIDIA
+                #pragma unroll
+            #endif
+            for(uint i = 0; i != NBFPE; ++i) {
+                double s = 0.0; //residual of addition
+                sum[i] = KnuthTwoSum(sum[i], r, &s);//Issues on Tesla
+                r = s;
+            }
+            if(r != 0.0)
+                Accumulate(g_workingBase, r);
         }
 
         //Synchronize to make sure that the preceding computation is done before 

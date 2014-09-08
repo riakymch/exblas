@@ -153,10 +153,11 @@ extern "C" size_t DDOTStandard(
         TotalNbThreads = PARTIAL_SUMMATION_COUNT * NbThreadsPerWorkGroup;
         NbElements = NbElements / VECTOR_NUMBER;
 
-        ciErrNum  = clSetKernelArg(ckKernel, 0, sizeof(cl_mem),  (void *)&d_PartialSum);
-        ciErrNum |= clSetKernelArg(ckKernel, 1, sizeof(cl_mem),  (void *)&d_a);
-        ciErrNum |= clSetKernelArg(ckKernel, 2, sizeof(cl_mem),  (void *)&d_b);
-        ciErrNum |= clSetKernelArg(ckKernel, 3, sizeof(cl_uint), (void *)&NbElements);
+        uint i = 0;
+        ciErrNum  = clSetKernelArg(ckKernel, i++, sizeof(cl_mem),  (void *)&d_PartialSum);
+        ciErrNum |= clSetKernelArg(ckKernel, i++, sizeof(cl_mem),  (void *)&d_a);
+        ciErrNum |= clSetKernelArg(ckKernel, i++, sizeof(cl_mem),  (void *)&d_b);
+        ciErrNum |= clSetKernelArg(ckKernel, i++, sizeof(cl_uint), (void *)&NbElements);
         if (ciErrNum != CL_SUCCESS) {
             printf("Error in clSetKernelArg, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
             *ciErrNumRes = EXIT_FAILURE;
@@ -174,9 +175,10 @@ extern "C" size_t DDOTStandard(
         NbThreadsPerWorkGroup = MERGE_WORKGROUP_SIZE;
         TotalNbThreads = NbThreadsPerWorkGroup;
 
-        ciErrNum  = clSetKernelArg(ckComplete, 0, sizeof(cl_mem),  (void *)&d_res);
-        ciErrNum |= clSetKernelArg(ckComplete, 1, sizeof(cl_mem),  (void *)&d_PartialSum);
-        ciErrNum |= clSetKernelArg(ckComplete, 2, sizeof(cl_uint), (void *)&PARTIAL_SUMMATION_COUNT);
+        uint i = 0;
+        ciErrNum  = clSetKernelArg(ckComplete, i++, sizeof(cl_mem),  (void *)&d_res);
+        ciErrNum |= clSetKernelArg(ckComplete, i++, sizeof(cl_mem),  (void *)&d_PartialSum);
+        ciErrNum |= clSetKernelArg(ckComplete, i++, sizeof(cl_uint), (void *)&PARTIAL_SUMMATION_COUNT);
         if (ciErrNum != CL_SUCCESS) {
             printf("Error in clSetKernelArg, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
             *ciErrNumRes = EXIT_FAILURE;
