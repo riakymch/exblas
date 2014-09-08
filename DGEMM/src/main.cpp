@@ -37,7 +37,7 @@ static void __usage(int argc __attribute__((unused)), char **argv) {
     printf("              -k nbcolumns of B,\n");
     printf("              -r range,\n");
     printf("              -e nbfpe,\n");
-    printf("              -a alg (0-mine, 1-amd, 2-nvidia, 30-pr-sa, 31-pr-fpe, 32-pr-fpe-ex-4, 33-pr-fpe-ex-8, 34-pr-fpe-multi, 40-lo-sa, 41-lo-fpe, 50-gl-sa, 51-gl-fpe, 52-gl-fpe-ex-4, 53-gl-fpe-ex-8, 54-gl-fpe-multi, 6-new),\n");
+    printf("              -a alg (0-mine, 1-amd, 2-nvidia, 30-pr-sa, 31-pr-fpe, 32-pr-fpe-ex-4, 33-pr-fpe-ex-8, 34-pr-fpe-multi, 40-lo-sa, 41-lo-fpe, 50-gl-sa, 51-gl-fpe, 52-gl-fpe-ex-4, 53-gl-fpe-ex-8, 54-gl-fpe-multi, 6-volkov),\n");
     printf("              -ml multi-values] \n");
     printf("  -?, -h:    Display this help and exit\n");
 }
@@ -131,7 +131,7 @@ int main(int argc, char **argv)
     else if (__alg == 54)
         runDGEMM("../src/DGEMM.NVIDIA.FPE.Global.Multi.cl");
     else if (__alg == 6)
-        runDGEMM("../src/DGEMM.new.cl");
+        runDGEMM("../src/DGEMM.Volkov.cl");
 }
 
 int runDGEMM(const char* program_file){
@@ -315,19 +315,19 @@ int runDGEMM(const char* program_file){
                 }
 
             printf(" ...DGEMM on CPU\n");
-                double *C_CPU;
+                /*double *C_CPU;
                 C_CPU = (double *) calloc(__nbRowsC * __nbColumnsC, sizeof(double));
-                DGEMMCPU(C_CPU, (const double *)A, (const double *)B, __nbRowsC, __nbColumnsC, __nbRowsB);
+                DGEMMCPU(C_CPU, (const double *)A, (const double *)B, __nbRowsC, __nbColumnsC, __nbRowsB);*/
                 /*printMatrix(C, d_C.width, d_C.height);
                 printf("\n");
                 printMatrix(C_CPU, d_C.width, d_C.height);*/
 
             printf(" ...comparing the results\n");
                 printf("//--------------------------------------------------------\n");
-                PassFailFlag = compare((const double *) C_CPU, (const double *) C, __nbRowsC * __nbColumnsC, 1e-16);
-                //PassFailFlag = compareDGEMMWithMPFR((const double *)C, (const double *)A, (const double *)B, __nbRowsC, __nbColumnsC, __nbRowsB, 1e-16);
+                //PassFailFlag = compare((const double *) C_CPU, (const double *) C, __nbRowsC * __nbColumnsC, 1e-16);
+                PassFailFlag = compareDGEMMWithMPFR((const double *)C, (const double *)A, (const double *)B, __nbRowsC, __nbColumnsC, __nbRowsB, 1e-16);
                 printf("//--------------------------------------------------------\n");
-                free(C_CPU);
+                //free(C_CPU);
 
          //Release kernels and program
          printf("Shutting down...\n\n");
