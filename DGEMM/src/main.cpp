@@ -300,7 +300,22 @@ int runDGEMM(const char* program_file){
         double minTime = min(gpuTime, NUM_ITER);
         double perf = nbElements * sizeof(double);
         double throughput = (perf / minTime) * 1e-9;
-        perf = 2.0 * d_A.width * d_B.width * d_A.height;
+        if ((__alg <= 2) || (__alg == 6)) {
+            perf = 2.0 * d_A.width;
+            perf *= d_B.width * d_A.height;
+        } else if (__alg % 10 == 0) {
+            perf = 2.0 * d_A.width;
+            perf *= d_B.width * d_A.height;
+        } else if ((__alg == 31) || (__alg == 41) || (__alg == 51)) {
+            perf = (2 + 12 * __nbfpe) * d_A.width;
+            perf *= d_B.width * d_A.height;
+        } else if ((__alg == 32) || (__alg == 52)) {
+            perf = 50 * d_A.width;
+            perf *= d_B.width * d_A.height;
+        } else if ((__alg == 33) || (__alg == 53)) {
+            perf = 98 * d_A.width;
+            perf *= d_B.width * d_A.height;
+        }
         perf = (perf / minTime) * 1e-9;
         printf("Alg = %u \t NbFPE = %u \t Range = %u \t NbElements = %u \t Size = %u \t Time = %.8f s \t Throughput = %.4f GB/s\n\n", __alg, __nbfpe, __range, nbElements, d_C.width, minTime, throughput);
         printf("Alg = %u \t NbFPE = %u \t Range = %u \t NbElements = %u \t Size = %u \t Time = %.8f s \t Performance = %.4f GFLOPS\n\n", __alg, __nbfpe, __range, nbElements, d_C.width, minTime, perf);
