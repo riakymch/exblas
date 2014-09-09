@@ -16,12 +16,14 @@
 ////////////////////////////////////////////////////////////////////////////////
 #define DDOT_KERNEL          "DDOT"
 #define DDOT_COMPLETE_KERNEL "DDOTComplete"
+#define DDOT_ROUND_KERNEL    "DDOTRound"
 
 static size_t szKernelLength;                  // Byte size of kernel code
 static char* cSources = NULL;                  // Buffer to hold source for compilation
 
 static cl_program       cpProgram;             //OpenCL program
 static cl_kernel        ckKernel, ckComplete;
+static cl_kernel        ckRound;
 static cl_command_queue cqDefaultCommandQue;   //Default command queue
 static cl_mem           d_PartialSuperaccs;
 
@@ -38,8 +40,8 @@ static char  compileOptions[256] = "-DNVIDIA -DWARP_COUNT=16 -DWORKGROUP_SIZE=25
 
 
 extern "C" cl_int initDDOT(
-    cl_context cxGPUContext, 
-    cl_command_queue cqParamCommandQue, 
+    cl_context cxGPUContext,
+    cl_command_queue cqParamCommandQue,
     cl_device_id cdDevice,
     const char* program_file,
     const uint NbFPE
@@ -94,6 +96,11 @@ extern "C" cl_int initDDOT(
             printf("Error in clCreateKernel: DDOTComplete, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
             return EXIT_FAILURE;
         }
+        ckRound = clCreateKernel(cpProgram, DDOT_ROUND_KERNEL, &ciErrNum);
+        if (ciErrNum != CL_SUCCESS) {
+            printf("Error in clCreateKernel: DDOTRound, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
+            return EXIT_FAILURE;
+        }
 
     printf("...allocating internal buffer\n");
         d_PartialSuperaccs = clCreateBuffer(cxGPUContext, CL_MEM_READ_WRITE, PARTIAL_SUPERACCS_COUNT * BIN_COUNT * sizeof(cl_long), NULL, &ciErrNum);
@@ -114,9 +121,10 @@ extern "C" cl_int initDDOT(
 extern "C" void closeDDOT(void){
     cl_int ciErrNum;
 
-    ciErrNum = clReleaseMemObject(d_PartialSuperaccs);
+    ciErrNum  = clReleaseMemObject(d_PartialSuperaccs);
     ciErrNum |= clReleaseKernel(ckKernel);
     ciErrNum |= clReleaseKernel(ckComplete);
+    ciErrNum |= clReleaseKernel(ckRound);
     ciErrNum |= clReleaseProgram(cpProgram);
     if (ciErrNum != CL_SUCCESS) {
         printf("Error in closeReduction(), Line %u in file %s !!!\n\n", __LINE__, __FILE__);
@@ -126,18 +134,9 @@ extern "C" void closeDDOT(void){
 ////////////////////////////////////////////////////////////////////////////////
 // OpenCL launchers for Reduction / mergeReduction kernels
 ////////////////////////////////////////////////////////////////////////////////
-//Round a / b to nearest higher integer value
-inline uint iDivUp(uint a, uint b){
-    return (a % b != 0) ? (a / b + 1) : (a / b);
-}
-
-//Snap a to nearest lower multiple of b
-inline uint iSnapDown(uint a, uint b){
-    return a - a % b;
-}
-
 extern "C" size_t DDOT(
     cl_command_queue cqCommandQueue,
+    cl_mem d_Res,
     cl_mem d_Superacc,
     const cl_mem d_a,
     const cl_mem d_b,
@@ -194,6 +193,27 @@ extern "C" size_t DDOT(
             return 0;
         }
     }
+    {
+        NbThreadsPerWorkGroup = MERGE_WORKGROUP_SIZE;
+        TotalNbThreads = NbThreadsPerWorkGroup;
+
+        cl_uint i = 0;
+        ciErrNum  = clSetKernelArg(ckRound, i++, sizeof(cl_mem),  (void *)&d_Res);
+        ciErrNum |= clSetKernelArg(ckRound, i++, sizeof(cl_mem),  (void *)&d_Superacc);
+        if (ciErrNum != CL_SUCCESS) {
+            printf("Error in clSetKernelArg, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
+           *ciErrNumRes = EXIT_FAILURE;
+            return 0;
+        }
+
+        ciErrNum = clEnqueueNDRangeKernel(cqCommandQueue, ckRound, 1, NULL, &TotalNbThreads, &NbThreadsPerWorkGroup, 0, NULL, NULL);
+        if (ciErrNum != CL_SUCCESS) {
+            printf("Error in clEnqueueNDRangeKernel, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
+           *ciErrNumRes = EXIT_FAILURE;
+            return 0;
+        }
+    }
 
     return WORKGROUP_SIZE;
 }
+

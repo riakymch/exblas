@@ -310,9 +310,19 @@ void DDOTComplete(
             l_Data[lid] += l_Data[lid + stride];
     }
 
-    if(lid == 0) {
+    if(lid == 0)
         d_Superacc[gid] = l_Data[0];
-        //barrier(CLK_LOCAL_MEM_FENCE);
-        //d_Res[0] = Round(d_Superacc);
-    }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Round the results
+////////////////////////////////////////////////////////////////////////////////
+__kernel __attribute__((reqd_work_group_size(MERGE_WORKGROUP_SIZE, 1, 1)))
+void DDOTRound(
+    __global double *d_res,
+    __global long *d_Superacc
+){
+    uint pos = get_local_id(0);
+    if (pos == 0)
+        d_res[0] = Round(d_Superacc);
 }

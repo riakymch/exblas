@@ -104,6 +104,7 @@ extern "C" void closeDDOTStandard(
 extern "C" size_t DDOT(
     cl_command_queue cqCommandQueue,
     cl_mem d_res,
+    cl_mem d_Superacc,
     const cl_mem d_a,
     const cl_mem d_b,
     uint NbElements,
