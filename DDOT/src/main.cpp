@@ -103,7 +103,7 @@ int main(int argc, char **argv)
 
 int runDDOT(const char* program_file){
     cl_int ciErrNum;
-    bool PassFailFlag = 1;
+    bool PassFailFlag = false;
 
     printf("Initializing data...\n");
         PassFailFlag  = posix_memalign(&h_a, 64, __nbElements * sizeof(double));
@@ -269,7 +269,7 @@ int runDDOT(const char* program_file){
 
 int runDDOTStandard(const char* program_file) {
     cl_int ciErrNum;
-    bool PassFailFlag = 1;
+    bool PassFailFlag = false;
 
     printf("Initializing data...\n");
         PassFailFlag  = posix_memalign(&h_a, 64, __nbElements * sizeof(double));
