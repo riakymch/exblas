@@ -1,0 +1,51 @@
+ExBLAS -- Exact (fast, accurate, and reproducible) BLAS library v0.1
+=============================================
+ExBLAS aims at providing new algorithms and implementations for fundamental 
+linear algebra operations -- like those included in the BLAS library -- that 
+deliver reproducible and accurate results with small or without losses to their 
+performance on modern parallel architectures such as Intel Xeon Phi many-core 
+processors and GPU accelerators. We construct our approach in such a way that it 
+is independent from data partitioning, order of computations, thread scheduling, 
+or reduction tree schemes.
+
+The current version of the library is equipped with 
+  * Reproducible parallel reduction (parallel summation);
+  * Reproducible dot product
+These routines can be executed on both AMD and NVIDIA GPUs using the OpenCL 
+framework.
+
+
+Requirements
+=============================================
+In order to use ExBLAS, the following software is needed:
+  * GMP of version 6.0;
+  * MPFR of version 3.1.2
+This libraries are required to verify the accuracy and reproducibility of the 
+results.
+
+
+Installation
+=============================================
+- Download the latest version of source code from
+  exblas.lip6.fr
+- Extract the sources from a tar.gz archive (tar -zxvf) to {EXBLAS_ROOT} folder
+- Move to {EXBLAS_ROOT}/src
+- In order to install the library, type
+    make <ARCH>,
+  where <ARCH> stands for amd or nvidia, meaning either AMD or NVIDIA GPUs. The 
+  executable file (main.out.<ARCH>) is located in {EXBLAS_ROOT}/src
+
+
+Usage
+=============================================
+./main.out.<ARCH> [-n number of elements in array,
+                   -r input data range,
+                   -e size of error-free transformation,
+                   -a algorithm (0-red, 1-acc, 2-fpe, 3-fpeee4, 4-fpeex6, 5-fpeex8)],
+where
+  - "red" corresponds to parallel reduction
+  - "acc" stands for a version with superaccumulator only;
+  - "fpe" relies on error-free transformations (EFT) of various sizes and 
+    superaccumulators that are used when the accuracy provided by EFT is not 
+    enough;
+  - "fpeee[X]" stands for the optimized EFT of size X with the early-exit technique;
