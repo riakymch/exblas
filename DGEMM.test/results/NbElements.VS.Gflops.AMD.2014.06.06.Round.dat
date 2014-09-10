@@ -1,0 +1,656 @@
+Alg = 0 	 Range = 1 	 NbElements = 196608 	 Size = 256 	 Time = 0.00073679 s 	 Throughput = 2.1348 GB/s
+Alg = 0 	 Range = 1 	 NbElements = 196608 	 Size = 256 	 Time = 0.00073679 s 	 Performance = 45.5414 GFLOPS
+Alg = 0 	 Range = 1 	 NbElements = 786432 	 Size = 512 	 Time = 0.00104708 s 	 Throughput = 6.0086 GB/s
+Alg = 0 	 Range = 1 	 NbElements = 786432 	 Size = 512 	 Time = 0.00104708 s 	 Performance = 256.3658 GFLOPS
+Alg = 0 	 Range = 1 	 NbElements = 1769472 	 Size = 768 	 Time = 0.00282067 s 	 Throughput = 5.0186 GB/s
+Alg = 0 	 Range = 1 	 NbElements = 1769472 	 Size = 768 	 Time = 0.00282067 s 	 Performance = 321.1900 GFLOPS
+Alg = 0 	 Range = 1 	 NbElements = 3145728 	 Size = 1024 	 Time = 0.00633987 s 	 Throughput = 3.9695 GB/s
+Alg = 0 	 Range = 1 	 NbElements = 3145728 	 Size = 1024 	 Time = 0.00633987 s 	 Performance = 338.7267 GFLOPS
+Alg = 0 	 Range = 1 	 NbElements = 4915200 	 Size = 1280 	 Time = 0.01170932 s 	 Throughput = 3.3581 GB/s
+Alg = 0 	 Range = 1 	 NbElements = 4915200 	 Size = 1280 	 Time = 0.01170932 s 	 Performance = 358.2021 GFLOPS
+Alg = 0 	 Range = 1 	 NbElements = 7077888 	 Size = 1536 	 Time = 0.02005734 s 	 Throughput = 2.8231 GB/s
+Alg = 0 	 Range = 1 	 NbElements = 7077888 	 Size = 1536 	 Time = 0.02005734 s 	 Performance = 361.3518 GFLOPS
+Alg = 0 	 Range = 1 	 NbElements = 9633792 	 Size = 1792 	 Time = 0.03147157 s 	 Throughput = 2.4489 GB/s
+Alg = 0 	 Range = 1 	 NbElements = 9633792 	 Size = 1792 	 Time = 0.03147157 s 	 Performance = 365.7005 GFLOPS
+Alg = 0 	 Range = 1 	 NbElements = 12582912 	 Size = 2048 	 Time = 0.04675032 s 	 Throughput = 2.1532 GB/s
+Alg = 0 	 Range = 1 	 NbElements = 12582912 	 Size = 2048 	 Time = 0.04675032 s 	 Performance = 367.4813 GFLOPS
+Alg = 0 	 Range = 1 	 NbElements = 15925248 	 Size = 2304 	 Time = 0.06637740 s 	 Throughput = 1.9194 GB/s
+Alg = 0 	 Range = 1 	 NbElements = 15925248 	 Size = 2304 	 Time = 0.06637740 s 	 Performance = 368.5167 GFLOPS
+Alg = 0 	 Range = 1 	 NbElements = 19660800 	 Size = 2560 	 Time = 0.09081868 s 	 Throughput = 1.7319 GB/s
+Alg = 0 	 Range = 1 	 NbElements = 19660800 	 Size = 2560 	 Time = 0.09081868 s 	 Performance = 369.4662 GFLOPS
+Alg = 0 	 Range = 1 	 NbElements = 23789568 	 Size = 2816 	 Time = 0.12054326 s 	 Throughput = 1.5788 GB/s
+Alg = 0 	 Range = 1 	 NbElements = 23789568 	 Size = 2816 	 Time = 0.12054326 s 	 Performance = 370.4973 GFLOPS
+Alg = 0 	 Range = 1 	 NbElements = 28311552 	 Size = 3072 	 Time = 0.15642093 s 	 Throughput = 1.4480 GB/s
+Alg = 0 	 Range = 1 	 NbElements = 28311552 	 Size = 3072 	 Time = 0.15642093 s 	 Performance = 370.6797 GFLOPS
+Alg = 0 	 Range = 1 	 NbElements = 33226752 	 Size = 3328 	 Time = 0.19868726 s 	 Throughput = 1.3379 GB/s
+Alg = 0 	 Range = 1 	 NbElements = 33226752 	 Size = 3328 	 Time = 0.19868726 s 	 Performance = 371.0308 GFLOPS
+Alg = 0 	 Range = 1 	 NbElements = 38535168 	 Size = 3584 	 Time = 0.24789998 s 	 Throughput = 1.2436 GB/s
+Alg = 0 	 Range = 1 	 NbElements = 38535168 	 Size = 3584 	 Time = 0.24789998 s 	 Performance = 371.4134 GFLOPS
+Alg = 0 	 Range = 1 	 NbElements = 44236800 	 Size = 3840 	 Time = 0.30467338 s 	 Throughput = 1.1616 GB/s
+Alg = 0 	 Range = 1 	 NbElements = 44236800 	 Size = 3840 	 Time = 0.30467338 s 	 Performance = 371.6971 GFLOPS
+Alg = 0 	 Range = 1 	 NbElements = 50331648 	 Size = 4096 	 Time = 0.36995717 s 	 Throughput = 1.0884 GB/s
+Alg = 0 	 Range = 1 	 NbElements = 50331648 	 Size = 4096 	 Time = 0.36995717 s 	 Performance = 371.4996 GFLOPS
+Alg = 1 	 Range = 1 	 NbElements = 196608 	 Size = 256 	 Time = 0.00060278 s 	 Throughput = 2.6093 GB/s
+Alg = 1 	 Range = 1 	 NbElements = 196608 	 Size = 256 	 Time = 0.00060278 s 	 Performance = 55.6659 GFLOPS
+Alg = 1 	 Range = 1 	 NbElements = 786432 	 Size = 512 	 Time = 0.00126689 s 	 Throughput = 4.9661 GB/s
+Alg = 1 	 Range = 1 	 NbElements = 786432 	 Size = 512 	 Time = 0.00126689 s 	 Performance = 211.8860 GFLOPS
+Alg = 1 	 Range = 1 	 NbElements = 1769472 	 Size = 768 	 Time = 0.00210491 s 	 Throughput = 6.7251 GB/s
+Alg = 1 	 Range = 1 	 NbElements = 1769472 	 Size = 768 	 Time = 0.00210491 s 	 Performance = 430.4080 GFLOPS
+Alg = 1 	 Range = 1 	 NbElements = 3145728 	 Size = 1024 	 Time = 0.00452226 s 	 Throughput = 5.5649 GB/s
+Alg = 1 	 Range = 1 	 NbElements = 3145728 	 Size = 1024 	 Time = 0.00452226 s 	 Performance = 474.8691 GFLOPS
+Alg = 1 	 Range = 1 	 NbElements = 4915200 	 Size = 1280 	 Time = 0.00842274 s 	 Throughput = 4.6685 GB/s
+Alg = 1 	 Range = 1 	 NbElements = 4915200 	 Size = 1280 	 Time = 0.00842274 s 	 Performance = 497.9737 GFLOPS
+Alg = 1 	 Range = 1 	 NbElements = 7077888 	 Size = 1536 	 Time = 0.01447334 s 	 Throughput = 3.9122 GB/s
+Alg = 1 	 Range = 1 	 NbElements = 7077888 	 Size = 1536 	 Time = 0.01447334 s 	 Performance = 500.7662 GFLOPS
+Alg = 1 	 Range = 1 	 NbElements = 9633792 	 Size = 1792 	 Time = 0.02258903 s 	 Throughput = 3.4118 GB/s
+Alg = 1 	 Range = 1 	 NbElements = 9633792 	 Size = 1792 	 Time = 0.02258903 s 	 Performance = 509.5027 GFLOPS
+Alg = 1 	 Range = 1 	 NbElements = 12582912 	 Size = 2048 	 Time = 0.03354275 s 	 Throughput = 3.0010 GB/s
+Alg = 1 	 Range = 1 	 NbElements = 12582912 	 Size = 2048 	 Time = 0.03354275 s 	 Performance = 512.1783 GFLOPS
+Alg = 1 	 Range = 1 	 NbElements = 15925248 	 Size = 2304 	 Time = 0.04733326 s 	 Throughput = 2.6916 GB/s
+Alg = 1 	 Range = 1 	 NbElements = 15925248 	 Size = 2304 	 Time = 0.04733326 s 	 Performance = 516.7863 GFLOPS
+Alg = 1 	 Range = 1 	 NbElements = 19660800 	 Size = 2560 	 Time = 0.06513269 s 	 Throughput = 2.4149 GB/s
+Alg = 1 	 Range = 1 	 NbElements = 19660800 	 Size = 2560 	 Time = 0.06513269 s 	 Performance = 515.1704 GFLOPS
+Alg = 1 	 Range = 1 	 NbElements = 23789568 	 Size = 2816 	 Time = 0.08730446 s 	 Throughput = 2.1799 GB/s
+Alg = 1 	 Range = 1 	 NbElements = 23789568 	 Size = 2816 	 Time = 0.08730446 s 	 Performance = 511.5540 GFLOPS
+Alg = 1 	 Range = 1 	 NbElements = 28311552 	 Size = 3072 	 Time = 0.11860874 s 	 Throughput = 1.9096 GB/s
+Alg = 1 	 Range = 1 	 NbElements = 28311552 	 Size = 3072 	 Time = 0.11860874 s 	 Performance = 488.8515 GFLOPS
+Alg = 1 	 Range = 1 	 NbElements = 33226752 	 Size = 3328 	 Time = 0.15375793 s 	 Throughput = 1.7288 GB/s
+Alg = 1 	 Range = 1 	 NbElements = 33226752 	 Size = 3328 	 Time = 0.15375793 s 	 Performance = 479.4490 GFLOPS
+Alg = 1 	 Range = 1 	 NbElements = 38535168 	 Size = 3584 	 Time = 0.19452741 s 	 Throughput = 1.5848 GB/s
+Alg = 1 	 Range = 1 	 NbElements = 38535168 	 Size = 3584 	 Time = 0.19452741 s 	 Performance = 473.3182 GFLOPS
+Alg = 1 	 Range = 1 	 NbElements = 44236800 	 Size = 3840 	 Time = 0.24094298 s 	 Throughput = 1.4688 GB/s
+Alg = 1 	 Range = 1 	 NbElements = 44236800 	 Size = 3840 	 Time = 0.24094298 s 	 Performance = 470.0125 GFLOPS
+Alg = 1 	 Range = 1 	 NbElements = 50331648 	 Size = 4096 	 Time = 0.29444783 s 	 Throughput = 1.3675 GB/s
+Alg = 1 	 Range = 1 	 NbElements = 50331648 	 Size = 4096 	 Time = 0.29444783 s 	 Performance = 466.7684 GFLOPS
+Alg = 2 	 Range = 1 	 NbElements = 196608 	 Size = 256 	 Time = 0.00056891 s 	 Throughput = 2.7647 GB/s
+Alg = 2 	 Range = 1 	 NbElements = 196608 	 Size = 256 	 Time = 0.00056891 s 	 Performance = 58.9799 GFLOPS
+Alg = 2 	 Range = 1 	 NbElements = 786432 	 Size = 512 	 Time = 0.00166039 s 	 Throughput = 3.7891 GB/s
+Alg = 2 	 Range = 1 	 NbElements = 786432 	 Size = 512 	 Time = 0.00166039 s 	 Performance = 161.6703 GFLOPS
+Alg = 2 	 Range = 1 	 NbElements = 1769472 	 Size = 768 	 Time = 0.00247485 s 	 Throughput = 5.7199 GB/s
+Alg = 2 	 Range = 1 	 NbElements = 1769472 	 Size = 768 	 Time = 0.00247485 s 	 Performance = 366.0705 GFLOPS
+Alg = 2 	 Range = 1 	 NbElements = 3145728 	 Size = 1024 	 Time = 0.00550044 s 	 Throughput = 4.5752 GB/s
+Alg = 2 	 Range = 1 	 NbElements = 3145728 	 Size = 1024 	 Time = 0.00550044 s 	 Performance = 390.4201 GFLOPS
+Alg = 2 	 Range = 1 	 NbElements = 4915200 	 Size = 1280 	 Time = 0.01021316 s 	 Throughput = 3.8501 GB/s
+Alg = 2 	 Range = 1 	 NbElements = 4915200 	 Size = 1280 	 Time = 0.01021316 s 	 Performance = 410.6765 GFLOPS
+Alg = 2 	 Range = 1 	 NbElements = 7077888 	 Size = 1536 	 Time = 0.01744583 s 	 Throughput = 3.2457 GB/s
+Alg = 2 	 Range = 1 	 NbElements = 7077888 	 Size = 1536 	 Time = 0.01744583 s 	 Performance = 415.4436 GFLOPS
+Alg = 2 	 Range = 1 	 NbElements = 9633792 	 Size = 1792 	 Time = 0.02734013 s 	 Throughput = 2.8189 GB/s
+Alg = 2 	 Range = 1 	 NbElements = 9633792 	 Size = 1792 	 Time = 0.02734013 s 	 Performance = 420.9625 GFLOPS
+Alg = 2 	 Range = 1 	 NbElements = 12582912 	 Size = 2048 	 Time = 0.04054814 s 	 Throughput = 2.4826 GB/s
+Alg = 2 	 Range = 1 	 NbElements = 12582912 	 Size = 2048 	 Time = 0.04054814 s 	 Performance = 423.6907 GFLOPS
+Alg = 2 	 Range = 1 	 NbElements = 15925248 	 Size = 2304 	 Time = 0.05730377 s 	 Throughput = 2.2233 GB/s
+Alg = 2 	 Range = 1 	 NbElements = 15925248 	 Size = 2304 	 Time = 0.05730377 s 	 Performance = 426.8686 GFLOPS
+Alg = 2 	 Range = 1 	 NbElements = 19660800 	 Size = 2560 	 Time = 0.07862447 s 	 Throughput = 2.0005 GB/s
+Alg = 2 	 Range = 1 	 NbElements = 19660800 	 Size = 2560 	 Time = 0.07862447 s 	 Performance = 426.7683 GFLOPS
+Alg = 2 	 Range = 1 	 NbElements = 23789568 	 Size = 2816 	 Time = 0.10429505 s 	 Throughput = 1.8248 GB/s
+Alg = 2 	 Range = 1 	 NbElements = 23789568 	 Size = 2816 	 Time = 0.10429505 s 	 Performance = 428.2173 GFLOPS
+Alg = 2 	 Range = 1 	 NbElements = 28311552 	 Size = 3072 	 Time = 0.13560778 s 	 Throughput = 1.6702 GB/s
+Alg = 2 	 Range = 1 	 NbElements = 28311552 	 Size = 3072 	 Time = 0.13560778 s 	 Performance = 427.5718 GFLOPS
+Alg = 2 	 Range = 1 	 NbElements = 33226752 	 Size = 3328 	 Time = 0.17202533 s 	 Throughput = 1.5452 GB/s
+Alg = 2 	 Range = 1 	 NbElements = 33226752 	 Size = 3328 	 Time = 0.17202533 s 	 Performance = 428.5362 GFLOPS
+Alg = 2 	 Range = 1 	 NbElements = 38535168 	 Size = 3584 	 Time = 0.21448033 s 	 Throughput = 1.4373 GB/s
+Alg = 2 	 Range = 1 	 NbElements = 38535168 	 Size = 3584 	 Time = 0.21448033 s 	 Performance = 429.2858 GFLOPS
+Alg = 2 	 Range = 1 	 NbElements = 44236800 	 Size = 3840 	 Time = 0.26382733 s 	 Throughput = 1.3414 GB/s
+Alg = 2 	 Range = 1 	 NbElements = 44236800 	 Size = 3840 	 Time = 0.26382733 s 	 Performance = 429.2437 GFLOPS
+Alg = 2 	 Range = 1 	 NbElements = 50331648 	 Size = 4096 	 Time = 0.32149975 s 	 Throughput = 1.2524 GB/s
+Alg = 2 	 Range = 1 	 NbElements = 50331648 	 Size = 4096 	 Time = 0.32149975 s 	 Performance = 427.4932 GFLOPS
+Alg = 3 	 Range = 1 	 NbElements = 196608 	 Size = 256 	 Time = 0.01490024 s 	 Throughput = 0.1056 GB/s
+Alg = 3 	 Range = 1 	 NbElements = 196608 	 Size = 256 	 Time = 0.01490024 s 	 Performance = 2.2519 GFLOPS
+Alg = 3 	 Range = 1 	 NbElements = 786432 	 Size = 512 	 Time = 0.11482491 s 	 Throughput = 0.0548 GB/s
+Alg = 3 	 Range = 1 	 NbElements = 786432 	 Size = 512 	 Time = 0.11482491 s 	 Performance = 2.3378 GFLOPS
+Alg = 3 	 Range = 1 	 NbElements = 1769472 	 Size = 768 	 Time = 0.38497082 s 	 Throughput = 0.0368 GB/s
+Alg = 3 	 Range = 1 	 NbElements = 1769472 	 Size = 768 	 Time = 0.38497082 s 	 Performance = 2.3533 GFLOPS
+Alg = 3 	 Range = 1 	 NbElements = 3145728 	 Size = 1024 	 Time = 0.91113955 s 	 Throughput = 0.0276 GB/s
+Alg = 3 	 Range = 1 	 NbElements = 3145728 	 Size = 1024 	 Time = 0.91113955 s 	 Performance = 2.3569 GFLOPS
+Alg = 3 	 Range = 1 	 NbElements = 4915200 	 Size = 1280 	 Time = 1.78089300 s 	 Throughput = 0.0221 GB/s
+Alg = 3 	 Range = 1 	 NbElements = 4915200 	 Size = 1280 	 Time = 1.78089300 s 	 Performance = 2.3552 GFLOPS
+Alg = 3 	 Range = 1 	 NbElements = 7077888 	 Size = 1536 	 Time = 3.07585317 s 	 Throughput = 0.0184 GB/s
+Alg = 3 	 Range = 1 	 NbElements = 7077888 	 Size = 1536 	 Time = 3.07585317 s 	 Performance = 2.3563 GFLOPS
+Alg = 3 	 Range = 1 	 NbElements = 9633792 	 Size = 1792 	 Time = 4.87864231 s 	 Throughput = 0.0158 GB/s
+Alg = 3 	 Range = 1 	 NbElements = 9633792 	 Size = 1792 	 Time = 4.87864231 s 	 Performance = 2.3591 GFLOPS
+Alg = 3 	 Range = 1 	 NbElements = 12582912 	 Size = 2048 	 Time = 7.27978037 s 	 Throughput = 0.0138 GB/s
+Alg = 3 	 Range = 1 	 NbElements = 12582912 	 Size = 2048 	 Time = 7.27978037 s 	 Performance = 2.3599 GFLOPS
+Alg = 3 	 Range = 1 	 NbElements = 15925248 	 Size = 2304 	 Time = 10.36220710 s 	 Throughput = 0.0123 GB/s
+Alg = 3 	 Range = 1 	 NbElements = 15925248 	 Size = 2304 	 Time = 10.36220710 s 	 Performance = 2.3606 GFLOPS
+Alg = 3 	 Range = 1 	 NbElements = 19660800 	 Size = 2560 	 Time = 14.21418284 s 	 Throughput = 0.0111 GB/s
+Alg = 3 	 Range = 1 	 NbElements = 19660800 	 Size = 2560 	 Time = 14.21418284 s 	 Performance = 2.3606 GFLOPS
+Alg = 3 	 Range = 1 	 NbElements = 23789568 	 Size = 2816 	 Time = 18.91702503 s 	 Throughput = 0.0101 GB/s
+Alg = 3 	 Range = 1 	 NbElements = 23789568 	 Size = 2816 	 Time = 18.91702503 s 	 Performance = 2.3609 GFLOPS
+Alg = 3 	 Range = 1 	 NbElements = 28311552 	 Size = 3072 	 Time = 24.55811035 s 	 Throughput = 0.0092 GB/s
+Alg = 3 	 Range = 1 	 NbElements = 28311552 	 Size = 3072 	 Time = 24.55811035 s 	 Performance = 2.3610 GFLOPS
+Alg = 3 	 Range = 1 	 NbElements = 33226752 	 Size = 3328 	 Time = 31.21078151 s 	 Throughput = 0.0085 GB/s
+Alg = 3 	 Range = 1 	 NbElements = 33226752 	 Size = 3328 	 Time = 31.21078151 s 	 Performance = 2.3620 GFLOPS
+Alg = 3 	 Range = 1 	 NbElements = 38535168 	 Size = 3584 	 Time = 38.99951402 s 	 Throughput = 0.0079 GB/s
+Alg = 3 	 Range = 1 	 NbElements = 38535168 	 Size = 3584 	 Time = 38.99951402 s 	 Performance = 2.3609 GFLOPS
+Alg = 3 	 Range = 1 	 NbElements = 44236800 	 Size = 3840 	 Time = 47.96195235 s 	 Throughput = 0.0074 GB/s
+Alg = 3 	 Range = 1 	 NbElements = 44236800 	 Size = 3840 	 Time = 47.96195235 s 	 Performance = 2.3612 GFLOPS
+Alg = 3 	 Range = 1 	 NbElements = 50331648 	 Size = 4096 	 Time = 58.22749007 s 	 Throughput = 0.0069 GB/s
+Alg = 3 	 Range = 1 	 NbElements = 50331648 	 Size = 4096 	 Time = 58.22749007 s 	 Performance = 2.3604 GFLOPS
+Alg = 7 	 Range = 1 	 NbElements = 196608 	 Size = 256 	 Time = 0.08018290 s 	 Throughput = 0.0196 GB/s
+Alg = 7 	 Range = 1 	 NbElements = 196608 	 Size = 256 	 Time = 0.08018290 s 	 Performance = 0.4185 GFLOPS
+Alg = 7 	 Range = 1 	 NbElements = 786432 	 Size = 512 	 Time = 0.63054968 s 	 Throughput = 0.0100 GB/s
+Alg = 7 	 Range = 1 	 NbElements = 786432 	 Size = 512 	 Time = 0.63054968 s 	 Performance = 0.4257 GFLOPS
+Alg = 7 	 Range = 1 	 NbElements = 1769472 	 Size = 768 	 Time = 2.12474009 s 	 Throughput = 0.0067 GB/s
+Alg = 7 	 Range = 1 	 NbElements = 1769472 	 Size = 768 	 Time = 2.12474009 s 	 Performance = 0.4264 GFLOPS
+Alg = 7 	 Range = 1 	 NbElements = 3145728 	 Size = 1024 	 Time = 5.02062880 s 	 Throughput = 0.0050 GB/s
+Alg = 7 	 Range = 1 	 NbElements = 3145728 	 Size = 1024 	 Time = 5.02062880 s 	 Performance = 0.4277 GFLOPS
+Alg = 7 	 Range = 1 	 NbElements = 4915200 	 Size = 1280 	 Time = 9.80035371 s 	 Throughput = 0.0040 GB/s
+Alg = 7 	 Range = 1 	 NbElements = 4915200 	 Size = 1280 	 Time = 9.80035371 s 	 Performance = 0.4280 GFLOPS
+Alg = 4 	 NbFPE = 2 	 Range = 1 	 NbElements = 196608 	 Size = 256 	 Time = 0.00684190 s 	 Throughput = 0.2299 GB/s
+Alg = 4 	 NbFPE = 2 	 Range = 1 	 NbElements = 196608 	 Size = 256 	 Time = 0.00684190 s 	 Performance = 4.9043 GFLOPS
+Alg = 4 	 NbFPE = 2 	 Range = 1 	 NbElements = 786432 	 Size = 512 	 Time = 0.05245074 s 	 Throughput = 0.1199 GB/s
+Alg = 4 	 NbFPE = 2 	 Range = 1 	 NbElements = 786432 	 Size = 512 	 Time = 0.05245074 s 	 Performance = 5.1179 GFLOPS
+Alg = 4 	 NbFPE = 2 	 Range = 1 	 NbElements = 1769472 	 Size = 768 	 Time = 0.17609402 s 	 Throughput = 0.0804 GB/s
+Alg = 4 	 NbFPE = 2 	 Range = 1 	 NbElements = 1769472 	 Size = 768 	 Time = 0.17609402 s 	 Performance = 5.1448 GFLOPS
+Alg = 4 	 NbFPE = 2 	 Range = 1 	 NbElements = 3145728 	 Size = 1024 	 Time = 0.41840775 s 	 Throughput = 0.0601 GB/s
+Alg = 4 	 NbFPE = 2 	 Range = 1 	 NbElements = 3145728 	 Size = 1024 	 Time = 0.41840775 s 	 Performance = 5.1325 GFLOPS
+Alg = 4 	 NbFPE = 2 	 Range = 1 	 NbElements = 4915200 	 Size = 1280 	 Time = 0.81743253 s 	 Throughput = 0.0481 GB/s
+Alg = 4 	 NbFPE = 2 	 Range = 1 	 NbElements = 4915200 	 Size = 1280 	 Time = 0.81743253 s 	 Performance = 5.1311 GFLOPS
+Alg = 4 	 NbFPE = 2 	 Range = 1 	 NbElements = 7077888 	 Size = 1536 	 Time = 1.41493347 s 	 Throughput = 0.0400 GB/s
+Alg = 4 	 NbFPE = 2 	 Range = 1 	 NbElements = 7077888 	 Size = 1536 	 Time = 1.41493347 s 	 Performance = 5.1223 GFLOPS
+Alg = 4 	 NbFPE = 2 	 Range = 1 	 NbElements = 9633792 	 Size = 1792 	 Time = 2.24729985 s 	 Throughput = 0.0343 GB/s
+Alg = 4 	 NbFPE = 2 	 Range = 1 	 NbElements = 9633792 	 Size = 1792 	 Time = 2.24729985 s 	 Performance = 5.1213 GFLOPS
+Alg = 4 	 NbFPE = 2 	 Range = 1 	 NbElements = 12582912 	 Size = 2048 	 Time = 3.35942212 s 	 Throughput = 0.0300 GB/s
+Alg = 4 	 NbFPE = 2 	 Range = 1 	 NbElements = 12582912 	 Size = 2048 	 Time = 3.35942212 s 	 Performance = 5.1139 GFLOPS
+Alg = 4 	 NbFPE = 2 	 Range = 1 	 NbElements = 15925248 	 Size = 2304 	 Time = 4.78244070 s 	 Throughput = 0.0266 GB/s
+Alg = 4 	 NbFPE = 2 	 Range = 1 	 NbElements = 15925248 	 Size = 2304 	 Time = 4.78244070 s 	 Performance = 5.1148 GFLOPS
+Alg = 4 	 NbFPE = 2 	 Range = 1 	 NbElements = 19660800 	 Size = 2560 	 Time = 6.56503184 s 	 Throughput = 0.0240 GB/s
+Alg = 4 	 NbFPE = 2 	 Range = 1 	 NbElements = 19660800 	 Size = 2560 	 Time = 6.56503184 s 	 Performance = 5.1111 GFLOPS
+Alg = 4 	 NbFPE = 2 	 Range = 1 	 NbElements = 23789568 	 Size = 2816 	 Time = 8.73802549 s 	 Throughput = 0.0218 GB/s
+Alg = 4 	 NbFPE = 2 	 Range = 1 	 NbElements = 23789568 	 Size = 2816 	 Time = 8.73802549 s 	 Performance = 5.1111 GFLOPS
+Alg = 4 	 NbFPE = 2 	 Range = 1 	 NbElements = 28311552 	 Size = 3072 	 Time = 11.35915350 s 	 Throughput = 0.0199 GB/s
+Alg = 4 	 NbFPE = 2 	 Range = 1 	 NbElements = 28311552 	 Size = 3072 	 Time = 11.35915350 s 	 Performance = 5.1044 GFLOPS
+Alg = 4 	 NbFPE = 2 	 Range = 1 	 NbElements = 33226752 	 Size = 3328 	 Time = 14.42999726 s 	 Throughput = 0.0184 GB/s
+Alg = 4 	 NbFPE = 2 	 Range = 1 	 NbElements = 33226752 	 Size = 3328 	 Time = 14.42999726 s 	 Performance = 5.1087 GFLOPS
+Alg = 4 	 NbFPE = 2 	 Range = 1 	 NbElements = 38535168 	 Size = 3584 	 Time = 18.03325811 s 	 Throughput = 0.0171 GB/s
+Alg = 4 	 NbFPE = 2 	 Range = 1 	 NbElements = 38535168 	 Size = 3584 	 Time = 18.03325811 s 	 Performance = 5.1058 GFLOPS
+Alg = 4 	 NbFPE = 2 	 Range = 1 	 NbElements = 44236800 	 Size = 3840 	 Time = 22.17797393 s 	 Throughput = 0.0160 GB/s
+Alg = 4 	 NbFPE = 2 	 Range = 1 	 NbElements = 44236800 	 Size = 3840 	 Time = 22.17797393 s 	 Performance = 5.1062 GFLOPS
+Alg = 4 	 NbFPE = 2 	 Range = 1 	 NbElements = 50331648 	 Size = 4096 	 Time = 26.92449147 s 	 Throughput = 0.0150 GB/s
+Alg = 4 	 NbFPE = 2 	 Range = 1 	 NbElements = 50331648 	 Size = 4096 	 Time = 26.92449147 s 	 Performance = 5.1046 GFLOPS
+Alg = 4 	 NbFPE = 3 	 Range = 1 	 NbElements = 196608 	 Size = 256 	 Time = 0.00153337 s 	 Throughput = 1.0258 GB/s
+Alg = 4 	 NbFPE = 3 	 Range = 1 	 NbElements = 196608 	 Size = 256 	 Time = 0.00153337 s 	 Performance = 21.8828 GFLOPS
+Alg = 4 	 NbFPE = 3 	 Range = 1 	 NbElements = 786432 	 Size = 512 	 Time = 0.00956754 s 	 Throughput = 0.6576 GB/s
+Alg = 4 	 NbFPE = 3 	 Range = 1 	 NbElements = 786432 	 Size = 512 	 Time = 0.00956754 s 	 Performance = 28.0569 GFLOPS
+Alg = 4 	 NbFPE = 3 	 Range = 1 	 NbElements = 1769472 	 Size = 768 	 Time = 0.03056622 s 	 Throughput = 0.4631 GB/s
+Alg = 4 	 NbFPE = 3 	 Range = 1 	 NbElements = 1769472 	 Size = 768 	 Time = 0.03056622 s 	 Performance = 29.6396 GFLOPS
+Alg = 4 	 NbFPE = 3 	 Range = 1 	 NbElements = 3145728 	 Size = 1024 	 Time = 0.07051228 s 	 Throughput = 0.3569 GB/s
+Alg = 4 	 NbFPE = 3 	 Range = 1 	 NbElements = 3145728 	 Size = 1024 	 Time = 0.07051228 s 	 Performance = 30.4555 GFLOPS
+Alg = 4 	 NbFPE = 3 	 Range = 1 	 NbElements = 4915200 	 Size = 1280 	 Time = 0.13559168 s 	 Throughput = 0.2900 GB/s
+Alg = 4 	 NbFPE = 3 	 Range = 1 	 NbElements = 4915200 	 Size = 1280 	 Time = 0.13559168 s 	 Performance = 30.9333 GFLOPS
+Alg = 4 	 NbFPE = 3 	 Range = 1 	 NbElements = 7077888 	 Size = 1536 	 Time = 0.23304481 s 	 Throughput = 0.2430 GB/s
+Alg = 4 	 NbFPE = 3 	 Range = 1 	 NbElements = 7077888 	 Size = 1536 	 Time = 0.23304481 s 	 Performance = 31.1003 GFLOPS
+Alg = 4 	 NbFPE = 3 	 Range = 1 	 NbElements = 9633792 	 Size = 1792 	 Time = 0.36651027 s 	 Throughput = 0.2103 GB/s
+Alg = 4 	 NbFPE = 3 	 Range = 1 	 NbElements = 9633792 	 Size = 1792 	 Time = 0.36651027 s 	 Performance = 31.4020 GFLOPS
+Alg = 4 	 NbFPE = 3 	 Range = 1 	 NbElements = 12582912 	 Size = 2048 	 Time = 0.55032839 s 	 Throughput = 0.1829 GB/s
+Alg = 4 	 NbFPE = 3 	 Range = 1 	 NbElements = 12582912 	 Size = 2048 	 Time = 0.55032839 s 	 Performance = 31.2175 GFLOPS
+Alg = 4 	 NbFPE = 3 	 Range = 1 	 NbElements = 15925248 	 Size = 2304 	 Time = 0.77349219 s 	 Throughput = 0.1647 GB/s
+Alg = 4 	 NbFPE = 3 	 Range = 1 	 NbElements = 15925248 	 Size = 2304 	 Time = 0.77349219 s 	 Performance = 31.6243 GFLOPS
+Alg = 4 	 NbFPE = 3 	 Range = 1 	 NbElements = 19660800 	 Size = 2560 	 Time = 1.06166925 s 	 Throughput = 0.1482 GB/s
+Alg = 4 	 NbFPE = 3 	 Range = 1 	 NbElements = 19660800 	 Size = 2560 	 Time = 1.06166925 s 	 Performance = 31.6054 GFLOPS
+Alg = 4 	 NbFPE = 3 	 Range = 1 	 NbElements = 23789568 	 Size = 2816 	 Time = 1.40586756 s 	 Throughput = 0.1354 GB/s
+Alg = 4 	 NbFPE = 3 	 Range = 1 	 NbElements = 23789568 	 Size = 2816 	 Time = 1.40586756 s 	 Performance = 31.7675 GFLOPS
+Alg = 4 	 NbFPE = 3 	 Range = 1 	 NbElements = 28311552 	 Size = 3072 	 Time = 1.84343868 s 	 Throughput = 0.1229 GB/s
+Alg = 4 	 NbFPE = 3 	 Range = 1 	 NbElements = 28311552 	 Size = 3072 	 Time = 1.84343868 s 	 Performance = 31.4532 GFLOPS
+Alg = 4 	 NbFPE = 3 	 Range = 1 	 NbElements = 33226752 	 Size = 3328 	 Time = 2.32112433 s 	 Throughput = 0.1145 GB/s
+Alg = 4 	 NbFPE = 3 	 Range = 1 	 NbElements = 33226752 	 Size = 3328 	 Time = 2.32112433 s 	 Performance = 31.7601 GFLOPS
+Alg = 4 	 NbFPE = 3 	 Range = 1 	 NbElements = 38535168 	 Size = 3584 	 Time = 2.89516231 s 	 Throughput = 0.1065 GB/s
+Alg = 4 	 NbFPE = 3 	 Range = 1 	 NbElements = 38535168 	 Size = 3584 	 Time = 2.89516231 s 	 Performance = 31.8025 GFLOPS
+Alg = 4 	 NbFPE = 3 	 Range = 1 	 NbElements = 44236800 	 Size = 3840 	 Time = 3.54650353 s 	 Throughput = 0.0998 GB/s
+Alg = 4 	 NbFPE = 3 	 Range = 1 	 NbElements = 44236800 	 Size = 3840 	 Time = 3.54650353 s 	 Performance = 31.9318 GFLOPS
+Alg = 4 	 NbFPE = 3 	 Range = 1 	 NbElements = 50331648 	 Size = 4096 	 Time = 4.30734153 s 	 Throughput = 0.0935 GB/s
+Alg = 4 	 NbFPE = 3 	 Range = 1 	 NbElements = 50331648 	 Size = 4096 	 Time = 4.30734153 s 	 Performance = 31.9081 GFLOPS
+Alg = 4 	 NbFPE = 4 	 Range = 1 	 NbElements = 196608 	 Size = 256 	 Time = 0.00154882 s 	 Throughput = 1.0155 GB/s
+Alg = 4 	 NbFPE = 4 	 Range = 1 	 NbElements = 196608 	 Size = 256 	 Time = 0.00154882 s 	 Performance = 21.6645 GFLOPS
+Alg = 4 	 NbFPE = 4 	 Range = 1 	 NbElements = 786432 	 Size = 512 	 Time = 0.01046329 s 	 Throughput = 0.6013 GB/s
+Alg = 4 	 NbFPE = 4 	 Range = 1 	 NbElements = 786432 	 Size = 512 	 Time = 0.01046329 s 	 Performance = 25.6550 GFLOPS
+Alg = 4 	 NbFPE = 4 	 Range = 1 	 NbElements = 1769472 	 Size = 768 	 Time = 0.03339011 s 	 Throughput = 0.4240 GB/s
+Alg = 4 	 NbFPE = 4 	 Range = 1 	 NbElements = 1769472 	 Size = 768 	 Time = 0.03339011 s 	 Performance = 27.1329 GFLOPS
+Alg = 4 	 NbFPE = 4 	 Range = 1 	 NbElements = 3145728 	 Size = 1024 	 Time = 0.07723413 s 	 Throughput = 0.3258 GB/s
+Alg = 4 	 NbFPE = 4 	 Range = 1 	 NbElements = 3145728 	 Size = 1024 	 Time = 0.07723413 s 	 Performance = 27.8049 GFLOPS
+Alg = 4 	 NbFPE = 4 	 Range = 1 	 NbElements = 4915200 	 Size = 1280 	 Time = 0.14855470 s 	 Throughput = 0.2647 GB/s
+Alg = 4 	 NbFPE = 4 	 Range = 1 	 NbElements = 4915200 	 Size = 1280 	 Time = 0.14855470 s 	 Performance = 28.2341 GFLOPS
+Alg = 4 	 NbFPE = 4 	 Range = 1 	 NbElements = 7077888 	 Size = 1536 	 Time = 0.25530955 s 	 Throughput = 0.2218 GB/s
+Alg = 4 	 NbFPE = 4 	 Range = 1 	 NbElements = 7077888 	 Size = 1536 	 Time = 0.25530955 s 	 Performance = 28.3881 GFLOPS
+Alg = 4 	 NbFPE = 4 	 Range = 1 	 NbElements = 9633792 	 Size = 1792 	 Time = 0.40311924 s 	 Throughput = 0.1912 GB/s
+Alg = 4 	 NbFPE = 4 	 Range = 1 	 NbElements = 9633792 	 Size = 1792 	 Time = 0.40311924 s 	 Performance = 28.5503 GFLOPS
+Alg = 4 	 NbFPE = 4 	 Range = 1 	 NbElements = 12582912 	 Size = 2048 	 Time = 0.60363314 s 	 Throughput = 0.1668 GB/s
+Alg = 4 	 NbFPE = 4 	 Range = 1 	 NbElements = 12582912 	 Size = 2048 	 Time = 0.60363314 s 	 Performance = 28.4608 GFLOPS
+Alg = 4 	 NbFPE = 4 	 Range = 1 	 NbElements = 15925248 	 Size = 2304 	 Time = 0.84953003 s 	 Throughput = 0.1500 GB/s
+Alg = 4 	 NbFPE = 4 	 Range = 1 	 NbElements = 15925248 	 Size = 2304 	 Time = 0.84953003 s 	 Performance = 28.7938 GFLOPS
+Alg = 4 	 NbFPE = 4 	 Range = 1 	 NbElements = 19660800 	 Size = 2560 	 Time = 1.16585500 s 	 Throughput = 0.1349 GB/s
+Alg = 4 	 NbFPE = 4 	 Range = 1 	 NbElements = 19660800 	 Size = 2560 	 Time = 1.16585500 s 	 Performance = 28.7810 GFLOPS
+Alg = 4 	 NbFPE = 4 	 Range = 1 	 NbElements = 23789568 	 Size = 2816 	 Time = 1.54336973 s 	 Throughput = 0.1233 GB/s
+Alg = 4 	 NbFPE = 4 	 Range = 1 	 NbElements = 23789568 	 Size = 2816 	 Time = 1.54336973 s 	 Performance = 28.9373 GFLOPS
+Alg = 4 	 NbFPE = 4 	 Range = 1 	 NbElements = 28311552 	 Size = 3072 	 Time = 2.02272011 s 	 Throughput = 0.1120 GB/s
+Alg = 4 	 NbFPE = 4 	 Range = 1 	 NbElements = 28311552 	 Size = 3072 	 Time = 2.02272011 s 	 Performance = 28.6654 GFLOPS
+Alg = 4 	 NbFPE = 4 	 Range = 1 	 NbElements = 33226752 	 Size = 3328 	 Time = 2.54678386 s 	 Throughput = 0.1044 GB/s
+Alg = 4 	 NbFPE = 4 	 Range = 1 	 NbElements = 33226752 	 Size = 3328 	 Time = 2.54678386 s 	 Performance = 28.9460 GFLOPS
+Alg = 4 	 NbFPE = 4 	 Range = 1 	 NbElements = 38535168 	 Size = 3584 	 Time = 3.17943374 s 	 Throughput = 0.0970 GB/s
+Alg = 4 	 NbFPE = 4 	 Range = 1 	 NbElements = 38535168 	 Size = 3584 	 Time = 3.17943374 s 	 Performance = 28.9590 GFLOPS
+Alg = 4 	 NbFPE = 4 	 Range = 1 	 NbElements = 44236800 	 Size = 3840 	 Time = 3.89534734 s 	 Throughput = 0.0909 GB/s
+Alg = 4 	 NbFPE = 4 	 Range = 1 	 NbElements = 44236800 	 Size = 3840 	 Time = 3.89534734 s 	 Performance = 29.0722 GFLOPS
+Alg = 4 	 NbFPE = 4 	 Range = 1 	 NbElements = 50331648 	 Size = 4096 	 Time = 4.73219494 s 	 Throughput = 0.0851 GB/s
+Alg = 4 	 NbFPE = 4 	 Range = 1 	 NbElements = 50331648 	 Size = 4096 	 Time = 4.73219494 s 	 Performance = 29.0434 GFLOPS
+Alg = 4 	 NbFPE = 5 	 Range = 1 	 NbElements = 196608 	 Size = 256 	 Time = 0.00176730 s 	 Throughput = 0.8900 GB/s
+Alg = 4 	 NbFPE = 5 	 Range = 1 	 NbElements = 196608 	 Size = 256 	 Time = 0.00176730 s 	 Performance = 18.9862 GFLOPS
+Alg = 4 	 NbFPE = 5 	 Range = 1 	 NbElements = 786432 	 Size = 512 	 Time = 0.01162116 s 	 Throughput = 0.5414 GB/s
+Alg = 4 	 NbFPE = 5 	 Range = 1 	 NbElements = 786432 	 Size = 512 	 Time = 0.01162116 s 	 Performance = 23.0989 GFLOPS
+Alg = 4 	 NbFPE = 5 	 Range = 1 	 NbElements = 1769472 	 Size = 768 	 Time = 0.03721454 s 	 Throughput = 0.3804 GB/s
+Alg = 4 	 NbFPE = 5 	 Range = 1 	 NbElements = 1769472 	 Size = 768 	 Time = 0.03721454 s 	 Performance = 24.3445 GFLOPS
+Alg = 4 	 NbFPE = 5 	 Range = 1 	 NbElements = 3145728 	 Size = 1024 	 Time = 0.08666797 s 	 Throughput = 0.2904 GB/s
+Alg = 4 	 NbFPE = 5 	 Range = 1 	 NbElements = 3145728 	 Size = 1024 	 Time = 0.08666797 s 	 Performance = 24.7783 GFLOPS
+Alg = 4 	 NbFPE = 5 	 Range = 1 	 NbElements = 4915200 	 Size = 1280 	 Time = 0.16614775 s 	 Throughput = 0.2367 GB/s
+Alg = 4 	 NbFPE = 5 	 Range = 1 	 NbElements = 4915200 	 Size = 1280 	 Time = 0.16614775 s 	 Performance = 25.2444 GFLOPS
+Alg = 4 	 NbFPE = 5 	 Range = 1 	 NbElements = 7077888 	 Size = 1536 	 Time = 0.28575594 s 	 Throughput = 0.1982 GB/s
+Alg = 4 	 NbFPE = 5 	 Range = 1 	 NbElements = 7077888 	 Size = 1536 	 Time = 0.28575594 s 	 Performance = 25.3635 GFLOPS
+Alg = 4 	 NbFPE = 5 	 Range = 1 	 NbElements = 9633792 	 Size = 1792 	 Time = 0.45066766 s 	 Throughput = 0.1710 GB/s
+Alg = 4 	 NbFPE = 5 	 Range = 1 	 NbElements = 9633792 	 Size = 1792 	 Time = 0.45066766 s 	 Performance = 25.5380 GFLOPS
+Alg = 4 	 NbFPE = 5 	 Range = 1 	 NbElements = 12582912 	 Size = 2048 	 Time = 0.67606928 s 	 Throughput = 0.1489 GB/s
+Alg = 4 	 NbFPE = 5 	 Range = 1 	 NbElements = 12582912 	 Size = 2048 	 Time = 0.67606928 s 	 Performance = 25.4114 GFLOPS
+Alg = 4 	 NbFPE = 5 	 Range = 1 	 NbElements = 15925248 	 Size = 2304 	 Time = 0.95248288 s 	 Throughput = 0.1338 GB/s
+Alg = 4 	 NbFPE = 5 	 Range = 1 	 NbElements = 15925248 	 Size = 2304 	 Time = 0.95248288 s 	 Performance = 25.6815 GFLOPS
+Alg = 4 	 NbFPE = 5 	 Range = 1 	 NbElements = 19660800 	 Size = 2560 	 Time = 1.30712646 s 	 Throughput = 0.1203 GB/s
+Alg = 4 	 NbFPE = 5 	 Range = 1 	 NbElements = 19660800 	 Size = 2560 	 Time = 1.30712646 s 	 Performance = 25.6704 GFLOPS
+Alg = 4 	 NbFPE = 5 	 Range = 1 	 NbElements = 23789568 	 Size = 2816 	 Time = 1.73178054 s 	 Throughput = 0.1099 GB/s
+Alg = 4 	 NbFPE = 5 	 Range = 1 	 NbElements = 23789568 	 Size = 2816 	 Time = 1.73178054 s 	 Performance = 25.7890 GFLOPS
+Alg = 4 	 NbFPE = 5 	 Range = 1 	 NbElements = 28311552 	 Size = 3072 	 Time = 2.26760952 s 	 Throughput = 0.0999 GB/s
+Alg = 4 	 NbFPE = 5 	 Range = 1 	 NbElements = 28311552 	 Size = 3072 	 Time = 2.26760952 s 	 Performance = 25.5697 GFLOPS
+Alg = 4 	 NbFPE = 5 	 Range = 1 	 NbElements = 33226752 	 Size = 3328 	 Time = 2.85675569 s 	 Throughput = 0.0930 GB/s
+Alg = 4 	 NbFPE = 5 	 Range = 1 	 NbElements = 33226752 	 Size = 3328 	 Time = 2.85675569 s 	 Performance = 25.8052 GFLOPS
+Alg = 4 	 NbFPE = 5 	 Range = 1 	 NbElements = 38535168 	 Size = 3584 	 Time = 3.56830051 s 	 Throughput = 0.0864 GB/s
+Alg = 4 	 NbFPE = 5 	 Range = 1 	 NbElements = 38535168 	 Size = 3584 	 Time = 3.56830051 s 	 Performance = 25.8031 GFLOPS
+Alg = 4 	 NbFPE = 5 	 Range = 1 	 NbElements = 44236800 	 Size = 3840 	 Time = 4.37406683 s 	 Throughput = 0.0809 GB/s
+Alg = 4 	 NbFPE = 5 	 Range = 1 	 NbElements = 44236800 	 Size = 3840 	 Time = 4.37406683 s 	 Performance = 25.8904 GFLOPS
+Alg = 4 	 NbFPE = 5 	 Range = 1 	 NbElements = 50331648 	 Size = 4096 	 Time = 5.31439434 s 	 Throughput = 0.0758 GB/s
+Alg = 4 	 NbFPE = 5 	 Range = 1 	 NbElements = 50331648 	 Size = 4096 	 Time = 5.31439434 s 	 Performance = 25.8616 GFLOPS
+Alg = 4 	 NbFPE = 6 	 Range = 1 	 NbElements = 196608 	 Size = 256 	 Time = 0.00204886 s 	 Throughput = 0.7677 GB/s
+Alg = 4 	 NbFPE = 6 	 Range = 1 	 NbElements = 196608 	 Size = 256 	 Time = 0.00204886 s 	 Performance = 16.3771 GFLOPS
+Alg = 4 	 NbFPE = 6 	 Range = 1 	 NbElements = 786432 	 Size = 512 	 Time = 0.01365180 s 	 Throughput = 0.4609 GB/s
+Alg = 4 	 NbFPE = 6 	 Range = 1 	 NbElements = 786432 	 Size = 512 	 Time = 0.01365180 s 	 Performance = 19.6630 GFLOPS
+Alg = 4 	 NbFPE = 6 	 Range = 1 	 NbElements = 1769472 	 Size = 768 	 Time = 0.04383043 s 	 Throughput = 0.3230 GB/s
+Alg = 4 	 NbFPE = 6 	 Range = 1 	 NbElements = 1769472 	 Size = 768 	 Time = 0.04383043 s 	 Performance = 20.6699 GFLOPS
+Alg = 4 	 NbFPE = 6 	 Range = 1 	 NbElements = 3145728 	 Size = 1024 	 Time = 0.10219873 s 	 Throughput = 0.2462 GB/s
+Alg = 4 	 NbFPE = 6 	 Range = 1 	 NbElements = 3145728 	 Size = 1024 	 Time = 0.10219873 s 	 Performance = 21.0128 GFLOPS
+Alg = 4 	 NbFPE = 6 	 Range = 1 	 NbElements = 4915200 	 Size = 1280 	 Time = 0.19636960 s 	 Throughput = 0.2002 GB/s
+Alg = 4 	 NbFPE = 6 	 Range = 1 	 NbElements = 4915200 	 Size = 1280 	 Time = 0.19636960 s 	 Performance = 21.3592 GFLOPS
+Alg = 4 	 NbFPE = 6 	 Range = 1 	 NbElements = 7077888 	 Size = 1536 	 Time = 0.33803495 s 	 Throughput = 0.1675 GB/s
+Alg = 4 	 NbFPE = 6 	 Range = 1 	 NbElements = 7077888 	 Size = 1536 	 Time = 0.33803495 s 	 Performance = 21.4409 GFLOPS
+Alg = 4 	 NbFPE = 6 	 Range = 1 	 NbElements = 9633792 	 Size = 1792 	 Time = 0.53286106 s 	 Throughput = 0.1446 GB/s
+Alg = 4 	 NbFPE = 6 	 Range = 1 	 NbElements = 9633792 	 Size = 1792 	 Time = 0.53286106 s 	 Performance = 21.5988 GFLOPS
+Alg = 4 	 NbFPE = 6 	 Range = 1 	 NbElements = 12582912 	 Size = 2048 	 Time = 0.79534252 s 	 Throughput = 0.1266 GB/s
+Alg = 4 	 NbFPE = 6 	 Range = 1 	 NbElements = 12582912 	 Size = 2048 	 Time = 0.79534252 s 	 Performance = 21.6006 GFLOPS
+Alg = 4 	 NbFPE = 6 	 Range = 1 	 NbElements = 15925248 	 Size = 2304 	 Time = 1.12583829 s 	 Throughput = 0.1132 GB/s
+Alg = 4 	 NbFPE = 6 	 Range = 1 	 NbElements = 15925248 	 Size = 2304 	 Time = 1.12583829 s 	 Performance = 21.7271 GFLOPS
+Alg = 4 	 NbFPE = 6 	 Range = 1 	 NbElements = 19660800 	 Size = 2560 	 Time = 1.54386437 s 	 Throughput = 0.1019 GB/s
+Alg = 4 	 NbFPE = 6 	 Range = 1 	 NbElements = 19660800 	 Size = 2560 	 Time = 1.54386437 s 	 Performance = 21.7341 GFLOPS
+Alg = 4 	 NbFPE = 6 	 Range = 1 	 NbElements = 23789568 	 Size = 2816 	 Time = 2.04788210 s 	 Throughput = 0.0929 GB/s
+Alg = 4 	 NbFPE = 6 	 Range = 1 	 NbElements = 23789568 	 Size = 2816 	 Time = 2.04788210 s 	 Performance = 21.8084 GFLOPS
+Alg = 4 	 NbFPE = 6 	 Range = 1 	 NbElements = 28311552 	 Size = 3072 	 Time = 2.66673765 s 	 Throughput = 0.0849 GB/s
+Alg = 4 	 NbFPE = 6 	 Range = 1 	 NbElements = 28311552 	 Size = 3072 	 Time = 2.66673765 s 	 Performance = 21.7427 GFLOPS
+Alg = 4 	 NbFPE = 6 	 Range = 1 	 NbElements = 33226752 	 Size = 3328 	 Time = 3.37158920 s 	 Throughput = 0.0788 GB/s
+Alg = 4 	 NbFPE = 6 	 Range = 1 	 NbElements = 33226752 	 Size = 3328 	 Time = 3.37158920 s 	 Performance = 21.8648 GFLOPS
+Alg = 4 	 NbFPE = 6 	 Range = 1 	 NbElements = 38535168 	 Size = 3584 	 Time = 4.21298578 s 	 Throughput = 0.0732 GB/s
+Alg = 4 	 NbFPE = 6 	 Range = 1 	 NbElements = 38535168 	 Size = 3584 	 Time = 4.21298578 s 	 Performance = 21.8547 GFLOPS
+Alg = 4 	 NbFPE = 6 	 Range = 1 	 NbElements = 44236800 	 Size = 3840 	 Time = 5.15752274 s 	 Throughput = 0.0686 GB/s
+Alg = 4 	 NbFPE = 6 	 Range = 1 	 NbElements = 44236800 	 Size = 3840 	 Time = 5.15752274 s 	 Performance = 21.9575 GFLOPS
+Alg = 4 	 NbFPE = 6 	 Range = 1 	 NbElements = 50331648 	 Size = 4096 	 Time = 6.27473743 s 	 Throughput = 0.0642 GB/s
+Alg = 4 	 NbFPE = 6 	 Range = 1 	 NbElements = 50331648 	 Size = 4096 	 Time = 6.27473743 s 	 Performance = 21.9035 GFLOPS
+Alg = 4 	 NbFPE = 7 	 Range = 1 	 NbElements = 196608 	 Size = 256 	 Time = 0.00208864 s 	 Throughput = 0.7531 GB/s
+Alg = 4 	 NbFPE = 7 	 Range = 1 	 NbElements = 196608 	 Size = 256 	 Time = 0.00208864 s 	 Performance = 16.0652 GFLOPS
+Alg = 4 	 NbFPE = 7 	 Range = 1 	 NbElements = 786432 	 Size = 512 	 Time = 0.01478541 s 	 Throughput = 0.4255 GB/s
+Alg = 4 	 NbFPE = 7 	 Range = 1 	 NbElements = 786432 	 Size = 512 	 Time = 0.01478541 s 	 Performance = 18.1554 GFLOPS
+Alg = 4 	 NbFPE = 7 	 Range = 1 	 NbElements = 1769472 	 Size = 768 	 Time = 0.04754969 s 	 Throughput = 0.2977 GB/s
+Alg = 4 	 NbFPE = 7 	 Range = 1 	 NbElements = 1769472 	 Size = 768 	 Time = 0.04754969 s 	 Performance = 19.0531 GFLOPS
+Alg = 4 	 NbFPE = 7 	 Range = 1 	 NbElements = 3145728 	 Size = 1024 	 Time = 0.11095823 s 	 Throughput = 0.2268 GB/s
+Alg = 4 	 NbFPE = 7 	 Range = 1 	 NbElements = 3145728 	 Size = 1024 	 Time = 0.11095823 s 	 Performance = 19.3540 GFLOPS
+Alg = 4 	 NbFPE = 7 	 Range = 1 	 NbElements = 4915200 	 Size = 1280 	 Time = 0.21411995 s 	 Throughput = 0.1836 GB/s
+Alg = 4 	 NbFPE = 7 	 Range = 1 	 NbElements = 4915200 	 Size = 1280 	 Time = 0.21411995 s 	 Performance = 19.5886 GFLOPS
+Alg = 4 	 NbFPE = 7 	 Range = 1 	 NbElements = 7077888 	 Size = 1536 	 Time = 0.36851860 s 	 Throughput = 0.1537 GB/s
+Alg = 4 	 NbFPE = 7 	 Range = 1 	 NbElements = 7077888 	 Size = 1536 	 Time = 0.36851860 s 	 Performance = 19.6673 GFLOPS
+Alg = 4 	 NbFPE = 7 	 Range = 1 	 NbElements = 9633792 	 Size = 1792 	 Time = 0.58251251 s 	 Throughput = 0.1323 GB/s
+Alg = 4 	 NbFPE = 7 	 Range = 1 	 NbElements = 9633792 	 Size = 1792 	 Time = 0.58251251 s 	 Performance = 19.7578 GFLOPS
+Alg = 4 	 NbFPE = 7 	 Range = 1 	 NbElements = 12582912 	 Size = 2048 	 Time = 0.87265452 s 	 Throughput = 0.1154 GB/s
+Alg = 4 	 NbFPE = 7 	 Range = 1 	 NbElements = 12582912 	 Size = 2048 	 Time = 0.87265452 s 	 Performance = 19.6869 GFLOPS
+Alg = 4 	 NbFPE = 7 	 Range = 1 	 NbElements = 15925248 	 Size = 2304 	 Time = 1.23259792 s 	 Throughput = 0.1034 GB/s
+Alg = 4 	 NbFPE = 7 	 Range = 1 	 NbElements = 15925248 	 Size = 2304 	 Time = 1.23259792 s 	 Performance = 19.8452 GFLOPS
+Alg = 4 	 NbFPE = 7 	 Range = 1 	 NbElements = 19660800 	 Size = 2560 	 Time = 1.69134732 s 	 Throughput = 0.0930 GB/s
+Alg = 4 	 NbFPE = 7 	 Range = 1 	 NbElements = 19660800 	 Size = 2560 	 Time = 1.69134732 s 	 Performance = 19.8389 GFLOPS
+Alg = 4 	 NbFPE = 7 	 Range = 1 	 NbElements = 23789568 	 Size = 2816 	 Time = 2.24360183 s 	 Throughput = 0.0848 GB/s
+Alg = 4 	 NbFPE = 7 	 Range = 1 	 NbElements = 23789568 	 Size = 2816 	 Time = 2.24360183 s 	 Performance = 19.9059 GFLOPS
+Alg = 4 	 NbFPE = 7 	 Range = 1 	 NbElements = 28311552 	 Size = 3072 	 Time = 2.93030540 s 	 Throughput = 0.0773 GB/s
+Alg = 4 	 NbFPE = 7 	 Range = 1 	 NbElements = 28311552 	 Size = 3072 	 Time = 2.93030540 s 	 Performance = 19.7870 GFLOPS
+Alg = 4 	 NbFPE = 7 	 Range = 1 	 NbElements = 33226752 	 Size = 3328 	 Time = 3.70046807 s 	 Throughput = 0.0718 GB/s
+Alg = 4 	 NbFPE = 7 	 Range = 1 	 NbElements = 33226752 	 Size = 3328 	 Time = 3.70046807 s 	 Performance = 19.9216 GFLOPS
+Alg = 4 	 NbFPE = 7 	 Range = 1 	 NbElements = 38535168 	 Size = 3584 	 Time = 4.62429007 s 	 Throughput = 0.0667 GB/s
+Alg = 4 	 NbFPE = 7 	 Range = 1 	 NbElements = 38535168 	 Size = 3584 	 Time = 4.62429007 s 	 Performance = 19.9108 GFLOPS
+Alg = 4 	 NbFPE = 7 	 Range = 1 	 NbElements = 44236800 	 Size = 3840 	 Time = 5.67093844 s 	 Throughput = 0.0624 GB/s
+Alg = 4 	 NbFPE = 7 	 Range = 1 	 NbElements = 44236800 	 Size = 3840 	 Time = 5.67093844 s 	 Performance = 19.9696 GFLOPS
+Alg = 4 	 NbFPE = 7 	 Range = 1 	 NbElements = 50331648 	 Size = 4096 	 Time = 6.88419002 s 	 Throughput = 0.0585 GB/s
+Alg = 4 	 NbFPE = 7 	 Range = 1 	 NbElements = 50331648 	 Size = 4096 	 Time = 6.88419002 s 	 Performance = 19.9644 GFLOPS
+Alg = 4 	 NbFPE = 8 	 Range = 1 	 NbElements = 196608 	 Size = 256 	 Time = 0.00270312 s 	 Throughput = 0.5819 GB/s
+Alg = 4 	 NbFPE = 8 	 Range = 1 	 NbElements = 196608 	 Size = 256 	 Time = 0.00270312 s 	 Performance = 12.4132 GFLOPS
+Alg = 4 	 NbFPE = 8 	 Range = 1 	 NbElements = 786432 	 Size = 512 	 Time = 0.01882285 s 	 Throughput = 0.3342 GB/s
+Alg = 4 	 NbFPE = 8 	 Range = 1 	 NbElements = 786432 	 Size = 512 	 Time = 0.01882285 s 	 Performance = 14.2611 GFLOPS
+Alg = 4 	 NbFPE = 8 	 Range = 1 	 NbElements = 1769472 	 Size = 768 	 Time = 0.06112370 s 	 Throughput = 0.2316 GB/s
+Alg = 4 	 NbFPE = 8 	 Range = 1 	 NbElements = 1769472 	 Size = 768 	 Time = 0.06112370 s 	 Performance = 14.8219 GFLOPS
+Alg = 4 	 NbFPE = 8 	 Range = 1 	 NbElements = 3145728 	 Size = 1024 	 Time = 0.14311768 s 	 Throughput = 0.1758 GB/s
+Alg = 4 	 NbFPE = 8 	 Range = 1 	 NbElements = 3145728 	 Size = 1024 	 Time = 0.14311768 s 	 Performance = 15.0050 GFLOPS
+Alg = 4 	 NbFPE = 8 	 Range = 1 	 NbElements = 4915200 	 Size = 1280 	 Time = 0.27677534 s 	 Throughput = 0.1421 GB/s
+Alg = 4 	 NbFPE = 8 	 Range = 1 	 NbElements = 4915200 	 Size = 1280 	 Time = 0.27677534 s 	 Performance = 15.1542 GFLOPS
+Alg = 4 	 NbFPE = 8 	 Range = 1 	 NbElements = 7077888 	 Size = 1536 	 Time = 0.47623748 s 	 Throughput = 0.1189 GB/s
+Alg = 4 	 NbFPE = 8 	 Range = 1 	 NbElements = 7077888 	 Size = 1536 	 Time = 0.47623748 s 	 Performance = 15.2188 GFLOPS
+Alg = 4 	 NbFPE = 8 	 Range = 1 	 NbElements = 9633792 	 Size = 1792 	 Time = 0.75432575 s 	 Throughput = 0.1022 GB/s
+Alg = 4 	 NbFPE = 8 	 Range = 1 	 NbElements = 9633792 	 Size = 1792 	 Time = 0.75432575 s 	 Performance = 15.2576 GFLOPS
+Alg = 4 	 NbFPE = 8 	 Range = 1 	 NbElements = 12582912 	 Size = 2048 	 Time = 1.12466410 s 	 Throughput = 0.0895 GB/s
+Alg = 4 	 NbFPE = 8 	 Range = 1 	 NbElements = 12582912 	 Size = 2048 	 Time = 1.12466410 s 	 Performance = 15.2756 GFLOPS
+Alg = 4 	 NbFPE = 8 	 Range = 1 	 NbElements = 15925248 	 Size = 2304 	 Time = 1.59536019 s 	 Throughput = 0.0799 GB/s
+Alg = 4 	 NbFPE = 8 	 Range = 1 	 NbElements = 15925248 	 Size = 2304 	 Time = 1.59536019 s 	 Performance = 15.3327 GFLOPS
+Alg = 4 	 NbFPE = 8 	 Range = 1 	 NbElements = 19660800 	 Size = 2560 	 Time = 2.18350203 s 	 Throughput = 0.0720 GB/s
+Alg = 4 	 NbFPE = 8 	 Range = 1 	 NbElements = 19660800 	 Size = 2560 	 Time = 2.18350203 s 	 Performance = 15.3673 GFLOPS
+Alg = 4 	 NbFPE = 8 	 Range = 1 	 NbElements = 23789568 	 Size = 2816 	 Time = 2.89995690 s 	 Throughput = 0.0656 GB/s
+Alg = 4 	 NbFPE = 8 	 Range = 1 	 NbElements = 23789568 	 Size = 2816 	 Time = 2.89995690 s 	 Performance = 15.4006 GFLOPS
+Alg = 4 	 NbFPE = 8 	 Range = 1 	 NbElements = 28311552 	 Size = 3072 	 Time = 3.76864148 s 	 Throughput = 0.0601 GB/s
+Alg = 4 	 NbFPE = 8 	 Range = 1 	 NbElements = 28311552 	 Size = 3072 	 Time = 3.76864148 s 	 Performance = 15.3854 GFLOPS
+Alg = 4 	 NbFPE = 8 	 Range = 1 	 NbElements = 33226752 	 Size = 3328 	 Time = 4.78013479 s 	 Throughput = 0.0556 GB/s
+Alg = 4 	 NbFPE = 8 	 Range = 1 	 NbElements = 33226752 	 Size = 3328 	 Time = 4.78013479 s 	 Performance = 15.4220 GFLOPS
+Alg = 4 	 NbFPE = 8 	 Range = 1 	 NbElements = 38535168 	 Size = 3584 	 Time = 5.97046777 s 	 Throughput = 0.0516 GB/s
+Alg = 4 	 NbFPE = 8 	 Range = 1 	 NbElements = 38535168 	 Size = 3584 	 Time = 5.97046777 s 	 Performance = 15.4215 GFLOPS
+Alg = 4 	 NbFPE = 8 	 Range = 1 	 NbElements = 44236800 	 Size = 3840 	 Time = 7.33274747 s 	 Throughput = 0.0483 GB/s
+Alg = 4 	 NbFPE = 8 	 Range = 1 	 NbElements = 44236800 	 Size = 3840 	 Time = 7.33274747 s 	 Performance = 15.4439 GFLOPS
+Alg = 4 	 NbFPE = 8 	 Range = 1 	 NbElements = 50331648 	 Size = 4096 	 Time = 8.92497195 s 	 Throughput = 0.0451 GB/s
+Alg = 4 	 NbFPE = 8 	 Range = 1 	 NbElements = 50331648 	 Size = 4096 	 Time = 8.92497195 s 	 Performance = 15.3994 GFLOPS
+Alg = 6 	 NbFPE = 2 	 Range = 1 	 NbElements = 196608 	 Size = 256 	 Time = 0.00680459 s 	 Throughput = 0.2311 GB/s
+Alg = 6 	 NbFPE = 2 	 Range = 1 	 NbElements = 196608 	 Size = 256 	 Time = 0.00680459 s 	 Performance = 4.9311 GFLOPS
+Alg = 6 	 NbFPE = 2 	 Range = 1 	 NbElements = 786432 	 Size = 512 	 Time = 0.05246885 s 	 Throughput = 0.1199 GB/s
+Alg = 6 	 NbFPE = 2 	 Range = 1 	 NbElements = 786432 	 Size = 512 	 Time = 0.05246885 s 	 Performance = 5.1161 GFLOPS
+Alg = 6 	 NbFPE = 2 	 Range = 1 	 NbElements = 1769472 	 Size = 768 	 Time = 0.17607467 s 	 Throughput = 0.0804 GB/s
+Alg = 6 	 NbFPE = 2 	 Range = 1 	 NbElements = 1769472 	 Size = 768 	 Time = 0.17607467 s 	 Performance = 5.1454 GFLOPS
+Alg = 6 	 NbFPE = 2 	 Range = 1 	 NbElements = 3145728 	 Size = 1024 	 Time = 0.41848345 s 	 Throughput = 0.0601 GB/s
+Alg = 6 	 NbFPE = 2 	 Range = 1 	 NbElements = 3145728 	 Size = 1024 	 Time = 0.41848345 s 	 Performance = 5.1316 GFLOPS
+Alg = 6 	 NbFPE = 2 	 Range = 1 	 NbElements = 4915200 	 Size = 1280 	 Time = 0.81746679 s 	 Throughput = 0.0481 GB/s
+Alg = 6 	 NbFPE = 2 	 Range = 1 	 NbElements = 4915200 	 Size = 1280 	 Time = 0.81746679 s 	 Performance = 5.1309 GFLOPS
+Alg = 6 	 NbFPE = 2 	 Range = 1 	 NbElements = 7077888 	 Size = 1536 	 Time = 1.41487229 s 	 Throughput = 0.0400 GB/s
+Alg = 6 	 NbFPE = 2 	 Range = 1 	 NbElements = 7077888 	 Size = 1536 	 Time = 1.41487229 s 	 Performance = 5.1226 GFLOPS
+Alg = 6 	 NbFPE = 2 	 Range = 1 	 NbElements = 9633792 	 Size = 1792 	 Time = 2.24740129 s 	 Throughput = 0.0343 GB/s
+Alg = 6 	 NbFPE = 2 	 Range = 1 	 NbElements = 9633792 	 Size = 1792 	 Time = 2.24740129 s 	 Performance = 5.1211 GFLOPS
+Alg = 6 	 NbFPE = 2 	 Range = 1 	 NbElements = 12582912 	 Size = 2048 	 Time = 3.35934734 s 	 Throughput = 0.0300 GB/s
+Alg = 6 	 NbFPE = 2 	 Range = 1 	 NbElements = 12582912 	 Size = 2048 	 Time = 3.35934734 s 	 Performance = 5.1140 GFLOPS
+Alg = 6 	 NbFPE = 2 	 Range = 1 	 NbElements = 15925248 	 Size = 2304 	 Time = 4.78254723 s 	 Throughput = 0.0266 GB/s
+Alg = 6 	 NbFPE = 2 	 Range = 1 	 NbElements = 15925248 	 Size = 2304 	 Time = 4.78254723 s 	 Performance = 5.1147 GFLOPS
+Alg = 6 	 NbFPE = 2 	 Range = 1 	 NbElements = 19660800 	 Size = 2560 	 Time = 6.56510331 s 	 Throughput = 0.0240 GB/s
+Alg = 6 	 NbFPE = 2 	 Range = 1 	 NbElements = 19660800 	 Size = 2560 	 Time = 6.56510331 s 	 Performance = 5.1110 GFLOPS
+Alg = 6 	 NbFPE = 2 	 Range = 1 	 NbElements = 23789568 	 Size = 2816 	 Time = 8.73806758 s 	 Throughput = 0.0218 GB/s
+Alg = 6 	 NbFPE = 2 	 Range = 1 	 NbElements = 23789568 	 Size = 2816 	 Time = 8.73806758 s 	 Performance = 5.1111 GFLOPS
+Alg = 6 	 NbFPE = 2 	 Range = 1 	 NbElements = 28311552 	 Size = 3072 	 Time = 11.35748810 s 	 Throughput = 0.0199 GB/s
+Alg = 6 	 NbFPE = 2 	 Range = 1 	 NbElements = 28311552 	 Size = 3072 	 Time = 11.35748810 s 	 Performance = 5.1052 GFLOPS
+Alg = 6 	 NbFPE = 2 	 Range = 1 	 NbElements = 33226752 	 Size = 3328 	 Time = 14.43179550 s 	 Throughput = 0.0184 GB/s
+Alg = 6 	 NbFPE = 2 	 Range = 1 	 NbElements = 33226752 	 Size = 3328 	 Time = 14.43179550 s 	 Performance = 5.1081 GFLOPS
+Alg = 6 	 NbFPE = 2 	 Range = 1 	 NbElements = 38535168 	 Size = 3584 	 Time = 18.03324447 s 	 Throughput = 0.0171 GB/s
+Alg = 6 	 NbFPE = 2 	 Range = 1 	 NbElements = 38535168 	 Size = 3584 	 Time = 18.03324447 s 	 Performance = 5.1058 GFLOPS
+Alg = 6 	 NbFPE = 2 	 Range = 1 	 NbElements = 44236800 	 Size = 3840 	 Time = 22.17809272 s 	 Throughput = 0.0160 GB/s
+Alg = 6 	 NbFPE = 2 	 Range = 1 	 NbElements = 44236800 	 Size = 3840 	 Time = 22.17809272 s 	 Performance = 5.1062 GFLOPS
+Alg = 6 	 NbFPE = 2 	 Range = 1 	 NbElements = 50331648 	 Size = 4096 	 Time = 26.92441849 s 	 Throughput = 0.0150 GB/s
+Alg = 6 	 NbFPE = 2 	 Range = 1 	 NbElements = 50331648 	 Size = 4096 	 Time = 26.92441849 s 	 Performance = 5.1046 GFLOPS
+Alg = 6 	 NbFPE = 3 	 Range = 1 	 NbElements = 196608 	 Size = 256 	 Time = 0.00155300 s 	 Throughput = 1.0128 GB/s
+Alg = 6 	 NbFPE = 3 	 Range = 1 	 NbElements = 196608 	 Size = 256 	 Time = 0.00155300 s 	 Performance = 21.6062 GFLOPS
+Alg = 6 	 NbFPE = 3 	 Range = 1 	 NbElements = 786432 	 Size = 512 	 Time = 0.00955254 s 	 Throughput = 0.6586 GB/s
+Alg = 6 	 NbFPE = 3 	 Range = 1 	 NbElements = 786432 	 Size = 512 	 Time = 0.00955254 s 	 Performance = 28.1010 GFLOPS
+Alg = 6 	 NbFPE = 3 	 Range = 1 	 NbElements = 1769472 	 Size = 768 	 Time = 0.03058356 s 	 Throughput = 0.4629 GB/s
+Alg = 6 	 NbFPE = 3 	 Range = 1 	 NbElements = 1769472 	 Size = 768 	 Time = 0.03058356 s 	 Performance = 29.6228 GFLOPS
+Alg = 6 	 NbFPE = 3 	 Range = 1 	 NbElements = 3145728 	 Size = 1024 	 Time = 0.07064251 s 	 Throughput = 0.3562 GB/s
+Alg = 6 	 NbFPE = 3 	 Range = 1 	 NbElements = 3145728 	 Size = 1024 	 Time = 0.07064251 s 	 Performance = 30.3993 GFLOPS
+Alg = 6 	 NbFPE = 3 	 Range = 1 	 NbElements = 4915200 	 Size = 1280 	 Time = 0.13554221 s 	 Throughput = 0.2901 GB/s
+Alg = 6 	 NbFPE = 3 	 Range = 1 	 NbElements = 4915200 	 Size = 1280 	 Time = 0.13554221 s 	 Performance = 30.9446 GFLOPS
+Alg = 6 	 NbFPE = 3 	 Range = 1 	 NbElements = 7077888 	 Size = 1536 	 Time = 0.23289631 s 	 Throughput = 0.2431 GB/s
+Alg = 6 	 NbFPE = 3 	 Range = 1 	 NbElements = 7077888 	 Size = 1536 	 Time = 0.23289631 s 	 Performance = 31.1201 GFLOPS
+Alg = 6 	 NbFPE = 3 	 Range = 1 	 NbElements = 9633792 	 Size = 1792 	 Time = 0.36663014 s 	 Throughput = 0.2102 GB/s
+Alg = 6 	 NbFPE = 3 	 Range = 1 	 NbElements = 9633792 	 Size = 1792 	 Time = 0.36663014 s 	 Performance = 31.3918 GFLOPS
+Alg = 6 	 NbFPE = 3 	 Range = 1 	 NbElements = 12582912 	 Size = 2048 	 Time = 0.55011714 s 	 Throughput = 0.1830 GB/s
+Alg = 6 	 NbFPE = 3 	 Range = 1 	 NbElements = 12582912 	 Size = 2048 	 Time = 0.55011714 s 	 Performance = 31.2295 GFLOPS
+Alg = 6 	 NbFPE = 3 	 Range = 1 	 NbElements = 15925248 	 Size = 2304 	 Time = 0.77445329 s 	 Throughput = 0.1645 GB/s
+Alg = 6 	 NbFPE = 3 	 Range = 1 	 NbElements = 15925248 	 Size = 2304 	 Time = 0.77445329 s 	 Performance = 31.5851 GFLOPS
+Alg = 6 	 NbFPE = 3 	 Range = 1 	 NbElements = 19660800 	 Size = 2560 	 Time = 1.06135646 s 	 Throughput = 0.1482 GB/s
+Alg = 6 	 NbFPE = 3 	 Range = 1 	 NbElements = 19660800 	 Size = 2560 	 Time = 1.06135646 s 	 Performance = 31.6147 GFLOPS
+Alg = 6 	 NbFPE = 3 	 Range = 1 	 NbElements = 23789568 	 Size = 2816 	 Time = 1.40588323 s 	 Throughput = 0.1354 GB/s
+Alg = 6 	 NbFPE = 3 	 Range = 1 	 NbElements = 23789568 	 Size = 2816 	 Time = 1.40588323 s 	 Performance = 31.7672 GFLOPS
+Alg = 6 	 NbFPE = 3 	 Range = 1 	 NbElements = 28311552 	 Size = 3072 	 Time = 1.84319504 s 	 Throughput = 0.1229 GB/s
+Alg = 6 	 NbFPE = 3 	 Range = 1 	 NbElements = 28311552 	 Size = 3072 	 Time = 1.84319504 s 	 Performance = 31.4574 GFLOPS
+Alg = 6 	 NbFPE = 3 	 Range = 1 	 NbElements = 33226752 	 Size = 3328 	 Time = 2.31952084 s 	 Throughput = 0.1146 GB/s
+Alg = 6 	 NbFPE = 3 	 Range = 1 	 NbElements = 33226752 	 Size = 3328 	 Time = 2.31952084 s 	 Performance = 31.7820 GFLOPS
+Alg = 6 	 NbFPE = 3 	 Range = 1 	 NbElements = 38535168 	 Size = 3584 	 Time = 2.89742320 s 	 Throughput = 0.1064 GB/s
+Alg = 6 	 NbFPE = 3 	 Range = 1 	 NbElements = 38535168 	 Size = 3584 	 Time = 2.89742320 s 	 Performance = 31.7777 GFLOPS
+Alg = 6 	 NbFPE = 3 	 Range = 1 	 NbElements = 44236800 	 Size = 3840 	 Time = 3.54593294 s 	 Throughput = 0.0998 GB/s
+Alg = 6 	 NbFPE = 3 	 Range = 1 	 NbElements = 44236800 	 Size = 3840 	 Time = 3.54593294 s 	 Performance = 31.9369 GFLOPS
+Alg = 6 	 NbFPE = 3 	 Range = 1 	 NbElements = 50331648 	 Size = 4096 	 Time = 4.30540065 s 	 Throughput = 0.0935 GB/s
+Alg = 6 	 NbFPE = 3 	 Range = 1 	 NbElements = 50331648 	 Size = 4096 	 Time = 4.30540065 s 	 Performance = 31.9225 GFLOPS
+Alg = 6 	 NbFPE = 4 	 Range = 1 	 NbElements = 196608 	 Size = 256 	 Time = 0.00154722 s 	 Throughput = 1.0166 GB/s
+Alg = 6 	 NbFPE = 4 	 Range = 1 	 NbElements = 196608 	 Size = 256 	 Time = 0.00154722 s 	 Performance = 21.6869 GFLOPS
+Alg = 6 	 NbFPE = 4 	 Range = 1 	 NbElements = 786432 	 Size = 512 	 Time = 0.01044926 s 	 Throughput = 0.6021 GB/s
+Alg = 6 	 NbFPE = 4 	 Range = 1 	 NbElements = 786432 	 Size = 512 	 Time = 0.01044926 s 	 Performance = 25.6894 GFLOPS
+Alg = 6 	 NbFPE = 4 	 Range = 1 	 NbElements = 1769472 	 Size = 768 	 Time = 0.03338317 s 	 Throughput = 0.4240 GB/s
+Alg = 6 	 NbFPE = 4 	 Range = 1 	 NbElements = 1769472 	 Size = 768 	 Time = 0.03338317 s 	 Performance = 27.1385 GFLOPS
+Alg = 6 	 NbFPE = 4 	 Range = 1 	 NbElements = 3145728 	 Size = 1024 	 Time = 0.07725312 s 	 Throughput = 0.3258 GB/s
+Alg = 6 	 NbFPE = 4 	 Range = 1 	 NbElements = 3145728 	 Size = 1024 	 Time = 0.07725312 s 	 Performance = 27.7980 GFLOPS
+Alg = 6 	 NbFPE = 4 	 Range = 1 	 NbElements = 4915200 	 Size = 1280 	 Time = 0.14857672 s 	 Throughput = 0.2647 GB/s
+Alg = 6 	 NbFPE = 4 	 Range = 1 	 NbElements = 4915200 	 Size = 1280 	 Time = 0.14857672 s 	 Performance = 28.2299 GFLOPS
+Alg = 6 	 NbFPE = 4 	 Range = 1 	 NbElements = 7077888 	 Size = 1536 	 Time = 0.25529980 s 	 Throughput = 0.2218 GB/s
+Alg = 6 	 NbFPE = 4 	 Range = 1 	 NbElements = 7077888 	 Size = 1536 	 Time = 0.25529980 s 	 Performance = 28.3892 GFLOPS
+Alg = 6 	 NbFPE = 4 	 Range = 1 	 NbElements = 9633792 	 Size = 1792 	 Time = 0.40266900 s 	 Throughput = 0.1914 GB/s
+Alg = 6 	 NbFPE = 4 	 Range = 1 	 NbElements = 9633792 	 Size = 1792 	 Time = 0.40266900 s 	 Performance = 28.5822 GFLOPS
+Alg = 6 	 NbFPE = 4 	 Range = 1 	 NbElements = 12582912 	 Size = 2048 	 Time = 0.60373583 s 	 Throughput = 0.1667 GB/s
+Alg = 6 	 NbFPE = 4 	 Range = 1 	 NbElements = 12582912 	 Size = 2048 	 Time = 0.60373583 s 	 Performance = 28.4559 GFLOPS
+Alg = 6 	 NbFPE = 4 	 Range = 1 	 NbElements = 15925248 	 Size = 2304 	 Time = 0.85073047 s 	 Throughput = 0.1498 GB/s
+Alg = 6 	 NbFPE = 4 	 Range = 1 	 NbElements = 15925248 	 Size = 2304 	 Time = 0.85073047 s 	 Performance = 28.7532 GFLOPS
+Alg = 6 	 NbFPE = 4 	 Range = 1 	 NbElements = 19660800 	 Size = 2560 	 Time = 1.16601092 s 	 Throughput = 0.1349 GB/s
+Alg = 6 	 NbFPE = 4 	 Range = 1 	 NbElements = 19660800 	 Size = 2560 	 Time = 1.16601092 s 	 Performance = 28.7771 GFLOPS
+Alg = 6 	 NbFPE = 4 	 Range = 1 	 NbElements = 23789568 	 Size = 2816 	 Time = 1.54457091 s 	 Throughput = 0.1232 GB/s
+Alg = 6 	 NbFPE = 4 	 Range = 1 	 NbElements = 23789568 	 Size = 2816 	 Time = 1.54457091 s 	 Performance = 28.9148 GFLOPS
+Alg = 6 	 NbFPE = 4 	 Range = 1 	 NbElements = 28311552 	 Size = 3072 	 Time = 2.02281125 s 	 Throughput = 0.1120 GB/s
+Alg = 6 	 NbFPE = 4 	 Range = 1 	 NbElements = 28311552 	 Size = 3072 	 Time = 2.02281125 s 	 Performance = 28.6641 GFLOPS
+Alg = 6 	 NbFPE = 4 	 Range = 1 	 NbElements = 33226752 	 Size = 3328 	 Time = 2.54632811 s 	 Throughput = 0.1044 GB/s
+Alg = 6 	 NbFPE = 4 	 Range = 1 	 NbElements = 33226752 	 Size = 3328 	 Time = 2.54632811 s 	 Performance = 28.9511 GFLOPS
+Alg = 6 	 NbFPE = 4 	 Range = 1 	 NbElements = 38535168 	 Size = 3584 	 Time = 3.18189262 s 	 Throughput = 0.0969 GB/s
+Alg = 6 	 NbFPE = 4 	 Range = 1 	 NbElements = 38535168 	 Size = 3584 	 Time = 3.18189262 s 	 Performance = 28.9367 GFLOPS
+Alg = 6 	 NbFPE = 4 	 Range = 1 	 NbElements = 44236800 	 Size = 3840 	 Time = 3.89467979 s 	 Throughput = 0.0909 GB/s
+Alg = 6 	 NbFPE = 4 	 Range = 1 	 NbElements = 44236800 	 Size = 3840 	 Time = 3.89467979 s 	 Performance = 29.0772 GFLOPS
+Alg = 6 	 NbFPE = 4 	 Range = 1 	 NbElements = 50331648 	 Size = 4096 	 Time = 4.73197310 s 	 Throughput = 0.0851 GB/s
+Alg = 6 	 NbFPE = 4 	 Range = 1 	 NbElements = 50331648 	 Size = 4096 	 Time = 4.73197310 s 	 Performance = 29.0447 GFLOPS
+Alg = 6 	 NbFPE = 5 	 Range = 1 	 NbElements = 196608 	 Size = 256 	 Time = 0.00168824 s 	 Throughput = 0.9317 GB/s
+Alg = 6 	 NbFPE = 5 	 Range = 1 	 NbElements = 196608 	 Size = 256 	 Time = 0.00168824 s 	 Performance = 19.8753 GFLOPS
+Alg = 6 	 NbFPE = 5 	 Range = 1 	 NbElements = 786432 	 Size = 512 	 Time = 0.01162873 s 	 Throughput = 0.5410 GB/s
+Alg = 6 	 NbFPE = 5 	 Range = 1 	 NbElements = 786432 	 Size = 512 	 Time = 0.01162873 s 	 Performance = 23.0838 GFLOPS
+Alg = 6 	 NbFPE = 5 	 Range = 1 	 NbElements = 1769472 	 Size = 768 	 Time = 0.03719899 s 	 Throughput = 0.3805 GB/s
+Alg = 6 	 NbFPE = 5 	 Range = 1 	 NbElements = 1769472 	 Size = 768 	 Time = 0.03719899 s 	 Performance = 24.3547 GFLOPS
+Alg = 6 	 NbFPE = 5 	 Range = 1 	 NbElements = 3145728 	 Size = 1024 	 Time = 0.08634375 s 	 Throughput = 0.2915 GB/s
+Alg = 6 	 NbFPE = 5 	 Range = 1 	 NbElements = 3145728 	 Size = 1024 	 Time = 0.08634375 s 	 Performance = 24.8713 GFLOPS
+Alg = 6 	 NbFPE = 5 	 Range = 1 	 NbElements = 4915200 	 Size = 1280 	 Time = 0.16622570 s 	 Throughput = 0.2366 GB/s
+Alg = 6 	 NbFPE = 5 	 Range = 1 	 NbElements = 4915200 	 Size = 1280 	 Time = 0.16622570 s 	 Performance = 25.2326 GFLOPS
+Alg = 6 	 NbFPE = 5 	 Range = 1 	 NbElements = 7077888 	 Size = 1536 	 Time = 0.28575331 s 	 Throughput = 0.1982 GB/s
+Alg = 6 	 NbFPE = 5 	 Range = 1 	 NbElements = 7077888 	 Size = 1536 	 Time = 0.28575331 s 	 Performance = 25.3637 GFLOPS
+Alg = 6 	 NbFPE = 5 	 Range = 1 	 NbElements = 9633792 	 Size = 1792 	 Time = 0.45096537 s 	 Throughput = 0.1709 GB/s
+Alg = 6 	 NbFPE = 5 	 Range = 1 	 NbElements = 9633792 	 Size = 1792 	 Time = 0.45096537 s 	 Performance = 25.5212 GFLOPS
+Alg = 6 	 NbFPE = 5 	 Range = 1 	 NbElements = 12582912 	 Size = 2048 	 Time = 0.67603668 s 	 Throughput = 0.1489 GB/s
+Alg = 6 	 NbFPE = 5 	 Range = 1 	 NbElements = 12582912 	 Size = 2048 	 Time = 0.67603668 s 	 Performance = 25.4126 GFLOPS
+Alg = 6 	 NbFPE = 5 	 Range = 1 	 NbElements = 15925248 	 Size = 2304 	 Time = 0.95255304 s 	 Throughput = 0.1337 GB/s
+Alg = 6 	 NbFPE = 5 	 Range = 1 	 NbElements = 15925248 	 Size = 2304 	 Time = 0.95255304 s 	 Performance = 25.6796 GFLOPS
+Alg = 6 	 NbFPE = 5 	 Range = 1 	 NbElements = 19660800 	 Size = 2560 	 Time = 1.30732095 s 	 Throughput = 0.1203 GB/s
+Alg = 6 	 NbFPE = 5 	 Range = 1 	 NbElements = 19660800 	 Size = 2560 	 Time = 1.30732095 s 	 Performance = 25.6666 GFLOPS
+Alg = 6 	 NbFPE = 5 	 Range = 1 	 NbElements = 23789568 	 Size = 2816 	 Time = 1.73214311 s 	 Throughput = 0.1099 GB/s
+Alg = 6 	 NbFPE = 5 	 Range = 1 	 NbElements = 23789568 	 Size = 2816 	 Time = 1.73214311 s 	 Performance = 25.7836 GFLOPS
+Alg = 6 	 NbFPE = 5 	 Range = 1 	 NbElements = 28311552 	 Size = 3072 	 Time = 2.26764687 s 	 Throughput = 0.0999 GB/s
+Alg = 6 	 NbFPE = 5 	 Range = 1 	 NbElements = 28311552 	 Size = 3072 	 Time = 2.26764687 s 	 Performance = 25.5693 GFLOPS
+Alg = 6 	 NbFPE = 5 	 Range = 1 	 NbElements = 33226752 	 Size = 3328 	 Time = 2.85657671 s 	 Throughput = 0.0931 GB/s
+Alg = 6 	 NbFPE = 5 	 Range = 1 	 NbElements = 33226752 	 Size = 3328 	 Time = 2.85657671 s 	 Performance = 25.8068 GFLOPS
+Alg = 6 	 NbFPE = 5 	 Range = 1 	 NbElements = 38535168 	 Size = 3584 	 Time = 3.56905297 s 	 Throughput = 0.0864 GB/s
+Alg = 6 	 NbFPE = 5 	 Range = 1 	 NbElements = 38535168 	 Size = 3584 	 Time = 3.56905297 s 	 Performance = 25.7977 GFLOPS
+Alg = 6 	 NbFPE = 5 	 Range = 1 	 NbElements = 44236800 	 Size = 3840 	 Time = 4.37401544 s 	 Throughput = 0.0809 GB/s
+Alg = 6 	 NbFPE = 5 	 Range = 1 	 NbElements = 44236800 	 Size = 3840 	 Time = 4.37401544 s 	 Performance = 25.8907 GFLOPS
+Alg = 6 	 NbFPE = 5 	 Range = 1 	 NbElements = 50331648 	 Size = 4096 	 Time = 5.31438644 s 	 Throughput = 0.0758 GB/s
+Alg = 6 	 NbFPE = 5 	 Range = 1 	 NbElements = 50331648 	 Size = 4096 	 Time = 5.31438644 s 	 Performance = 25.8617 GFLOPS
+Alg = 6 	 NbFPE = 6 	 Range = 1 	 NbElements = 196608 	 Size = 256 	 Time = 0.00211487 s 	 Throughput = 0.7437 GB/s
+Alg = 6 	 NbFPE = 6 	 Range = 1 	 NbElements = 196608 	 Size = 256 	 Time = 0.00211487 s 	 Performance = 15.8660 GFLOPS
+Alg = 6 	 NbFPE = 6 	 Range = 1 	 NbElements = 786432 	 Size = 512 	 Time = 0.01366150 s 	 Throughput = 0.4605 GB/s
+Alg = 6 	 NbFPE = 6 	 Range = 1 	 NbElements = 786432 	 Size = 512 	 Time = 0.01366150 s 	 Performance = 19.6490 GFLOPS
+Alg = 6 	 NbFPE = 6 	 Range = 1 	 NbElements = 1769472 	 Size = 768 	 Time = 0.04382742 s 	 Throughput = 0.3230 GB/s
+Alg = 6 	 NbFPE = 6 	 Range = 1 	 NbElements = 1769472 	 Size = 768 	 Time = 0.04382742 s 	 Performance = 20.6713 GFLOPS
+Alg = 6 	 NbFPE = 6 	 Range = 1 	 NbElements = 3145728 	 Size = 1024 	 Time = 0.10219920 s 	 Throughput = 0.2462 GB/s
+Alg = 6 	 NbFPE = 6 	 Range = 1 	 NbElements = 3145728 	 Size = 1024 	 Time = 0.10219920 s 	 Performance = 21.0127 GFLOPS
+Alg = 6 	 NbFPE = 6 	 Range = 1 	 NbElements = 4915200 	 Size = 1280 	 Time = 0.19639635 s 	 Throughput = 0.2002 GB/s
+Alg = 6 	 NbFPE = 6 	 Range = 1 	 NbElements = 4915200 	 Size = 1280 	 Time = 0.19639635 s 	 Performance = 21.3563 GFLOPS
+Alg = 6 	 NbFPE = 6 	 Range = 1 	 NbElements = 7077888 	 Size = 1536 	 Time = 0.33798746 s 	 Throughput = 0.1675 GB/s
+Alg = 6 	 NbFPE = 6 	 Range = 1 	 NbElements = 7077888 	 Size = 1536 	 Time = 0.33798746 s 	 Performance = 21.4439 GFLOPS
+Alg = 6 	 NbFPE = 6 	 Range = 1 	 NbElements = 9633792 	 Size = 1792 	 Time = 0.53285404 s 	 Throughput = 0.1446 GB/s
+Alg = 6 	 NbFPE = 6 	 Range = 1 	 NbElements = 9633792 	 Size = 1792 	 Time = 0.53285404 s 	 Performance = 21.5991 GFLOPS
+Alg = 6 	 NbFPE = 6 	 Range = 1 	 NbElements = 12582912 	 Size = 2048 	 Time = 0.79538395 s 	 Throughput = 0.1266 GB/s
+Alg = 6 	 NbFPE = 6 	 Range = 1 	 NbElements = 12582912 	 Size = 2048 	 Time = 0.79538395 s 	 Performance = 21.5995 GFLOPS
+Alg = 6 	 NbFPE = 6 	 Range = 1 	 NbElements = 15925248 	 Size = 2304 	 Time = 1.12596802 s 	 Throughput = 0.1131 GB/s
+Alg = 6 	 NbFPE = 6 	 Range = 1 	 NbElements = 15925248 	 Size = 2304 	 Time = 1.12596802 s 	 Performance = 21.7246 GFLOPS
+Alg = 6 	 NbFPE = 6 	 Range = 1 	 NbElements = 19660800 	 Size = 2560 	 Time = 1.54380506 s 	 Throughput = 0.1019 GB/s
+Alg = 6 	 NbFPE = 6 	 Range = 1 	 NbElements = 19660800 	 Size = 2560 	 Time = 1.54380506 s 	 Performance = 21.7349 GFLOPS
+Alg = 6 	 NbFPE = 6 	 Range = 1 	 NbElements = 23789568 	 Size = 2816 	 Time = 2.04801309 s 	 Throughput = 0.0929 GB/s
+Alg = 6 	 NbFPE = 6 	 Range = 1 	 NbElements = 23789568 	 Size = 2816 	 Time = 2.04801309 s 	 Performance = 21.8070 GFLOPS
+Alg = 6 	 NbFPE = 6 	 Range = 1 	 NbElements = 28311552 	 Size = 3072 	 Time = 2.66652993 s 	 Throughput = 0.0849 GB/s
+Alg = 6 	 NbFPE = 6 	 Range = 1 	 NbElements = 28311552 	 Size = 3072 	 Time = 2.66652993 s 	 Performance = 21.7444 GFLOPS
+Alg = 6 	 NbFPE = 6 	 Range = 1 	 NbElements = 33226752 	 Size = 3328 	 Time = 3.37256628 s 	 Throughput = 0.0788 GB/s
+Alg = 6 	 NbFPE = 6 	 Range = 1 	 NbElements = 33226752 	 Size = 3328 	 Time = 3.37256628 s 	 Performance = 21.8585 GFLOPS
+Alg = 6 	 NbFPE = 6 	 Range = 1 	 NbElements = 38535168 	 Size = 3584 	 Time = 4.21302236 s 	 Throughput = 0.0732 GB/s
+Alg = 6 	 NbFPE = 6 	 Range = 1 	 NbElements = 38535168 	 Size = 3584 	 Time = 4.21302236 s 	 Performance = 21.8545 GFLOPS
+Alg = 6 	 NbFPE = 6 	 Range = 1 	 NbElements = 44236800 	 Size = 3840 	 Time = 5.15704785 s 	 Throughput = 0.0686 GB/s
+Alg = 6 	 NbFPE = 6 	 Range = 1 	 NbElements = 44236800 	 Size = 3840 	 Time = 5.15704785 s 	 Performance = 21.9595 GFLOPS
+Alg = 6 	 NbFPE = 6 	 Range = 1 	 NbElements = 50331648 	 Size = 4096 	 Time = 6.27442684 s 	 Throughput = 0.0642 GB/s
+Alg = 6 	 NbFPE = 6 	 Range = 1 	 NbElements = 50331648 	 Size = 4096 	 Time = 6.27442684 s 	 Performance = 21.9046 GFLOPS
+Alg = 6 	 NbFPE = 7 	 Range = 1 	 NbElements = 196608 	 Size = 256 	 Time = 0.00230292 s 	 Throughput = 0.6830 GB/s
+Alg = 6 	 NbFPE = 7 	 Range = 1 	 NbElements = 196608 	 Size = 256 	 Time = 0.00230292 s 	 Performance = 14.5704 GFLOPS
+Alg = 6 	 NbFPE = 7 	 Range = 1 	 NbElements = 786432 	 Size = 512 	 Time = 0.01476724 s 	 Throughput = 0.4260 GB/s
+Alg = 6 	 NbFPE = 7 	 Range = 1 	 NbElements = 786432 	 Size = 512 	 Time = 0.01476724 s 	 Performance = 18.1778 GFLOPS
+Alg = 6 	 NbFPE = 7 	 Range = 1 	 NbElements = 1769472 	 Size = 768 	 Time = 0.04761434 s 	 Throughput = 0.2973 GB/s
+Alg = 6 	 NbFPE = 7 	 Range = 1 	 NbElements = 1769472 	 Size = 768 	 Time = 0.04761434 s 	 Performance = 19.0272 GFLOPS
+Alg = 6 	 NbFPE = 7 	 Range = 1 	 NbElements = 3145728 	 Size = 1024 	 Time = 0.11102768 s 	 Throughput = 0.2267 GB/s
+Alg = 6 	 NbFPE = 7 	 Range = 1 	 NbElements = 3145728 	 Size = 1024 	 Time = 0.11102768 s 	 Performance = 19.3419 GFLOPS
+Alg = 6 	 NbFPE = 7 	 Range = 1 	 NbElements = 4915200 	 Size = 1280 	 Time = 0.21404613 s 	 Throughput = 0.1837 GB/s
+Alg = 6 	 NbFPE = 7 	 Range = 1 	 NbElements = 4915200 	 Size = 1280 	 Time = 0.21404613 s 	 Performance = 19.5953 GFLOPS
+Alg = 6 	 NbFPE = 7 	 Range = 1 	 NbElements = 7077888 	 Size = 1536 	 Time = 0.36864707 s 	 Throughput = 0.1536 GB/s
+Alg = 6 	 NbFPE = 7 	 Range = 1 	 NbElements = 7077888 	 Size = 1536 	 Time = 0.36864707 s 	 Performance = 19.6604 GFLOPS
+Alg = 6 	 NbFPE = 7 	 Range = 1 	 NbElements = 9633792 	 Size = 1792 	 Time = 0.58231712 s 	 Throughput = 0.1324 GB/s
+Alg = 6 	 NbFPE = 7 	 Range = 1 	 NbElements = 9633792 	 Size = 1792 	 Time = 0.58231712 s 	 Performance = 19.7644 GFLOPS
+Alg = 6 	 NbFPE = 7 	 Range = 1 	 NbElements = 12582912 	 Size = 2048 	 Time = 0.87260506 s 	 Throughput = 0.1154 GB/s
+Alg = 6 	 NbFPE = 7 	 Range = 1 	 NbElements = 12582912 	 Size = 2048 	 Time = 0.87260506 s 	 Performance = 19.6880 GFLOPS
+Alg = 6 	 NbFPE = 7 	 Range = 1 	 NbElements = 15925248 	 Size = 2304 	 Time = 1.23246282 s 	 Throughput = 0.1034 GB/s
+Alg = 6 	 NbFPE = 7 	 Range = 1 	 NbElements = 15925248 	 Size = 2304 	 Time = 1.23246282 s 	 Performance = 19.8474 GFLOPS
+Alg = 6 	 NbFPE = 7 	 Range = 1 	 NbElements = 19660800 	 Size = 2560 	 Time = 1.69137842 s 	 Throughput = 0.0930 GB/s
+Alg = 6 	 NbFPE = 7 	 Range = 1 	 NbElements = 19660800 	 Size = 2560 	 Time = 1.69137842 s 	 Performance = 19.8385 GFLOPS
+Alg = 6 	 NbFPE = 7 	 Range = 1 	 NbElements = 23789568 	 Size = 2816 	 Time = 2.24353134 s 	 Throughput = 0.0848 GB/s
+Alg = 6 	 NbFPE = 7 	 Range = 1 	 NbElements = 23789568 	 Size = 2816 	 Time = 2.24353134 s 	 Performance = 19.9065 GFLOPS
+Alg = 6 	 NbFPE = 7 	 Range = 1 	 NbElements = 28311552 	 Size = 3072 	 Time = 2.93043613 s 	 Throughput = 0.0773 GB/s
+Alg = 6 	 NbFPE = 7 	 Range = 1 	 NbElements = 28311552 	 Size = 3072 	 Time = 2.93043613 s 	 Performance = 19.7862 GFLOPS
+Alg = 6 	 NbFPE = 7 	 Range = 1 	 NbElements = 33226752 	 Size = 3328 	 Time = 3.70136676 s 	 Throughput = 0.0718 GB/s
+Alg = 6 	 NbFPE = 7 	 Range = 1 	 NbElements = 33226752 	 Size = 3328 	 Time = 3.70136676 s 	 Performance = 19.9167 GFLOPS
+Alg = 6 	 NbFPE = 7 	 Range = 1 	 NbElements = 38535168 	 Size = 3584 	 Time = 4.62357035 s 	 Throughput = 0.0667 GB/s
+Alg = 6 	 NbFPE = 7 	 Range = 1 	 NbElements = 38535168 	 Size = 3584 	 Time = 4.62357035 s 	 Performance = 19.9139 GFLOPS
+Alg = 6 	 NbFPE = 7 	 Range = 1 	 NbElements = 44236800 	 Size = 3840 	 Time = 5.67086919 s 	 Throughput = 0.0624 GB/s
+Alg = 6 	 NbFPE = 7 	 Range = 1 	 NbElements = 44236800 	 Size = 3840 	 Time = 5.67086919 s 	 Performance = 19.9698 GFLOPS
+Alg = 6 	 NbFPE = 7 	 Range = 1 	 NbElements = 50331648 	 Size = 4096 	 Time = 6.88428697 s 	 Throughput = 0.0585 GB/s
+Alg = 6 	 NbFPE = 7 	 Range = 1 	 NbElements = 50331648 	 Size = 4096 	 Time = 6.88428697 s 	 Performance = 19.9642 GFLOPS
+Alg = 6 	 NbFPE = 8 	 Range = 1 	 NbElements = 196608 	 Size = 256 	 Time = 0.00261355 s 	 Throughput = 0.6018 GB/s
+Alg = 6 	 NbFPE = 8 	 Range = 1 	 NbElements = 196608 	 Size = 256 	 Time = 0.00261355 s 	 Performance = 12.8387 GFLOPS
+Alg = 6 	 NbFPE = 8 	 Range = 1 	 NbElements = 786432 	 Size = 512 	 Time = 0.01884011 s 	 Throughput = 0.3339 GB/s
+Alg = 6 	 NbFPE = 8 	 Range = 1 	 NbElements = 786432 	 Size = 512 	 Time = 0.01884011 s 	 Performance = 14.2481 GFLOPS
+Alg = 6 	 NbFPE = 8 	 Range = 1 	 NbElements = 1769472 	 Size = 768 	 Time = 0.06112157 s 	 Throughput = 0.2316 GB/s
+Alg = 6 	 NbFPE = 8 	 Range = 1 	 NbElements = 1769472 	 Size = 768 	 Time = 0.06112157 s 	 Performance = 14.8224 GFLOPS
+Alg = 6 	 NbFPE = 8 	 Range = 1 	 NbElements = 3145728 	 Size = 1024 	 Time = 0.14308271 s 	 Throughput = 0.1759 GB/s
+Alg = 6 	 NbFPE = 8 	 Range = 1 	 NbElements = 3145728 	 Size = 1024 	 Time = 0.14308271 s 	 Performance = 15.0087 GFLOPS
+Alg = 6 	 NbFPE = 8 	 Range = 1 	 NbElements = 4915200 	 Size = 1280 	 Time = 0.27678330 s 	 Throughput = 0.1421 GB/s
+Alg = 6 	 NbFPE = 8 	 Range = 1 	 NbElements = 4915200 	 Size = 1280 	 Time = 0.27678330 s 	 Performance = 15.1537 GFLOPS
+Alg = 6 	 NbFPE = 8 	 Range = 1 	 NbElements = 7077888 	 Size = 1536 	 Time = 0.47654994 s 	 Throughput = 0.1188 GB/s
+Alg = 6 	 NbFPE = 8 	 Range = 1 	 NbElements = 7077888 	 Size = 1536 	 Time = 0.47654994 s 	 Performance = 15.2088 GFLOPS
+Alg = 6 	 NbFPE = 8 	 Range = 1 	 NbElements = 9633792 	 Size = 1792 	 Time = 0.75374120 s 	 Throughput = 0.1023 GB/s
+Alg = 6 	 NbFPE = 8 	 Range = 1 	 NbElements = 9633792 	 Size = 1792 	 Time = 0.75374120 s 	 Performance = 15.2694 GFLOPS
+Alg = 6 	 NbFPE = 8 	 Range = 1 	 NbElements = 12582912 	 Size = 2048 	 Time = 1.12461254 s 	 Throughput = 0.0895 GB/s
+Alg = 6 	 NbFPE = 8 	 Range = 1 	 NbElements = 12582912 	 Size = 2048 	 Time = 1.12461254 s 	 Performance = 15.2763 GFLOPS
+Alg = 6 	 NbFPE = 8 	 Range = 1 	 NbElements = 15925248 	 Size = 2304 	 Time = 1.59529972 s 	 Throughput = 0.0799 GB/s
+Alg = 6 	 NbFPE = 8 	 Range = 1 	 NbElements = 15925248 	 Size = 2304 	 Time = 1.59529972 s 	 Performance = 15.3333 GFLOPS
+Alg = 6 	 NbFPE = 8 	 Range = 1 	 NbElements = 19660800 	 Size = 2560 	 Time = 2.18219398 s 	 Throughput = 0.0721 GB/s
+Alg = 6 	 NbFPE = 8 	 Range = 1 	 NbElements = 19660800 	 Size = 2560 	 Time = 2.18219398 s 	 Performance = 15.3765 GFLOPS
+Alg = 6 	 NbFPE = 8 	 Range = 1 	 NbElements = 23789568 	 Size = 2816 	 Time = 2.89915435 s 	 Throughput = 0.0656 GB/s
+Alg = 6 	 NbFPE = 8 	 Range = 1 	 NbElements = 23789568 	 Size = 2816 	 Time = 2.89915435 s 	 Performance = 15.4048 GFLOPS
+Alg = 6 	 NbFPE = 8 	 Range = 1 	 NbElements = 28311552 	 Size = 3072 	 Time = 3.76884699 s 	 Throughput = 0.0601 GB/s
+Alg = 6 	 NbFPE = 8 	 Range = 1 	 NbElements = 28311552 	 Size = 3072 	 Time = 3.76884699 s 	 Performance = 15.3846 GFLOPS
+Alg = 6 	 NbFPE = 8 	 Range = 1 	 NbElements = 33226752 	 Size = 3328 	 Time = 4.78319626 s 	 Throughput = 0.0556 GB/s
+Alg = 6 	 NbFPE = 8 	 Range = 1 	 NbElements = 33226752 	 Size = 3328 	 Time = 4.78319626 s 	 Performance = 15.4121 GFLOPS
+Alg = 6 	 NbFPE = 8 	 Range = 1 	 NbElements = 38535168 	 Size = 3584 	 Time = 5.97049005 s 	 Throughput = 0.0516 GB/s
+Alg = 6 	 NbFPE = 8 	 Range = 1 	 NbElements = 38535168 	 Size = 3584 	 Time = 5.97049005 s 	 Performance = 15.4214 GFLOPS
+Alg = 6 	 NbFPE = 8 	 Range = 1 	 NbElements = 44236800 	 Size = 3840 	 Time = 7.33334993 s 	 Throughput = 0.0483 GB/s
+Alg = 6 	 NbFPE = 8 	 Range = 1 	 NbElements = 44236800 	 Size = 3840 	 Time = 7.33334993 s 	 Performance = 15.4426 GFLOPS
+Alg = 6 	 NbFPE = 8 	 Range = 1 	 NbElements = 50331648 	 Size = 4096 	 Time = 8.91274894 s 	 Throughput = 0.0452 GB/s
+Alg = 6 	 NbFPE = 8 	 Range = 1 	 NbElements = 50331648 	 Size = 4096 	 Time = 8.91274894 s 	 Performance = 15.4205 GFLOPS
+Alg = 8 	 NbFPE = 2 	 Range = 1 	 NbElements = 196608 	 Size = 256 	 Time = 0.00573763 s 	 Throughput = 0.2741 GB/s
+Alg = 8 	 NbFPE = 2 	 Range = 1 	 NbElements = 196608 	 Size = 256 	 Time = 0.00573763 s 	 Performance = 5.8481 GFLOPS
+Alg = 8 	 NbFPE = 2 	 Range = 1 	 NbElements = 786432 	 Size = 512 	 Time = 0.02381189 s 	 Throughput = 0.2642 GB/s
+Alg = 8 	 NbFPE = 2 	 Range = 1 	 NbElements = 786432 	 Size = 512 	 Time = 0.02381189 s 	 Performance = 11.2732 GFLOPS
+Alg = 8 	 NbFPE = 2 	 Range = 1 	 NbElements = 1769472 	 Size = 768 	 Time = 0.05359311 s 	 Throughput = 0.2641 GB/s
+Alg = 8 	 NbFPE = 2 	 Range = 1 	 NbElements = 1769472 	 Size = 768 	 Time = 0.05359311 s 	 Performance = 16.9046 GFLOPS
+Alg = 8 	 NbFPE = 2 	 Range = 1 	 NbElements = 3145728 	 Size = 1024 	 Time = 0.09161388 s 	 Throughput = 0.2747 GB/s
+Alg = 8 	 NbFPE = 2 	 Range = 1 	 NbElements = 3145728 	 Size = 1024 	 Time = 0.09161388 s 	 Performance = 23.4406 GFLOPS
+Alg = 8 	 NbFPE = 2 	 Range = 1 	 NbElements = 4915200 	 Size = 1280 	 Time = 0.14079182 s 	 Throughput = 0.2793 GB/s
+Alg = 8 	 NbFPE = 2 	 Range = 1 	 NbElements = 4915200 	 Size = 1280 	 Time = 0.14079182 s 	 Performance = 29.7908 GFLOPS
+Alg = 8 	 NbFPE = 3 	 Range = 1 	 NbElements = 196608 	 Size = 256 	 Time = 0.00575741 s 	 Throughput = 0.2732 GB/s
+Alg = 8 	 NbFPE = 3 	 Range = 1 	 NbElements = 196608 	 Size = 256 	 Time = 0.00575741 s 	 Performance = 5.8280 GFLOPS
+Alg = 8 	 NbFPE = 3 	 Range = 1 	 NbElements = 786432 	 Size = 512 	 Time = 0.02370447 s 	 Throughput = 0.2654 GB/s
+Alg = 8 	 NbFPE = 3 	 Range = 1 	 NbElements = 786432 	 Size = 512 	 Time = 0.02370447 s 	 Performance = 11.3243 GFLOPS
+Alg = 8 	 NbFPE = 3 	 Range = 1 	 NbElements = 1769472 	 Size = 768 	 Time = 0.05282299 s 	 Throughput = 0.2680 GB/s
+Alg = 8 	 NbFPE = 3 	 Range = 1 	 NbElements = 1769472 	 Size = 768 	 Time = 0.05282299 s 	 Performance = 17.1510 GFLOPS
+Alg = 8 	 NbFPE = 3 	 Range = 1 	 NbElements = 3145728 	 Size = 1024 	 Time = 0.09065510 s 	 Throughput = 0.2776 GB/s
+Alg = 8 	 NbFPE = 3 	 Range = 1 	 NbElements = 3145728 	 Size = 1024 	 Time = 0.09065510 s 	 Performance = 23.6885 GFLOPS
+Alg = 8 	 NbFPE = 3 	 Range = 1 	 NbElements = 4915200 	 Size = 1280 	 Time = 0.14101615 s 	 Throughput = 0.2788 GB/s
+Alg = 8 	 NbFPE = 3 	 Range = 1 	 NbElements = 4915200 	 Size = 1280 	 Time = 0.14101615 s 	 Performance = 29.7434 GFLOPS
+Alg = 8 	 NbFPE = 4 	 Range = 1 	 NbElements = 196608 	 Size = 256 	 Time = 0.00556431 s 	 Throughput = 0.2827 GB/s
+Alg = 8 	 NbFPE = 4 	 Range = 1 	 NbElements = 196608 	 Size = 256 	 Time = 0.00556431 s 	 Performance = 6.0303 GFLOPS
+Alg = 8 	 NbFPE = 4 	 Range = 1 	 NbElements = 786432 	 Size = 512 	 Time = 0.02202836 s 	 Throughput = 0.2856 GB/s
+Alg = 8 	 NbFPE = 4 	 Range = 1 	 NbElements = 786432 	 Size = 512 	 Time = 0.02202836 s 	 Performance = 12.1859 GFLOPS
+Alg = 8 	 NbFPE = 4 	 Range = 1 	 NbElements = 1769472 	 Size = 768 	 Time = 0.04839543 s 	 Throughput = 0.2925 GB/s
+Alg = 8 	 NbFPE = 4 	 Range = 1 	 NbElements = 1769472 	 Size = 768 	 Time = 0.04839543 s 	 Performance = 18.7201 GFLOPS
+Alg = 8 	 NbFPE = 4 	 Range = 1 	 NbElements = 3145728 	 Size = 1024 	 Time = 0.07967636 s 	 Throughput = 0.3159 GB/s
+Alg = 8 	 NbFPE = 4 	 Range = 1 	 NbElements = 3145728 	 Size = 1024 	 Time = 0.07967636 s 	 Performance = 26.9526 GFLOPS
+Alg = 8 	 NbFPE = 4 	 Range = 1 	 NbElements = 4915200 	 Size = 1280 	 Time = 0.07265034 s 	 Throughput = 0.5412 GB/s
+Alg = 8 	 NbFPE = 4 	 Range = 1 	 NbElements = 4915200 	 Size = 1280 	 Time = 0.07265034 s 	 Performance = 57.7327 GFLOPS
+Alg = 8 	 NbFPE = 5 	 Range = 1 	 NbElements = 196608 	 Size = 256 	 Time = 0.00563940 s 	 Throughput = 0.2789 GB/s
+Alg = 8 	 NbFPE = 5 	 Range = 1 	 NbElements = 196608 	 Size = 256 	 Time = 0.00563940 s 	 Performance = 5.9500 GFLOPS
+Alg = 8 	 NbFPE = 5 	 Range = 1 	 NbElements = 786432 	 Size = 512 	 Time = 0.02180010 s 	 Throughput = 0.2886 GB/s
+Alg = 8 	 NbFPE = 5 	 Range = 1 	 NbElements = 786432 	 Size = 512 	 Time = 0.02180010 s 	 Performance = 12.3135 GFLOPS
+Alg = 8 	 NbFPE = 5 	 Range = 1 	 NbElements = 1769472 	 Size = 768 	 Time = 0.04792218 s 	 Throughput = 0.2954 GB/s
+Alg = 8 	 NbFPE = 5 	 Range = 1 	 NbElements = 1769472 	 Size = 768 	 Time = 0.04792218 s 	 Performance = 18.9050 GFLOPS
+Alg = 8 	 NbFPE = 5 	 Range = 1 	 NbElements = 3145728 	 Size = 1024 	 Time = 0.04466819 s 	 Throughput = 0.5634 GB/s
+Alg = 8 	 NbFPE = 5 	 Range = 1 	 NbElements = 3145728 	 Size = 1024 	 Time = 0.04466819 s 	 Performance = 48.0764 GFLOPS
+Alg = 8 	 NbFPE = 5 	 Range = 1 	 NbElements = 4915200 	 Size = 1280 	 Time = 0.08536846 s 	 Throughput = 0.4606 GB/s
+Alg = 8 	 NbFPE = 5 	 Range = 1 	 NbElements = 4915200 	 Size = 1280 	 Time = 0.08536846 s 	 Performance = 49.1318 GFLOPS
+Alg = 8 	 NbFPE = 6 	 Range = 1 	 NbElements = 196608 	 Size = 256 	 Time = 0.00569809 s 	 Throughput = 0.2760 GB/s
+Alg = 8 	 NbFPE = 6 	 Range = 1 	 NbElements = 196608 	 Size = 256 	 Time = 0.00569809 s 	 Performance = 5.8887 GFLOPS
+Alg = 8 	 NbFPE = 6 	 Range = 1 	 NbElements = 786432 	 Size = 512 	 Time = 0.02152081 s 	 Throughput = 0.2923 GB/s
+Alg = 8 	 NbFPE = 6 	 Range = 1 	 NbElements = 786432 	 Size = 512 	 Time = 0.02152081 s 	 Performance = 12.4733 GFLOPS
+Alg = 8 	 NbFPE = 6 	 Range = 1 	 NbElements = 1769472 	 Size = 768 	 Time = 0.04700341 s 	 Throughput = 0.3012 GB/s
+Alg = 8 	 NbFPE = 6 	 Range = 1 	 NbElements = 1769472 	 Size = 768 	 Time = 0.04700341 s 	 Performance = 19.2746 GFLOPS
+Alg = 8 	 NbFPE = 6 	 Range = 1 	 NbElements = 3145728 	 Size = 1024 	 Time = 0.05116674 s 	 Throughput = 0.4918 GB/s
+Alg = 8 	 NbFPE = 6 	 Range = 1 	 NbElements = 3145728 	 Size = 1024 	 Time = 0.05116674 s 	 Performance = 41.9703 GFLOPS
+Alg = 8 	 NbFPE = 6 	 Range = 1 	 NbElements = 4915200 	 Size = 1280 	 Time = 0.09844816 s 	 Throughput = 0.3994 GB/s
+Alg = 8 	 NbFPE = 6 	 Range = 1 	 NbElements = 4915200 	 Size = 1280 	 Time = 0.09844816 s 	 Performance = 42.6042 GFLOPS
+Alg = 8 	 NbFPE = 7 	 Range = 1 	 NbElements = 196608 	 Size = 256 	 Time = 0.00555537 s 	 Throughput = 0.2831 GB/s
+Alg = 8 	 NbFPE = 7 	 Range = 1 	 NbElements = 196608 	 Size = 256 	 Time = 0.00555537 s 	 Performance = 6.0400 GFLOPS
+Alg = 8 	 NbFPE = 7 	 Range = 1 	 NbElements = 786432 	 Size = 512 	 Time = 0.02137001 s 	 Throughput = 0.2944 GB/s
+Alg = 8 	 NbFPE = 7 	 Range = 1 	 NbElements = 786432 	 Size = 512 	 Time = 0.02137001 s 	 Performance = 12.5613 GFLOPS
+Alg = 8 	 NbFPE = 7 	 Range = 1 	 NbElements = 1769472 	 Size = 768 	 Time = 0.02529563 s 	 Throughput = 0.5596 GB/s
+Alg = 8 	 NbFPE = 7 	 Range = 1 	 NbElements = 1769472 	 Size = 768 	 Time = 0.02529563 s 	 Performance = 35.8153 GFLOPS
+Alg = 8 	 NbFPE = 7 	 Range = 1 	 NbElements = 3145728 	 Size = 1024 	 Time = 0.05804788 s 	 Throughput = 0.4335 GB/s
+Alg = 8 	 NbFPE = 7 	 Range = 1 	 NbElements = 3145728 	 Size = 1024 	 Time = 0.05804788 s 	 Performance = 36.9950 GFLOPS
+Alg = 8 	 NbFPE = 7 	 Range = 1 	 NbElements = 4915200 	 Size = 1280 	 Time = 0.11171118 s 	 Throughput = 0.3520 GB/s
+Alg = 8 	 NbFPE = 7 	 Range = 1 	 NbElements = 4915200 	 Size = 1280 	 Time = 0.11171118 s 	 Performance = 37.5460 GFLOPS
+Alg = 8 	 NbFPE = 8 	 Range = 1 	 NbElements = 196608 	 Size = 256 	 Time = 0.00569578 s 	 Throughput = 0.2761 GB/s
+Alg = 8 	 NbFPE = 8 	 Range = 1 	 NbElements = 196608 	 Size = 256 	 Time = 0.00569578 s 	 Performance = 5.8911 GFLOPS
+Alg = 8 	 NbFPE = 8 	 Range = 1 	 NbElements = 786432 	 Size = 512 	 Time = 0.02153554 s 	 Throughput = 0.2921 GB/s
+Alg = 8 	 NbFPE = 8 	 Range = 1 	 NbElements = 786432 	 Size = 512 	 Time = 0.02153554 s 	 Performance = 12.4648 GFLOPS
+Alg = 8 	 NbFPE = 8 	 Range = 1 	 NbElements = 1769472 	 Size = 768 	 Time = 0.02817782 s 	 Throughput = 0.5024 GB/s
+Alg = 8 	 NbFPE = 8 	 Range = 1 	 NbElements = 1769472 	 Size = 768 	 Time = 0.02817782 s 	 Performance = 32.1519 GFLOPS
+Alg = 8 	 NbFPE = 8 	 Range = 1 	 NbElements = 3145728 	 Size = 1024 	 Time = 0.06476298 s 	 Throughput = 0.3886 GB/s
+Alg = 8 	 NbFPE = 8 	 Range = 1 	 NbElements = 3145728 	 Size = 1024 	 Time = 0.06476298 s 	 Performance = 33.1591 GFLOPS
+Alg = 8 	 NbFPE = 8 	 Range = 1 	 NbElements = 4915200 	 Size = 1280 	 Time = 0.12485184 s 	 Throughput = 0.3149 GB/s
+Alg = 8 	 NbFPE = 8 	 Range = 1 	 NbElements = 4915200 	 Size = 1280 	 Time = 0.12485184 s 	 Performance = 33.5943 GFLOPS
