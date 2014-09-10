@@ -34,7 +34,7 @@ extern "C" bool compare(
     for(uint i = 0; i < length; i++)
         norm += pow(abs(ref_dgemm[i] - dgemm[i]), 2);
     norm = ::sqrt(norm);
-    printf("Compare. Norm = %.17g\n", norm);
+    printf("Norm = %.17g\n", norm);
 
     return norm < epsilon ? true : false;
 }
@@ -76,7 +76,7 @@ extern "C" bool compareDGEMMWithMPFR(
     for (uint i = 0; i < m * n; i++)
         norm += pow(abs(dgemm[i] - dgemm_mpfr[i]), 2);
     norm = ::sqrt(norm);
-    printf("Compare to MPFR. Norm = %.17g\n", norm);
+    printf("Compared to MPFR. Norm = %.17g\n", norm);
 
     free(dgemm_mpfr);
     mpfr_free_cache();

@@ -20,21 +20,21 @@ cl_platform_id    cpPlatform;                   //OpenCL platform
 cl_device_id      cdDevice;                     //OpenCL device list    
 cl_context        cxGPUContext;                 //OpenCL context
 cl_command_queue  cqCommandQueue;               //OpenCL command que
-Matrix            d_A, d_B, d_C;                //OpenCL memory buffer objects
+cl_mem            d_A, d_B, d_C;                //OpenCL memory buffer objects
 double            *A, *B, *C;
 
-static uint __nbRowsC    = 0;
-static uint __nbColumnsC = 0;
-static uint __nbRowsB    = 0;
-static uint __range      = 0;
-static uint __nbfpe      = 0;
-static uint __alg        = 0;
-static uint __multi      = 1;
+static uint __m     = 0;
+static uint __n     = 0;
+static uint __k     = 0;
+static uint __range = 0;
+static uint __nbfpe = 0;
+static uint __alg   = 0;
+static uint __multi = 1;
 
 static void __usage(int argc __attribute__((unused)), char **argv) {
     fprintf(stderr, "Usage:\n  %s [-m nbrows of C,\n", argv[0]);
     printf("              -n nbcolumns of C,\n");
-    printf("              -k nbcolumns of B,\n");
+    printf("              -k nbrows of B,\n");
     printf("              -r range,\n");
     printf("              -e nbfpe,\n");
     printf("              -a alg (0-mine, 1-amd, 2-nvidia, 30-pr-sa, 31-pr-fpe, 32-pr-fpe-ex-4, 33-pr-fpe-ex-8, 34-pr-fpe-multi, 40-lo-sa, 41-lo-fpe, 50-gl-sa, 51-gl-fpe, 52-gl-fpe-ex-4, 53-gl-fpe-ex-8, 54-gl-fpe-multi, 6-volkov),\n");
@@ -47,11 +47,11 @@ static void __parse_args(int argc, char **argv) {
 
     for (i = 1; i < argc; i++) {
         if ((strcmp(argv[i], "-m") == 0)) {
-            __nbRowsC = atoi(argv[++i]);
+            __m = atoi(argv[++i]);
         } if ((strcmp(argv[i], "-n") == 0)) {
-           __nbColumnsC = atoi(argv[++i]);
+           __n = atoi(argv[++i]);
         } if ((strcmp(argv[i], "-k") == 0)) {
-            __nbRowsB = atoi(argv[++i]);
+            __k = atoi(argv[++i]);
         } if ((strcmp(argv[i], "-r") == 0)) {
             __range = atoi(argv[++i]);
         } if ((strcmp(argv[i], "-e") == 0)) {
@@ -70,7 +70,7 @@ static void __parse_args(int argc, char **argv) {
         }
     }
 
-    if ((__nbRowsC <= 0) || (__nbColumnsC <= 0) || (__nbRowsB <= 0)) {
+    if ((__m <= 0) || (__n <= 0) || (__k <= 0)) {
         __usage(argc, argv);
         exit(-1);
     }
@@ -98,7 +98,7 @@ int cleanUp (
 int main(int argc, char **argv)
 {
     __parse_args(argc, argv);
-    printf("Starting with a matrices of %ix%ix%i double elements\n\n", __nbRowsC, __nbRowsB, __nbColumnsC); 
+    printf("Starting with a matrices of %ix%ix%i double\n\n", __m, __k, __n); 
 
     if (__alg == 0)
         runDGEMM("../src/DGEMM.cl");
@@ -140,17 +140,21 @@ int runDGEMM(const char* program_file){
     int nbElements = 0;
 
     printf("Initializing data...\n");
-        PassFailFlag  = posix_memalign((void **)&A, 64, __nbRowsC * __nbRowsB * sizeof(double));
-        PassFailFlag |= posix_memalign((void **)&B, 64, __nbRowsB * __nbColumnsC * sizeof(double));
-        PassFailFlag |= posix_memalign((void **)&C, 64, __nbRowsC * __nbColumnsC * sizeof(double));
+        /*PassFailFlag  = posix_memalign((void **)&A, 64, __m * __k * sizeof(double));
+        PassFailFlag |= posix_memalign((void **)&B, 64, __k * __n * sizeof(double));
+        PassFailFlag |= posix_memalign((void **)&C, 64, __m * __n * sizeof(double));
         if (PassFailFlag != 0) {
             printf("ERROR: could not allocate memory with posix_memalign!\n");
             exit(1);
-        }
+        }*/
+	A = (double *) malloc(__m * __k * sizeof(double));
+	B = (double *) malloc(__k * __n * sizeof(double));
+	C = (double *) malloc(__m * __n * sizeof(double));
         // init data
-        int emax = E_BITS - log2(__nbRowsC * __nbRowsB + __nbRowsB * __nbColumnsC + __nbRowsC * __nbColumnsC);// use log in order to stay within [emin, emax]
-        init_fpuniform(A, __nbRowsC * __nbRowsB, __range, emax);
-        init_fpuniform(B, __nbRowsB * __nbColumnsC, __range, emax);
+        nbElements = __m * __k + __k * __n + __m * __n;
+        int emax = E_BITS - log2(nbElements);// use log in order to stay within [emin, emax]
+        init_fpuniform(A, __m * __k, __range, emax);
+        init_fpuniform(B, __k * __n, __range, emax);
 
     printf("Initializing OpenCL...\n");
         char platform_name[64];
@@ -188,29 +192,20 @@ int runDGEMM(const char* program_file){
         }
 
     printf("Allocating OpenCL memory...\n\n");
-        Matrix d_A;
-        d_A.width = d_A.stride = __nbRowsB;
-        d_A.height = __nbRowsC;
-        size_t size = d_A.width * d_A.height * sizeof(double);
-        d_A.elements = clCreateBuffer(cxGPUContext, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, size, A, &ciErrNum);
+        size_t size = __m * __k * sizeof(double);
+        d_A = clCreateBuffer(cxGPUContext, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, size, A, &ciErrNum);
         if (ciErrNum != CL_SUCCESS) {
             printf("Error in clCreateBuffer for d_A, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
             cleanUp(EXIT_FAILURE);
         }
-        Matrix d_B;
-        d_B.width = d_B.stride = __nbColumnsC;
-        d_B.height = __nbRowsB;
-        size = d_B.width * d_B.height * sizeof(double);
-        d_B.elements = clCreateBuffer(cxGPUContext, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, size, B, &ciErrNum);
+        size = __k * __n * sizeof(double);
+        d_B = clCreateBuffer(cxGPUContext, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, size, B, &ciErrNum);
         if (ciErrNum != CL_SUCCESS) {
             printf("Error in clCreateBuffer for d_B, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
             cleanUp(EXIT_FAILURE);
         }
-        Matrix d_C;
-        d_C.width = d_C.stride = __nbColumnsC;
-        d_C.height = __nbRowsC;
-        size = d_C.width * d_C.height * sizeof(double);
-        d_C.elements = clCreateBuffer(cxGPUContext, CL_MEM_WRITE_ONLY, size, NULL, &ciErrNum);
+        size = __m * __n * sizeof(double);
+        d_C = clCreateBuffer(cxGPUContext, CL_MEM_WRITE_ONLY, size, NULL, &ciErrNum);
         if (ciErrNum != CL_SUCCESS) {
             printf("Error in clCreateBuffer for d_C, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
             cleanUp(EXIT_FAILURE);
@@ -226,28 +221,27 @@ int runDGEMM(const char* program_file){
             else if (((__alg >= 30) && (__alg <= 34)) || (__alg == 40) || (__alg == 41))
                 ciErrNum = initDGEMMNVIDIAPrivate(cxGPUContext, cqCommandQueue, cdDevice, program_file, __nbfpe);
             else if ((__alg >= 50) && (__alg <= 54))
-                ciErrNum = initDGEMMNVIDIAGlobal(cxGPUContext, cqCommandQueue, cdDevice, program_file, __nbfpe, __nbColumnsC, __nbRowsC, __multi);
+                ciErrNum = initDGEMMNVIDIAGlobal(cxGPUContext, cqCommandQueue, cdDevice, program_file, __nbfpe, __m, __n, __multi);
             else if (__alg == 6)
-                ciErrNum = initDGEMMNew(cxGPUContext, cqCommandQueue, cdDevice, program_file);
+                ciErrNum = initDGEMMVolkov(cxGPUContext, cqCommandQueue, cdDevice, program_file);
 
             if (ciErrNum != CL_SUCCESS)
                 cleanUp(EXIT_FAILURE);
 
-        nbElements = __nbRowsC * __nbRowsB + __nbRowsB * __nbColumnsC + __nbRowsC * __nbColumnsC;
-        printf("Running OpenCL DGEMM with %u elements...\n\n", nbElements);
+        printf("Running OpenCL DGEMM with %u...\n\n", nbElements);
             //Just a single launch or a warmup iteration
             if (__alg == 0)
-                DGEMM(NULL, d_C, d_A, d_B, &ciErrNum);
+                DGEMM(NULL, d_C, d_A, d_B, __m, __n, __k, &ciErrNum);
             else if (__alg == 1)
-                DGEMMAMD(NULL, d_C, d_A, d_B, &ciErrNum);
+                DGEMMAMD(NULL, d_C, d_A, d_B, __m, &ciErrNum);
             else if (__alg == 2)
-                DGEMMNVIDIA(NULL, d_C, d_A, d_B, &ciErrNum);
+                DGEMMNVIDIA(NULL, d_C, d_A, d_B, __m, __n, &ciErrNum);
             else if (((__alg >= 30) && (__alg <= 34)) || (__alg == 40) || (__alg == 41))
-                DGEMMNVIDIAPrivate(NULL, d_C, d_A, d_B, &ciErrNum, __multi);
+                DGEMMNVIDIAPrivate(NULL, d_C, d_A, d_B, __m, __n, __multi, &ciErrNum);
             else if ((__alg >= 50) && (__alg <= 54))
-                DGEMMNVIDIAGlobal(NULL, d_C, d_A, d_B, &ciErrNum, __multi);
+                DGEMMNVIDIAGlobal(NULL, d_C, d_A, d_B, __m, __n, __multi, &ciErrNum);
             else if (__alg == 6)
-                DGEMMNew(NULL, d_C, d_A, d_B, &ciErrNum);
+                DGEMMVolkov(NULL, d_C, d_A, d_B, __m, __n, __k, &ciErrNum);
 
             if (ciErrNum != CL_SUCCESS)
                 cleanUp(EXIT_FAILURE);
@@ -259,25 +253,23 @@ int runDGEMM(const char* program_file){
         for(uint iter = 0; iter < NUM_ITER; iter++) {
             ciErrNum = clEnqueueMarker(cqCommandQueue, &startMark);
             ciErrNum |= clFinish(cqCommandQueue);
-            //if (ciErrNum == CL_INVALID_COMMAND_QUEUE)
-            //    printf("CL_INVALID_COMMAND_QUEUE\n");
             if (ciErrNum != CL_SUCCESS) {
                 printf("Error in clEnqueueMarker, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
                 cleanUp(EXIT_FAILURE);
             }
 
             if (__alg == 0)
-                DGEMM(NULL, d_C, d_A, d_B, &ciErrNum);
+                DGEMM(NULL, d_C, d_A, d_B, __m, __n, __k, &ciErrNum);
             else if (__alg == 1)
-                DGEMMAMD(NULL, d_C, d_A, d_B, &ciErrNum);
+                DGEMMAMD(NULL, d_C, d_A, d_B, __m, &ciErrNum);
             else if (__alg == 2)
-                DGEMMNVIDIA(NULL, d_C, d_A, d_B, &ciErrNum);
+                DGEMMNVIDIA(NULL, d_C, d_A, d_B, __m, __n, &ciErrNum);
             else if (((__alg >= 30) && (__alg <= 34)) || (__alg == 40) || (__alg == 41))
-                DGEMMNVIDIAPrivate(NULL, d_C, d_A, d_B, &ciErrNum, __multi);
+                DGEMMNVIDIAPrivate(NULL, d_C, d_A, d_B, __m, __n, __multi, &ciErrNum);
             else if ((__alg >= 50) && (__alg <= 54))
-                DGEMMNVIDIAGlobal(NULL, d_C, d_A, d_B, &ciErrNum, __multi);
+                DGEMMNVIDIAGlobal(NULL, d_C, d_A, d_B, __m, __n, __multi, &ciErrNum);
             else if (__alg == 6)
-                DGEMMNew(NULL, d_C, d_A, d_B, &ciErrNum);
+                DGEMMVolkov(NULL, d_C, d_A, d_B, __m, __n, __k, &ciErrNum);
 
             ciErrNum  = clEnqueueMarker(cqCommandQueue, &endMark);
             ciErrNum |= clFinish(cqCommandQueue);
@@ -301,29 +293,29 @@ int runDGEMM(const char* program_file){
         double perf = nbElements * sizeof(double);
         double throughput = (perf / minTime) * 1e-9;
         if ((__alg <= 2) || (__alg == 6)) {
-            perf = 2.0 * d_A.width;
-            perf *= d_B.width * d_A.height;
+            perf = 2.0 * __m;
+            perf *= __n * __k;
         } else if (__alg % 10 == 0) {
-            perf = 2.0 * d_A.width;
-            perf *= d_B.width * d_A.height;
+            perf = 2.0 * __m;
+            perf *= __n * __k;
         } else if ((__alg == 31) || (__alg == 41) || (__alg == 51)) {
-            perf = (2 + 12 * __nbfpe) * d_A.width;
-            perf *= d_B.width * d_A.height;
+            perf = (2 + 12 * __nbfpe) * __m;
+            perf *= __n * __k;
         } else if ((__alg == 32) || (__alg == 52)) {
-            perf = 50 * d_A.width;
-            perf *= d_B.width * d_A.height;
+            perf = 50 * __m;
+            perf *= __n * __k;
         } else if ((__alg == 33) || (__alg == 53)) {
-            perf = 98 * d_A.width;
-            perf *= d_B.width * d_A.height;
+            perf = 98 * __m;
+            perf *= __n * __k;
         }
         perf = (perf / minTime) * 1e-9;
-        printf("Alg = %u \t NbFPE = %u \t Range = %u \t NbElements = %u \t Size = %u \t Time = %.8f s \t Throughput = %.4f GB/s\n\n", __alg, __nbfpe, __range, nbElements, d_C.width, minTime, throughput);
-        printf("Alg = %u \t NbFPE = %u \t Range = %u \t NbElements = %u \t Size = %u \t Time = %.8f s \t Performance = %.4f GFLOPS\n\n", __alg, __nbfpe, __range, nbElements, d_C.width, minTime, perf);
+        printf("Alg = %u \t NbFPE = %u \t Range = %u \t NbElements = %u \t Time = %.8f s \t Throughput = %.4f GB/s\n\n", __alg, __nbfpe, __range, nbElements, minTime, throughput);
+        printf("Alg = %u \t NbFPE = %u \t Range = %u \t NbElements = %u \t Time = %.8f s \t Performance = %.4f GFLOPS\n\n", __alg, __nbfpe, __range, nbElements, minTime, perf);
 #endif
 
         printf("Validating DGEMM OpenCL results...\n");
             printf(" ...reading back OpenCL results\n");
-                ciErrNum = clEnqueueReadBuffer(cqCommandQueue, d_C.elements, CL_TRUE, 0, d_C.width * d_C.height * sizeof(double), C, 0, NULL, NULL);
+                ciErrNum = clEnqueueReadBuffer(cqCommandQueue, d_C, CL_TRUE, 0, __m * __n * sizeof(double), C, 0, NULL, NULL);
                 if (ciErrNum != CL_SUCCESS) {
                     printf("Error in clEnqueueReadBuffer Line %u in file %s !!!\n\n", __LINE__, __FILE__);
                     cleanUp(EXIT_FAILURE);
@@ -331,16 +323,16 @@ int runDGEMM(const char* program_file){
 
             printf(" ...DGEMM on CPU\n");
                 double *C_CPU;
-                C_CPU = (double *) calloc(__nbRowsC * __nbColumnsC, sizeof(double));
-                DGEMMCPU(C_CPU, (const double *)A, (const double *)B, __nbRowsC, __nbColumnsC, __nbRowsB);
-                /*printMatrix(C, d_C.width, d_C.height);
+                C_CPU = (double *) calloc(__m * __n, sizeof(double));
+                DGEMMCPU(C_CPU, (const double *)A, (const double *)B, __m, __n, __k);
+                /*printMatrix(C, __m, __n);
                 printf("\n");
-                printMatrix(C_CPU, d_C.width, d_C.height);*/
+                printMatrix(C_CPU, __m, __n);*/
 
             printf(" ...comparing the results\n");
                 printf("//--------------------------------------------------------\n");
-                PassFailFlag = compare((const double *) C_CPU, (const double *) C, __nbRowsC * __nbColumnsC, 1e-16);
-                //PassFailFlag = compareDGEMMWithMPFR((const double *)C, (const double *)A, (const double *)B, __nbRowsC, __nbColumnsC, __nbRowsB, 1e-16);
+                PassFailFlag = compare((const double *) C_CPU, (const double *) C, __m * __n, 1e-16);
+                //PassFailFlag = compareDGEMMWithMPFR((const double *)C, (const double *)A, (const double *)B, __m, __n, __k, 1e-16);
                 printf("//--------------------------------------------------------\n");
                 free(C_CPU);
 
@@ -357,7 +349,7 @@ int runDGEMM(const char* program_file){
             else if ((__alg >= 50) && (__alg <= 54))
                 closeDGEMMNVIDIAGlobal();
             if (__alg == 6)
-                closeDGEMMNew();
+                closeDGEMMVolkov();
 
     // pass or fail
     if (PassFailFlag)
@@ -370,12 +362,12 @@ int runDGEMM(const char* program_file){
 
 int cleanUp (int exitCode) {
     //Release other OpenCL Objects
-    if(d_A.elements) 
-        clReleaseMemObject(d_A.elements);
-    if(d_B.elements) 
-        clReleaseMemObject(d_B.elements);
-    if(d_C.elements) 
-        clReleaseMemObject(d_C.elements);
+    if(d_A) 
+        clReleaseMemObject(d_A);
+    if(d_B) 
+        clReleaseMemObject(d_B);
+    if(d_C) 
+        clReleaseMemObject(d_C);
     if(cqCommandQueue) 
         clReleaseCommandQueue(cqCommandQueue);
     if(cxGPUContext) 
