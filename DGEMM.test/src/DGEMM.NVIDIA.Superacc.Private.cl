@@ -279,8 +279,9 @@ __kernel void matrixMul(
                   #pragma unroll
                 #endif
                 for (int k = 0; k < BLOCK_SIZE; ++k) {
-                    double r = 0.0; //residual of multiplication
+                    double r; //residual of multiplication
                     double x = TwoProductFMA(AS(ty, k), BS(k, tx), &r);
+
                     Accumulate(p_workingBase, x);
                     if(r != 0.0)
                         Accumulate(p_workingBase, r);

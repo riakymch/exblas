@@ -115,7 +115,7 @@ int main(int argc, char **argv)
     else if (__alg == 33)
         runDGEMM("../src/DGEMM.NVIDIA.FPE.EX8.Private.cl");
     else if (__alg == 34)
-        runDGEMM("../src/DGEMM.NVIDIA.FPE.Private.Multi.cl");
+        runDGEMM("../src/DGEMM.NVIDIA.FPE.Multi.Private.cl");
     else if (__alg == 40)
         runDGEMM("../src/DGEMM.NVIDIA.Superacc.Local.cl");
     else if (__alg == 41)
@@ -129,7 +129,7 @@ int main(int argc, char **argv)
     else if (__alg == 53)
         runDGEMM("../src/DGEMM.NVIDIA.FPE.EX8.Global.cl");
     else if (__alg == 54)
-        runDGEMM("../src/DGEMM.NVIDIA.FPE.Global.Multi.cl");
+        runDGEMM("../src/DGEMM.NVIDIA.FPE.Multi.Global.cl");
     else if (__alg == 6)
         runDGEMM("../src/DGEMM.Volkov.cl");
 }
@@ -147,9 +147,9 @@ int runDGEMM(const char* program_file){
             printf("ERROR: could not allocate memory with posix_memalign!\n");
             exit(1);
         }*/
-	A = (double *) malloc(__m * __k * sizeof(double));
-	B = (double *) malloc(__k * __n * sizeof(double));
-	C = (double *) malloc(__m * __n * sizeof(double));
+        A = (double *) malloc(__m * __k * sizeof(double));
+        B = (double *) malloc(__k * __n * sizeof(double));
+        C = (double *) malloc(__m * __n * sizeof(double));
         // init data
         nbElements = __m * __k + __k * __n + __m * __n;
         int emax = E_BITS - log2(nbElements);// use log in order to stay within [emin, emax]

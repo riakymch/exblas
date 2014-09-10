@@ -262,82 +262,92 @@ __kernel void matrixMul(
     //Step size used to iterate through the sub-matrices of B
     int bStep  = BLOCK_SIZE * n;
 
-    //A superaccumulator that corresponds to a single value in the matrix C
-    long p_workingBase[BIN_COUNT] = {0};
+    int bdimx = n / BLOCK_SIZE;
+    int bdimy = m / BLOCK_SIZE;
+    int bsizex = get_num_groups(0);
+    int bsizey = get_num_groups(1);
 
-    //for floating-point expansion
-    double sum[4] = {0.0};
+    for (int i = bx; i < bdimx; i += bsizex) {
+        for (int j = by; j < bdimy; j += bsizey) {
+            //A superaccumulator that corresponds to a single value in the matrix C
+            long p_workingBase[BIN_COUNT] = {0};
 
-    //Loop over all the sub-matrices of A and B
-    //required to compute the block sub-matrix
-    for (int a = aBegin, b = bBegin;
-             a <= aEnd;
-             a += aStep, b += bStep) {
-        //Load the matrices from device memory to shared memory;
-        //each thread loads one element of each matrix
-        AS(ty, tx) = A[a + m * ty + tx];
-        BS(ty, tx) = B[b + n * ty + tx];
+            //for floating-point expansion
+            double sum[4] = {0.0};
 
-        //Synchronize to make sure the matrices are loaded
-        barrier(CLK_LOCAL_MEM_FENCE);
+            //Loop over all the sub-matrices of A and B
+            //required to compute the block sub-matrix
+            for (int a = aBegin, b = bBegin;
+                     a <= aEnd;
+                     a += aStep, b += bStep) {
+                //Load the matrices from device memory to shared memory;
+                //each thread loads one element of each matrix
+                AS(ty, tx) = A[a + m * ty + tx];
+                BS(ty, tx) = B[b + n * ty + tx];
 
-        //Multiply the two matrices together;
-        //each thread computes one element of the block sub-matrix
-        #ifdef NVIDIA
-          #pragma unroll
-        #endif
-        for (int k = 0; k < BLOCK_SIZE; ++k) {
-            double r = 0.0; //residual of multiplication
-            double x = TwoProductFMA(AS(ty, k), BS(k, tx), &r);
+                //Synchronize to make sure the matrices are loaded
+                barrier(CLK_LOCAL_MEM_FENCE);
 
-            double s; //residual of addition
-            sum[0] = KnuthTwoSum(sum[0], x, &s);
-            x = s;
-            if(x != 0.0) {
-                sum[1] = KnuthTwoSum(sum[1], x, &s);
-                x = s;
-                if(x != 0.0) {
-                    sum[2] = KnuthTwoSum(sum[2], x, &s);
+                //Multiply the two matrices together;
+                //each thread computes one element of the block sub-matrix
+                #ifdef NVIDIA
+                  #pragma unroll
+                #endif
+                for (int k = 0; k < BLOCK_SIZE; ++k) {
+                    double r; //residual of multiplication
+                    double x = TwoProductFMA(AS(ty, k), BS(k, tx), &r);
+
+                    double s; //residual of addition
+                    sum[0] = KnuthTwoSum(sum[0], x, &s);
                     x = s;
                     if(x != 0.0) {
-                        sum[3] = KnuthTwoSum(sum[3], x, &s);
+                        sum[1] = KnuthTwoSum(sum[1], x, &s);
                         x = s;
+                        if(x != 0.0) {
+                            sum[2] = KnuthTwoSum(sum[2], x, &s);
+                            x = s;
+                            if(x != 0.0) {
+                                sum[3] = KnuthTwoSum(sum[3], x, &s);
+                                x = s;
+                            }
+                        }
                     }
-                }
-            }
-            if(x != 0.0)
-                Accumulate(p_workingBase, x);
+                    if(x != 0.0)
+                        Accumulate(p_workingBase, x);
 
-            sum[0] = KnuthTwoSum(sum[0], r, &s);
-            r = s;
-            if(r != 0.0) {
-                sum[1] = KnuthTwoSum(sum[1], r, &s);
-                r = s;
-                if(r != 0.0) {
-                    sum[2] = KnuthTwoSum(sum[2], r, &s);
+                    sum[0] = KnuthTwoSum(sum[0], r, &s);
                     r = s;
                     if(r != 0.0) {
-                        sum[3] = KnuthTwoSum(sum[3], r, &s);
+                        sum[1] = KnuthTwoSum(sum[1], r, &s);
                         r = s;
+                            if(r != 0.0) {
+                                sum[2] = KnuthTwoSum(sum[2], r, &s);
+                                r = s;
+                                if(r != 0.0) {
+                                    sum[3] = KnuthTwoSum(sum[3], r, &s);
+                                    r = s;
+                                }
+                            }
                     }
+                    if(r != 0.0)
+                        Accumulate(p_workingBase, r);
                 }
+
+                //Synchronize to make sure that the preceding computation is done before 
+                //loading two new sub-matrices of A and B in the next iteration
+                barrier(CLK_LOCAL_MEM_FENCE);
             }
-            if(r != 0.0)
-                Accumulate(p_workingBase, r);
+
+            //Flush to the accumulator
+            Accumulate(p_workingBase, sum[0]);
+            Accumulate(p_workingBase, sum[1]);
+            Accumulate(p_workingBase, sum[2]);
+            Accumulate(p_workingBase, sum[3]);
+
+            //TODO: the first non-zero from rigth
+            int c = (n * by + bx) * BLOCK_SIZE;
+            C[c + n * ty + tx] = Round(p_workingBase);
         }
-
-        //Synchronize to make sure that the preceding computation is done before 
-        //loading two new sub-matrices of A and B in the next iteration
-        barrier(CLK_LOCAL_MEM_FENCE);
     }
-    //Flush to the accumulator
-    Accumulate(p_workingBase, sum[0]);
-    Accumulate(p_workingBase, sum[1]);
-    Accumulate(p_workingBase, sum[2]);
-    Accumulate(p_workingBase, sum[3]);
-
-    //TODO: the first non-zero from rigth
-    int c = (m * by + bx) * BLOCK_SIZE;
-    C[c + n * ty + tx] = Round(p_workingBase);
 }
 
