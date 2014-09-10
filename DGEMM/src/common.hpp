@@ -123,7 +123,7 @@ extern "C" cl_int initDGEMM(
     const char* program_file
 );
 
-extern "C" cl_int initDGEMMNew(
+extern "C" cl_int initDGEMMVolkov(
     cl_context cxGPUContext,
     cl_command_queue cqParamCommandQue,
     cl_device_id cdDevice,
@@ -167,7 +167,7 @@ extern "C" void closeDGEMM(
     void
 );
 
-extern "C" void closeDGEMMNew(
+extern "C" void closeDGEMMVolkov(
     void
 );
 
@@ -189,52 +189,65 @@ extern "C" void closeDGEMMNVIDIAPrivate(
 
 extern "C" size_t DGEMM(
     cl_command_queue cqCommandQueue,
-    Matrix d_mC,
-    const Matrix d_mA,
-    const Matrix d_mB,
-    cl_int *ciErrNum
-);
-
-extern "C" size_t DGEMMNew(
-    cl_command_queue cqCommandQueue,
-    Matrix d_mC,
-    const Matrix d_mA,
-    const Matrix d_mB,
+    cl_mem d_C,
+    const cl_mem d_A,
+    const cl_mem d_B,
+    const uint m,
+    const uint n,
+    const uint k,
     cl_int *ciErrNum
 );
 
 extern "C" size_t DGEMMAMD(
     cl_command_queue cqCommandQueue,
-    Matrix d_mC,
-    const Matrix d_mA,
-    const Matrix d_mB,
+    cl_mem d_C,
+    const cl_mem d_A,
+    const cl_mem d_B,
+    const uint m,
     cl_int *ciErrNum
 );
 
 extern "C" size_t DGEMMNVIDIA(
     cl_command_queue cqCommandQueue,
-    Matrix d_mC,
-    const Matrix d_mA,
-    const Matrix d_mB,
+    cl_mem d_C,
+    const cl_mem d_A,
+    const cl_mem d_B,
+    const uint m,
+    const uint n,
     cl_int *ciErrNum
 );
 
 extern "C" size_t DGEMMNVIDIAGlobal(
     cl_command_queue cqCommandQueue,
-    Matrix d_mC,
-    const Matrix d_mA,
-    const Matrix d_mB,
-    cl_int *ciErrNum,
-    const int multi
+    cl_mem d_C,
+    const cl_mem d_A,
+    const cl_mem d_B,
+    const uint m,
+    const uint n,
+    const int multi,
+    cl_int *ciErrNum
 );
 
 extern "C" size_t DGEMMNVIDIAPrivate(
     cl_command_queue cqCommandQueue,
-    Matrix d_mC,
-    const Matrix d_mA,
-    const Matrix d_mB,
-    cl_int *ciErrNum,
-    const int multi
+    cl_mem d_C,
+    const cl_mem d_A,
+    const cl_mem d_B,
+    const uint m,
+    const uint n,
+    const int multi,
+    cl_int *ciErrNum
+);
+
+extern "C" size_t DGEMMVolkov(
+    cl_command_queue cqCommandQueue,
+    cl_mem d_C,
+    const cl_mem d_A,
+    const cl_mem d_B,
+    const uint m,
+    const uint n,
+    const uint k,
+    cl_int *ciErrNum
 );
 
 

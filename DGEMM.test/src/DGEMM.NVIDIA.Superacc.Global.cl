@@ -34,8 +34,7 @@ typedef double data_t;
 ////////////////////////////////////////////////////////////////////////////////
 double TwoProductFMA(double a, double b, double *d) {
     double p = a * b;
-    //*d = fma(a, b, -p);
-    *d = a * b;
+    *d = fma(a, b, -p);
     return p;
 }
 

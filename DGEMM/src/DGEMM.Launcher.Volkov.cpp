@@ -43,7 +43,7 @@ static char  compileOptions[256] = "-DBM=64 -DBK=16 -DBN=16 -DNVIDIA -cl-mad-ena
 #endif
 
 
-extern "C" cl_int initDGEMMNew(
+extern "C" cl_int initDGEMMVolkov(
    cl_context cxGPUContext,
     cl_command_queue cqParamCommandQue,
     cl_device_id cdDevice,
@@ -103,7 +103,7 @@ extern "C" cl_int initDGEMMNew(
     return EXIT_SUCCESS;
 }
 
-extern "C" void closeDGEMMNew(void){
+extern "C" void closeDGEMMVolkov(void){
     cl_int ciErrNum;
 
     ciErrNum = clReleaseKernel(ckMatrixMul);
@@ -116,21 +116,14 @@ extern "C" void closeDGEMMNew(void){
 ////////////////////////////////////////////////////////////////////////////////
 // OpenCL launchers for Superaccumulator / mergeSuperaccumulators kernels
 ////////////////////////////////////////////////////////////////////////////////
-//Round a / b to nearest higher integer value
-inline uint iDivUp(uint a, uint b){
-    return (a % b != 0) ? (a / b + 1) : (a / b);
-}
-
-//Snap a to nearest lower multiple of b
-inline uint iSnapDown(uint a, uint b){
-    return a - a % b;
-}
-
-extern "C" size_t DGEMMNew(
+extern "C" size_t DGEMMVolkov(
     cl_command_queue cqCommandQueue,
-    Matrix d_C,
-    const Matrix d_A,
-    const Matrix d_B,
+    cl_mem d_C,
+    const cl_mem d_A,
+    const cl_mem d_B,
+    const uint m,
+    const uint n,
+    const uint k,
     cl_int *ciErrNumRes
 ){
     cl_int ciErrNum;
@@ -140,17 +133,17 @@ extern "C" size_t DGEMMNew(
 
     {
         size_t NbThreadsPerWorkGroup[] = {(size_t) (16), (size_t) (4)};
-        size_t TotalNbThreads[] = {(size_t) (d_C.width / 4), (size_t) (d_C.height / 4)};
+        size_t TotalNbThreads[] = {(size_t) (n / 4), (size_t) (m / 4)};
         //size_t NbThreadsPerWorkGroup[] = {(size_t) (BLOCK_SIZE), (size_t) (BLOCK_SIZE)};
         //size_t TotalNbThreads[] = {(size_t) (d_C.height / 64), (size_t) (d_C.height / 16)};
 
         cl_int i = 0;
-        ciErrNum  = clSetKernelArg(ckMatrixMul, i++, sizeof(cl_mem),  (void *)&d_C.elements);
-        ciErrNum |= clSetKernelArg(ckMatrixMul, i++, sizeof(cl_mem),  (void *)&d_A.elements);
-        ciErrNum |= clSetKernelArg(ckMatrixMul, i++, sizeof(cl_mem),  (void *)&d_B.elements);
-        ciErrNum |= clSetKernelArg(ckMatrixMul, i++, sizeof(cl_int),  (void *)&d_C.height);
-        ciErrNum |= clSetKernelArg(ckMatrixMul, i++, sizeof(cl_int),  (void *)&d_C.width);
-        ciErrNum |= clSetKernelArg(ckMatrixMul, i++, sizeof(cl_int),  (void *)&d_A.width);
+        ciErrNum  = clSetKernelArg(ckMatrixMul, i++, sizeof(cl_mem),  (void *)&d_C);
+        ciErrNum |= clSetKernelArg(ckMatrixMul, i++, sizeof(cl_mem),  (void *)&d_A);
+        ciErrNum |= clSetKernelArg(ckMatrixMul, i++, sizeof(cl_mem),  (void *)&d_B);
+        ciErrNum |= clSetKernelArg(ckMatrixMul, i++, sizeof(cl_int),  (void *)&m);
+        ciErrNum |= clSetKernelArg(ckMatrixMul, i++, sizeof(cl_int),  (void *)&n);
+        ciErrNum |= clSetKernelArg(ckMatrixMul, i++, sizeof(cl_int),  (void *)&k);
         if (ciErrNum != CL_SUCCESS) {
             printf("Error in clSetKernelArg, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
             *ciErrNumRes = EXIT_FAILURE;
