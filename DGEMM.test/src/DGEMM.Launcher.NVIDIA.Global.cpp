@@ -43,8 +43,8 @@ extern "C" cl_int initDGEMMNVIDIAGlobal(
     cl_device_id cdDevice,
     const char* program_file,
     const uint NbFPE,
-    const uint width,
-    const uint height,
+    const uint m,
+    const uint n,
     const int multi
 ){
     cl_int ciErrNum;
@@ -94,7 +94,7 @@ extern "C" cl_int initDGEMMNVIDIAGlobal(
         }
 
     printf("...allocating memory for a matrix of superaccumulators\n");
-        size_t size = (width * height) / multi;
+        size_t size = (m * n) / multi;
         size = size * BIN_COUNT;
         // init superaccs on the host side
         /*Accus = (bintype*) malloc(size * sizeof(bintype));
@@ -136,11 +136,13 @@ extern "C" void closeDGEMMNVIDIAGlobal(void){
 ////////////////////////////////////////////////////////////////////////////////
 extern "C" size_t DGEMMNVIDIAGlobal(
     cl_command_queue cqCommandQueue,
-    Matrix d_C,
-    const Matrix d_A,
-    const Matrix d_B,
-    cl_int *ciErrNumRes,
-    const int multi
+    cl_mem d_C,
+    const cl_mem d_A,
+    const cl_mem d_B,
+    const uint m,
+    const uint n,
+    const int multi,
+    cl_int *ciErrNumRes
 ){
     cl_int ciErrNum;
 
@@ -149,18 +151,16 @@ extern "C" size_t DGEMMNVIDIAGlobal(
 
     {
         size_t NbThreadsPerWorkGroup[] = {BLOCK_SIZE, BLOCK_SIZE};
-        size_t heightC = d_C.height;
-        size_t widthC = d_C.width;
-        size_t TotalNbThreads[] = {widthC, heightC / multi};
+        size_t TotalNbThreads[] = {n, m / multi};
         size_t neededLocalMemory = BLOCK_SIZE * BLOCK_SIZE * sizeof(cl_double);
 
         cl_int i = 0;
         ciErrNum  = clSetKernelArg(ckMatrixMul, i++, sizeof(cl_mem),  (void *)&d_Accus);
-        ciErrNum |= clSetKernelArg(ckMatrixMul, i++, sizeof(cl_mem),  (void *)&d_C.elements);
-        ciErrNum |= clSetKernelArg(ckMatrixMul, i++, sizeof(cl_mem),  (void *)&d_A.elements);
-        ciErrNum |= clSetKernelArg(ckMatrixMul, i++, sizeof(cl_mem),  (void *)&d_B.elements);
-        ciErrNum |= clSetKernelArg(ckMatrixMul, i++, sizeof(cl_int),  (void *)&d_C.height);
-        ciErrNum |= clSetKernelArg(ckMatrixMul, i++, sizeof(cl_int),  (void *)&d_C.width);
+        ciErrNum |= clSetKernelArg(ckMatrixMul, i++, sizeof(cl_mem),  (void *)&d_C);
+        ciErrNum |= clSetKernelArg(ckMatrixMul, i++, sizeof(cl_mem),  (void *)&d_A);
+        ciErrNum |= clSetKernelArg(ckMatrixMul, i++, sizeof(cl_mem),  (void *)&d_B);
+        ciErrNum |= clSetKernelArg(ckMatrixMul, i++, sizeof(cl_int),  (void *)&m);
+        ciErrNum |= clSetKernelArg(ckMatrixMul, i++, sizeof(cl_int),  (void *)&n);
         ciErrNum |= clSetKernelArg(ckMatrixMul, i++, neededLocalMemory,  NULL);
         ciErrNum |= clSetKernelArg(ckMatrixMul, i++, neededLocalMemory,  NULL);
         if (ciErrNum != CL_SUCCESS) {
