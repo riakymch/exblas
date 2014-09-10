@@ -228,13 +228,13 @@ __kernel void matrixMul(
     __local data_t* As,
     __local data_t* Bs
 ) {
-    //Block index
-    int bx = get_group_id(0);
-    int by = get_group_id(1);
-
     //Thread index
     int tx = get_local_id(0);
     int ty = get_local_id(1);
+
+    //Block index
+    int bx = get_group_id(0);
+    int by = get_group_id(1);
 
     //Index of the first sub-matrix of A processed by the block
     int aBegin = m * BLOCK_SIZE * by;
@@ -251,40 +251,49 @@ __kernel void matrixMul(
     //Step size used to iterate through the sub-matrices of B
     int bStep  = BLOCK_SIZE * n;
 
-    //A superaccumulator that corresponds to a single value in the matrix C
-    long p_workingBase[BIN_COUNT] = {0};
+    int bdimx = n / BLOCK_SIZE;
+    int bdimy = m / BLOCK_SIZE;
+    int bsizex = get_num_groups(0);
+    int bsizey = get_num_groups(1);
 
-    //Loop over all the sub-matrices of A and B required to compute the block sub-matrix
-    for (int a = aBegin, b = bBegin;
-             a <= aEnd;
-             a += aStep, b += bStep) {
-        //Load the matrices from device memory to shared memory;
-        //each thread loads one element of each matrix
-        AS(ty, tx) = A[a + m * ty + tx];
-        BS(ty, tx) = B[b + n * ty + tx];
+    for (int i = bx; i < bdimx; i += bsizex) {
+        for (int j = by; j < bdimy; j += bsizey) {
+            //A superaccumulator that corresponds to a single value in the matrix C
+            long p_workingBase[BIN_COUNT] = {0};
 
-        //Synchronize to make sure the matrices are loaded
-        barrier(CLK_LOCAL_MEM_FENCE);
+            //Loop over all the sub-matrices of A and B required to compute the block sub-matrix
+            for (int a = aBegin, b = bBegin;
+                     a <= aEnd;
+                     a += aStep, b += bStep) {
+                //Load the matrices from device memory to shared memory;
+                //each thread loads one element of each matrix
+                AS(ty, tx) = A[a + m * ty + tx];
+                BS(ty, tx) = B[b + n * ty + tx];
 
-        //Multiply the two matrices together;
-        //each thread computes one element of the block sub-matrix
-        #ifdef NVIDIA
-          #pragma unroll
-        #endif
-        for (int k = 0; k < BLOCK_SIZE; ++k) {
-            double r = 0.0; //residual of multiplication
-            double x = TwoProductFMA(AS(ty, k), BS(k, tx), &r);
-            Accumulate(p_workingBase, x);
-            if(r != 0.0)
-                Accumulate(p_workingBase, r);
+                //Synchronize to make sure the matrices are loaded
+                barrier(CLK_LOCAL_MEM_FENCE);
+
+                //Multiply the two matrices together;
+                //each thread computes one element of the block sub-matrix
+                #ifdef NVIDIA
+                  #pragma unroll
+                #endif
+                for (int k = 0; k < BLOCK_SIZE; ++k) {
+                    double r = 0.0; //residual of multiplication
+                    double x = TwoProductFMA(AS(ty, k), BS(k, tx), &r);
+                    Accumulate(p_workingBase, x);
+                    if(r != 0.0)
+                        Accumulate(p_workingBase, r);
+                }
+
+                //Synchronize to make sure that the preceding computation is done before 
+                //loading two new sub-matrices of A and B in the next iteration
+                barrier(CLK_LOCAL_MEM_FENCE);
+            }
+
+            int c = (n * by + bx) * BLOCK_SIZE;
+            C[c + n * ty + tx] = Round(p_workingBase);
         }
-
-        //Synchronize to make sure that the preceding computation is done before 
-        //loading two new sub-matrices of A and B in the next iteration
-        barrier(CLK_LOCAL_MEM_FENCE);
     }
-
-    int c = (m * by + bx) * BLOCK_SIZE;
-    C[c + n * ty + tx] = Round(p_workingBase);
 }
 
