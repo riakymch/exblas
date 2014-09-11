@@ -296,16 +296,16 @@ int runDGEMM(const char* program_file){
             perf = 2.0 * __m;
             perf *= __n * __k;
         } else if (__alg % 10 == 0) {
-            perf = 2.0 * __m;
+            perf = (2.0 + 8.0) * __m;
             perf *= __n * __k;
         } else if ((__alg == 31) || (__alg == 34) || (__alg == 41) || (__alg == 51) || (__alg == 54)) {
-            perf = (2 + 12 * __nbfpe) * __m;
+            perf = (2.0 + 12.0 * __nbfpe) * __m;
             perf *= __n * __k;
         } else if ((__alg == 32) || (__alg == 52)) {
-            perf = 50 * __m;
+            perf = 50.0 * __m;
             perf *= __n * __k;
         } else if ((__alg == 33) || (__alg == 53)) {
-            perf = 98 * __m;
+            perf = 98.0 * __m;
             perf *= __n * __k;
         }
         perf = (perf / minTime) * 1e-9;
