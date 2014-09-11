@@ -309,8 +309,8 @@ int runDGEMM(const char* program_file){
             perf *= __n * __k;
         }
         perf = (perf / minTime) * 1e-9;
-        printf("Alg = %u \t NbFPE = %u \t Range = %u \t NbElements = %u \t Time = %.8f s \t Throughput = %.4f GB/s\n\n", __alg, __nbfpe, __range, nbElements, minTime, throughput);
-        printf("Alg = %u \t NbFPE = %u \t Range = %u \t NbElements = %u \t Time = %.8f s \t Performance = %.4f GFLOPS\n\n", __alg, __nbfpe, __range, nbElements, minTime, perf);
+        printf("Alg = %u \t NbFPE = %u \t Range = %u \t Size = %u \t Time = %.8f s \t Throughput = %.4f GB/s\n\n", __alg, __nbfpe, __range, __n, minTime, throughput);
+        printf("Alg = %u \t NbFPE = %u \t Range = %u \t Size = %u \t Time = %.8f s \t Performance = %.4f GFLOPS\n\n", __alg, __nbfpe, __range, __n, minTime, perf);
 #endif
 
         printf("Validating DGEMM OpenCL results...\n");
