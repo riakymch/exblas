@@ -218,7 +218,7 @@ void Accumulate(long *sa, double x) {
   for (i = iup; xscaled != 0; --i) {
     double xrounded = rint(xscaled);
     long xint = (long) xrounded;
- 
+
     AccumulateWord(sa, i, xint);
 
     xscaled -= xrounded;

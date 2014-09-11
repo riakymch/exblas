@@ -116,7 +116,7 @@ int Normalize(long *accumulator, int *imin, int *imax) {
 }
 
 double Round(long *accumulator) {
-  int imin = 0;
+  int imin = 0; 
   int imax = 38;
   int negative = Normalize(accumulator, &imin, &imax);
 
@@ -176,7 +176,7 @@ void AccumulateWord(long *sa, int i, long x) {
   uchar overflow;
   long oldword = xadd(&sa[i], x, &overflow);
 
-  // To propagate over- or underflow 
+  // To propagate over- or underflow
   while (overflow) {
     // Carry or borrow
     // oldword has sign S
@@ -275,8 +275,7 @@ __kernel void matrixMul(
             //for floating-point expansion
             double sum[NBFPE] = {0.0};
 
-            //Loop over all the sub-matrices of A and B
-            //required to compute the block sub-matrix
+            //Loop over all the sub-matrices of A and B required to compute the block sub-matrix
             for (int a = aBegin, b = bBegin;
                      a <= aEnd;
                      a += aStep, b += bStep) {
@@ -298,11 +297,11 @@ __kernel void matrixMul(
                     double x = TwoProductFMA(AS(ty, k), BS(k, tx), &r);
 
                     #ifdef NVIDIA
-                        #pragma unroll
+                         #pragma unroll
                     #endif
                     for(uint l = 0; l != NBFPE; ++l) {
                         double s; //residual of addition
-                        sum[l] = KnuthTwoSum(sum[l], x, &s);
+                        sum[l] = KnuthTwoSum(sum[l], x, &s); //Issues on Tesla
                         x = s;
                     }
                     if(x != 0.0)
@@ -324,12 +323,14 @@ __kernel void matrixMul(
                 //loading two new sub-matrices of A and B in the next iteration
                 barrier(CLK_LOCAL_MEM_FENCE);
             }
+
             //Flush to the accumulator
             #ifdef NVIDIA
                 #pragma unroll
             #endif
             for(uint l = 0; l != NBFPE; ++l)
                 Accumulate(p_workingBase, sum[l]);
+            barrier(CLK_LOCAL_MEM_FENCE);
 
             //TODO: the first non-zero from rigth
             int c = (n * by + bx) * BLOCK_SIZE;

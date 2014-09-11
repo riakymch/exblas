@@ -298,7 +298,7 @@ int runDGEMM(const char* program_file){
         } else if (__alg % 10 == 0) {
             perf = 2.0 * __m;
             perf *= __n * __k;
-        } else if ((__alg == 31) || (__alg == 41) || (__alg == 51)) {
+        } else if ((__alg == 31) || (__alg == 34) || (__alg == 41) || (__alg == 51) || (__alg == 54)) {
             perf = (2 + 12 * __nbfpe) * __m;
             perf *= __n * __k;
         } else if ((__alg == 32) || (__alg == 52)) {

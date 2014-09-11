@@ -239,13 +239,13 @@ __kernel void matrixMul(
     __local data_t* As,
     __local data_t* Bs
 ) {
-    //Block index
-    int bx = get_group_id(0);
-    int by = get_group_id(1);
-
     //Thread index
     int tx = get_local_id(0);
     int ty = get_local_id(1);
+
+    //Block index
+    int bx = get_group_id(0);
+    int by = get_group_id(1);
 
     //Index of the first sub-matrix of A processed by the block
     int aBegin = m * BLOCK_SIZE * by;
@@ -379,6 +379,7 @@ __kernel void matrixMul(
             Accumulate(p_workingBase, sum[5]);
             Accumulate(p_workingBase, sum[6]);
             Accumulate(p_workingBase, sum[7]);
+            barrier(CLK_LOCAL_MEM_FENCE);
 
             //TODO: the first non-zero from rigth
             int c = (n * by + bx) * BLOCK_SIZE;
