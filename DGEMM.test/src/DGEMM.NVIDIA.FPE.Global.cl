@@ -239,13 +239,13 @@ __kernel void matrixMul(
     __local double* As,
     __local double* Bs
 ) {
-    //Block index
-    int bx = get_group_id(0);
-    int by = get_group_id(1);
-
     //Thread index
     int tx = get_local_id(0);
     int ty = get_local_id(1);
+
+    //Block index
+    int bx = get_group_id(0);
+    int by = get_group_id(1);
 
     //Index of the first sub-matrix of A processed by the block
     int aBegin = m * BLOCK_SIZE * by;
@@ -262,72 +262,80 @@ __kernel void matrixMul(
     //Step size used to iterate through the sub-matrices of B
     int bStep  = BLOCK_SIZE * n;
 
-    //A superaccumulator that corresponds to a single value in the matrix C
-    int c = (m * by + bx) * BLOCK_SIZE;
-    __global long *g_workingBase = Accus + (c + n * ty + tx) * BIN_COUNT;
-    for (uint i = 0; i < BIN_COUNT; i++)
-        g_workingBase[i] = 0;
+    int bdimx = n / BLOCK_SIZE;
+    int bdimy = m / BLOCK_SIZE;
+    int bsizex = get_num_groups(0);
+    int bsizey = get_num_groups(1);
 
-    //for floating-point expansion
-    double sum[NBFPE] = {0.0};
+    for (int i = bx; i < bdimx; i += bsizex) {
+        for (int j = by; j < bdimy; j += bsizey) {
+            //A superaccumulator that corresponds to a single value in the matrix C
+            int c = (m * by + bx) * BLOCK_SIZE;
+            __global long *g_workingBase = Accus + (c + n * ty + tx) * BIN_COUNT;
+            for (uint l = 0; l < BIN_COUNT; l++)
+                g_workingBase[l] = 0;
 
-    //Loop over all the sub-matrices of A and B
-    //required to compute the block sub-matrix
-    for (int a = aBegin, b = bBegin;
-             a <= aEnd;
-             a += aStep, b += bStep) {
-        //Load the matrices from device memory to shared memory;
-        //each thread loads one element of each matrix
-        AS(ty, tx) = A[a + m * ty + tx];
-        BS(ty, tx) = B[b + n * ty + tx];
+            //for floating-point expansion
+            double sum[NBFPE] = {0.0};
 
-        //Synchronize to make sure the matrices are loaded
-        barrier(CLK_LOCAL_MEM_FENCE);
+            //Loop over all the sub-matrices of A and B
+            //required to compute the block sub-matrix
+            for (int a = aBegin, b = bBegin;
+                     a <= aEnd;
+                     a += aStep, b += bStep) {
+                //Load the matrices from device memory to shared memory;
+                //each thread loads one element of each matrix
+                AS(ty, tx) = A[a + m * ty + tx];
+                BS(ty, tx) = B[b + n * ty + tx];
 
-        //Multiply the two matrices together;
-        //each thread computes one element of the block sub-matrix
-        #ifdef NVIDIA
-          #pragma unroll
-        #endif
-        for (int k = 0; k < BLOCK_SIZE; ++k) {
-            double r = 0.0; //residual of multiplication
-            double x = TwoProductFMA(AS(ty, k), BS(k, tx), &r);
+                //Synchronize to make sure the matrices are loaded
+                barrier(CLK_LOCAL_MEM_FENCE);
 
+                //Multiply the two matrices together;
+                //each thread computes one element of the block sub-matrix
+                #ifdef NVIDIA
+                  #pragma unroll
+                #endif
+                for (int k = 0; k < BLOCK_SIZE; ++k) {
+                    double r = 0.0; //residual of multiplication
+                    double x = TwoProductFMA(AS(ty, k), BS(k, tx), &r);
+
+                    #ifdef NVIDIA
+                        #pragma unroll
+                    #endif
+                    for(uint l = 0; l != NBFPE; ++l) {
+                        double s = 0.0; //residual of addition
+                        sum[l] = KnuthTwoSum(sum[l], x, &s);//Issues on Tesla
+                        x = s;
+                    }
+                    if(x != 0.0)
+                        Accumulate(g_workingBase, x);
+
+                    #ifdef NVIDIA
+                        #pragma unroll
+                    #endif
+                    for(uint l = 0; l != NBFPE; ++l) {
+                        double s = 0.0; //residual of addition
+                        sum[l] = KnuthTwoSum(sum[l], r, &s);//Issues on Tesla
+                        r = s;
+                    }
+                    if(r != 0.0)
+                        Accumulate(g_workingBase, r);
+                }
+
+                //Synchronize to make sure that the preceding computation is done before 
+                //loading two new sub-matrices of A and B in the next iteration
+                barrier(CLK_LOCAL_MEM_FENCE);
+            }
+            //Flush to the accumulator
             #ifdef NVIDIA
                 #pragma unroll
             #endif
-            for(uint i = 0; i != NBFPE; ++i) {
-                double s = 0.0; //residual of addition
-                sum[i] = KnuthTwoSum(sum[i], x, &s);//Issues on Tesla
-                x = s;
-            }
-            if(x != 0.0)
-                Accumulate(g_workingBase, x);
+            for(uint l = 0; l != NBFPE; ++l)
+                Accumulate(g_workingBase, sum[l]);
 
-            #ifdef NVIDIA
-                #pragma unroll
-            #endif
-            for(uint i = 0; i != NBFPE; ++i) {
-                double s = 0.0; //residual of addition
-                sum[i] = KnuthTwoSum(sum[i], r, &s);//Issues on Tesla
-                r = s;
-            }
-            if(r != 0.0)
-                Accumulate(g_workingBase, r);
+            C[c + n * ty + tx] = Round(g_workingBase);
         }
-
-        //Synchronize to make sure that the preceding computation is done before 
-        //loading two new sub-matrices of A and B in the next iteration
-        barrier(CLK_LOCAL_MEM_FENCE);
     }
-    //Flush to the accumulator
-#ifdef NVIDIA
-    #pragma unroll
-#endif
-    for(uint i = 0; i != NBFPE; ++i)
-        Accumulate(g_workingBase, sum[i]);
-
-    C[c + n * ty + tx] = Round(g_workingBase);
-    //C[c + n * ty + tx] = sum[0];
 }
 

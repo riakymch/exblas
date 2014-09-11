@@ -379,7 +379,7 @@ __kernel void matrixMul(
             Accumulate(p_workingBase, sum[5]);
             Accumulate(p_workingBase, sum[6]);
             Accumulate(p_workingBase, sum[7]);
-            barrier(CLK_LOCAL_MEM_FENCE);
+            //barrier(CLK_LOCAL_MEM_FENCE);
 
             //TODO: the first non-zero from rigth
             int c = (n * by + bx) * BLOCK_SIZE;
