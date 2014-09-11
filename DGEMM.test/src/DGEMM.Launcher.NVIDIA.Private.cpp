@@ -35,8 +35,8 @@ static char  compileOptions[256] = "-DBLOCK_SIZE=32 -DUSE_KNUTH -DNVIDIA -cl-mad
 #endif
 
 extern "C" cl_int initDGEMMNVIDIAPrivate(
-    cl_context cxGPUContext, 
-    cl_command_queue cqParamCommandQue, 
+    cl_context cxGPUContext,
+    cl_command_queue cqParamCommandQue,
     cl_device_id cdDevice,
     const char* program_file,
     const uint NbFPE
@@ -69,7 +69,7 @@ extern "C" cl_int initDGEMMNVIDIAPrivate(
     printf("...building program\n");
         sprintf(compileOptions, "%s -DNBFPE=%d", compileOptions, NbFPE);
         ciErrNum = clBuildProgram(cpProgram, 0, NULL, compileOptions, NULL, NULL);
-        //if (ciErrNum != CL_SUCCESS) {
+        if (ciErrNum != CL_SUCCESS) {
             //printf("Error in clBuildProgram, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
 
             // Determine the reason for the error
@@ -77,8 +77,8 @@ extern "C" cl_int initDGEMMNVIDIAPrivate(
             clGetProgramBuildInfo(cpProgram, cdDevice, CL_PROGRAM_BUILD_LOG, sizeof(buildLog), &buildLog, NULL);
             printf("%s\n", buildLog);
 
-        //    return EXIT_FAILURE;
-        //}
+            //return EXIT_FAILURE;
+        }
 
     printf("...creating DGEMM kernel:\n");
         ckMatrixMul = clCreateKernel(cpProgram, DGEMM_KERNEL, &ciErrNum);
@@ -126,7 +126,8 @@ extern "C" size_t DGEMMNVIDIAPrivate(
 
     {
         size_t NbThreadsPerWorkGroup[] = {(size_t) BLOCK_SIZE, (size_t) BLOCK_SIZE};
-        size_t TotalNbThreads[] = {(size_t) (1024 / multi), (size_t) (1024 / multi)};
+        //size_t TotalNbThreads[] = {(size_t) (n), (size_t) (m / multi)};
+        size_t TotalNbThreads[] = {(size_t) (1024), (size_t) (1024 / multi)};
         size_t neededLocalMemory = BLOCK_SIZE * BLOCK_SIZE * sizeof(cl_double);
 
         cl_int i = 0;
@@ -153,3 +154,4 @@ extern "C" size_t DGEMMNVIDIAPrivate(
 
     return EXIT_SUCCESS;
 }
+

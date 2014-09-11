@@ -27,7 +27,6 @@ static char* cSources = NULL;                 // Buffer to hold source for compi
 static cl_program       cpProgram;            //OpenCL Superaccumulator program
 static cl_kernel        ckMatrixMul;
 static cl_command_queue cqDefaultCommandQue;  //Default command queue for Superaccumulator
-static bintype          *Accus;
 static cl_mem           d_Accus;
 
 #ifdef AMD
@@ -115,7 +114,6 @@ extern "C" cl_int initDGEMMNVIDIAGlobal(
 extern "C" void closeDGEMMNVIDIAGlobal(void){
     cl_int ciErrNum;
 
-    free(Accus);
     if(d_Accus)
         clReleaseMemObject(d_Accus);
 
@@ -145,8 +143,8 @@ extern "C" size_t DGEMMNVIDIAGlobal(
         cqCommandQueue = cqDefaultCommandQue;
 
     {
-        size_t NbThreadsPerWorkGroup[] = {BLOCK_SIZE, BLOCK_SIZE};
-        size_t TotalNbThreads[] = {n, m / multi};
+        size_t NbThreadsPerWorkGroup[] = {(size_t) BLOCK_SIZE, (size_t) BLOCK_SIZE};
+        size_t TotalNbThreads[] = {(size_t) (n), (size_t) (m / multi)};
         size_t neededLocalMemory = BLOCK_SIZE * BLOCK_SIZE * sizeof(cl_double);
 
         cl_int i = 0;
