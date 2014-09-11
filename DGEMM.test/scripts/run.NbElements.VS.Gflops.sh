@@ -8,37 +8,53 @@ then
   exit 1
 fi
 
-nMax=2048
 step=256
-exe=./../src/main.out
-file=../results/NbElements.VS.Gflops.K20c.2014.06.29.Round.dat
+step=256
+nMax=2048
+exe=./../src/main.out.nvidia
+file=../results/NbElements.VS.Gflops.K20c.2014.09.11.Round.dat
 
 touch $file
 echo -n "" > $file
 
-#DGEMM with various FPEs
-for alg in 51 31 34 54
+for alg in 0 2 
 do
-    for ((range=2; range<=8; range+=1))
-    do
-        for ((n=256; n<=${nMax}; n+=${step}))
-        do
-            $exe -m $n -n $n -k $n -r 1 -e $range -a $alg | tee -a $file
-        done
-    done
-done
-
-#DGEMM: 0-mine; 1-amd; 2-nvidia; with superaccs in private memory
-for alg in 50 52 53 30 
-do
-    for ((n=256; n<=${nMax}; n+=${step}))
+    for ((n=${start}; n<=${nMax}; n+=${step}))
     do
         $exe -m $n -n $n -k $n -r 1 -e 0 -a $alg | tee -a $file
     done
 done
 
-#DDOT using superaccumulator with FPE of format 8 and the early-exit
-#for ((nbElements=1024; nbElements<=${nbMax}; nbElements*=${step}))
-#do
-#    $exe -n $nbElements -r 1 -e 8 -a 3 | tee -a $file
-#done
+#DGEMM with various FPEs
+for alg in 51 31
+do
+    for ((range=3; range<=8; range+=1))
+    do
+        for ((n=${start}; n<=${nMax}; n+=${step}))
+        do
+            $exe -m $n -n $n -k $n -r 1 -e $range -a $alg | tee -a $file
+        done
+    done
+done
+for alg in 54 34
+do
+    for ((range=3; range<=8; range+=i))
+    do
+     	for ((ml=2; ml<=8; range+=1))
+	do
+	    for ((n=${start}; n<=${nMax}; n+=${step}))
+            do
+                $exe -m $n -n $n -k $n -r 1 -e $range -a $alg -ml $ml | tee -a $file
+            done
+	done
+    done
+done
+
+for alg in 50 52 53 30 32 33
+do
+    for ((n=${start}; n<=${nMax}; n+=${step}))
+    do
+        $exe -m $n -n $n -k $n -r 1 -e 0 -a $alg | tee -a $file
+    done
+done
+
