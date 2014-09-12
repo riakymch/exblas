@@ -36,19 +36,19 @@ do
         done
     done
 done
-for alg in 54 34
-do
-    for ((range=3; range<=8; range+=i))
-    do
-     	for ((ml=2; ml<=8; range+=1))
-	do
-	    for ((n=${begin}; n<=${nMax}; n+=${step}))
-            do
-                $exe -m $n -n $n -k $n -r 1 -e $range -a $alg -ml $ml | tee -a $file
-            done
-	done
-    done
-done
+#for alg in 54 34
+#do
+#    for ((range=3; range<=8; range+=i))
+#    do
+#     	for ((ml=2; ml<=8; range+=1))
+#	do
+#	    for ((n=${begin}; n<=${nMax}; n+=${step}))
+#            do
+#                $exe -m $n -n $n -k $n -r 1 -e $range -a $alg -ml $ml | tee -a $file
+#            done
+#	done
+#    done
+#done
 
 for alg in 50 52 53 30 32 33
 do
