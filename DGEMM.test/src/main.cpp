@@ -113,8 +113,10 @@ int main(int argc, char **argv)
     else if (__alg == 32)
         runDGEMM("../src/DGEMM.NVIDIA.FPE.EX4.Private.cl");
     else if (__alg == 33)
-        runDGEMM("../src/DGEMM.NVIDIA.FPE.EX8.Private.cl");
+        runDGEMM("../src/DGEMM.NVIDIA.FPE.EX6.Private.cl");
     else if (__alg == 34)
+        runDGEMM("../src/DGEMM.NVIDIA.FPE.EX8.Private.cl");
+    else if (__alg == 35)
         runDGEMM("../src/DGEMM.NVIDIA.FPE.Multi.Private.cl");
     else if (__alg == 40)
         runDGEMM("../src/DGEMM.NVIDIA.Superacc.Local.cl");

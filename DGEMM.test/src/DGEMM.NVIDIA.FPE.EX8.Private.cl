@@ -272,7 +272,7 @@ __kernel void matrixMul(
             long p_workingBase[BIN_COUNT] = {0};
 
             //for floating-point expansion
-            double sum[5] = {0.0};
+            double sum[8] = {0.0};
 
             //Loop over all the sub-matrices of A and B required to compute the block sub-matrix
             for (int a = aBegin, b = bBegin;
@@ -307,7 +307,7 @@ __kernel void matrixMul(
                                 if(x != 0.0) {
                                     sum[4] = KnuthTwoSum(sum[4], x, &s);
                                     x = s;
-                                    /*if(x != 0.0) {
+                                    if(x != 0.0) {
                                         sum[5] = KnuthTwoSum(sum[5], x, &s);
                                         x = s;
                                         if(x != 0.0) {
@@ -318,7 +318,7 @@ __kernel void matrixMul(
                                                 x = s;
                                             }
                                         }
-                                    }*/
+                                    }
                                 }
                             }
                         }
@@ -340,7 +340,7 @@ __kernel void matrixMul(
                                 if(r != 0.0) {
                                     sum[4] = KnuthTwoSum(sum[4], r, &s);
                                     r = s;
-                                    /*if(r != 0.0) {
+                                    if(r != 0.0) {
                                         sum[5] = KnuthTwoSum(sum[5], r, &s);
                                         r = s;
                                         if(r != 0.0) {
@@ -351,7 +351,7 @@ __kernel void matrixMul(
                                                 r = s;
                                             }
                                         }
-                                    }*/
+                                    }
                                 }
                             }
                         }
@@ -371,9 +371,9 @@ __kernel void matrixMul(
             Accumulate(p_workingBase, sum[2]);
             Accumulate(p_workingBase, sum[3]);
             Accumulate(p_workingBase, sum[4]);
-            /*Accumulate(p_workingBase, sum[5]);
+            Accumulate(p_workingBase, sum[5]);
             Accumulate(p_workingBase, sum[6]);
-            Accumulate(p_workingBase, sum[7]);*/
+            Accumulate(p_workingBase, sum[7]);
 
             //TODO: the first non-zero from rigth
             int c = (n * by + bx) * BLOCK_SIZE;
