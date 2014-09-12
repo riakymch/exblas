@@ -1,0 +1,4403 @@
+Starting with a matrices of 1024x1024x1024 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 6.0.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : Tesla K20c
+### Device[1] : Tesla C2070
+### Device[2] : Tesla C2070
+### Using Device : Tesla K20c
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.cl)...
+clCreateProgramWithSource...
+...building Superaccumulator program
+...creating DGEMM kernel:
+Running OpenCL DGEMM with 3145728...
+
+Alg = 0 	 NbFPE = 0 	 Range = 1 	 Size = 1024 	 Time = 0.00820950 s 	 Throughput = 3.0654 GB/s
+
+Alg = 0 	 NbFPE = 0 	 Range = 1 	 Size = 1024 	 Time = 0.00820950 s 	 Performance = 261.5851 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 1280x1280x1280 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 6.0.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : Tesla K20c
+### Device[1] : Tesla C2070
+### Device[2] : Tesla C2070
+### Using Device : Tesla K20c
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.cl)...
+clCreateProgramWithSource...
+...building Superaccumulator program
+...creating DGEMM kernel:
+Running OpenCL DGEMM with 4915200...
+
+Alg = 0 	 NbFPE = 0 	 Range = 1 	 Size = 1280 	 Time = 0.01016736 s 	 Throughput = 3.8674 GB/s
+
+Alg = 0 	 NbFPE = 0 	 Range = 1 	 Size = 1280 	 Time = 0.01016736 s 	 Performance = 412.5264 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 2227133.0390897174
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	FAILED
+Starting with a matrices of 1536x1536x1536 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 6.0.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : Tesla K20c
+### Device[1] : Tesla C2070
+### Device[2] : Tesla C2070
+### Using Device : Tesla K20c
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.cl)...
+clCreateProgramWithSource...
+...building Superaccumulator program
+...creating DGEMM kernel:
+Running OpenCL DGEMM with 7077888...
+
+Alg = 0 	 NbFPE = 0 	 Range = 1 	 Size = 1536 	 Time = 0.01228630 s 	 Throughput = 4.6086 GB/s
+
+Alg = 0 	 NbFPE = 0 	 Range = 1 	 Size = 1536 	 Time = 0.01228630 s 	 Performance = 589.9054 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 3982717.9855727921
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	FAILED
+Starting with a matrices of 1792x1792x1792 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 6.0.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : Tesla K20c
+### Device[1] : Tesla C2070
+### Device[2] : Tesla C2070
+### Using Device : Tesla K20c
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.cl)...
+clCreateProgramWithSource...
+...building Superaccumulator program
+...creating DGEMM kernel:
+Running OpenCL DGEMM with 9633792...
+
+Alg = 0 	 NbFPE = 0 	 Range = 1 	 Size = 1792 	 Time = 0.01434368 s 	 Throughput = 5.3731 GB/s
+
+Alg = 0 	 NbFPE = 0 	 Range = 1 	 Size = 1792 	 Time = 0.01434368 s 	 Performance = 802.3862 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 5968968.454182934
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	FAILED
+Starting with a matrices of 2048x2048x2048 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 6.0.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : Tesla K20c
+### Device[1] : Tesla C2070
+### Device[2] : Tesla C2070
+### Using Device : Tesla K20c
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.cl)...
+clCreateProgramWithSource...
+...building Superaccumulator program
+...creating DGEMM kernel:
+Running OpenCL DGEMM with 12582912...
+
+Alg = 0 	 NbFPE = 0 	 Range = 1 	 Size = 2048 	 Time = 0.01636874 s 	 Throughput = 6.1497 GB/s
+
+Alg = 0 	 NbFPE = 0 	 Range = 1 	 Size = 2048 	 Time = 0.01636874 s 	 Performance = 1049.5538 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 8227328.1241337396
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	FAILED
+Starting with a matrices of 256x256x256 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 6.0.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : Tesla K20c
+### Device[1] : Tesla C2070
+### Device[2] : Tesla C2070
+### Using Device : Tesla K20c
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+Running OpenCL DGEMM with 196608...
+
+Alg = 2 	 NbFPE = 0 	 Range = 1 	 Size = 256 	 Time = 0.00021853 s 	 Throughput = 7.1975 GB/s
+
+Alg = 2 	 NbFPE = 0 	 Range = 1 	 Size = 256 	 Time = 0.00021853 s 	 Performance = 153.5475 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 512x512x512 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 6.0.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : Tesla K20c
+### Device[1] : Tesla C2070
+### Device[2] : Tesla C2070
+### Using Device : Tesla K20c
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+Running OpenCL DGEMM with 786432...
+
+Alg = 2 	 NbFPE = 0 	 Range = 1 	 Size = 512 	 Time = 0.00139325 s 	 Throughput = 4.5157 GB/s
+
+Alg = 2 	 NbFPE = 0 	 Range = 1 	 Size = 512 	 Time = 0.00139325 s 	 Performance = 192.6688 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 768x768x768 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 6.0.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : Tesla K20c
+### Device[1] : Tesla C2070
+### Device[2] : Tesla C2070
+### Using Device : Tesla K20c
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+Running OpenCL DGEMM with 1769472...
+
+Alg = 2 	 NbFPE = 0 	 Range = 1 	 Size = 768 	 Time = 0.00459187 s 	 Throughput = 3.0828 GB/s
+
+Alg = 2 	 NbFPE = 0 	 Range = 1 	 Size = 768 	 Time = 0.00459187 s 	 Performance = 197.2985 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 1024x1024x1024 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 6.0.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : Tesla K20c
+### Device[1] : Tesla C2070
+### Device[2] : Tesla C2070
+### Using Device : Tesla K20c
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+Running OpenCL DGEMM with 3145728...
+
+Alg = 2 	 NbFPE = 0 	 Range = 1 	 Size = 1024 	 Time = 0.01067597 s 	 Throughput = 2.3572 GB/s
+
+Alg = 2 	 NbFPE = 0 	 Range = 1 	 Size = 1024 	 Time = 0.01067597 s 	 Performance = 201.1512 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 1280x1280x1280 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 6.0.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : Tesla K20c
+### Device[1] : Tesla C2070
+### Device[2] : Tesla C2070
+### Using Device : Tesla K20c
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+Running OpenCL DGEMM with 4915200...
+
+Alg = 2 	 NbFPE = 0 	 Range = 1 	 Size = 1280 	 Time = 0.02085779 s 	 Throughput = 1.8852 GB/s
+
+Alg = 2 	 NbFPE = 0 	 Range = 1 	 Size = 1280 	 Time = 0.02085779 s 	 Performance = 201.0905 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 1536x1536x1536 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 6.0.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : Tesla K20c
+### Device[1] : Tesla C2070
+### Device[2] : Tesla C2070
+### Using Device : Tesla K20c
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+Running OpenCL DGEMM with 7077888...
+
+Alg = 2 	 NbFPE = 0 	 Range = 1 	 Size = 1536 	 Time = 0.03592723 s 	 Throughput = 1.5760 GB/s
+
+Alg = 2 	 NbFPE = 0 	 Range = 1 	 Size = 1536 	 Time = 0.03592723 s 	 Performance = 201.7344 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 1792x1792x1792 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 6.0.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : Tesla K20c
+### Device[1] : Tesla C2070
+### Device[2] : Tesla C2070
+### Using Device : Tesla K20c
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+Running OpenCL DGEMM with 9633792...
+
+Alg = 2 	 NbFPE = 0 	 Range = 1 	 Size = 1792 	 Time = 0.05704186 s 	 Throughput = 1.3511 GB/s
+
+Alg = 2 	 NbFPE = 0 	 Range = 1 	 Size = 1792 	 Time = 0.05704186 s 	 Performance = 201.7671 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 2048x2048x2048 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 6.0.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : Tesla K20c
+### Device[1] : Tesla C2070
+### Device[2] : Tesla C2070
+### Using Device : Tesla K20c
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+Running OpenCL DGEMM with 12582912...
+
+Alg = 2 	 NbFPE = 0 	 Range = 1 	 Size = 2048 	 Time = 0.08584618 s 	 Throughput = 1.1726 GB/s
+
+Alg = 2 	 NbFPE = 0 	 Range = 1 	 Size = 2048 	 Time = 0.08584618 s 	 Performance = 200.1239 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 256x256x256 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 6.0.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : Tesla K20c
+### Device[1] : Tesla C2070
+### Device[2] : Tesla C2070
+### Using Device : Tesla K20c
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Global.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+...allocating memory for a matrix of superaccumulators
+Running OpenCL DGEMM with 196608...
+
+Alg = 51 	 NbFPE = 3 	 Range = 1 	 Size = 256 	 Time = 0.11633104 s 	 Throughput = 0.0135 GB/s
+
+Alg = 51 	 NbFPE = 3 	 Range = 1 	 Size = 256 	 Time = 0.11633104 s 	 Performance = 5.4803 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 512x512x512 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 6.0.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : Tesla K20c
+### Device[1] : Tesla C2070
+### Device[2] : Tesla C2070
+### Using Device : Tesla K20c
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Global.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+...allocating memory for a matrix of superaccumulators
+Running OpenCL DGEMM with 786432...
+
+Alg = 51 	 NbFPE = 3 	 Range = 1 	 Size = 512 	 Time = 0.94243226 s 	 Throughput = 0.0067 GB/s
+
+Alg = 51 	 NbFPE = 3 	 Range = 1 	 Size = 512 	 Time = 0.94243226 s 	 Performance = 5.4118 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 768x768x768 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 6.0.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : Tesla K20c
+### Device[1] : Tesla C2070
+### Device[2] : Tesla C2070
+### Using Device : Tesla K20c
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Global.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+...allocating memory for a matrix of superaccumulators
+Running OpenCL DGEMM with 1769472...
+
+Alg = 51 	 NbFPE = 3 	 Range = 1 	 Size = 768 	 Time = 3.19476118 s 	 Throughput = 0.0044 GB/s
+
+Alg = 51 	 NbFPE = 3 	 Range = 1 	 Size = 768 	 Time = 3.19476118 s 	 Performance = 5.3880 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 1024x1024x1024 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 6.0.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : Tesla K20c
+### Device[1] : Tesla C2070
+### Device[2] : Tesla C2070
+### Using Device : Tesla K20c
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Global.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+...allocating memory for a matrix of superaccumulators
+Running OpenCL DGEMM with 3145728...
+
+Alg = 51 	 NbFPE = 3 	 Range = 1 	 Size = 1024 	 Time = 7.79072858 s 	 Throughput = 0.0032 GB/s
+
+Alg = 51 	 NbFPE = 3 	 Range = 1 	 Size = 1024 	 Time = 7.79072858 s 	 Performance = 5.2373 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 1280x1280x1280 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 6.0.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : Tesla K20c
+### Device[1] : Tesla C2070
+### Device[2] : Tesla C2070
+### Using Device : Tesla K20c
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Global.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+...allocating memory for a matrix of superaccumulators
+Running OpenCL DGEMM with 4915200...
+
+Alg = 51 	 NbFPE = 3 	 Range = 1 	 Size = 1280 	 Time = 15.07621357 s 	 Throughput = 0.0026 GB/s
+
+Alg = 51 	 NbFPE = 3 	 Range = 1 	 Size = 1280 	 Time = 15.07621357 s 	 Performance = 5.2859 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 2227133.0390897174
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	FAILED
+Starting with a matrices of 1536x1536x1536 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 6.0.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : Tesla K20c
+### Device[1] : Tesla C2070
+### Device[2] : Tesla C2070
+### Using Device : Tesla K20c
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Global.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+...allocating memory for a matrix of superaccumulators
+Running OpenCL DGEMM with 7077888...
+
+Alg = 51 	 NbFPE = 3 	 Range = 1 	 Size = 1536 	 Time = 25.96717712 s 	 Throughput = 0.0022 GB/s
+
+Alg = 51 	 NbFPE = 3 	 Range = 1 	 Size = 1536 	 Time = 25.96717712 s 	 Performance = 5.3031 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 3982717.9855727921
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	FAILED
+Starting with a matrices of 1792x1792x1792 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 6.0.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : Tesla K20c
+### Device[1] : Tesla C2070
+### Device[2] : Tesla C2070
+### Using Device : Tesla K20c
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Global.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+...allocating memory for a matrix of superaccumulators
+Running OpenCL DGEMM with 9633792...
+
+Alg = 51 	 NbFPE = 3 	 Range = 1 	 Size = 1792 	 Time = 41.33225187 s 	 Throughput = 0.0019 GB/s
+
+Alg = 51 	 NbFPE = 3 	 Range = 1 	 Size = 1792 	 Time = 41.33225187 s 	 Performance = 5.2906 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 5968968.454182934
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	FAILED
+Starting with a matrices of 2048x2048x2048 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 6.0.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : Tesla K20c
+### Device[1] : Tesla C2070
+### Device[2] : Tesla C2070
+### Using Device : Tesla K20c
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Global.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+...allocating memory for a matrix of superaccumulators
+Running OpenCL DGEMM with 12582912...
+
+Alg = 51 	 NbFPE = 3 	 Range = 1 	 Size = 2048 	 Time = 61.74950086 s 	 Throughput = 0.0016 GB/s
+
+Alg = 51 	 NbFPE = 3 	 Range = 1 	 Size = 2048 	 Time = 61.74950086 s 	 Performance = 5.2862 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 8227328.1241337396
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	FAILED
+Starting with a matrices of 256x256x256 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 6.0.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : Tesla K20c
+### Device[1] : Tesla C2070
+### Device[2] : Tesla C2070
+### Using Device : Tesla K20c
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Global.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+...allocating memory for a matrix of superaccumulators
+Running OpenCL DGEMM with 196608...
+
+Alg = 51 	 NbFPE = 4 	 Range = 1 	 Size = 256 	 Time = 0.11667955 s 	 Throughput = 0.0135 GB/s
+
+Alg = 51 	 NbFPE = 4 	 Range = 1 	 Size = 256 	 Time = 0.11667955 s 	 Performance = 7.1894 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 512x512x512 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 6.0.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : Tesla K20c
+### Device[1] : Tesla C2070
+### Device[2] : Tesla C2070
+### Using Device : Tesla K20c
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Global.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+...allocating memory for a matrix of superaccumulators
+Running OpenCL DGEMM with 786432...
+
+Alg = 51 	 NbFPE = 4 	 Range = 1 	 Size = 512 	 Time = 0.94100704 s 	 Throughput = 0.0067 GB/s
+
+Alg = 51 	 NbFPE = 4 	 Range = 1 	 Size = 512 	 Time = 0.94100704 s 	 Performance = 7.1316 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 768x768x768 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 6.0.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : Tesla K20c
+### Device[1] : Tesla C2070
+### Device[2] : Tesla C2070
+### Using Device : Tesla K20c
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Global.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+...allocating memory for a matrix of superaccumulators
+Running OpenCL DGEMM with 1769472...
+
+Alg = 51 	 NbFPE = 4 	 Range = 1 	 Size = 768 	 Time = 3.19550541 s 	 Throughput = 0.0044 GB/s
+
+Alg = 51 	 NbFPE = 4 	 Range = 1 	 Size = 768 	 Time = 3.19550541 s 	 Performance = 7.0878 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 1024x1024x1024 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 6.0.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : Tesla K20c
+### Device[1] : Tesla C2070
+### Device[2] : Tesla C2070
+### Using Device : Tesla K20c
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Global.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+...allocating memory for a matrix of superaccumulators
+Running OpenCL DGEMM with 3145728...
+
+Alg = 51 	 NbFPE = 4 	 Range = 1 	 Size = 1024 	 Time = 7.79757478 s 	 Throughput = 0.0032 GB/s
+
+Alg = 51 	 NbFPE = 4 	 Range = 1 	 Size = 1024 	 Time = 7.79757478 s 	 Performance = 6.8851 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 1280x1280x1280 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 6.0.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : Tesla K20c
+### Device[1] : Tesla C2070
+### Device[2] : Tesla C2070
+### Using Device : Tesla K20c
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Global.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+...allocating memory for a matrix of superaccumulators
+Running OpenCL DGEMM with 4915200...
+
+Alg = 51 	 NbFPE = 4 	 Range = 1 	 Size = 1280 	 Time = 15.08316915 s 	 Throughput = 0.0026 GB/s
+
+Alg = 51 	 NbFPE = 4 	 Range = 1 	 Size = 1280 	 Time = 15.08316915 s 	 Performance = 6.9520 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 2227133.0390897174
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	FAILED
+Starting with a matrices of 1536x1536x1536 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 6.0.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : Tesla K20c
+### Device[1] : Tesla C2070
+### Device[2] : Tesla C2070
+### Using Device : Tesla K20c
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Global.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+...allocating memory for a matrix of superaccumulators
+Running OpenCL DGEMM with 7077888...
+
+Alg = 51 	 NbFPE = 4 	 Range = 1 	 Size = 1536 	 Time = 26.00839568 s 	 Throughput = 0.0022 GB/s
+
+Alg = 51 	 NbFPE = 4 	 Range = 1 	 Size = 1536 	 Time = 26.00839568 s 	 Performance = 6.9667 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 3982717.9855727921
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	FAILED
+Starting with a matrices of 1792x1792x1792 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 6.0.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : Tesla K20c
+### Device[1] : Tesla C2070
+### Device[2] : Tesla C2070
+### Using Device : Tesla K20c
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Global.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+...allocating memory for a matrix of superaccumulators
+Running OpenCL DGEMM with 9633792...
+
+Alg = 51 	 NbFPE = 4 	 Range = 1 	 Size = 1792 	 Time = 41.33666720 s 	 Throughput = 0.0019 GB/s
+
+Alg = 51 	 NbFPE = 4 	 Range = 1 	 Size = 1792 	 Time = 41.33666720 s 	 Performance = 6.9606 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 5968968.454182934
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	FAILED
+Starting with a matrices of 2048x2048x2048 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 6.0.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : Tesla K20c
+### Device[1] : Tesla C2070
+### Device[2] : Tesla C2070
+### Using Device : Tesla K20c
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Global.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+...allocating memory for a matrix of superaccumulators
+Running OpenCL DGEMM with 12582912...
+
+Alg = 51 	 NbFPE = 4 	 Range = 1 	 Size = 2048 	 Time = 61.73297958 s 	 Throughput = 0.0016 GB/s
+
+Alg = 51 	 NbFPE = 4 	 Range = 1 	 Size = 2048 	 Time = 61.73297958 s 	 Performance = 6.9573 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 8227328.1241337396
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	FAILED
+Starting with a matrices of 256x256x256 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 6.0.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : Tesla K20c
+### Device[1] : Tesla C2070
+### Device[2] : Tesla C2070
+### Using Device : Tesla K20c
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Global.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+...allocating memory for a matrix of superaccumulators
+Running OpenCL DGEMM with 196608...
+
+Alg = 51 	 NbFPE = 5 	 Range = 1 	 Size = 256 	 Time = 0.11637661 s 	 Throughput = 0.0135 GB/s
+
+Alg = 51 	 NbFPE = 5 	 Range = 1 	 Size = 256 	 Time = 0.11637661 s 	 Performance = 8.9381 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 512x512x512 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 6.0.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : Tesla K20c
+### Device[1] : Tesla C2070
+### Device[2] : Tesla C2070
+### Using Device : Tesla K20c
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Global.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+...allocating memory for a matrix of superaccumulators
+Running OpenCL DGEMM with 786432...
+
+Alg = 51 	 NbFPE = 5 	 Range = 1 	 Size = 512 	 Time = 0.94125488 s 	 Throughput = 0.0067 GB/s
+
+Alg = 51 	 NbFPE = 5 	 Range = 1 	 Size = 512 	 Time = 0.94125488 s 	 Performance = 8.8409 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 768x768x768 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 6.0.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : Tesla K20c
+### Device[1] : Tesla C2070
+### Device[2] : Tesla C2070
+### Using Device : Tesla K20c
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Global.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+...allocating memory for a matrix of superaccumulators
+Running OpenCL DGEMM with 1769472...
+
+Alg = 51 	 NbFPE = 5 	 Range = 1 	 Size = 768 	 Time = 3.19268234 s 	 Throughput = 0.0044 GB/s
+
+Alg = 51 	 NbFPE = 5 	 Range = 1 	 Size = 768 	 Time = 3.19268234 s 	 Performance = 8.7967 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 1024x1024x1024 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 6.0.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : Tesla K20c
+### Device[1] : Tesla C2070
+### Device[2] : Tesla C2070
+### Using Device : Tesla K20c
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Global.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+...allocating memory for a matrix of superaccumulators
+Running OpenCL DGEMM with 3145728...
+
+Alg = 51 	 NbFPE = 5 	 Range = 1 	 Size = 1024 	 Time = 7.78553962 s 	 Throughput = 0.0032 GB/s
+
+Alg = 51 	 NbFPE = 5 	 Range = 1 	 Size = 1024 	 Time = 7.78553962 s 	 Performance = 8.5507 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 1280x1280x1280 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 6.0.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : Tesla K20c
+### Device[1] : Tesla C2070
+### Device[2] : Tesla C2070
+### Using Device : Tesla K20c
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Global.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+...allocating memory for a matrix of superaccumulators
+Running OpenCL DGEMM with 4915200...
+
+Alg = 51 	 NbFPE = 5 	 Range = 1 	 Size = 1280 	 Time = 15.07538928 s 	 Throughput = 0.0026 GB/s
+
+Alg = 51 	 NbFPE = 5 	 Range = 1 	 Size = 1280 	 Time = 15.07538928 s 	 Performance = 8.6249 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 2227133.0390897174
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	FAILED
+Starting with a matrices of 1536x1536x1536 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 6.0.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : Tesla K20c
+### Device[1] : Tesla C2070
+### Device[2] : Tesla C2070
+### Using Device : Tesla K20c
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Global.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+...allocating memory for a matrix of superaccumulators
+Running OpenCL DGEMM with 7077888...
+
+Alg = 51 	 NbFPE = 5 	 Range = 1 	 Size = 1536 	 Time = 25.96164154 s 	 Throughput = 0.0022 GB/s
+
+Alg = 51 	 NbFPE = 5 	 Range = 1 	 Size = 1536 	 Time = 25.96164154 s 	 Performance = 8.6543 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 3982717.9855727921
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	FAILED
+Starting with a matrices of 1792x1792x1792 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 6.0.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : Tesla K20c
+### Device[1] : Tesla C2070
+### Device[2] : Tesla C2070
+### Using Device : Tesla K20c
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Global.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+...allocating memory for a matrix of superaccumulators
+Running OpenCL DGEMM with 9633792...
+
+Alg = 51 	 NbFPE = 5 	 Range = 1 	 Size = 1792 	 Time = 41.31918595 s 	 Throughput = 0.0019 GB/s
+
+Alg = 51 	 NbFPE = 5 	 Range = 1 	 Size = 1792 	 Time = 41.31918595 s 	 Performance = 8.6348 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 5968968.454182934
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	FAILED
+Starting with a matrices of 2048x2048x2048 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 6.0.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : Tesla K20c
+### Device[1] : Tesla C2070
+### Device[2] : Tesla C2070
+### Using Device : Tesla K20c
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Global.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+...allocating memory for a matrix of superaccumulators
+Running OpenCL DGEMM with 12582912...
+
+Alg = 51 	 NbFPE = 5 	 Range = 1 	 Size = 2048 	 Time = 61.69085958 s 	 Throughput = 0.0016 GB/s
+
+Alg = 51 	 NbFPE = 5 	 Range = 1 	 Size = 2048 	 Time = 61.69085958 s 	 Performance = 8.6330 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 8227328.1241337396
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	FAILED
+Starting with a matrices of 256x256x256 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 6.0.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : Tesla K20c
+### Device[1] : Tesla C2070
+### Device[2] : Tesla C2070
+### Using Device : Tesla K20c
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Global.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+...allocating memory for a matrix of superaccumulators
+Running OpenCL DGEMM with 196608...
+
+Alg = 51 	 NbFPE = 6 	 Range = 1 	 Size = 256 	 Time = 0.11654979 s 	 Throughput = 0.0135 GB/s
+
+Alg = 51 	 NbFPE = 6 	 Range = 1 	 Size = 256 	 Time = 0.11654979 s 	 Performance = 10.6522 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 512x512x512 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 6.0.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : Tesla K20c
+### Device[1] : Tesla C2070
+### Device[2] : Tesla C2070
+### Using Device : Tesla K20c
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Global.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+...allocating memory for a matrix of superaccumulators
+Running OpenCL DGEMM with 786432...
+
+Alg = 51 	 NbFPE = 6 	 Range = 1 	 Size = 512 	 Time = 0.94059971 s 	 Throughput = 0.0067 GB/s
+
+Alg = 51 	 NbFPE = 6 	 Range = 1 	 Size = 512 	 Time = 0.94059971 s 	 Performance = 10.5593 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 768x768x768 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 6.0.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : Tesla K20c
+### Device[1] : Tesla C2070
+### Device[2] : Tesla C2070
+### Using Device : Tesla K20c
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Global.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+...allocating memory for a matrix of superaccumulators
+Running OpenCL DGEMM with 1769472...
+
+Alg = 51 	 NbFPE = 6 	 Range = 1 	 Size = 768 	 Time = 3.19120979 s 	 Throughput = 0.0044 GB/s
+
+Alg = 51 	 NbFPE = 6 	 Range = 1 	 Size = 768 	 Time = 3.19120979 s 	 Performance = 10.5041 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 1024x1024x1024 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 6.0.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : Tesla K20c
+### Device[1] : Tesla C2070
+### Device[2] : Tesla C2070
+### Using Device : Tesla K20c
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Global.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+...allocating memory for a matrix of superaccumulators
+Running OpenCL DGEMM with 3145728...
+
+Alg = 51 	 NbFPE = 6 	 Range = 1 	 Size = 1024 	 Time = 7.78805325 s 	 Throughput = 0.0032 GB/s
+
+Alg = 51 	 NbFPE = 6 	 Range = 1 	 Size = 1024 	 Time = 7.78805325 s 	 Performance = 10.2024 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 1280x1280x1280 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 6.0.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : Tesla K20c
+### Device[1] : Tesla C2070
+### Device[2] : Tesla C2070
+### Using Device : Tesla K20c
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Global.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+...allocating memory for a matrix of superaccumulators
+Running OpenCL DGEMM with 4915200...
+
+Alg = 51 	 NbFPE = 6 	 Range = 1 	 Size = 1280 	 Time = 15.07839114 s 	 Throughput = 0.0026 GB/s
+
+Alg = 51 	 NbFPE = 6 	 Range = 1 	 Size = 1280 	 Time = 15.07839114 s 	 Performance = 10.2922 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 2227133.0390897174
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	FAILED
+Starting with a matrices of 1536x1536x1536 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 6.0.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : Tesla K20c
+### Device[1] : Tesla C2070
+### Device[2] : Tesla C2070
+### Using Device : Tesla K20c
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Global.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+...allocating memory for a matrix of superaccumulators
+Running OpenCL DGEMM with 7077888...
+
+Alg = 51 	 NbFPE = 6 	 Range = 1 	 Size = 1536 	 Time = 25.95179514 s 	 Throughput = 0.0022 GB/s
+
+Alg = 51 	 NbFPE = 6 	 Range = 1 	 Size = 1536 	 Time = 25.95179514 s 	 Performance = 10.3333 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 3982717.9855727921
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	FAILED
+Starting with a matrices of 1792x1792x1792 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 6.0.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : Tesla K20c
+### Device[1] : Tesla C2070
+### Device[2] : Tesla C2070
+### Using Device : Tesla K20c
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Global.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+...allocating memory for a matrix of superaccumulators
+Running OpenCL DGEMM with 9633792...
+
+Alg = 51 	 NbFPE = 6 	 Range = 1 	 Size = 1792 	 Time = 41.29686013 s 	 Throughput = 0.0019 GB/s
+
+Alg = 51 	 NbFPE = 6 	 Range = 1 	 Size = 1792 	 Time = 41.29686013 s 	 Performance = 10.3117 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 5968968.454182934
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	FAILED
+Starting with a matrices of 2048x2048x2048 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 6.0.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : Tesla K20c
+### Device[1] : Tesla C2070
+### Device[2] : Tesla C2070
+### Using Device : Tesla K20c
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Global.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+...allocating memory for a matrix of superaccumulators
+Running OpenCL DGEMM with 12582912...
+
+Alg = 51 	 NbFPE = 6 	 Range = 1 	 Size = 2048 	 Time = 61.72083747 s 	 Throughput = 0.0016 GB/s
+
+Alg = 51 	 NbFPE = 6 	 Range = 1 	 Size = 2048 	 Time = 61.72083747 s 	 Performance = 10.2989 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 8227328.1241337396
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	FAILED
+Starting with a matrices of 256x256x256 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 6.0.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : Tesla K20c
+### Device[1] : Tesla C2070
+### Device[2] : Tesla C2070
+### Using Device : Tesla K20c
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Global.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+...allocating memory for a matrix of superaccumulators
+Running OpenCL DGEMM with 196608...
+
+Alg = 51 	 NbFPE = 7 	 Range = 1 	 Size = 256 	 Time = 0.11632861 s 	 Throughput = 0.0135 GB/s
+
+Alg = 51 	 NbFPE = 7 	 Range = 1 	 Size = 256 	 Time = 0.11632861 s 	 Performance = 12.4031 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 512x512x512 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 6.0.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : Tesla K20c
+### Device[1] : Tesla C2070
+### Device[2] : Tesla C2070
+### Using Device : Tesla K20c
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Global.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+...allocating memory for a matrix of superaccumulators
+Running OpenCL DGEMM with 786432...
+
+Alg = 51 	 NbFPE = 7 	 Range = 1 	 Size = 512 	 Time = 0.94139309 s 	 Throughput = 0.0067 GB/s
+
+Alg = 51 	 NbFPE = 7 	 Range = 1 	 Size = 512 	 Time = 0.94139309 s 	 Performance = 12.2613 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 768x768x768 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 6.0.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : Tesla K20c
+### Device[1] : Tesla C2070
+### Device[2] : Tesla C2070
+### Using Device : Tesla K20c
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Global.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+...allocating memory for a matrix of superaccumulators
+Running OpenCL DGEMM with 1769472...
+
+Alg = 51 	 NbFPE = 7 	 Range = 1 	 Size = 768 	 Time = 3.19051898 s 	 Throughput = 0.0044 GB/s
+
+Alg = 51 	 NbFPE = 7 	 Range = 1 	 Size = 768 	 Time = 3.19051898 s 	 Performance = 12.2101 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 1024x1024x1024 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 6.0.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : Tesla K20c
+### Device[1] : Tesla C2070
+### Device[2] : Tesla C2070
+### Using Device : Tesla K20c
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Global.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+...allocating memory for a matrix of superaccumulators
+Running OpenCL DGEMM with 3145728...
+
+Alg = 51 	 NbFPE = 7 	 Range = 1 	 Size = 1024 	 Time = 7.79730998 s 	 Throughput = 0.0032 GB/s
+
+Alg = 51 	 NbFPE = 7 	 Range = 1 	 Size = 1024 	 Time = 7.79730998 s 	 Performance = 11.8428 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 1280x1280x1280 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 6.0.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : Tesla K20c
+### Device[1] : Tesla C2070
+### Device[2] : Tesla C2070
+### Using Device : Tesla K20c
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Global.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+...allocating memory for a matrix of superaccumulators
+Running OpenCL DGEMM with 4915200...
+
+Alg = 51 	 NbFPE = 7 	 Range = 1 	 Size = 1280 	 Time = 15.09475395 s 	 Throughput = 0.0026 GB/s
+
+Alg = 51 	 NbFPE = 7 	 Range = 1 	 Size = 1280 	 Time = 15.09475395 s 	 Performance = 11.9482 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 2227133.0390897174
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	FAILED
+Starting with a matrices of 1536x1536x1536 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 6.0.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : Tesla K20c
+### Device[1] : Tesla C2070
+### Device[2] : Tesla C2070
+### Using Device : Tesla K20c
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Global.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+...allocating memory for a matrix of superaccumulators
+Running OpenCL DGEMM with 7077888...
+
+Alg = 51 	 NbFPE = 7 	 Range = 1 	 Size = 1536 	 Time = 25.97296541 s 	 Throughput = 0.0022 GB/s
+
+Alg = 51 	 NbFPE = 7 	 Range = 1 	 Size = 1536 	 Time = 25.97296541 s 	 Performance = 11.9992 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 3982717.9855727921
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	FAILED
+Starting with a matrices of 1792x1792x1792 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 6.0.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : Tesla K20c
+### Device[1] : Tesla C2070
+### Device[2] : Tesla C2070
+### Using Device : Tesla K20c
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Global.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+...allocating memory for a matrix of superaccumulators
+Running OpenCL DGEMM with 9633792...
+
+Alg = 51 	 NbFPE = 7 	 Range = 1 	 Size = 1792 	 Time = 41.31164358 s 	 Throughput = 0.0019 GB/s
+
+Alg = 51 	 NbFPE = 7 	 Range = 1 	 Size = 1792 	 Time = 41.31164358 s 	 Performance = 11.9795 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 5968968.454182934
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	FAILED
+Starting with a matrices of 2048x2048x2048 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 6.0.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : Tesla K20c
+### Device[1] : Tesla C2070
+### Device[2] : Tesla C2070
+### Using Device : Tesla K20c
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Global.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+...allocating memory for a matrix of superaccumulators
+Running OpenCL DGEMM with 12582912...
+
+Alg = 51 	 NbFPE = 7 	 Range = 1 	 Size = 2048 	 Time = 61.75993290 s 	 Throughput = 0.0016 GB/s
+
+Alg = 51 	 NbFPE = 7 	 Range = 1 	 Size = 2048 	 Time = 61.75993290 s 	 Performance = 11.9614 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 8227328.1241337396
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	FAILED
+Starting with a matrices of 256x256x256 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 6.0.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : Tesla K20c
+### Device[1] : Tesla C2070
+### Device[2] : Tesla C2070
+### Using Device : Tesla K20c
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Global.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+...allocating memory for a matrix of superaccumulators
+Running OpenCL DGEMM with 196608...
+
+Alg = 51 	 NbFPE = 8 	 Range = 1 	 Size = 256 	 Time = 0.11646816 s 	 Throughput = 0.0135 GB/s
+
+Alg = 51 	 NbFPE = 8 	 Range = 1 	 Size = 256 	 Time = 0.11646816 s 	 Performance = 14.1169 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 512x512x512 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 6.0.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : Tesla K20c
+### Device[1] : Tesla C2070
+### Device[2] : Tesla C2070
+### Using Device : Tesla K20c
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Global.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+...allocating memory for a matrix of superaccumulators
+Running OpenCL DGEMM with 786432...
+
+Alg = 51 	 NbFPE = 8 	 Range = 1 	 Size = 512 	 Time = 0.94307302 s 	 Throughput = 0.0067 GB/s
+
+Alg = 51 	 NbFPE = 8 	 Range = 1 	 Size = 512 	 Time = 0.94307302 s 	 Performance = 13.9473 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 768x768x768 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 6.0.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : Tesla K20c
+### Device[1] : Tesla C2070
+### Device[2] : Tesla C2070
+### Using Device : Tesla K20c
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Global.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+...allocating memory for a matrix of superaccumulators
+Running OpenCL DGEMM with 1769472...
+
+Alg = 51 	 NbFPE = 8 	 Range = 1 	 Size = 768 	 Time = 3.19673635 s 	 Throughput = 0.0044 GB/s
+
+Alg = 51 	 NbFPE = 8 	 Range = 1 	 Size = 768 	 Time = 3.19673635 s 	 Performance = 13.8868 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 1024x1024x1024 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 6.0.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : Tesla K20c
+### Device[1] : Tesla C2070
+### Device[2] : Tesla C2070
+### Using Device : Tesla K20c
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Global.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+...allocating memory for a matrix of superaccumulators
+Running OpenCL DGEMM with 3145728...
+
+Alg = 51 	 NbFPE = 8 	 Range = 1 	 Size = 1024 	 Time = 7.80529674 s 	 Throughput = 0.0032 GB/s
+
+Alg = 51 	 NbFPE = 8 	 Range = 1 	 Size = 1024 	 Time = 7.80529674 s 	 Performance = 13.4814 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 1280x1280x1280 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 6.0.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : Tesla K20c
+### Device[1] : Tesla C2070
+### Device[2] : Tesla C2070
+### Using Device : Tesla K20c
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Global.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+...allocating memory for a matrix of superaccumulators
+Running OpenCL DGEMM with 4915200...
+
+Alg = 51 	 NbFPE = 8 	 Range = 1 	 Size = 1280 	 Time = 15.10957088 s 	 Throughput = 0.0026 GB/s
+
+Alg = 51 	 NbFPE = 8 	 Range = 1 	 Size = 1280 	 Time = 15.10957088 s 	 Performance = 13.6020 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 2227133.0390897174
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	FAILED
+Starting with a matrices of 1536x1536x1536 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 6.0.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : Tesla K20c
+### Device[1] : Tesla C2070
+### Device[2] : Tesla C2070
+### Using Device : Tesla K20c
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Global.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+...allocating memory for a matrix of superaccumulators
+Running OpenCL DGEMM with 7077888...
+
+Alg = 51 	 NbFPE = 8 	 Range = 1 	 Size = 1536 	 Time = 25.98938464 s 	 Throughput = 0.0022 GB/s
+
+Alg = 51 	 NbFPE = 8 	 Range = 1 	 Size = 1536 	 Time = 25.98938464 s 	 Performance = 13.6648 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 3982717.9855727921
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	FAILED
+Starting with a matrices of 1792x1792x1792 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 6.0.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : Tesla K20c
+### Device[1] : Tesla C2070
+### Device[2] : Tesla C2070
+### Using Device : Tesla K20c
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Global.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+...allocating memory for a matrix of superaccumulators
+Running OpenCL DGEMM with 9633792...
+
+Alg = 51 	 NbFPE = 8 	 Range = 1 	 Size = 1792 	 Time = 41.36852406 s 	 Throughput = 0.0019 GB/s
+
+Alg = 51 	 NbFPE = 8 	 Range = 1 	 Size = 1792 	 Time = 41.36852406 s 	 Performance = 13.6323 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 5968968.454182934
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	FAILED
+Starting with a matrices of 2048x2048x2048 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 6.0.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : Tesla K20c
+### Device[1] : Tesla C2070
+### Device[2] : Tesla C2070
+### Using Device : Tesla K20c
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Global.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+...allocating memory for a matrix of superaccumulators
+Running OpenCL DGEMM with 12582912...
+
+Alg = 51 	 NbFPE = 8 	 Range = 1 	 Size = 2048 	 Time = 61.82143565 s 	 Throughput = 0.0016 GB/s
+
+Alg = 51 	 NbFPE = 8 	 Range = 1 	 Size = 2048 	 Time = 61.82143565 s 	 Performance = 13.6169 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 8227328.1241337396
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	FAILED
+Starting with a matrices of 256x256x256 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 6.0.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : Tesla K20c
+### Device[1] : Tesla C2070
+### Device[2] : Tesla C2070
+### Using Device : Tesla K20c
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Private.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+Running OpenCL DGEMM with 196608...
+
+Alg = 31 	 NbFPE = 3 	 Range = 1 	 Size = 256 	 Time = 0.00294378 s 	 Throughput = 0.5343 GB/s
+
+Alg = 31 	 NbFPE = 3 	 Range = 1 	 Size = 256 	 Time = 0.00294378 s 	 Performance = 216.5702 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 512x512x512 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 6.0.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : Tesla K20c
+### Device[1] : Tesla C2070
+### Device[2] : Tesla C2070
+### Using Device : Tesla K20c
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Private.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+Running OpenCL DGEMM with 786432...
+
+Alg = 31 	 NbFPE = 3 	 Range = 1 	 Size = 512 	 Time = 0.01966784 s 	 Throughput = 0.3199 GB/s
+
+Alg = 31 	 NbFPE = 3 	 Range = 1 	 Size = 512 	 Time = 0.01966784 s 	 Performance = 259.3205 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 768x768x768 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 6.0.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : Tesla K20c
+### Device[1] : Tesla C2070
+### Device[2] : Tesla C2070
+### Using Device : Tesla K20c
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Private.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+Running OpenCL DGEMM with 1769472...
+
+Alg = 31 	 NbFPE = 3 	 Range = 1 	 Size = 768 	 Time = 0.06226579 s 	 Throughput = 0.2273 GB/s
+
+Alg = 31 	 NbFPE = 3 	 Range = 1 	 Size = 768 	 Time = 0.06226579 s 	 Performance = 276.4507 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 1024x1024x1024 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 6.0.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : Tesla K20c
+### Device[1] : Tesla C2070
+### Device[2] : Tesla C2070
+### Using Device : Tesla K20c
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Private.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+Running OpenCL DGEMM with 3145728...
+
+Alg = 31 	 NbFPE = 3 	 Range = 1 	 Size = 1024 	 Time = 0.14031491 s 	 Throughput = 0.1794 GB/s
+
+Alg = 31 	 NbFPE = 3 	 Range = 1 	 Size = 1024 	 Time = 0.14031491 s 	 Performance = 290.7901 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 1280x1280x1280 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 6.0.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : Tesla K20c
+### Device[1] : Tesla C2070
+### Device[2] : Tesla C2070
+### Using Device : Tesla K20c
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Private.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+Running OpenCL DGEMM with 4915200...
+
+Alg = 31 	 NbFPE = 3 	 Range = 1 	 Size = 1280 	 Time = 0.26855680 s 	 Throughput = 0.1464 GB/s
+
+Alg = 31 	 NbFPE = 3 	 Range = 1 	 Size = 1280 	 Time = 0.26855680 s 	 Performance = 296.7409 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 2227133.0390897174
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	FAILED
+Starting with a matrices of 1536x1536x1536 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 6.0.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : Tesla K20c
+### Device[1] : Tesla C2070
+### Device[2] : Tesla C2070
+### Using Device : Tesla K20c
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Private.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+Running OpenCL DGEMM with 7077888...
+
+Alg = 31 	 NbFPE = 3 	 Range = 1 	 Size = 1536 	 Time = 0.45672685 s 	 Throughput = 0.1240 GB/s
+
+Alg = 31 	 NbFPE = 3 	 Range = 1 	 Size = 1536 	 Time = 0.45672685 s 	 Performance = 301.5093 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 3982717.9855727921
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	FAILED
+Starting with a matrices of 1792x1792x1792 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 6.0.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : Tesla K20c
+### Device[1] : Tesla C2070
+### Device[2] : Tesla C2070
+### Using Device : Tesla K20c
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Private.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+Running OpenCL DGEMM with 9633792...
+
+Alg = 31 	 NbFPE = 3 	 Range = 1 	 Size = 1792 	 Time = 0.71851766 s 	 Throughput = 0.1073 GB/s
+
+Alg = 31 	 NbFPE = 3 	 Range = 1 	 Size = 1792 	 Time = 0.71851766 s 	 Performance = 304.3408 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 5968968.454182934
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	FAILED
+Starting with a matrices of 2048x2048x2048 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 6.0.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : Tesla K20c
+### Device[1] : Tesla C2070
+### Device[2] : Tesla C2070
+### Using Device : Tesla K20c
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Private.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+Running OpenCL DGEMM with 12582912...
+
+Alg = 31 	 NbFPE = 3 	 Range = 1 	 Size = 2048 	 Time = 1.06270470 s 	 Throughput = 0.0947 GB/s
+
+Alg = 31 	 NbFPE = 3 	 Range = 1 	 Size = 2048 	 Time = 1.06270470 s 	 Performance = 307.1573 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 8227328.1241337396
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	FAILED
+Starting with a matrices of 256x256x256 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 6.0.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : Tesla K20c
+### Device[1] : Tesla C2070
+### Device[2] : Tesla C2070
+### Using Device : Tesla K20c
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Private.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+Running OpenCL DGEMM with 196608...
+
+Alg = 31 	 NbFPE = 4 	 Range = 1 	 Size = 256 	 Time = 0.00350090 s 	 Throughput = 0.4493 GB/s
+
+Alg = 31 	 NbFPE = 4 	 Range = 1 	 Size = 256 	 Time = 0.00350090 s 	 Performance = 239.6132 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 512x512x512 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 6.0.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : Tesla K20c
+### Device[1] : Tesla C2070
+### Device[2] : Tesla C2070
+### Using Device : Tesla K20c
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Private.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+Running OpenCL DGEMM with 786432...
+
+Alg = 31 	 NbFPE = 4 	 Range = 1 	 Size = 512 	 Time = 0.02408070 s 	 Throughput = 0.2613 GB/s
+
+Alg = 31 	 NbFPE = 4 	 Range = 1 	 Size = 512 	 Time = 0.02408070 s 	 Performance = 278.6831 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 768x768x768 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 6.0.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : Tesla K20c
+### Device[1] : Tesla C2070
+### Device[2] : Tesla C2070
+### Using Device : Tesla K20c
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Private.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+Running OpenCL DGEMM with 1769472...
+
+Alg = 31 	 NbFPE = 4 	 Range = 1 	 Size = 768 	 Time = 0.07639686 s 	 Throughput = 0.1853 GB/s
+
+Alg = 31 	 NbFPE = 4 	 Range = 1 	 Size = 768 	 Time = 0.07639686 s 	 Performance = 296.4682 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 1024x1024x1024 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 6.0.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : Tesla K20c
+### Device[1] : Tesla C2070
+### Device[2] : Tesla C2070
+### Using Device : Tesla K20c
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Private.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+Running OpenCL DGEMM with 3145728...
+
+Alg = 31 	 NbFPE = 4 	 Range = 1 	 Size = 1024 	 Time = 0.17653904 s 	 Throughput = 0.1426 GB/s
+
+Alg = 31 	 NbFPE = 4 	 Range = 1 	 Size = 1024 	 Time = 0.17653904 s 	 Performance = 304.1089 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 1280x1280x1280 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 6.0.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : Tesla K20c
+### Device[1] : Tesla C2070
+### Device[2] : Tesla C2070
+### Using Device : Tesla K20c
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Private.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+Running OpenCL DGEMM with 4915200...
+
+Alg = 31 	 NbFPE = 4 	 Range = 1 	 Size = 1280 	 Time = 0.33566861 s 	 Throughput = 0.1171 GB/s
+
+Alg = 31 	 NbFPE = 4 	 Range = 1 	 Size = 1280 	 Time = 0.33566861 s 	 Performance = 312.3843 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 2227133.0390897174
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	FAILED
+Starting with a matrices of 1536x1536x1536 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 6.0.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : Tesla K20c
+### Device[1] : Tesla C2070
+### Device[2] : Tesla C2070
+### Using Device : Tesla K20c
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Private.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+Running OpenCL DGEMM with 7077888...
+
+Alg = 31 	 NbFPE = 4 	 Range = 1 	 Size = 1536 	 Time = 0.57480186 s 	 Throughput = 0.0985 GB/s
+
+Alg = 31 	 NbFPE = 4 	 Range = 1 	 Size = 1536 	 Time = 0.57480186 s 	 Performance = 315.2285 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 3982717.9855727921
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	FAILED
+Starting with a matrices of 1792x1792x1792 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 6.0.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : Tesla K20c
+### Device[1] : Tesla C2070
+### Device[2] : Tesla C2070
+### Using Device : Tesla K20c
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Private.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+Running OpenCL DGEMM with 9633792...
+
+Alg = 31 	 NbFPE = 4 	 Range = 1 	 Size = 1792 	 Time = 0.90515814 s 	 Throughput = 0.0851 GB/s
+
+Alg = 31 	 NbFPE = 4 	 Range = 1 	 Size = 1792 	 Time = 0.90515814 s 	 Performance = 317.8773 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 5968968.454182934
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	FAILED
+Starting with a matrices of 2048x2048x2048 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 6.0.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : Tesla K20c
+### Device[1] : Tesla C2070
+### Device[2] : Tesla C2070
+### Using Device : Tesla K20c
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Private.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+Running OpenCL DGEMM with 12582912...
+
+Alg = 31 	 NbFPE = 4 	 Range = 1 	 Size = 2048 	 Time = 1.34165094 s 	 Throughput = 0.0750 GB/s
+
+Alg = 31 	 NbFPE = 4 	 Range = 1 	 Size = 2048 	 Time = 1.34165094 s 	 Performance = 320.1255 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 8227328.1241337396
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	FAILED
+Starting with a matrices of 256x256x256 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 6.0.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : Tesla K20c
+### Device[1] : Tesla C2070
+### Device[2] : Tesla C2070
+### Using Device : Tesla K20c
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Private.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+Running OpenCL DGEMM with 196608...
+
+Alg = 31 	 NbFPE = 5 	 Range = 1 	 Size = 256 	 Time = 0.00378771 s 	 Throughput = 0.4153 GB/s
+
+Alg = 31 	 NbFPE = 5 	 Range = 1 	 Size = 256 	 Time = 0.00378771 s 	 Performance = 274.6216 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 512x512x512 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 6.0.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : Tesla K20c
+### Device[1] : Tesla C2070
+### Device[2] : Tesla C2070
+### Using Device : Tesla K20c
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Private.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+Running OpenCL DGEMM with 786432...
+
+Alg = 31 	 NbFPE = 5 	 Range = 1 	 Size = 512 	 Time = 0.02638989 s 	 Throughput = 0.2384 GB/s
+
+Alg = 31 	 NbFPE = 5 	 Range = 1 	 Size = 512 	 Time = 0.02638989 s 	 Performance = 315.3291 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 768x768x768 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 6.0.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : Tesla K20c
+### Device[1] : Tesla C2070
+### Device[2] : Tesla C2070
+### Using Device : Tesla K20c
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Private.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+Running OpenCL DGEMM with 1769472...
+
+Alg = 31 	 NbFPE = 5 	 Range = 1 	 Size = 768 	 Time = 0.08410189 s 	 Throughput = 0.1683 GB/s
+
+Alg = 31 	 NbFPE = 5 	 Range = 1 	 Size = 768 	 Time = 0.08410189 s 	 Performance = 333.9409 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 1024x1024x1024 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 6.0.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : Tesla K20c
+### Device[1] : Tesla C2070
+### Device[2] : Tesla C2070
+### Using Device : Tesla K20c
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Private.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+Running OpenCL DGEMM with 3145728...
+
+Alg = 31 	 NbFPE = 5 	 Range = 1 	 Size = 1024 	 Time = 0.19346605 s 	 Throughput = 0.1301 GB/s
+
+Alg = 31 	 NbFPE = 5 	 Range = 1 	 Size = 1024 	 Time = 0.19346605 s 	 Performance = 344.1017 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 1280x1280x1280 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 6.0.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : Tesla K20c
+### Device[1] : Tesla C2070
+### Device[2] : Tesla C2070
+### Using Device : Tesla K20c
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Private.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+Running OpenCL DGEMM with 4915200...
+
+Alg = 31 	 NbFPE = 5 	 Range = 1 	 Size = 1280 	 Time = 0.37147309 s 	 Throughput = 0.1059 GB/s
+
+Alg = 31 	 NbFPE = 5 	 Range = 1 	 Size = 1280 	 Time = 0.37147309 s 	 Performance = 350.0211 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 2227133.0390897174
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	FAILED
+Starting with a matrices of 1536x1536x1536 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 6.0.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : Tesla K20c
+### Device[1] : Tesla C2070
+### Device[2] : Tesla C2070
+### Using Device : Tesla K20c
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Private.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+Running OpenCL DGEMM with 7077888...
+
+Alg = 31 	 NbFPE = 5 	 Range = 1 	 Size = 1536 	 Time = 0.63628547 s 	 Throughput = 0.0890 GB/s
+
+Alg = 31 	 NbFPE = 5 	 Range = 1 	 Size = 1536 	 Time = 0.63628547 s 	 Performance = 353.1127 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 3982717.9855727921
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	FAILED
+Starting with a matrices of 1792x1792x1792 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 6.0.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : Tesla K20c
+### Device[1] : Tesla C2070
+### Device[2] : Tesla C2070
+### Using Device : Tesla K20c
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Private.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+Running OpenCL DGEMM with 9633792...
+
+Alg = 31 	 NbFPE = 5 	 Range = 1 	 Size = 1792 	 Time = 1.00411987 s 	 Throughput = 0.0768 GB/s
+
+Alg = 31 	 NbFPE = 5 	 Range = 1 	 Size = 1792 	 Time = 1.00411987 s 	 Performance = 355.3204 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 5968968.454182934
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	FAILED
+Starting with a matrices of 2048x2048x2048 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 6.0.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : Tesla K20c
+### Device[1] : Tesla C2070
+### Device[2] : Tesla C2070
+### Using Device : Tesla K20c
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Private.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+Running OpenCL DGEMM with 12582912...
+
+Alg = 31 	 NbFPE = 5 	 Range = 1 	 Size = 2048 	 Time = 1.48899456 s 	 Throughput = 0.0676 GB/s
+
+Alg = 31 	 NbFPE = 5 	 Range = 1 	 Size = 2048 	 Time = 1.48899456 s 	 Performance = 357.6749 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 8227328.1241337396
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	FAILED
+Starting with a matrices of 256x256x256 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 6.0.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : Tesla K20c
+### Device[1] : Tesla C2070
+### Device[2] : Tesla C2070
+### Using Device : Tesla K20c
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Private.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+Running OpenCL DGEMM with 196608...
+
+Alg = 31 	 NbFPE = 6 	 Range = 1 	 Size = 256 	 Time = 0.00410416 s 	 Throughput = 0.3832 GB/s
+
+Alg = 31 	 NbFPE = 6 	 Range = 1 	 Size = 256 	 Time = 0.00410416 s 	 Performance = 302.5014 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 512x512x512 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 6.0.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : Tesla K20c
+### Device[1] : Tesla C2070
+### Device[2] : Tesla C2070
+### Using Device : Tesla K20c
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Private.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+Running OpenCL DGEMM with 786432...
+
+Alg = 31 	 NbFPE = 6 	 Range = 1 	 Size = 512 	 Time = 0.02906013 s 	 Throughput = 0.2165 GB/s
+
+Alg = 31 	 NbFPE = 6 	 Range = 1 	 Size = 512 	 Time = 0.02906013 s 	 Performance = 341.7780 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 768x768x768 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 6.0.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : Tesla K20c
+### Device[1] : Tesla C2070
+### Device[2] : Tesla C2070
+### Using Device : Tesla K20c
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Private.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+Running OpenCL DGEMM with 1769472...
+
+Alg = 31 	 NbFPE = 6 	 Range = 1 	 Size = 768 	 Time = 0.09308934 s 	 Throughput = 0.1521 GB/s
+
+Alg = 31 	 NbFPE = 6 	 Range = 1 	 Size = 768 	 Time = 0.09308934 s 	 Performance = 360.0936 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 1024x1024x1024 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 6.0.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : Tesla K20c
+### Device[1] : Tesla C2070
+### Device[2] : Tesla C2070
+### Using Device : Tesla K20c
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Private.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+Running OpenCL DGEMM with 3145728...
+
+Alg = 31 	 NbFPE = 6 	 Range = 1 	 Size = 1024 	 Time = 0.21472704 s 	 Throughput = 0.1172 GB/s
+
+Alg = 31 	 NbFPE = 6 	 Range = 1 	 Size = 1024 	 Time = 0.21472704 s 	 Performance = 370.0367 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 1280x1280x1280 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 6.0.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : Tesla K20c
+### Device[1] : Tesla C2070
+### Device[2] : Tesla C2070
+### Using Device : Tesla K20c
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Private.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+Running OpenCL DGEMM with 4915200...
+
+Alg = 31 	 NbFPE = 6 	 Range = 1 	 Size = 1280 	 Time = 0.41244048 s 	 Throughput = 0.0953 GB/s
+
+Alg = 31 	 NbFPE = 6 	 Range = 1 	 Size = 1280 	 Time = 0.41244048 s 	 Performance = 376.2707 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 2227133.0390897174
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	FAILED
+Starting with a matrices of 1536x1536x1536 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 6.0.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : Tesla K20c
+### Device[1] : Tesla C2070
+### Device[2] : Tesla C2070
+### Using Device : Tesla K20c
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Private.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+Running OpenCL DGEMM with 7077888...
+
+Alg = 31 	 NbFPE = 6 	 Range = 1 	 Size = 1536 	 Time = 0.70458758 s 	 Throughput = 0.0804 GB/s
+
+Alg = 31 	 NbFPE = 6 	 Range = 1 	 Size = 1536 	 Time = 0.70458758 s 	 Performance = 380.6014 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 3982717.9855727921
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	FAILED
+Starting with a matrices of 1792x1792x1792 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 6.0.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : Tesla K20c
+### Device[1] : Tesla C2070
+### Device[2] : Tesla C2070
+### Using Device : Tesla K20c
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Private.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+Running OpenCL DGEMM with 9633792...
+
+Alg = 31 	 NbFPE = 6 	 Range = 1 	 Size = 1792 	 Time = 1.11334125 s 	 Throughput = 0.0692 GB/s
+
+Alg = 31 	 NbFPE = 6 	 Range = 1 	 Size = 1792 	 Time = 1.11334125 s 	 Performance = 382.4877 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 5968968.454182934
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	FAILED
+Starting with a matrices of 2048x2048x2048 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 6.0.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : Tesla K20c
+### Device[1] : Tesla C2070
+### Device[2] : Tesla C2070
+### Using Device : Tesla K20c
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Private.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+Running OpenCL DGEMM with 12582912...
+
+Alg = 31 	 NbFPE = 6 	 Range = 1 	 Size = 2048 	 Time = 1.65696784 s 	 Throughput = 0.0608 GB/s
+
+Alg = 31 	 NbFPE = 6 	 Range = 1 	 Size = 2048 	 Time = 1.65696784 s 	 Performance = 383.6255 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 8227328.1241337396
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	FAILED
+Starting with a matrices of 256x256x256 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 6.0.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : Tesla K20c
+### Device[1] : Tesla C2070
+### Device[2] : Tesla C2070
+### Using Device : Tesla K20c
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Private.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+Running OpenCL DGEMM with 196608...
+
+Alg = 31 	 NbFPE = 7 	 Range = 1 	 Size = 256 	 Time = 0.00428902 s 	 Throughput = 0.3667 GB/s
+
+Alg = 31 	 NbFPE = 7 	 Range = 1 	 Size = 256 	 Time = 0.00428902 s 	 Performance = 336.4030 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 512x512x512 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 6.0.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : Tesla K20c
+### Device[1] : Tesla C2070
+### Device[2] : Tesla C2070
+### Using Device : Tesla K20c
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Private.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+Running OpenCL DGEMM with 786432...
+
+Alg = 31 	 NbFPE = 7 	 Range = 1 	 Size = 512 	 Time = 0.03057366 s 	 Throughput = 0.2058 GB/s
+
+Alg = 31 	 NbFPE = 7 	 Range = 1 	 Size = 512 	 Time = 0.03057366 s 	 Performance = 377.5382 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 768x768x768 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 6.0.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : Tesla K20c
+### Device[1] : Tesla C2070
+### Device[2] : Tesla C2070
+### Using Device : Tesla K20c
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Private.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+Running OpenCL DGEMM with 1769472...
+
+Alg = 31 	 NbFPE = 7 	 Range = 1 	 Size = 768 	 Time = 0.09819686 s 	 Throughput = 0.1442 GB/s
+
+Alg = 31 	 NbFPE = 7 	 Range = 1 	 Size = 768 	 Time = 0.09819686 s 	 Performance = 396.7204 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 1024x1024x1024 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 6.0.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : Tesla K20c
+### Device[1] : Tesla C2070
+### Device[2] : Tesla C2070
+### Using Device : Tesla K20c
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Private.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+Running OpenCL DGEMM with 3145728...
+
+Alg = 31 	 NbFPE = 7 	 Range = 1 	 Size = 1024 	 Time = 0.22650768 s 	 Throughput = 0.1111 GB/s
+
+Alg = 31 	 NbFPE = 7 	 Range = 1 	 Size = 1024 	 Time = 0.22650768 s 	 Performance = 407.6762 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 1280x1280x1280 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 6.0.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : Tesla K20c
+### Device[1] : Tesla C2070
+### Device[2] : Tesla C2070
+### Using Device : Tesla K20c
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Private.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+Running OpenCL DGEMM with 4915200...
+
+Alg = 31 	 NbFPE = 7 	 Range = 1 	 Size = 1280 	 Time = 0.43738390 s 	 Throughput = 0.0899 GB/s
+
+Alg = 31 	 NbFPE = 7 	 Range = 1 	 Size = 1280 	 Time = 0.43738390 s 	 Performance = 412.3496 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 2227133.0390897174
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	FAILED
+Starting with a matrices of 1536x1536x1536 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 6.0.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : Tesla K20c
+### Device[1] : Tesla C2070
+### Device[2] : Tesla C2070
+### Using Device : Tesla K20c
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Private.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+Running OpenCL DGEMM with 7077888...
+
+Alg = 31 	 NbFPE = 7 	 Range = 1 	 Size = 1536 	 Time = 0.74596438 s 	 Throughput = 0.0759 GB/s
+
+Alg = 31 	 NbFPE = 7 	 Range = 1 	 Size = 1536 	 Time = 0.74596438 s 	 Performance = 417.7861 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 3982717.9855727921
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	FAILED
+Starting with a matrices of 1792x1792x1792 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 6.0.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : Tesla K20c
+### Device[1] : Tesla C2070
+### Device[2] : Tesla C2070
+### Using Device : Tesla K20c
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Private.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+Running OpenCL DGEMM with 9633792...
+
+Alg = 31 	 NbFPE = 7 	 Range = 1 	 Size = 1792 	 Time = 1.17670816 s 	 Throughput = 0.0655 GB/s
+
+Alg = 31 	 NbFPE = 7 	 Range = 1 	 Size = 1792 	 Time = 1.17670816 s 	 Performance = 420.5752 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 5968968.454182934
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	FAILED
+Starting with a matrices of 2048x2048x2048 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 6.0.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : Tesla K20c
+### Device[1] : Tesla C2070
+### Device[2] : Tesla C2070
+### Using Device : Tesla K20c
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Private.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+Running OpenCL DGEMM with 12582912...
+
+Alg = 31 	 NbFPE = 7 	 Range = 1 	 Size = 2048 	 Time = 1.75564522 s 	 Throughput = 0.0573 GB/s
+
+Alg = 31 	 NbFPE = 7 	 Range = 1 	 Size = 2048 	 Time = 1.75564522 s 	 Performance = 420.7766 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 8227328.1241337396
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	FAILED
+Starting with a matrices of 256x256x256 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 6.0.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : Tesla K20c
+### Device[1] : Tesla C2070
+### Device[2] : Tesla C2070
+### Using Device : Tesla K20c
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Private.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+Running OpenCL DGEMM with 196608...
+
+Alg = 31 	 NbFPE = 8 	 Range = 1 	 Size = 256 	 Time = 0.00474726 s 	 Throughput = 0.3313 GB/s
+
+Alg = 31 	 NbFPE = 8 	 Range = 1 	 Size = 256 	 Time = 0.00474726 s 	 Performance = 346.3399 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 512x512x512 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 6.0.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : Tesla K20c
+### Device[1] : Tesla C2070
+### Device[2] : Tesla C2070
+### Using Device : Tesla K20c
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Private.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+Running OpenCL DGEMM with 786432...
+
+Alg = 31 	 NbFPE = 8 	 Range = 1 	 Size = 512 	 Time = 0.03422547 s 	 Throughput = 0.1838 GB/s
+
+Alg = 31 	 NbFPE = 8 	 Range = 1 	 Size = 512 	 Time = 0.03422547 s 	 Performance = 384.3143 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 768x768x768 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 6.0.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : Tesla K20c
+### Device[1] : Tesla C2070
+### Device[2] : Tesla C2070
+### Using Device : Tesla K20c
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Private.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+Running OpenCL DGEMM with 1769472...
+
+Alg = 31 	 NbFPE = 8 	 Range = 1 	 Size = 768 	 Time = 0.11056496 s 	 Throughput = 0.1280 GB/s
+
+Alg = 31 	 NbFPE = 8 	 Range = 1 	 Size = 768 	 Time = 0.11056496 s 	 Performance = 401.5062 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 1024x1024x1024 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 6.0.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : Tesla K20c
+### Device[1] : Tesla C2070
+### Device[2] : Tesla C2070
+### Using Device : Tesla K20c
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Private.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+Running OpenCL DGEMM with 3145728...
+
+Alg = 31 	 NbFPE = 8 	 Range = 1 	 Size = 1024 	 Time = 0.25470384 s 	 Throughput = 0.0988 GB/s
+
+Alg = 31 	 NbFPE = 8 	 Range = 1 	 Size = 1024 	 Time = 0.25470384 s 	 Performance = 413.1335 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 1280x1280x1280 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 6.0.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : Tesla K20c
+### Device[1] : Tesla C2070
+### Device[2] : Tesla C2070
+### Using Device : Tesla K20c
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Private.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+Running OpenCL DGEMM with 4915200...
+
+Alg = 31 	 NbFPE = 8 	 Range = 1 	 Size = 1280 	 Time = 0.49367395 s 	 Throughput = 0.0797 GB/s
+
+Alg = 31 	 NbFPE = 8 	 Range = 1 	 Size = 1280 	 Time = 0.49367395 s 	 Performance = 416.3090 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 2227133.0390897174
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	FAILED
+Starting with a matrices of 1536x1536x1536 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 6.0.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : Tesla K20c
+### Device[1] : Tesla C2070
+### Device[2] : Tesla C2070
+### Using Device : Tesla K20c
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Private.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+Running OpenCL DGEMM with 7077888...
+
+Alg = 31 	 NbFPE = 8 	 Range = 1 	 Size = 1536 	 Time = 0.84241600 s 	 Throughput = 0.0672 GB/s
+
+Alg = 31 	 NbFPE = 8 	 Range = 1 	 Size = 1536 	 Time = 0.84241600 s 	 Performance = 421.5733 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 3982717.9855727921
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	FAILED
+Starting with a matrices of 1792x1792x1792 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 6.0.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : Tesla K20c
+### Device[1] : Tesla C2070
+### Device[2] : Tesla C2070
+### Using Device : Tesla K20c
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Private.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+Running OpenCL DGEMM with 9633792...
+
+Alg = 31 	 NbFPE = 8 	 Range = 1 	 Size = 1792 	 Time = 1.32936278 s 	 Throughput = 0.0580 GB/s
+
+Alg = 31 	 NbFPE = 8 	 Range = 1 	 Size = 1792 	 Time = 1.32936278 s 	 Performance = 424.2253 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 5968968.454182934
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	FAILED
+Starting with a matrices of 2048x2048x2048 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 6.0.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : Tesla K20c
+### Device[1] : Tesla C2070
+### Device[2] : Tesla C2070
+### Using Device : Tesla K20c
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Private.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+Running OpenCL DGEMM with 12582912...
+
+Alg = 31 	 NbFPE = 8 	 Range = 1 	 Size = 2048 	 Time = 1.98108397 s 	 Throughput = 0.0508 GB/s
+
+Alg = 31 	 NbFPE = 8 	 Range = 1 	 Size = 2048 	 Time = 1.98108397 s 	 Performance = 424.9257 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 8227328.1241337396
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	FAILED
+Starting with a matrices of 1024x1024x1024 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 6.0.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : Tesla K20c
+### Device[1] : Tesla C2070
+### Device[2] : Tesla C2070
+### Using Device : Tesla K20c
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Multi.Global.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+...allocating memory for a matrix of superaccumulators
+Running OpenCL DGEMM with 3145728...
+
+Alg = 54 	 NbFPE = 3 	 Range = 1 	 Size = 1024 	 Time = 7.77466365 s 	 Throughput = 0.0032 GB/s
+
+Alg = 54 	 NbFPE = 3 	 Range = 1 	 Size = 1024 	 Time = 7.77466365 s 	 Performance = 5.2481 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 1679727.0111797929
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	FAILED
+Starting with a matrices of 1280x1280x1280 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 6.0.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : Tesla K20c
+### Device[1] : Tesla C2070
+### Device[2] : Tesla C2070
+### Using Device : Tesla K20c
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Multi.Global.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+...allocating memory for a matrix of superaccumulators
+Running OpenCL DGEMM with 4915200...
+
+Alg = 54 	 NbFPE = 3 	 Range = 1 	 Size = 1280 	 Time = 15.05060954 s 	 Throughput = 0.0026 GB/s
+
+Alg = 54 	 NbFPE = 3 	 Range = 1 	 Size = 1280 	 Time = 15.05060954 s 	 Performance = 5.2949 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 3060627.4692557734
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	FAILED
+Starting with a matrices of 1536x1536x1536 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 6.0.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : Tesla K20c
+### Device[1] : Tesla C2070
+### Device[2] : Tesla C2070
+### Using Device : Tesla K20c
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Multi.Global.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+...allocating memory for a matrix of superaccumulators
+Running OpenCL DGEMM with 7077888...
+
+Alg = 54 	 NbFPE = 3 	 Range = 1 	 Size = 1536 	 Time = 25.96671213 s 	 Throughput = 0.0022 GB/s
+
+Alg = 54 	 NbFPE = 3 	 Range = 1 	 Size = 1536 	 Time = 25.96671213 s 	 Performance = 5.3032 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 4712661.5759603409
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	FAILED
+Starting with a matrices of 1792x1792x1792 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 6.0.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : Tesla K20c
+### Device[1] : Tesla C2070
+### Device[2] : Tesla C2070
+### Using Device : Tesla K20c
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Multi.Global.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+...allocating memory for a matrix of superaccumulators
+Running OpenCL DGEMM with 9633792...
+
+Alg = 54 	 NbFPE = 3 	 Range = 1 	 Size = 1792 	 Time = 41.21658579 s 	 Throughput = 0.0019 GB/s
+
+Alg = 54 	 NbFPE = 3 	 Range = 1 	 Size = 1792 	 Time = 41.21658579 s 	 Performance = 5.3055 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 6653535.6004284667
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	FAILED
+Starting with a matrices of 2048x2048x2048 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 6.0.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : Tesla K20c
+### Device[1] : Tesla C2070
+### Device[2] : Tesla C2070
+### Using Device : Tesla K20c
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Multi.Global.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+...allocating memory for a matrix of superaccumulators
+Running OpenCL DGEMM with 12582912...
+
+Alg = 54 	 NbFPE = 3 	 Range = 1 	 Size = 2048 	 Time = 61.69376346 s 	 Throughput = 0.0016 GB/s
+
+Alg = 54 	 NbFPE = 3 	 Range = 1 	 Size = 2048 	 Time = 61.69376346 s 	 Performance = 5.2909 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 8886934.5087050125
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	FAILED
+Starting with a matrices of 1024x1024x1024 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 6.0.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : Tesla K20c
+### Device[1] : Tesla C2070
+### Device[2] : Tesla C2070
+### Using Device : Tesla K20c
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Multi.Global.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+...allocating memory for a matrix of superaccumulators
+Running OpenCL DGEMM with 3145728...
+
+Alg = 54 	 NbFPE = 4 	 Range = 1 	 Size = 1024 	 Time = 7.77607574 s 	 Throughput = 0.0032 GB/s
+
+Alg = 54 	 NbFPE = 4 	 Range = 1 	 Size = 1024 	 Time = 7.77607574 s 	 Performance = 6.9041 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 1679727.0111797929
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	FAILED
+Starting with a matrices of 1280x1280x1280 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 6.0.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : Tesla K20c
+### Device[1] : Tesla C2070
+### Device[2] : Tesla C2070
+### Using Device : Tesla K20c
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Multi.Global.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+...allocating memory for a matrix of superaccumulators
+Running OpenCL DGEMM with 4915200...
+
+Alg = 54 	 NbFPE = 4 	 Range = 1 	 Size = 1280 	 Time = 15.05604288 s 	 Throughput = 0.0026 GB/s
+
+Alg = 54 	 NbFPE = 4 	 Range = 1 	 Size = 1280 	 Time = 15.05604288 s 	 Performance = 6.9645 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 3060627.4692557734
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	FAILED
+Starting with a matrices of 1536x1536x1536 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 6.0.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : Tesla K20c
+### Device[1] : Tesla C2070
+### Device[2] : Tesla C2070
+### Using Device : Tesla K20c
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Multi.Global.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+...allocating memory for a matrix of superaccumulators
+Running OpenCL DGEMM with 7077888...
+
+Alg = 54 	 NbFPE = 4 	 Range = 1 	 Size = 1536 	 Time = 25.93997117 s 	 Throughput = 0.0022 GB/s
+
+Alg = 54 	 NbFPE = 4 	 Range = 1 	 Size = 1536 	 Time = 25.93997117 s 	 Performance = 6.9851 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 4712661.5759603409
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	FAILED
+Starting with a matrices of 1792x1792x1792 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 6.0.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : Tesla K20c
+### Device[1] : Tesla C2070
+### Device[2] : Tesla C2070
+### Using Device : Tesla K20c
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Multi.Global.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+...allocating memory for a matrix of superaccumulators
+Running OpenCL DGEMM with 9633792...
+
+Alg = 54 	 NbFPE = 4 	 Range = 1 	 Size = 1792 	 Time = 41.19944794 s 	 Throughput = 0.0019 GB/s
+
+Alg = 54 	 NbFPE = 4 	 Range = 1 	 Size = 1792 	 Time = 41.19944794 s 	 Performance = 6.9838 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 6653535.6004284667
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	FAILED
+Starting with a matrices of 2048x2048x2048 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 6.0.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : Tesla K20c
+### Device[1] : Tesla C2070
+### Device[2] : Tesla C2070
+### Using Device : Tesla K20c
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Multi.Global.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+...allocating memory for a matrix of superaccumulators
+Running OpenCL DGEMM with 12582912...
+
+Alg = 54 	 NbFPE = 4 	 Range = 1 	 Size = 2048 	 Time = 61.69833533 s 	 Throughput = 0.0016 GB/s
+
+Alg = 54 	 NbFPE = 4 	 Range = 1 	 Size = 2048 	 Time = 61.69833533 s 	 Performance = 6.9612 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 8886934.5087050125
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	FAILED
+Starting with a matrices of 1024x1024x1024 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 6.0.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : Tesla K20c
+### Device[1] : Tesla C2070
+### Device[2] : Tesla C2070
+### Using Device : Tesla K20c
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Multi.Global.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+...allocating memory for a matrix of superaccumulators
+Running OpenCL DGEMM with 3145728...
+
+Alg = 54 	 NbFPE = 5 	 Range = 1 	 Size = 1024 	 Time = 7.77158534 s 	 Throughput = 0.0032 GB/s
+
+Alg = 54 	 NbFPE = 5 	 Range = 1 	 Size = 1024 	 Time = 7.77158534 s 	 Performance = 8.5661 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 1679727.0111797929
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	FAILED
+Starting with a matrices of 1280x1280x1280 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 6.0.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : Tesla K20c
+### Device[1] : Tesla C2070
+### Device[2] : Tesla C2070
+### Using Device : Tesla K20c
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Multi.Global.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+...allocating memory for a matrix of superaccumulators
+Running OpenCL DGEMM with 4915200...
+
+Alg = 54 	 NbFPE = 5 	 Range = 1 	 Size = 1280 	 Time = 15.03773648 s 	 Throughput = 0.0026 GB/s
+
+Alg = 54 	 NbFPE = 5 	 Range = 1 	 Size = 1280 	 Time = 15.03773648 s 	 Performance = 8.6465 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 3060627.4692557734
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	FAILED
+Starting with a matrices of 1536x1536x1536 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 6.0.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : Tesla K20c
+### Device[1] : Tesla C2070
+### Device[2] : Tesla C2070
+### Using Device : Tesla K20c
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Multi.Global.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+...allocating memory for a matrix of superaccumulators
+Running OpenCL DGEMM with 7077888...
+
+Alg = 54 	 NbFPE = 5 	 Range = 1 	 Size = 1536 	 Time = 25.96702758 s 	 Throughput = 0.0022 GB/s
+
+Alg = 54 	 NbFPE = 5 	 Range = 1 	 Size = 1536 	 Time = 25.96702758 s 	 Performance = 8.6525 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 4712661.5759603409
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	FAILED
+Starting with a matrices of 1792x1792x1792 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 6.0.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : Tesla K20c
+### Device[1] : Tesla C2070
+### Device[2] : Tesla C2070
+### Using Device : Tesla K20c
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Multi.Global.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+...allocating memory for a matrix of superaccumulators
+Running OpenCL DGEMM with 9633792...
+
+Alg = 54 	 NbFPE = 5 	 Range = 1 	 Size = 1792 	 Time = 41.15658650 s 	 Throughput = 0.0019 GB/s
+
+Alg = 54 	 NbFPE = 5 	 Range = 1 	 Size = 1792 	 Time = 41.15658650 s 	 Performance = 8.6689 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 6653535.6004284667
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	FAILED
+Starting with a matrices of 2048x2048x2048 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.1 CUDA 6.0.1
+### Platform[0] : NVIDIA CUDA
+### Using Platform : NVIDIA CUDA
+clGetDeviceIDs...
+### Device[0] : Tesla K20c
+### Device[1] : Tesla C2070
+### Device[2] : Tesla C2070
+### Using Device : Tesla K20c
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Multi.Global.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+...allocating memory for a matrix of superaccumulators
+Running OpenCL DGEMM with 12582912...
+
+Alg = 54 	 NbFPE = 5 	 Range = 1 	 Size = 2048 	 Time = 61.65391258 s 	 Throughput = 0.0016 GB/s
+
+Alg = 54 	 NbFPE = 5 	 Range = 1 	 Size = 2048 	 Time = 61.65391258 s 	 Performance = 8.6382 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 8886934.5087050125
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	FAILED
