@@ -126,7 +126,7 @@ extern "C" size_t DGEMMAMD(
     {
         size_t NbThreadsPerWorkGroup[] = {(size_t) (BLOCK_SIZE / VECTOR_NUMBER), (size_t) (BLOCK_SIZE / VECTOR_NUMBER)};
         //size_t TotalNbThreads[] = {(size_t) (512 / VECTOR_NUMBER), (size_t) (512 / VECTOR_NUMBER)};
-        size_t TotalNbThreads[] = {(size_t) 512, (size_t) 512};
+        size_t TotalNbThreads[] = {(size_t) m, (size_t) m};
         //size_t neededLocalMemory = (BLOCK_SIZE / VECTOR_NUMBER) * (BLOCK_SIZE / VECTOR_NUMBER) * sizeof(cl_double);
         size_t neededLocalMemory = BLOCK_SIZE * BLOCK_SIZE * sizeof(cl_double);
 

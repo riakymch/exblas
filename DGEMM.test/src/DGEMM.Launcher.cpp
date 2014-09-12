@@ -127,7 +127,7 @@ extern "C" size_t DGEMM(
 
     {
         size_t NbThreadsPerWorkGroup[] = {(size_t) (BLOCK_SIZE), (size_t) (BLOCK_SIZE / VECTOR_NUMBER)};
-        size_t TotalNbThreads[] = {(size_t) (1024), (size_t)(1024 / VECTOR_NUMBER)};
+        size_t TotalNbThreads[] = {(size_t) (m), (size_t)(n / VECTOR_NUMBER)};
         size_t neededLocalMemory = BLOCK_SIZE * BLOCK_SIZE * sizeof(cl_double);
 
         cl_int i = 0;

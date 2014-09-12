@@ -135,7 +135,7 @@ extern "C" size_t DGEMMVolkov(
         size_t NbThreadsPerWorkGroup[] = {(size_t) (16), (size_t) (4)};
         size_t TotalNbThreads[] = {(size_t) (n / 4), (size_t) (m / 4)};
         //size_t NbThreadsPerWorkGroup[] = {(size_t) (BLOCK_SIZE), (size_t) (BLOCK_SIZE)};
-        //size_t TotalNbThreads[] = {(size_t) (d_C.height / 64), (size_t) (d_C.height / 16)};
+        //size_t TotalNbThreads[] = {(size_t) (n / 64), (size_t) (m / 16)};
 
         cl_int i = 0;
         ciErrNum  = clSetKernelArg(ckMatrixMul, i++, sizeof(cl_mem),  (void *)&d_C);
