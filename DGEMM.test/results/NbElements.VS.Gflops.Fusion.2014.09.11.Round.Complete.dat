@@ -1,0 +1,2868 @@
+Starting with a matrices of 256x256x256 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.2 AMD-APP (1124.2)
+### Platform[0] : AMD Accelerated Parallel Processing
+### Using Platform : AMD Accelerated Parallel Processing
+clGetDeviceIDs...
+### Device[0] : Tahiti
+### Using Device : Tahiti
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+Running OpenCL DGEMM with 196608...
+
+Alg = 2 	 NbFPE = 0 	 Range = 1 	 Size = 256 	 Time = 0.00064186 s 	 Throughput = 2.4505 GB/s
+
+Alg = 2 	 NbFPE = 0 	 Range = 1 	 Size = 256 	 Time = 0.00064186 s 	 Performance = 52.2772 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 512x512x512 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.2 AMD-APP (1124.2)
+### Platform[0] : AMD Accelerated Parallel Processing
+### Using Platform : AMD Accelerated Parallel Processing
+clGetDeviceIDs...
+### Device[0] : Tahiti
+### Using Device : Tahiti
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+Running OpenCL DGEMM with 786432...
+
+Alg = 2 	 NbFPE = 0 	 Range = 1 	 Size = 512 	 Time = 0.00129318 s 	 Throughput = 4.8651 GB/s
+
+Alg = 2 	 NbFPE = 0 	 Range = 1 	 Size = 512 	 Time = 0.00129318 s 	 Performance = 207.5783 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 768x768x768 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.2 AMD-APP (1124.2)
+### Platform[0] : AMD Accelerated Parallel Processing
+### Using Platform : AMD Accelerated Parallel Processing
+clGetDeviceIDs...
+### Device[0] : Tahiti
+### Using Device : Tahiti
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+Running OpenCL DGEMM with 1769472...
+
+Alg = 2 	 NbFPE = 0 	 Range = 1 	 Size = 768 	 Time = 0.00361765 s 	 Throughput = 3.9130 GB/s
+
+Alg = 2 	 NbFPE = 0 	 Range = 1 	 Size = 768 	 Time = 0.00361765 s 	 Performance = 250.4306 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 1024x1024x1024 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.2 AMD-APP (1124.2)
+### Platform[0] : AMD Accelerated Parallel Processing
+### Using Platform : AMD Accelerated Parallel Processing
+clGetDeviceIDs...
+### Device[0] : Tahiti
+### Using Device : Tahiti
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+Running OpenCL DGEMM with 3145728...
+
+Alg = 2 	 NbFPE = 0 	 Range = 1 	 Size = 1024 	 Time = 0.00795410 s 	 Throughput = 3.1639 GB/s
+
+Alg = 2 	 NbFPE = 0 	 Range = 1 	 Size = 1024 	 Time = 0.00795410 s 	 Performance = 269.9846 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 1280x1280x1280 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.2 AMD-APP (1124.2)
+### Platform[0] : AMD Accelerated Parallel Processing
+### Using Platform : AMD Accelerated Parallel Processing
+clGetDeviceIDs...
+### Device[0] : Tahiti
+### Using Device : Tahiti
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+Running OpenCL DGEMM with 4915200...
+
+Alg = 2 	 NbFPE = 0 	 Range = 1 	 Size = 1280 	 Time = 0.01539956 s 	 Throughput = 2.5534 GB/s
+
+Alg = 2 	 NbFPE = 0 	 Range = 1 	 Size = 1280 	 Time = 0.01539956 s 	 Performance = 272.3651 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 1536x1536x1536 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.2 AMD-APP (1124.2)
+### Platform[0] : AMD Accelerated Parallel Processing
+### Using Platform : AMD Accelerated Parallel Processing
+clGetDeviceIDs...
+### Device[0] : Tahiti
+### Using Device : Tahiti
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+Running OpenCL DGEMM with 7077888...
+
+Alg = 2 	 NbFPE = 0 	 Range = 1 	 Size = 1536 	 Time = 0.02596748 s 	 Throughput = 2.1805 GB/s
+
+Alg = 2 	 NbFPE = 0 	 Range = 1 	 Size = 1536 	 Time = 0.02596748 s 	 Performance = 279.1090 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 1792x1792x1792 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.2 AMD-APP (1124.2)
+### Platform[0] : AMD Accelerated Parallel Processing
+### Using Platform : AMD Accelerated Parallel Processing
+clGetDeviceIDs...
+### Device[0] : Tahiti
+### Using Device : Tahiti
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+Running OpenCL DGEMM with 9633792...
+
+Alg = 2 	 NbFPE = 0 	 Range = 1 	 Size = 1792 	 Time = 0.04140579 s 	 Throughput = 1.8613 GB/s
+
+Alg = 2 	 NbFPE = 0 	 Range = 1 	 Size = 1792 	 Time = 0.04140579 s 	 Performance = 277.9604 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 2048x2048x2048 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.2 AMD-APP (1124.2)
+### Platform[0] : AMD Accelerated Parallel Processing
+### Using Platform : AMD Accelerated Parallel Processing
+clGetDeviceIDs...
+### Device[0] : Tahiti
+### Using Device : Tahiti
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+Running OpenCL DGEMM with 12582912...
+
+Alg = 2 	 NbFPE = 0 	 Range = 1 	 Size = 2048 	 Time = 0.06127043 s 	 Throughput = 1.6429 GB/s
+
+Alg = 2 	 NbFPE = 0 	 Range = 1 	 Size = 2048 	 Time = 0.06127043 s 	 Performance = 280.3941 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 256x256x256 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.2 AMD-APP (1124.2)
+### Platform[0] : AMD Accelerated Parallel Processing
+### Using Platform : AMD Accelerated Parallel Processing
+clGetDeviceIDs...
+### Device[0] : Tahiti
+### Using Device : Tahiti
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Global.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+...allocating memory for a matrix of superaccumulators
+Running OpenCL DGEMM with 196608...
+
+Alg = 51 	 NbFPE = 3 	 Range = 1 	 Size = 256 	 Time = 0.09792369 s 	 Throughput = 0.0161 GB/s
+
+Alg = 51 	 NbFPE = 3 	 Range = 1 	 Size = 256 	 Time = 0.09792369 s 	 Performance = 6.5105 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 512x512x512 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.2 AMD-APP (1124.2)
+### Platform[0] : AMD Accelerated Parallel Processing
+### Using Platform : AMD Accelerated Parallel Processing
+clGetDeviceIDs...
+### Device[0] : Tahiti
+### Using Device : Tahiti
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Global.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+...allocating memory for a matrix of superaccumulators
+Running OpenCL DGEMM with 786432...
+
+Alg = 51 	 NbFPE = 3 	 Range = 1 	 Size = 512 	 Time = 0.76903076 s 	 Throughput = 0.0082 GB/s
+
+Alg = 51 	 NbFPE = 3 	 Range = 1 	 Size = 512 	 Time = 0.76903076 s 	 Performance = 6.6321 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 768x768x768 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.2 AMD-APP (1124.2)
+### Platform[0] : AMD Accelerated Parallel Processing
+### Using Platform : AMD Accelerated Parallel Processing
+clGetDeviceIDs...
+### Device[0] : Tahiti
+### Using Device : Tahiti
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Global.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+...allocating memory for a matrix of superaccumulators
+Running OpenCL DGEMM with 1769472...
+
+Alg = 51 	 NbFPE = 3 	 Range = 1 	 Size = 768 	 Time = 2.59635517 s 	 Throughput = 0.0055 GB/s
+
+Alg = 51 	 NbFPE = 3 	 Range = 1 	 Size = 768 	 Time = 2.59635517 s 	 Performance = 6.6298 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 1024x1024x1024 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.2 AMD-APP (1124.2)
+### Platform[0] : AMD Accelerated Parallel Processing
+### Using Platform : AMD Accelerated Parallel Processing
+clGetDeviceIDs...
+### Device[0] : Tahiti
+### Using Device : Tahiti
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Global.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+...allocating memory for a matrix of superaccumulators
+Running OpenCL DGEMM with 3145728...
+
+Alg = 51 	 NbFPE = 3 	 Range = 1 	 Size = 1024 	 Time = 6.13720645 s 	 Throughput = 0.0041 GB/s
+
+Alg = 51 	 NbFPE = 3 	 Range = 1 	 Size = 1024 	 Time = 6.13720645 s 	 Performance = 6.6483 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 1280x1280x1280 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.2 AMD-APP (1124.2)
+### Platform[0] : AMD Accelerated Parallel Processing
+### Using Platform : AMD Accelerated Parallel Processing
+clGetDeviceIDs...
+### Device[0] : Tahiti
+### Using Device : Tahiti
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Global.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+...allocating memory for a matrix of superaccumulators
+Running OpenCL DGEMM with 4915200...
+
+Alg = 51 	 NbFPE = 3 	 Range = 1 	 Size = 1280 	 Time = 12.11752114 s 	 Throughput = 0.0032 GB/s
+
+Alg = 51 	 NbFPE = 3 	 Range = 1 	 Size = 1280 	 Time = 12.11752114 s 	 Performance = 6.5766 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 1192358997028.0022
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	FAILED
+Starting with a matrices of 256x256x256 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.2 AMD-APP (1124.2)
+### Platform[0] : AMD Accelerated Parallel Processing
+### Using Platform : AMD Accelerated Parallel Processing
+clGetDeviceIDs...
+### Device[0] : Tahiti
+### Using Device : Tahiti
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Global.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+...allocating memory for a matrix of superaccumulators
+Running OpenCL DGEMM with 196608...
+
+Alg = 51 	 NbFPE = 4 	 Range = 1 	 Size = 256 	 Time = 0.09776626 s 	 Throughput = 0.0161 GB/s
+
+Alg = 51 	 NbFPE = 4 	 Range = 1 	 Size = 256 	 Time = 0.09776626 s 	 Performance = 8.5803 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 512x512x512 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.2 AMD-APP (1124.2)
+### Platform[0] : AMD Accelerated Parallel Processing
+### Using Platform : AMD Accelerated Parallel Processing
+clGetDeviceIDs...
+### Device[0] : Tahiti
+### Using Device : Tahiti
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Global.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+...allocating memory for a matrix of superaccumulators
+Running OpenCL DGEMM with 786432...
+
+Alg = 51 	 NbFPE = 4 	 Range = 1 	 Size = 512 	 Time = 0.76910424 s 	 Throughput = 0.0082 GB/s
+
+Alg = 51 	 NbFPE = 4 	 Range = 1 	 Size = 512 	 Time = 0.76910424 s 	 Performance = 8.7256 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 768x768x768 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.2 AMD-APP (1124.2)
+### Platform[0] : AMD Accelerated Parallel Processing
+### Using Platform : AMD Accelerated Parallel Processing
+clGetDeviceIDs...
+### Device[0] : Tahiti
+### Using Device : Tahiti
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Global.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+...allocating memory for a matrix of superaccumulators
+Running OpenCL DGEMM with 1769472...
+
+Alg = 51 	 NbFPE = 4 	 Range = 1 	 Size = 768 	 Time = 2.59584939 s 	 Throughput = 0.0055 GB/s
+
+Alg = 51 	 NbFPE = 4 	 Range = 1 	 Size = 768 	 Time = 2.59584939 s 	 Performance = 8.7252 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 1024x1024x1024 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.2 AMD-APP (1124.2)
+### Platform[0] : AMD Accelerated Parallel Processing
+### Using Platform : AMD Accelerated Parallel Processing
+clGetDeviceIDs...
+### Device[0] : Tahiti
+### Using Device : Tahiti
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Global.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+...allocating memory for a matrix of superaccumulators
+Running OpenCL DGEMM with 3145728...
+
+Alg = 51 	 NbFPE = 4 	 Range = 1 	 Size = 1024 	 Time = 6.13611866 s 	 Throughput = 0.0041 GB/s
+
+Alg = 51 	 NbFPE = 4 	 Range = 1 	 Size = 1024 	 Time = 6.13611866 s 	 Performance = 8.7494 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 1280x1280x1280 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.2 AMD-APP (1124.2)
+### Platform[0] : AMD Accelerated Parallel Processing
+### Using Platform : AMD Accelerated Parallel Processing
+clGetDeviceIDs...
+### Device[0] : Tahiti
+### Using Device : Tahiti
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Global.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+...allocating memory for a matrix of superaccumulators
+Running OpenCL DGEMM with 4915200...
+
+Alg = 51 	 NbFPE = 4 	 Range = 1 	 Size = 1280 	 Time = 12.11031205 s 	 Throughput = 0.0032 GB/s
+
+Alg = 51 	 NbFPE = 4 	 Range = 1 	 Size = 1280 	 Time = 12.11031205 s 	 Performance = 8.6585 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 1192358997028.0022
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	FAILED
+Starting with a matrices of 256x256x256 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.2 AMD-APP (1124.2)
+### Platform[0] : AMD Accelerated Parallel Processing
+### Using Platform : AMD Accelerated Parallel Processing
+clGetDeviceIDs...
+### Device[0] : Tahiti
+### Using Device : Tahiti
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Global.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+...allocating memory for a matrix of superaccumulators
+Running OpenCL DGEMM with 196608...
+
+Alg = 51 	 NbFPE = 5 	 Range = 1 	 Size = 256 	 Time = 0.09781074 s 	 Throughput = 0.0161 GB/s
+
+Alg = 51 	 NbFPE = 5 	 Range = 1 	 Size = 256 	 Time = 0.09781074 s 	 Performance = 10.6347 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 512x512x512 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.2 AMD-APP (1124.2)
+### Platform[0] : AMD Accelerated Parallel Processing
+### Using Platform : AMD Accelerated Parallel Processing
+clGetDeviceIDs...
+### Device[0] : Tahiti
+### Using Device : Tahiti
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Global.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+...allocating memory for a matrix of superaccumulators
+Running OpenCL DGEMM with 786432...
+
+Alg = 51 	 NbFPE = 5 	 Range = 1 	 Size = 512 	 Time = 0.76870120 s 	 Throughput = 0.0082 GB/s
+
+Alg = 51 	 NbFPE = 5 	 Range = 1 	 Size = 512 	 Time = 0.76870120 s 	 Performance = 10.8254 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 768x768x768 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.2 AMD-APP (1124.2)
+### Platform[0] : AMD Accelerated Parallel Processing
+### Using Platform : AMD Accelerated Parallel Processing
+clGetDeviceIDs...
+### Device[0] : Tahiti
+### Using Device : Tahiti
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Global.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+...allocating memory for a matrix of superaccumulators
+Running OpenCL DGEMM with 1769472...
+
+Alg = 51 	 NbFPE = 5 	 Range = 1 	 Size = 768 	 Time = 2.59539509 s 	 Throughput = 0.0055 GB/s
+
+Alg = 51 	 NbFPE = 5 	 Range = 1 	 Size = 768 	 Time = 2.59539509 s 	 Performance = 10.8211 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 1024x1024x1024 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.2 AMD-APP (1124.2)
+### Platform[0] : AMD Accelerated Parallel Processing
+### Using Platform : AMD Accelerated Parallel Processing
+clGetDeviceIDs...
+### Device[0] : Tahiti
+### Using Device : Tahiti
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Global.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+...allocating memory for a matrix of superaccumulators
+Running OpenCL DGEMM with 3145728...
+
+Alg = 51 	 NbFPE = 5 	 Range = 1 	 Size = 1024 	 Time = 6.13667360 s 	 Throughput = 0.0041 GB/s
+
+Alg = 51 	 NbFPE = 5 	 Range = 1 	 Size = 1024 	 Time = 6.13667360 s 	 Performance = 10.8482 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 1280x1280x1280 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.2 AMD-APP (1124.2)
+### Platform[0] : AMD Accelerated Parallel Processing
+### Using Platform : AMD Accelerated Parallel Processing
+clGetDeviceIDs...
+### Device[0] : Tahiti
+### Using Device : Tahiti
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Global.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+...allocating memory for a matrix of superaccumulators
+Running OpenCL DGEMM with 4915200...
+
+Alg = 51 	 NbFPE = 5 	 Range = 1 	 Size = 1280 	 Time = 12.11757567 s 	 Throughput = 0.0032 GB/s
+
+Alg = 51 	 NbFPE = 5 	 Range = 1 	 Size = 1280 	 Time = 12.11757567 s 	 Performance = 10.7302 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 1192358997028.0022
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	FAILED
+Starting with a matrices of 256x256x256 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.2 AMD-APP (1124.2)
+### Platform[0] : AMD Accelerated Parallel Processing
+### Using Platform : AMD Accelerated Parallel Processing
+clGetDeviceIDs...
+### Device[0] : Tahiti
+### Using Device : Tahiti
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Global.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+...allocating memory for a matrix of superaccumulators
+Running OpenCL DGEMM with 196608...
+
+Alg = 51 	 NbFPE = 6 	 Range = 1 	 Size = 256 	 Time = 0.09079180 s 	 Throughput = 0.0173 GB/s
+
+Alg = 51 	 NbFPE = 6 	 Range = 1 	 Size = 256 	 Time = 0.09079180 s 	 Performance = 13.6743 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 512x512x512 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.2 AMD-APP (1124.2)
+### Platform[0] : AMD Accelerated Parallel Processing
+### Using Platform : AMD Accelerated Parallel Processing
+clGetDeviceIDs...
+### Device[0] : Tahiti
+### Using Device : Tahiti
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Global.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+...allocating memory for a matrix of superaccumulators
+Running OpenCL DGEMM with 786432...
+
+Alg = 51 	 NbFPE = 6 	 Range = 1 	 Size = 512 	 Time = 0.70612323 s 	 Throughput = 0.0089 GB/s
+
+Alg = 51 	 NbFPE = 6 	 Range = 1 	 Size = 512 	 Time = 0.70612323 s 	 Performance = 14.0657 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 768x768x768 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.2 AMD-APP (1124.2)
+### Platform[0] : AMD Accelerated Parallel Processing
+### Using Platform : AMD Accelerated Parallel Processing
+clGetDeviceIDs...
+### Device[0] : Tahiti
+### Using Device : Tahiti
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Global.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+...allocating memory for a matrix of superaccumulators
+Running OpenCL DGEMM with 1769472...
+
+Alg = 51 	 NbFPE = 6 	 Range = 1 	 Size = 768 	 Time = 2.40172788 s 	 Throughput = 0.0059 GB/s
+
+Alg = 51 	 NbFPE = 6 	 Range = 1 	 Size = 768 	 Time = 2.40172788 s 	 Performance = 13.9570 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 1024x1024x1024 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.2 AMD-APP (1124.2)
+### Platform[0] : AMD Accelerated Parallel Processing
+### Using Platform : AMD Accelerated Parallel Processing
+clGetDeviceIDs...
+### Device[0] : Tahiti
+### Using Device : Tahiti
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Global.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+...allocating memory for a matrix of superaccumulators
+Running OpenCL DGEMM with 3145728...
+
+Alg = 51 	 NbFPE = 6 	 Range = 1 	 Size = 1024 	 Time = 5.66586452 s 	 Throughput = 0.0044 GB/s
+
+Alg = 51 	 NbFPE = 6 	 Range = 1 	 Size = 1024 	 Time = 5.66586452 s 	 Performance = 14.0238 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 1280x1280x1280 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.2 AMD-APP (1124.2)
+### Platform[0] : AMD Accelerated Parallel Processing
+### Using Platform : AMD Accelerated Parallel Processing
+clGetDeviceIDs...
+### Device[0] : Tahiti
+### Using Device : Tahiti
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Global.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+...allocating memory for a matrix of superaccumulators
+Running OpenCL DGEMM with 4915200...
+
+Alg = 51 	 NbFPE = 6 	 Range = 1 	 Size = 1280 	 Time = 11.00089749 s 	 Throughput = 0.0036 GB/s
+
+Alg = 51 	 NbFPE = 6 	 Range = 1 	 Size = 1280 	 Time = 11.00089749 s 	 Performance = 14.1070 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 1192358997028.0022
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	FAILED
+Starting with a matrices of 256x256x256 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.2 AMD-APP (1124.2)
+### Platform[0] : AMD Accelerated Parallel Processing
+### Using Platform : AMD Accelerated Parallel Processing
+clGetDeviceIDs...
+### Device[0] : Tahiti
+### Using Device : Tahiti
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Global.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+...allocating memory for a matrix of superaccumulators
+Running OpenCL DGEMM with 196608...
+
+Alg = 51 	 NbFPE = 7 	 Range = 1 	 Size = 256 	 Time = 0.09096899 s 	 Throughput = 0.0173 GB/s
+
+Alg = 51 	 NbFPE = 7 	 Range = 1 	 Size = 256 	 Time = 0.09096899 s 	 Performance = 15.8608 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 512x512x512 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.2 AMD-APP (1124.2)
+### Platform[0] : AMD Accelerated Parallel Processing
+### Using Platform : AMD Accelerated Parallel Processing
+clGetDeviceIDs...
+### Device[0] : Tahiti
+### Using Device : Tahiti
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Global.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+...allocating memory for a matrix of superaccumulators
+Running OpenCL DGEMM with 786432...
+
+Alg = 51 	 NbFPE = 7 	 Range = 1 	 Size = 512 	 Time = 0.70533759 s 	 Throughput = 0.0089 GB/s
+
+Alg = 51 	 NbFPE = 7 	 Range = 1 	 Size = 512 	 Time = 0.70533759 s 	 Performance = 16.3648 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 768x768x768 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.2 AMD-APP (1124.2)
+### Platform[0] : AMD Accelerated Parallel Processing
+### Using Platform : AMD Accelerated Parallel Processing
+clGetDeviceIDs...
+### Device[0] : Tahiti
+### Using Device : Tahiti
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Global.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+...allocating memory for a matrix of superaccumulators
+Running OpenCL DGEMM with 1769472...
+
+Alg = 51 	 NbFPE = 7 	 Range = 1 	 Size = 768 	 Time = 2.40000112 s 	 Throughput = 0.0059 GB/s
+
+Alg = 51 	 NbFPE = 7 	 Range = 1 	 Size = 768 	 Time = 2.40000112 s 	 Performance = 16.2319 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 1024x1024x1024 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.2 AMD-APP (1124.2)
+### Platform[0] : AMD Accelerated Parallel Processing
+### Using Platform : AMD Accelerated Parallel Processing
+clGetDeviceIDs...
+### Device[0] : Tahiti
+### Using Device : Tahiti
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Global.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+...allocating memory for a matrix of superaccumulators
+Running OpenCL DGEMM with 3145728...
+
+Alg = 51 	 NbFPE = 7 	 Range = 1 	 Size = 1024 	 Time = 5.66743922 s 	 Throughput = 0.0044 GB/s
+
+Alg = 51 	 NbFPE = 7 	 Range = 1 	 Size = 1024 	 Time = 5.66743922 s 	 Performance = 16.2934 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 1280x1280x1280 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.2 AMD-APP (1124.2)
+### Platform[0] : AMD Accelerated Parallel Processing
+### Using Platform : AMD Accelerated Parallel Processing
+clGetDeviceIDs...
+### Device[0] : Tahiti
+### Using Device : Tahiti
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Global.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+...allocating memory for a matrix of superaccumulators
+Running OpenCL DGEMM with 4915200...
+
+Alg = 51 	 NbFPE = 7 	 Range = 1 	 Size = 1280 	 Time = 10.98519637 s 	 Throughput = 0.0036 GB/s
+
+Alg = 51 	 NbFPE = 7 	 Range = 1 	 Size = 1280 	 Time = 10.98519637 s 	 Performance = 16.4180 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 1192358997028.0022
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	FAILED
+Starting with a matrices of 256x256x256 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.2 AMD-APP (1124.2)
+### Platform[0] : AMD Accelerated Parallel Processing
+### Using Platform : AMD Accelerated Parallel Processing
+clGetDeviceIDs...
+### Device[0] : Tahiti
+### Using Device : Tahiti
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Global.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+...allocating memory for a matrix of superaccumulators
+Running OpenCL DGEMM with 196608...
+
+Alg = 51 	 NbFPE = 8 	 Range = 1 	 Size = 256 	 Time = 0.04060898 s 	 Throughput = 0.0387 GB/s
+
+Alg = 51 	 NbFPE = 8 	 Range = 1 	 Size = 256 	 Time = 0.04060898 s 	 Performance = 40.4878 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 512x512x512 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.2 AMD-APP (1124.2)
+### Platform[0] : AMD Accelerated Parallel Processing
+### Using Platform : AMD Accelerated Parallel Processing
+clGetDeviceIDs...
+### Device[0] : Tahiti
+### Using Device : Tahiti
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Global.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+...allocating memory for a matrix of superaccumulators
+Running OpenCL DGEMM with 786432...
+
+Alg = 51 	 NbFPE = 8 	 Range = 1 	 Size = 512 	 Time = 0.32670273 s 	 Throughput = 0.0193 GB/s
+
+Alg = 51 	 NbFPE = 8 	 Range = 1 	 Size = 512 	 Time = 0.32670273 s 	 Performance = 40.2609 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 768x768x768 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.2 AMD-APP (1124.2)
+### Platform[0] : AMD Accelerated Parallel Processing
+### Using Platform : AMD Accelerated Parallel Processing
+clGetDeviceIDs...
+### Device[0] : Tahiti
+### Using Device : Tahiti
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Global.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+...allocating memory for a matrix of superaccumulators
+Running OpenCL DGEMM with 1769472...
+
+Alg = 51 	 NbFPE = 8 	 Range = 1 	 Size = 768 	 Time = 1.12334010 s 	 Throughput = 0.0126 GB/s
+
+Alg = 51 	 NbFPE = 8 	 Range = 1 	 Size = 768 	 Time = 1.12334010 s 	 Performance = 39.5183 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 1024x1024x1024 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.2 AMD-APP (1124.2)
+### Platform[0] : AMD Accelerated Parallel Processing
+### Using Platform : AMD Accelerated Parallel Processing
+clGetDeviceIDs...
+### Device[0] : Tahiti
+### Using Device : Tahiti
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Global.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+...allocating memory for a matrix of superaccumulators
+Running OpenCL DGEMM with 3145728...
+
+Alg = 51 	 NbFPE = 8 	 Range = 1 	 Size = 1024 	 Time = 2.67536802 s 	 Throughput = 0.0094 GB/s
+
+Alg = 51 	 NbFPE = 8 	 Range = 1 	 Size = 1024 	 Time = 2.67536802 s 	 Performance = 39.3317 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 1280x1280x1280 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.2 AMD-APP (1124.2)
+### Platform[0] : AMD Accelerated Parallel Processing
+### Using Platform : AMD Accelerated Parallel Processing
+clGetDeviceIDs...
+### Device[0] : Tahiti
+### Using Device : Tahiti
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Global.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+...allocating memory for a matrix of superaccumulators
+Running OpenCL DGEMM with 4915200...
+
+Alg = 51 	 NbFPE = 8 	 Range = 1 	 Size = 1280 	 Time = 5.37334477 s 	 Throughput = 0.0073 GB/s
+
+Alg = 51 	 NbFPE = 8 	 Range = 1 	 Size = 1280 	 Time = 5.37334477 s 	 Performance = 38.2482 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 1192358997028.0022
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	FAILED
+Starting with a matrices of 256x256x256 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.2 AMD-APP (1124.2)
+### Platform[0] : AMD Accelerated Parallel Processing
+### Using Platform : AMD Accelerated Parallel Processing
+clGetDeviceIDs...
+### Device[0] : Tahiti
+### Using Device : Tahiti
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Private.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+Running OpenCL DGEMM with 196608...
+
+Alg = 31 	 NbFPE = 3 	 Range = 1 	 Size = 256 	 Time = 0.00213213 s 	 Throughput = 0.7377 GB/s
+
+Alg = 31 	 NbFPE = 3 	 Range = 1 	 Size = 256 	 Time = 0.00213213 s 	 Performance = 299.0131 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 512x512x512 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.2 AMD-APP (1124.2)
+### Platform[0] : AMD Accelerated Parallel Processing
+### Using Platform : AMD Accelerated Parallel Processing
+clGetDeviceIDs...
+### Device[0] : Tahiti
+### Using Device : Tahiti
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Private.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+Running OpenCL DGEMM with 786432...
+
+Alg = 31 	 NbFPE = 3 	 Range = 1 	 Size = 512 	 Time = 0.01353136 s 	 Throughput = 0.4650 GB/s
+
+Alg = 31 	 NbFPE = 3 	 Range = 1 	 Size = 512 	 Time = 0.01353136 s 	 Performance = 376.9225 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 768x768x768 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.2 AMD-APP (1124.2)
+### Platform[0] : AMD Accelerated Parallel Processing
+### Using Platform : AMD Accelerated Parallel Processing
+clGetDeviceIDs...
+### Device[0] : Tahiti
+### Using Device : Tahiti
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Private.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+Running OpenCL DGEMM with 1769472...
+
+Alg = 31 	 NbFPE = 3 	 Range = 1 	 Size = 768 	 Time = 0.04327677 s 	 Throughput = 0.3271 GB/s
+
+Alg = 31 	 NbFPE = 3 	 Range = 1 	 Size = 768 	 Time = 0.04327677 s 	 Performance = 397.7520 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 1024x1024x1024 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.2 AMD-APP (1124.2)
+### Platform[0] : AMD Accelerated Parallel Processing
+### Using Platform : AMD Accelerated Parallel Processing
+clGetDeviceIDs...
+### Device[0] : Tahiti
+### Using Device : Tahiti
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Private.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+Running OpenCL DGEMM with 3145728...
+
+Alg = 31 	 NbFPE = 3 	 Range = 1 	 Size = 1024 	 Time = 0.10049654 s 	 Throughput = 0.2504 GB/s
+
+Alg = 31 	 NbFPE = 3 	 Range = 1 	 Size = 1024 	 Time = 0.10049654 s 	 Performance = 406.0059 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 1280x1280x1280 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.2 AMD-APP (1124.2)
+### Platform[0] : AMD Accelerated Parallel Processing
+### Using Platform : AMD Accelerated Parallel Processing
+clGetDeviceIDs...
+### Device[0] : Tahiti
+### Using Device : Tahiti
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Private.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+Running OpenCL DGEMM with 4915200...
+
+Alg = 31 	 NbFPE = 3 	 Range = 1 	 Size = 1280 	 Time = 0.19377686 s 	 Throughput = 0.2029 GB/s
+
+Alg = 31 	 NbFPE = 3 	 Range = 1 	 Size = 1280 	 Time = 0.19377686 s 	 Performance = 411.2554 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 1806669.3861902349
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	FAILED
+Starting with a matrices of 1536x1536x1536 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.2 AMD-APP (1124.2)
+### Platform[0] : AMD Accelerated Parallel Processing
+### Using Platform : AMD Accelerated Parallel Processing
+clGetDeviceIDs...
+### Device[0] : Tahiti
+### Using Device : Tahiti
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Private.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+Running OpenCL DGEMM with 7077888...
+
+Alg = 31 	 NbFPE = 3 	 Range = 1 	 Size = 1536 	 Time = 0.33339769 s 	 Throughput = 0.1698 GB/s
+
+Alg = 31 	 NbFPE = 3 	 Range = 1 	 Size = 1536 	 Time = 0.33339769 s 	 Performance = 413.0424 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 3315184.4259849256
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	FAILED
+Starting with a matrices of 1792x1792x1792 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.2 AMD-APP (1124.2)
+### Platform[0] : AMD Accelerated Parallel Processing
+### Using Platform : AMD Accelerated Parallel Processing
+clGetDeviceIDs...
+### Device[0] : Tahiti
+### Using Device : Tahiti
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Private.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+Running OpenCL DGEMM with 9633792...
+
+Alg = 31 	 NbFPE = 3 	 Range = 1 	 Size = 1792 	 Time = 0.52628975 s 	 Throughput = 0.1464 GB/s
+
+Alg = 31 	 NbFPE = 3 	 Range = 1 	 Size = 1792 	 Time = 0.52628975 s 	 Performance = 415.5016 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 5069795.7404501019
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	FAILED
+Starting with a matrices of 2048x2048x2048 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.2 AMD-APP (1124.2)
+### Platform[0] : AMD Accelerated Parallel Processing
+### Using Platform : AMD Accelerated Parallel Processing
+clGetDeviceIDs...
+### Device[0] : Tahiti
+### Using Device : Tahiti
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Private.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+Running OpenCL DGEMM with 12582912...
+
+Alg = 31 	 NbFPE = 3 	 Range = 1 	 Size = 2048 	 Time = 0.78730606 s 	 Throughput = 0.1279 GB/s
+
+Alg = 31 	 NbFPE = 3 	 Range = 1 	 Size = 2048 	 Time = 0.78730606 s 	 Performance = 414.6005 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 7099055.4812605176
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	FAILED
+Starting with a matrices of 256x256x256 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.2 AMD-APP (1124.2)
+### Platform[0] : AMD Accelerated Parallel Processing
+### Using Platform : AMD Accelerated Parallel Processing
+clGetDeviceIDs...
+### Device[0] : Tahiti
+### Using Device : Tahiti
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Private.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+Running OpenCL DGEMM with 196608...
+
+Alg = 31 	 NbFPE = 4 	 Range = 1 	 Size = 256 	 Time = 0.00222289 s 	 Throughput = 0.7076 GB/s
+
+Alg = 31 	 NbFPE = 4 	 Range = 1 	 Size = 256 	 Time = 0.00222289 s 	 Performance = 377.3736 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 512x512x512 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.2 AMD-APP (1124.2)
+### Platform[0] : AMD Accelerated Parallel Processing
+### Using Platform : AMD Accelerated Parallel Processing
+clGetDeviceIDs...
+### Device[0] : Tahiti
+### Using Device : Tahiti
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Private.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+Running OpenCL DGEMM with 786432...
+
+Alg = 31 	 NbFPE = 4 	 Range = 1 	 Size = 512 	 Time = 0.01550050 s 	 Throughput = 0.4059 GB/s
+
+Alg = 31 	 NbFPE = 4 	 Range = 1 	 Size = 512 	 Time = 0.01550050 s 	 Performance = 432.9466 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 768x768x768 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.2 AMD-APP (1124.2)
+### Platform[0] : AMD Accelerated Parallel Processing
+### Using Platform : AMD Accelerated Parallel Processing
+clGetDeviceIDs...
+### Device[0] : Tahiti
+### Using Device : Tahiti
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Private.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+Running OpenCL DGEMM with 1769472...
+
+Alg = 31 	 NbFPE = 4 	 Range = 1 	 Size = 768 	 Time = 0.05005512 s 	 Throughput = 0.2828 GB/s
+
+Alg = 31 	 NbFPE = 4 	 Range = 1 	 Size = 768 	 Time = 0.05005512 s 	 Performance = 452.4860 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 1024x1024x1024 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.2 AMD-APP (1124.2)
+### Platform[0] : AMD Accelerated Parallel Processing
+### Using Platform : AMD Accelerated Parallel Processing
+clGetDeviceIDs...
+### Device[0] : Tahiti
+### Using Device : Tahiti
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Private.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+Running OpenCL DGEMM with 3145728...
+
+Alg = 31 	 NbFPE = 4 	 Range = 1 	 Size = 1024 	 Time = 0.11677863 s 	 Throughput = 0.2155 GB/s
+
+Alg = 31 	 NbFPE = 4 	 Range = 1 	 Size = 1024 	 Time = 0.11677863 s 	 Performance = 459.7339 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 1280x1280x1280 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.2 AMD-APP (1124.2)
+### Platform[0] : AMD Accelerated Parallel Processing
+### Using Platform : AMD Accelerated Parallel Processing
+clGetDeviceIDs...
+### Device[0] : Tahiti
+### Using Device : Tahiti
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Private.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+Running OpenCL DGEMM with 4915200...
+
+Alg = 31 	 NbFPE = 4 	 Range = 1 	 Size = 1280 	 Time = 0.22487945 s 	 Throughput = 0.1749 GB/s
+
+Alg = 31 	 NbFPE = 4 	 Range = 1 	 Size = 1280 	 Time = 0.22487945 s 	 Performance = 466.2836 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 1806669.3861902349
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	FAILED
+Starting with a matrices of 1536x1536x1536 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.2 AMD-APP (1124.2)
+### Platform[0] : AMD Accelerated Parallel Processing
+### Using Platform : AMD Accelerated Parallel Processing
+clGetDeviceIDs...
+### Device[0] : Tahiti
+### Using Device : Tahiti
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Private.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+Running OpenCL DGEMM with 7077888...
+
+Alg = 31 	 NbFPE = 4 	 Range = 1 	 Size = 1536 	 Time = 0.38733339 s 	 Throughput = 0.1462 GB/s
+
+Alg = 31 	 NbFPE = 4 	 Range = 1 	 Size = 1536 	 Time = 0.38733339 s 	 Performance = 467.7984 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 3315184.4259849256
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	FAILED
+Starting with a matrices of 1792x1792x1792 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.2 AMD-APP (1124.2)
+### Platform[0] : AMD Accelerated Parallel Processing
+### Using Platform : AMD Accelerated Parallel Processing
+clGetDeviceIDs...
+### Device[0] : Tahiti
+### Using Device : Tahiti
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Private.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+Running OpenCL DGEMM with 9633792...
+
+Alg = 31 	 NbFPE = 4 	 Range = 1 	 Size = 1792 	 Time = 0.61076208 s 	 Throughput = 0.1262 GB/s
+
+Alg = 31 	 NbFPE = 4 	 Range = 1 	 Size = 1792 	 Time = 0.61076208 s 	 Performance = 471.0988 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 5069795.7404501019
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	FAILED
+Starting with a matrices of 2048x2048x2048 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.2 AMD-APP (1124.2)
+### Platform[0] : AMD Accelerated Parallel Processing
+### Using Platform : AMD Accelerated Parallel Processing
+clGetDeviceIDs...
+### Device[0] : Tahiti
+### Using Device : Tahiti
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Private.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+Running OpenCL DGEMM with 12582912...
+
+Alg = 31 	 NbFPE = 4 	 Range = 1 	 Size = 2048 	 Time = 0.91217384 s 	 Throughput = 0.1104 GB/s
+
+Alg = 31 	 NbFPE = 4 	 Range = 1 	 Size = 2048 	 Time = 0.91217384 s 	 Performance = 470.8496 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 7099055.4812605176
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	FAILED
+Starting with a matrices of 256x256x256 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.2 AMD-APP (1124.2)
+### Platform[0] : AMD Accelerated Parallel Processing
+### Using Platform : AMD Accelerated Parallel Processing
+clGetDeviceIDs...
+### Device[0] : Tahiti
+### Using Device : Tahiti
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Private.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+Running OpenCL DGEMM with 196608...
+
+Alg = 31 	 NbFPE = 5 	 Range = 1 	 Size = 256 	 Time = 0.00270168 s 	 Throughput = 0.5822 GB/s
+
+Alg = 31 	 NbFPE = 5 	 Range = 1 	 Size = 256 	 Time = 0.00270168 s 	 Performance = 385.0153 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 512x512x512 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.2 AMD-APP (1124.2)
+### Platform[0] : AMD Accelerated Parallel Processing
+### Using Platform : AMD Accelerated Parallel Processing
+clGetDeviceIDs...
+### Device[0] : Tahiti
+### Using Device : Tahiti
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Private.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+Running OpenCL DGEMM with 786432...
+
+Alg = 31 	 NbFPE = 5 	 Range = 1 	 Size = 512 	 Time = 0.01814422 s 	 Throughput = 0.3467 GB/s
+
+Alg = 31 	 NbFPE = 5 	 Range = 1 	 Size = 512 	 Time = 0.01814422 s 	 Performance = 458.6309 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 768x768x768 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.2 AMD-APP (1124.2)
+### Platform[0] : AMD Accelerated Parallel Processing
+### Using Platform : AMD Accelerated Parallel Processing
+clGetDeviceIDs...
+### Device[0] : Tahiti
+### Using Device : Tahiti
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Private.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+Running OpenCL DGEMM with 1769472...
+
+Alg = 31 	 NbFPE = 5 	 Range = 1 	 Size = 768 	 Time = 0.05814072 s 	 Throughput = 0.2435 GB/s
+
+Alg = 31 	 NbFPE = 5 	 Range = 1 	 Size = 768 	 Time = 0.05814072 s 	 Performance = 483.0532 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 1024x1024x1024 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.2 AMD-APP (1124.2)
+### Platform[0] : AMD Accelerated Parallel Processing
+### Using Platform : AMD Accelerated Parallel Processing
+clGetDeviceIDs...
+### Device[0] : Tahiti
+### Using Device : Tahiti
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Private.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+Running OpenCL DGEMM with 3145728...
+
+Alg = 31 	 NbFPE = 5 	 Range = 1 	 Size = 1024 	 Time = 0.13523459 s 	 Throughput = 0.1861 GB/s
+
+Alg = 31 	 NbFPE = 5 	 Range = 1 	 Size = 1024 	 Time = 0.13523459 s 	 Performance = 492.2704 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 1280x1280x1280 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.2 AMD-APP (1124.2)
+### Platform[0] : AMD Accelerated Parallel Processing
+### Using Platform : AMD Accelerated Parallel Processing
+clGetDeviceIDs...
+### Device[0] : Tahiti
+### Using Device : Tahiti
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Private.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+Running OpenCL DGEMM with 4915200...
+
+Alg = 31 	 NbFPE = 5 	 Range = 1 	 Size = 1280 	 Time = 0.26006029 s 	 Throughput = 0.1512 GB/s
+
+Alg = 31 	 NbFPE = 5 	 Range = 1 	 Size = 1280 	 Time = 0.26006029 s 	 Performance = 499.9742 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 1806669.3861902349
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	FAILED
+Starting with a matrices of 1536x1536x1536 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.2 AMD-APP (1124.2)
+### Platform[0] : AMD Accelerated Parallel Processing
+### Using Platform : AMD Accelerated Parallel Processing
+clGetDeviceIDs...
+### Device[0] : Tahiti
+### Using Device : Tahiti
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Private.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+Running OpenCL DGEMM with 7077888...
+
+Alg = 31 	 NbFPE = 5 	 Range = 1 	 Size = 1536 	 Time = 0.44678605 s 	 Throughput = 0.1267 GB/s
+
+Alg = 31 	 NbFPE = 5 	 Range = 1 	 Size = 1536 	 Time = 0.44678605 s 	 Performance = 502.8816 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 3315184.4259849256
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	FAILED
+Starting with a matrices of 1792x1792x1792 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.2 AMD-APP (1124.2)
+### Platform[0] : AMD Accelerated Parallel Processing
+### Using Platform : AMD Accelerated Parallel Processing
+clGetDeviceIDs...
+### Device[0] : Tahiti
+### Using Device : Tahiti
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Private.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+Running OpenCL DGEMM with 9633792...
+
+Alg = 31 	 NbFPE = 5 	 Range = 1 	 Size = 1792 	 Time = 0.70430934 s 	 Throughput = 0.1094 GB/s
+
+Alg = 31 	 NbFPE = 5 	 Range = 1 	 Size = 1792 	 Time = 0.70430934 s 	 Performance = 506.5733 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 5069795.7404501019
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	FAILED
+Starting with a matrices of 2048x2048x2048 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.2 AMD-APP (1124.2)
+### Platform[0] : AMD Accelerated Parallel Processing
+### Using Platform : AMD Accelerated Parallel Processing
+clGetDeviceIDs...
+### Device[0] : Tahiti
+### Using Device : Tahiti
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Private.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+Running OpenCL DGEMM with 12582912...
+
+Alg = 31 	 NbFPE = 5 	 Range = 1 	 Size = 2048 	 Time = 1.04940282 s 	 Throughput = 0.0959 GB/s
+
+Alg = 31 	 NbFPE = 5 	 Range = 1 	 Size = 2048 	 Time = 1.04940282 s 	 Performance = 507.5038 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 7099055.4812605176
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	FAILED
+Starting with a matrices of 256x256x256 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.2 AMD-APP (1124.2)
+### Platform[0] : AMD Accelerated Parallel Processing
+### Using Platform : AMD Accelerated Parallel Processing
+clGetDeviceIDs...
+### Device[0] : Tahiti
+### Using Device : Tahiti
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Private.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+Running OpenCL DGEMM with 196608...
+
+Alg = 31 	 NbFPE = 6 	 Range = 1 	 Size = 256 	 Time = 0.00439939 s 	 Throughput = 0.3575 GB/s
+
+Alg = 31 	 NbFPE = 6 	 Range = 1 	 Size = 256 	 Time = 0.00439939 s 	 Performance = 282.2015 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 512x512x512 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.2 AMD-APP (1124.2)
+### Platform[0] : AMD Accelerated Parallel Processing
+### Using Platform : AMD Accelerated Parallel Processing
+clGetDeviceIDs...
+### Device[0] : Tahiti
+### Using Device : Tahiti
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Private.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+Running OpenCL DGEMM with 786432...
+
+Alg = 31 	 NbFPE = 6 	 Range = 1 	 Size = 512 	 Time = 0.03118999 s 	 Throughput = 0.2017 GB/s
+
+Alg = 31 	 NbFPE = 6 	 Range = 1 	 Size = 512 	 Time = 0.03118999 s 	 Performance = 318.4391 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 768x768x768 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.2 AMD-APP (1124.2)
+### Platform[0] : AMD Accelerated Parallel Processing
+### Using Platform : AMD Accelerated Parallel Processing
+clGetDeviceIDs...
+### Device[0] : Tahiti
+### Using Device : Tahiti
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Private.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+Running OpenCL DGEMM with 1769472...
+
+Alg = 31 	 NbFPE = 6 	 Range = 1 	 Size = 768 	 Time = 0.10163254 s 	 Throughput = 0.1393 GB/s
+
+Alg = 31 	 NbFPE = 6 	 Range = 1 	 Size = 768 	 Time = 0.10163254 s 	 Performance = 329.8243 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 1024x1024x1024 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.2 AMD-APP (1124.2)
+### Platform[0] : AMD Accelerated Parallel Processing
+### Using Platform : AMD Accelerated Parallel Processing
+clGetDeviceIDs...
+### Device[0] : Tahiti
+### Using Device : Tahiti
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Private.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+Running OpenCL DGEMM with 3145728...
+
+Alg = 31 	 NbFPE = 6 	 Range = 1 	 Size = 1024 	 Time = 0.23775014 s 	 Throughput = 0.1058 GB/s
+
+Alg = 31 	 NbFPE = 6 	 Range = 1 	 Size = 1024 	 Time = 0.23775014 s 	 Performance = 334.2034 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 1280x1280x1280 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.2 AMD-APP (1124.2)
+### Platform[0] : AMD Accelerated Parallel Processing
+### Using Platform : AMD Accelerated Parallel Processing
+clGetDeviceIDs...
+### Device[0] : Tahiti
+### Using Device : Tahiti
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Private.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+Running OpenCL DGEMM with 4915200...
+
+Alg = 31 	 NbFPE = 6 	 Range = 1 	 Size = 1280 	 Time = 0.46153943 s 	 Throughput = 0.0852 GB/s
+
+Alg = 31 	 NbFPE = 6 	 Range = 1 	 Size = 1280 	 Time = 0.46153943 s 	 Performance = 336.2427 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 1806669.3861902349
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	FAILED
+Starting with a matrices of 1536x1536x1536 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.2 AMD-APP (1124.2)
+### Platform[0] : AMD Accelerated Parallel Processing
+### Using Platform : AMD Accelerated Parallel Processing
+clGetDeviceIDs...
+### Device[0] : Tahiti
+### Using Device : Tahiti
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Private.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+Running OpenCL DGEMM with 7077888...
+
+Alg = 31 	 NbFPE = 6 	 Range = 1 	 Size = 1536 	 Time = 0.79624414 s 	 Throughput = 0.0711 GB/s
+
+Alg = 31 	 NbFPE = 6 	 Range = 1 	 Size = 1536 	 Time = 0.79624414 s 	 Performance = 336.7899 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 3315184.4259849256
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	FAILED
+Starting with a matrices of 1792x1792x1792 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.2 AMD-APP (1124.2)
+### Platform[0] : AMD Accelerated Parallel Processing
+### Using Platform : AMD Accelerated Parallel Processing
+clGetDeviceIDs...
+### Device[0] : Tahiti
+### Using Device : Tahiti
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Private.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+Running OpenCL DGEMM with 9633792...
+
+Alg = 31 	 NbFPE = 6 	 Range = 1 	 Size = 1792 	 Time = 1.26111704 s 	 Throughput = 0.0611 GB/s
+
+Alg = 31 	 NbFPE = 6 	 Range = 1 	 Size = 1792 	 Time = 1.26111704 s 	 Performance = 337.6683 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 5069795.7404501019
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	FAILED
+Starting with a matrices of 2048x2048x2048 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.2 AMD-APP (1124.2)
+### Platform[0] : AMD Accelerated Parallel Processing
+### Using Platform : AMD Accelerated Parallel Processing
+clGetDeviceIDs...
+### Device[0] : Tahiti
+### Using Device : Tahiti
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Private.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+Running OpenCL DGEMM with 12582912...
+
+Alg = 31 	 NbFPE = 6 	 Range = 1 	 Size = 2048 	 Time = 1.88078573 s 	 Throughput = 0.0535 GB/s
+
+Alg = 31 	 NbFPE = 6 	 Range = 1 	 Size = 2048 	 Time = 1.88078573 s 	 Performance = 337.9732 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 7099055.4812605176
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	FAILED
+Starting with a matrices of 256x256x256 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.2 AMD-APP (1124.2)
+### Platform[0] : AMD Accelerated Parallel Processing
+### Using Platform : AMD Accelerated Parallel Processing
+clGetDeviceIDs...
+### Device[0] : Tahiti
+### Using Device : Tahiti
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Private.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+Running OpenCL DGEMM with 196608...
+
+Alg = 31 	 NbFPE = 7 	 Range = 1 	 Size = 256 	 Time = 0.00343323 s 	 Throughput = 0.4581 GB/s
+
+Alg = 31 	 NbFPE = 7 	 Range = 1 	 Size = 256 	 Time = 0.00343323 s 	 Performance = 420.2576 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 512x512x512 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.2 AMD-APP (1124.2)
+### Platform[0] : AMD Accelerated Parallel Processing
+### Using Platform : AMD Accelerated Parallel Processing
+clGetDeviceIDs...
+### Device[0] : Tahiti
+### Using Device : Tahiti
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Private.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+Running OpenCL DGEMM with 786432...
+
+Alg = 31 	 NbFPE = 7 	 Range = 1 	 Size = 512 	 Time = 0.02396787 s 	 Throughput = 0.2625 GB/s
+
+Alg = 31 	 NbFPE = 7 	 Range = 1 	 Size = 512 	 Time = 0.02396787 s 	 Performance = 481.5917 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 768x768x768 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.2 AMD-APP (1124.2)
+### Platform[0] : AMD Accelerated Parallel Processing
+### Using Platform : AMD Accelerated Parallel Processing
+clGetDeviceIDs...
+### Device[0] : Tahiti
+### Using Device : Tahiti
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Private.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+Running OpenCL DGEMM with 1769472...
+
+Alg = 31 	 NbFPE = 7 	 Range = 1 	 Size = 768 	 Time = 0.07805531 s 	 Throughput = 0.1814 GB/s
+
+Alg = 31 	 NbFPE = 7 	 Range = 1 	 Size = 768 	 Time = 0.07805531 s 	 Performance = 499.0909 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 1024x1024x1024 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.2 AMD-APP (1124.2)
+### Platform[0] : AMD Accelerated Parallel Processing
+### Using Platform : AMD Accelerated Parallel Processing
+clGetDeviceIDs...
+### Device[0] : Tahiti
+### Using Device : Tahiti
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Private.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+Running OpenCL DGEMM with 3145728...
+
+Alg = 31 	 NbFPE = 7 	 Range = 1 	 Size = 1024 	 Time = 0.18274537 s 	 Throughput = 0.1377 GB/s
+
+Alg = 31 	 NbFPE = 7 	 Range = 1 	 Size = 1024 	 Time = 0.18274537 s 	 Performance = 505.3031 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 1280x1280x1280 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.2 AMD-APP (1124.2)
+### Platform[0] : AMD Accelerated Parallel Processing
+### Using Platform : AMD Accelerated Parallel Processing
+clGetDeviceIDs...
+### Device[0] : Tahiti
+### Using Device : Tahiti
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Private.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+Running OpenCL DGEMM with 4915200...
+
+Alg = 31 	 NbFPE = 7 	 Range = 1 	 Size = 1280 	 Time = 0.35307784 s 	 Throughput = 0.1114 GB/s
+
+Alg = 31 	 NbFPE = 7 	 Range = 1 	 Size = 1280 	 Time = 0.35307784 s 	 Performance = 510.8082 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 1806669.3861902349
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	FAILED
+Starting with a matrices of 1536x1536x1536 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.2 AMD-APP (1124.2)
+### Platform[0] : AMD Accelerated Parallel Processing
+### Using Platform : AMD Accelerated Parallel Processing
+clGetDeviceIDs...
+### Device[0] : Tahiti
+### Using Device : Tahiti
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Private.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+Running OpenCL DGEMM with 7077888...
+
+Alg = 31 	 NbFPE = 7 	 Range = 1 	 Size = 1536 	 Time = 0.60810048 s 	 Throughput = 0.0931 GB/s
+
+Alg = 31 	 NbFPE = 7 	 Range = 1 	 Size = 1536 	 Time = 0.60810048 s 	 Performance = 512.5034 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 3315184.4259849256
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	FAILED
+Starting with a matrices of 1792x1792x1792 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.2 AMD-APP (1124.2)
+### Platform[0] : AMD Accelerated Parallel Processing
+### Using Platform : AMD Accelerated Parallel Processing
+clGetDeviceIDs...
+### Device[0] : Tahiti
+### Using Device : Tahiti
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Private.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+Running OpenCL DGEMM with 9633792...
+
+Alg = 31 	 NbFPE = 7 	 Range = 1 	 Size = 1792 	 Time = 0.96084990 s 	 Throughput = 0.0802 GB/s
+
+Alg = 31 	 NbFPE = 7 	 Range = 1 	 Size = 1792 	 Time = 0.96084990 s 	 Performance = 515.0589 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 5069795.7404501019
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	FAILED
+Starting with a matrices of 2048x2048x2048 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.2 AMD-APP (1124.2)
+### Platform[0] : AMD Accelerated Parallel Processing
+### Using Platform : AMD Accelerated Parallel Processing
+clGetDeviceIDs...
+### Device[0] : Tahiti
+### Using Device : Tahiti
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Private.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+Running OpenCL DGEMM with 12582912...
+
+Alg = 31 	 NbFPE = 7 	 Range = 1 	 Size = 2048 	 Time = 1.43299632 s 	 Throughput = 0.0702 GB/s
+
+Alg = 31 	 NbFPE = 7 	 Range = 1 	 Size = 2048 	 Time = 1.43299632 s 	 Performance = 515.5173 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 7099055.4812605176
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	FAILED
+Starting with a matrices of 256x256x256 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.2 AMD-APP (1124.2)
+### Platform[0] : AMD Accelerated Parallel Processing
+### Using Platform : AMD Accelerated Parallel Processing
+clGetDeviceIDs...
+### Device[0] : Tahiti
+### Using Device : Tahiti
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Private.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+Running OpenCL DGEMM with 196608...
+
+Alg = 31 	 NbFPE = 8 	 Range = 1 	 Size = 256 	 Time = 0.00397478 s 	 Throughput = 0.3957 GB/s
+
+Alg = 31 	 NbFPE = 8 	 Range = 1 	 Size = 256 	 Time = 0.00397478 s 	 Performance = 413.6502 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 512x512x512 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.2 AMD-APP (1124.2)
+### Platform[0] : AMD Accelerated Parallel Processing
+### Using Platform : AMD Accelerated Parallel Processing
+clGetDeviceIDs...
+### Device[0] : Tahiti
+### Using Device : Tahiti
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Private.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+Running OpenCL DGEMM with 786432...
+
+Alg = 31 	 NbFPE = 8 	 Range = 1 	 Size = 512 	 Time = 0.02805045 s 	 Throughput = 0.2243 GB/s
+
+Alg = 31 	 NbFPE = 8 	 Range = 1 	 Size = 512 	 Time = 0.02805045 s 	 Performance = 468.9172 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 768x768x768 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.2 AMD-APP (1124.2)
+### Platform[0] : AMD Accelerated Parallel Processing
+### Using Platform : AMD Accelerated Parallel Processing
+clGetDeviceIDs...
+### Device[0] : Tahiti
+### Using Device : Tahiti
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Private.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+Running OpenCL DGEMM with 1769472...
+
+Alg = 31 	 NbFPE = 8 	 Range = 1 	 Size = 768 	 Time = 0.09115465 s 	 Throughput = 0.1553 GB/s
+
+Alg = 31 	 NbFPE = 8 	 Range = 1 	 Size = 768 	 Time = 0.09115465 s 	 Performance = 487.0022 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 1024x1024x1024 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.2 AMD-APP (1124.2)
+### Platform[0] : AMD Accelerated Parallel Processing
+### Using Platform : AMD Accelerated Parallel Processing
+clGetDeviceIDs...
+### Device[0] : Tahiti
+### Using Device : Tahiti
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Private.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+Running OpenCL DGEMM with 3145728...
+
+Alg = 31 	 NbFPE = 8 	 Range = 1 	 Size = 1024 	 Time = 0.21299241 s 	 Throughput = 0.1182 GB/s
+
+Alg = 31 	 NbFPE = 8 	 Range = 1 	 Size = 1024 	 Time = 0.21299241 s 	 Performance = 494.0397 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 0
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	PASSED
+Starting with a matrices of 1280x1280x1280 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.2 AMD-APP (1124.2)
+### Platform[0] : AMD Accelerated Parallel Processing
+### Using Platform : AMD Accelerated Parallel Processing
+clGetDeviceIDs...
+### Device[0] : Tahiti
+### Using Device : Tahiti
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Private.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+Running OpenCL DGEMM with 4915200...
+
+Alg = 31 	 NbFPE = 8 	 Range = 1 	 Size = 1280 	 Time = 0.41146618 s 	 Throughput = 0.0956 GB/s
+
+Alg = 31 	 NbFPE = 8 	 Range = 1 	 Size = 1280 	 Time = 0.41146618 s 	 Performance = 499.4843 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 1806669.3861902349
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	FAILED
+Starting with a matrices of 1536x1536x1536 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.2 AMD-APP (1124.2)
+### Platform[0] : AMD Accelerated Parallel Processing
+### Using Platform : AMD Accelerated Parallel Processing
+clGetDeviceIDs...
+### Device[0] : Tahiti
+### Using Device : Tahiti
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Private.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+Running OpenCL DGEMM with 7077888...
+
+Alg = 31 	 NbFPE = 8 	 Range = 1 	 Size = 1536 	 Time = 0.70778918 s 	 Throughput = 0.0800 GB/s
+
+Alg = 31 	 NbFPE = 8 	 Range = 1 	 Size = 1536 	 Time = 0.70778918 s 	 Performance = 501.7597 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 3315184.4259849256
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	FAILED
+Starting with a matrices of 1792x1792x1792 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.2 AMD-APP (1124.2)
+### Platform[0] : AMD Accelerated Parallel Processing
+### Using Platform : AMD Accelerated Parallel Processing
+clGetDeviceIDs...
+### Device[0] : Tahiti
+### Using Device : Tahiti
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Private.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+Running OpenCL DGEMM with 9633792...
+
+Alg = 31 	 NbFPE = 8 	 Range = 1 	 Size = 1792 	 Time = 1.11822587 s 	 Throughput = 0.0689 GB/s
+
+Alg = 31 	 NbFPE = 8 	 Range = 1 	 Size = 1792 	 Time = 1.11822587 s 	 Performance = 504.3251 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 5069795.7404501019
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	FAILED
+Starting with a matrices of 2048x2048x2048 double
+
+Initializing data...
+Initializing OpenCL...
+platform version : OpenCL 1.2 AMD-APP (1124.2)
+### Platform[0] : AMD Accelerated Parallel Processing
+### Using Platform : AMD Accelerated Parallel Processing
+clGetDeviceIDs...
+### Device[0] : Tahiti
+### Using Device : Tahiti
+Allocating OpenCL memory...
+
+Initializing OpenCL DGEMM...
+Load the program sources (../src/DGEMM.NVIDIA.FPE.Private.cl)...
+clCreateProgramWithSource...
+...building program
+...creating DGEMM kernel:
+Running OpenCL DGEMM with 12582912...
+
+Alg = 31 	 NbFPE = 8 	 Range = 1 	 Size = 2048 	 Time = 1.66519602 s 	 Throughput = 0.0605 GB/s
+
+Alg = 31 	 NbFPE = 8 	 Range = 1 	 Size = 2048 	 Time = 1.66519602 s 	 Performance = 505.5342 GFLOPS
+
+Validating DGEMM OpenCL results...
+ ...reading back OpenCL results
+ ...DGEMM on CPU
+ ...comparing the results
+//--------------------------------------------------------
+Norm = 7099055.4812605176
+//--------------------------------------------------------
+Shutting down...
+
+[DGEMM] test results...	FAILED
