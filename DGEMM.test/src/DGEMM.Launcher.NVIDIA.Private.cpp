@@ -69,7 +69,7 @@ extern "C" cl_int initDGEMMNVIDIAPrivate(
     printf("...building program\n");
         sprintf(compileOptions, "%s -DNBFPE=%d", compileOptions, NbFPE);
         ciErrNum = clBuildProgram(cpProgram, 0, NULL, compileOptions, NULL, NULL);
-        if (ciErrNum != CL_SUCCESS) {
+        //if (ciErrNum != CL_SUCCESS) {
             //printf("Error in clBuildProgram, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
 
             // Determine the reason for the error
@@ -78,7 +78,7 @@ extern "C" cl_int initDGEMMNVIDIAPrivate(
             printf("%s\n", buildLog);
 
             //return EXIT_FAILURE;
-        }
+        //}
 
     printf("...creating DGEMM kernel:\n");
         ckMatrixMul = clCreateKernel(cpProgram, DGEMM_KERNEL, &ciErrNum);

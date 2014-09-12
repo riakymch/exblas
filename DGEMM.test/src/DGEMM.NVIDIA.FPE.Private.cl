@@ -289,9 +289,6 @@ __kernel void matrixMul(
 
                 //Multiply the two matrices together;
                 //each thread computes one element of the block sub-matrix
-                #ifdef NVIDIA
-                  #pragma unroll
-                #endif
                 for (int k = 0; k < BLOCK_SIZE; ++k) {
                     double r; //residual of multiplication
                     double x = TwoProductFMA(AS(ty, k), BS(k, tx), &r);
@@ -330,7 +327,6 @@ __kernel void matrixMul(
             #endif
             for(uint l = 0; l != NBFPE; ++l)
                 Accumulate(p_workingBase, sum[l]);
-            barrier(CLK_LOCAL_MEM_FENCE);
 
             //TODO: the first non-zero from rigth
             int c = (n * by + bx) * BLOCK_SIZE;

@@ -13,7 +13,6 @@
 #pragma OPENCL EXTENSION cl_khr_byte_addressable_store : enable
 #ifdef NVIDIA
   #pragma OPENCL EXTENSION cl_khr_fp64                 : enable  // For double precision numbers
-  #pragma OPENCL EXTENSION cl_nv_pragma_unroll         : enable
 #endif
 
 typedef double data_t;
@@ -176,7 +175,7 @@ void AccumulateWord(long *sa, int i, long x) {
   uchar overflow;
   long oldword = xadd(&sa[i], x, &overflow);
 
-  // To propagate over- or underflow 
+  // To propagate over- or underflow
   while (overflow) {
     // Carry or borrow
     // oldword has sign S
@@ -218,7 +217,7 @@ void Accumulate(long *sa, double x) {
   for (i = iup; xscaled != 0; --i) {
     double xrounded = rint(xscaled);
     long xint = (long) xrounded;
- 
+
     AccumulateWord(sa, i, xint);
 
     xscaled -= xrounded;
@@ -275,8 +274,7 @@ __kernel void matrixMul(
             //for floating-point expansion
             double sum[4] = {0.0};
 
-            //Loop over all the sub-matrices of A and B
-            //required to compute the block sub-matrix
+            //Loop over all the sub-matrices of A and B required to compute the block sub-matrix
             for (int a = aBegin, b = bBegin;
                      a <= aEnd;
                      a += aStep, b += bStep) {
@@ -290,9 +288,6 @@ __kernel void matrixMul(
 
                 //Multiply the two matrices together;
                 //each thread computes one element of the block sub-matrix
-                #ifdef NVIDIA
-                  #pragma unroll
-                #endif
                 for (int k = 0; k < BLOCK_SIZE; ++k) {
                     double r; //residual of multiplication
                     double x = TwoProductFMA(AS(ty, k), BS(k, tx), &r);
@@ -320,20 +315,20 @@ __kernel void matrixMul(
                     if(r != 0.0) {
                         sum[1] = KnuthTwoSum(sum[1], r, &s);
                         r = s;
+                        if(r != 0.0) {
+                            sum[2] = KnuthTwoSum(sum[2], r, &s);
+                            r = s;
                             if(r != 0.0) {
-                                sum[2] = KnuthTwoSum(sum[2], r, &s);
+                                sum[3] = KnuthTwoSum(sum[3], r, &s);
                                 r = s;
-                                if(r != 0.0) {
-                                    sum[3] = KnuthTwoSum(sum[3], r, &s);
-                                    r = s;
-                                }
                             }
+                        }
                     }
                     if(r != 0.0)
                         Accumulate(p_workingBase, r);
                 }
 
-                //Synchronize to make sure that the preceding computation is done before
+                //Synchronize to make sure that the preceding computation is done before 
                 //loading two new sub-matrices of A and B in the next iteration
                 barrier(CLK_LOCAL_MEM_FENCE);
             }
@@ -343,7 +338,6 @@ __kernel void matrixMul(
             Accumulate(p_workingBase, sum[1]);
             Accumulate(p_workingBase, sum[2]);
             Accumulate(p_workingBase, sum[3]);
-            //barrier(CLK_LOCAL_MEM_FENCE);
 
             //TODO: the first non-zero from rigth
             int c = (n * by + bx) * BLOCK_SIZE;
