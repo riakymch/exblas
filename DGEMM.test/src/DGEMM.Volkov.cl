@@ -44,38 +44,38 @@ __kernel void matrixMulKernel (
     int bx = get_group_id(0);
     int by = get_group_id(1);
 
-    //Load Asub and Bsub from device memory to shared memory
-    A += ibx + id;
-    B += inx + mul24(iby + iny, k);
-    C += ibx + id + mul24(iby, m);
+    int M_wia = M_WG / M_DIMA;
+    int K_wia = K_WG / K_DIMA;
+    int K_wib = K_WG / K_DIMB;
+    int N_wib = N_WG / N_DIMB;
 
-    //TODO: replace this with computable statements
-    int M_wia = 2;
-    int K_wia = 8;
-    int K_wib = 8;
-    int N_wib = 8;
-    data_t C_pm[M_wia][N_wia] = {0.0};
+    data_t C_pm[M_WI * N_WI] = {0.0};
 
-    __local data_t A_lm[M_WG][K_WG];
-    __local data_t B_lm[K_WG][N_WG];
+    __local data_t A_lm[M_WG * K_WG];
+    __local data_t B_lm[K_WG * N_WG];
 
-    for (int p_wg = 0; p_wg < k - K_WG; j += K_WG) {
+    for (int p_wg = 0; p_wg < k - K_WG; p_wg += K_WG) {
+	//load M_wia x K_wia elements of A into A_lm
+    	for (int j = 0; j < M_wia; j++)
+    	    for (int i = 0; i < K_wia; i++)
+		A_lm[tx + ty] = 
+
+	//load K_wib x N_wib elements of B into B_lm
     	for (int i = 0; i < M_wia; i++)
     	    for (int j = 0; j < K_wia; j++)
-		A_lm[tx ][] = 
+		B_lm[tx ] = 
+
         barrier(CLK_LOCAL_MEM_FENCE);
 
-        #ifdef NVIDIA
-            #pragma unroll
-        #endif
-        for (int i = 0; i < 16; i++, A += m)
+        for (int p_wi = 0; p_Wi < K_WG - K_WI; p_wi += K_WI) {
             saxpy(A[0], &bs[i][0], c);
+	}
 
         barrier(CLK_LOCAL_MEM_FENCE);
     }
 
-    for (int i = 0; i < M_wia; i++)
-    	for (int j = 0; j < N_wia; j++)
-            C[0] = C_pm[i][j];
+    for (int i = 0; i < M_wi; i++)
+    	for (int j = 0; j < N_wi; j++)
+            C[0] = C_pm[i + j];
 }
 
