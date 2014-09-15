@@ -88,15 +88,6 @@ __kernel void matrixMul(
     int bx = get_group_id(0);
     int by = get_group_id(1);
 
-    /*int bdimx = n / BLOCK_SIZE;
-    int bdimy = m / BLOCK_SIZE;
-    int bsizex = get_num_groups(0);
-    int bsizey = get_num_groups(1);
-
-    for (int i = bx; i < bdimx; i += bsizex)
-        for (int j = by; j < bdimy; j += bsizey)
-            DGEMM_1(C, A, B, m, n, k, As, Bs, i, j, tx, ty);*/
-
     //Each thread block computes one sub-matrix of C
     __global data_t* Csub = &C[n * BLOCK_SIZE * by + BLOCK_SIZE * bx];
 
@@ -124,14 +115,6 @@ __kernel void matrixMul(
         Bs[(ty + 2 * step) * BLOCK_SIZE + tx] = Bsub[(ty + 2 * step) * k + tx];
         As[(ty + 3 * step) * BLOCK_SIZE + tx] = Asub[(ty + 3 * step) * m + tx];
         Bs[(ty + 3 * step) * BLOCK_SIZE + tx] = Bsub[(ty + 3 * step) * k + tx];
-        /*As[(ty + 4 * step) * BLOCK_SIZE + tx] = Asub[(ty + 4 * step) * m + tx];
-        Bs[(ty + 4 * step) * BLOCK_SIZE + tx] = Bsub[(ty + 4 * step) * k + tx];
-        As[(ty + 5 * step) * BLOCK_SIZE + tx] = Asub[(ty + 5 * step) * m + tx];
-        Bs[(ty + 5 * step) * BLOCK_SIZE + tx] = Bsub[(ty + 5 * step) * k + tx];
-        As[(ty + 6 * step) * BLOCK_SIZE + tx] = Asub[(ty + 6 * step) * m + tx];
-        Bs[(ty + 6 * step) * BLOCK_SIZE + tx] = Bsub[(ty + 6 * step) * k + tx];
-        As[(ty + 7 * step) * BLOCK_SIZE + tx] = Asub[(ty + 7 * step) * m + tx];
-        Bs[(ty + 7 * step) * BLOCK_SIZE + tx] = Bsub[(ty + 7 * step) * k + tx];*/
 
         //Synchronize to make sure that the sub-matrices are loaded before the computation starts
         barrier(CLK_LOCAL_MEM_FENCE);
@@ -145,10 +128,6 @@ __kernel void matrixMul(
             sum[1] = fma(As[(ty + step) * BLOCK_SIZE + l], Bs[l * BLOCK_SIZE + tx], sum[1]);
             sum[2] = fma(As[(ty + 2 * step) * BLOCK_SIZE + l], Bs[l * BLOCK_SIZE + tx], sum[2]);
             sum[3] = fma(As[(ty + 3 * step) * BLOCK_SIZE + l], Bs[l * BLOCK_SIZE + tx], sum[3]);
-            /*sum[4] = fma(As[(ty + 4 * step) * BLOCK_SIZE + l], Bs[l * BLOCK_SIZE + tx], sum[4]);
-            sum[5] = fma(As[(ty + 5 * step) * BLOCK_SIZE + l], Bs[l * BLOCK_SIZE + tx], sum[5]);
-            sum[6] = fma(As[(ty + 6 * step) * BLOCK_SIZE + l], Bs[l * BLOCK_SIZE + tx], sum[6]);
-            sum[7] = fma(As[(ty + 7 * step) * BLOCK_SIZE + l], Bs[l * BLOCK_SIZE + tx], sum[7]);*/
         }
 
         barrier(CLK_LOCAL_MEM_FENCE);
@@ -157,9 +136,5 @@ __kernel void matrixMul(
     Csub[(ty + step) * n + tx] = sum[1];
     Csub[(ty + 2 * step) * n + tx] = sum[2];
     Csub[(ty + 3 * step) * n + tx] = sum[3];
-    /*Csub[(ty + 4 * step) * n + tx] = sum[4];
-    Csub[(ty + 5 * step) * n + tx] = sum[5];
-    Csub[(ty + 6 * step) * n + tx] = sum[6];
-    Csub[(ty + 7 * step) * n + tx] = sum[7];*/
 }
 
