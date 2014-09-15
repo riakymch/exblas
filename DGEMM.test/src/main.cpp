@@ -220,7 +220,7 @@ int runDGEMM(const char* program_file){
                 ciErrNum = initDGEMMAMD(cxGPUContext, cqCommandQueue, cdDevice, program_file);
             else if (__alg == 2)
                 ciErrNum = initDGEMMNVIDIA(cxGPUContext, cqCommandQueue, cdDevice, program_file);
-            else if (((__alg >= 30) && (__alg <= 34)) || (__alg == 40) || (__alg == 41))
+            else if (((__alg >= 30) && (__alg <= 35)) || (__alg == 40) || (__alg == 41))
                 ciErrNum = initDGEMMNVIDIAPrivate(cxGPUContext, cqCommandQueue, cdDevice, program_file, __nbfpe);
             else if ((__alg >= 50) && (__alg <= 54))
                 ciErrNum = initDGEMMNVIDIAGlobal(cxGPUContext, cqCommandQueue, cdDevice, program_file, __nbfpe, __m, __n, __multi);
@@ -238,7 +238,7 @@ int runDGEMM(const char* program_file){
                 DGEMMAMD(NULL, d_C, d_A, d_B, __m, &ciErrNum);
             else if (__alg == 2)
                 DGEMMNVIDIA(NULL, d_C, d_A, d_B, __m, __n, &ciErrNum);
-            else if (((__alg >= 30) && (__alg <= 34)) || (__alg == 40) || (__alg == 41))
+            else if (((__alg >= 30) && (__alg <= 35)) || (__alg == 40) || (__alg == 41))
                 DGEMMNVIDIAPrivate(NULL, d_C, d_A, d_B, __m, __n, __multi, &ciErrNum);
             else if ((__alg >= 50) && (__alg <= 54))
                 DGEMMNVIDIAGlobal(NULL, d_C, d_A, d_B, __m, __n, __multi, &ciErrNum);
@@ -266,7 +266,7 @@ int runDGEMM(const char* program_file){
                 DGEMMAMD(NULL, d_C, d_A, d_B, __m, &ciErrNum);
             else if (__alg == 2)
                 DGEMMNVIDIA(NULL, d_C, d_A, d_B, __m, __n, &ciErrNum);
-            else if (((__alg >= 30) && (__alg <= 34)) || (__alg == 40) || (__alg == 41))
+            else if (((__alg >= 30) && (__alg <= 35)) || (__alg == 40) || (__alg == 41))
                 DGEMMNVIDIAPrivate(NULL, d_C, d_A, d_B, __m, __n, __multi, &ciErrNum);
             else if ((__alg >= 50) && (__alg <= 54))
                 DGEMMNVIDIAGlobal(NULL, d_C, d_A, d_B, __m, __n, __multi, &ciErrNum);
@@ -300,7 +300,7 @@ int runDGEMM(const char* program_file){
         } else if (__alg % 10 == 0) {
             perf = (2.0 + 8.0) * __m;
             perf *= __n * __k;
-        } else if ((__alg == 31) || (__alg == 34) || (__alg == 41) || (__alg == 51) || (__alg == 54)) {
+        } else if ((__alg == 31) || (__alg == 34) || (__alg == 35) || (__alg == 41) || (__alg == 51) || (__alg == 54)) {
             perf = (2.0 + 12.0 * __nbfpe) * __m;
             perf *= __n * __k;
         } else if ((__alg == 32) || (__alg == 52)) {
