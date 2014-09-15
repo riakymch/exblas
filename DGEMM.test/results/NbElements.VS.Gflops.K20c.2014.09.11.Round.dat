@@ -216,33 +216,3 @@ Alg = 31 	 NbFPE = 8 	 Range = 1 	 Size = 1792 	 Time = 1.32936278 s 	 Performan
 Norm = 5968968.454182934
 Alg = 31 	 NbFPE = 8 	 Range = 1 	 Size = 2048 	 Time = 1.98108397 s 	 Performance = 424.9257 GFLOPS
 Norm = 8227328.1241337396
-Alg = 54 	 NbFPE = 3 	 Range = 1 	 Size = 1024 	 Time = 7.77466365 s 	 Performance = 5.2481 GFLOPS
-Norm = 1679727.0111797929
-Alg = 54 	 NbFPE = 3 	 Range = 1 	 Size = 1280 	 Time = 15.05060954 s 	 Performance = 5.2949 GFLOPS
-Norm = 3060627.4692557734
-Alg = 54 	 NbFPE = 3 	 Range = 1 	 Size = 1536 	 Time = 25.96671213 s 	 Performance = 5.3032 GFLOPS
-Norm = 4712661.5759603409
-Alg = 54 	 NbFPE = 3 	 Range = 1 	 Size = 1792 	 Time = 41.21658579 s 	 Performance = 5.3055 GFLOPS
-Norm = 6653535.6004284667
-Alg = 54 	 NbFPE = 3 	 Range = 1 	 Size = 2048 	 Time = 61.69376346 s 	 Performance = 5.2909 GFLOPS
-Norm = 8886934.5087050125
-Alg = 54 	 NbFPE = 4 	 Range = 1 	 Size = 1024 	 Time = 7.77607574 s 	 Performance = 6.9041 GFLOPS
-Norm = 1679727.0111797929
-Alg = 54 	 NbFPE = 4 	 Range = 1 	 Size = 1280 	 Time = 15.05604288 s 	 Performance = 6.9645 GFLOPS
-Norm = 3060627.4692557734
-Alg = 54 	 NbFPE = 4 	 Range = 1 	 Size = 1536 	 Time = 25.93997117 s 	 Performance = 6.9851 GFLOPS
-Norm = 4712661.5759603409
-Alg = 54 	 NbFPE = 4 	 Range = 1 	 Size = 1792 	 Time = 41.19944794 s 	 Performance = 6.9838 GFLOPS
-Norm = 6653535.6004284667
-Alg = 54 	 NbFPE = 4 	 Range = 1 	 Size = 2048 	 Time = 61.69833533 s 	 Performance = 6.9612 GFLOPS
-Norm = 8886934.5087050125
-Alg = 54 	 NbFPE = 5 	 Range = 1 	 Size = 1024 	 Time = 7.77158534 s 	 Performance = 8.5661 GFLOPS
-Norm = 1679727.0111797929
-Alg = 54 	 NbFPE = 5 	 Range = 1 	 Size = 1280 	 Time = 15.03773648 s 	 Performance = 8.6465 GFLOPS
-Norm = 3060627.4692557734
-Alg = 54 	 NbFPE = 5 	 Range = 1 	 Size = 1536 	 Time = 25.96702758 s 	 Performance = 8.6525 GFLOPS
-Norm = 4712661.5759603409
-Alg = 54 	 NbFPE = 5 	 Range = 1 	 Size = 1792 	 Time = 41.15658650 s 	 Performance = 8.6689 GFLOPS
-Norm = 6653535.6004284667
-Alg = 54 	 NbFPE = 5 	 Range = 1 	 Size = 2048 	 Time = 61.65391258 s 	 Performance = 8.6382 GFLOPS
-Norm = 8886934.5087050125
