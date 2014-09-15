@@ -126,7 +126,7 @@ extern "C" size_t DGEMMNVIDIAPrivate(
 
     {
         size_t NbThreadsPerWorkGroup[] = {(size_t) BLOCK_SIZE, (size_t) BLOCK_SIZE};
-        size_t TotalNbThreads[] = {(size_t) (n), (size_t) (m / multi)};
+        size_t TotalNbThreads[] = {(size_t) (n / multi), (size_t) (m / multi)};
         size_t neededLocalMemory = BLOCK_SIZE * BLOCK_SIZE * sizeof(cl_double);
 
         cl_int i = 0;

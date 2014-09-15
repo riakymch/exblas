@@ -37,7 +37,7 @@ static void __usage(int argc __attribute__((unused)), char **argv) {
     printf("              -k nbrows of B,\n");
     printf("              -r range,\n");
     printf("              -e nbfpe,\n");
-    printf("              -a alg (0-mine, 1-amd, 2-nvidia, 30-pr-sa, 31-pr-fpe, 32-pr-fpe-ex-4, 33-pr-fpe-ex-6, 34-pr-fpe-ex-8, 35-pr-fpe-multi, 40-lo-sa, 41-lo-fpe, 50-gl-sa, 51-gl-fpe, 52-gl-fpe-ex-4, 53-gl-fpe-ex-8, 54-gl-fpe-multi, 6-volkov),\n");
+    printf("              -a alg (0-mine, 1-amd, 2-nvidia, 30-pr-sa, 31-pr-fpe, 32-pr-fpe-ex-4, 33-pr-fpe-ex-6, 34-pr-fpe-ex-8, 40-lo-sa, 41-lo-fpe, 50-gl-sa, 51-gl-fpe, 52-gl-fpe-ex-4, 53-gl-fpe-ex-8, 54-gl-fpe-multi, 6-volkov),\n");
     printf("              -ml multi-values] \n");
     printf("  -?, -h:    Display this help and exit\n");
 }
@@ -75,9 +75,9 @@ static void __parse_args(int argc, char **argv) {
         exit(-1);
     }
 
-    uint algs[]= {0,1,2,30,31,32,33,34,35,40,41,50,51,52,53,54,6};
+    uint algs[]= {0,1,2,30,31,32,33,34,40,41,50,51,52,53,54,6};
     int is_alg = 0;
-    for (i = 0; i < 17; i++)
+    for (i = 0; i < 1666666; i++)
         if (algs[i] == __alg) {
             is_alg = 1;
             break;
@@ -116,8 +116,6 @@ int main(int argc, char **argv)
         runDGEMM("../src/DGEMM.NVIDIA.FPE.EX6.Private.cl");
     else if (__alg == 34)
         runDGEMM("../src/DGEMM.NVIDIA.FPE.EX8.Private.cl");
-    else if (__alg == 35)
-        runDGEMM("../src/DGEMM.NVIDIA.FPE.Multi.Private.cl");
     else if (__alg == 40)
         runDGEMM("../src/DGEMM.NVIDIA.Superacc.Local.cl");
     else if (__alg == 41)
@@ -220,7 +218,7 @@ int runDGEMM(const char* program_file){
                 ciErrNum = initDGEMMAMD(cxGPUContext, cqCommandQueue, cdDevice, program_file);
             else if (__alg == 2)
                 ciErrNum = initDGEMMNVIDIA(cxGPUContext, cqCommandQueue, cdDevice, program_file);
-            else if (((__alg >= 30) && (__alg <= 35)) || (__alg == 40) || (__alg == 41))
+            else if (((__alg >= 30) && (__alg <= 34)) || (__alg == 40) || (__alg == 41))
                 ciErrNum = initDGEMMNVIDIAPrivate(cxGPUContext, cqCommandQueue, cdDevice, program_file, __nbfpe);
             else if ((__alg >= 50) && (__alg <= 54))
                 ciErrNum = initDGEMMNVIDIAGlobal(cxGPUContext, cqCommandQueue, cdDevice, program_file, __nbfpe, __m, __n, __multi);
@@ -238,7 +236,7 @@ int runDGEMM(const char* program_file){
                 DGEMMAMD(NULL, d_C, d_A, d_B, __m, &ciErrNum);
             else if (__alg == 2)
                 DGEMMNVIDIA(NULL, d_C, d_A, d_B, __m, __n, &ciErrNum);
-            else if (((__alg >= 30) && (__alg <= 35)) || (__alg == 40) || (__alg == 41))
+            else if (((__alg >= 30) && (__alg <= 34)) || (__alg == 40) || (__alg == 41))
                 DGEMMNVIDIAPrivate(NULL, d_C, d_A, d_B, __m, __n, __multi, &ciErrNum);
             else if ((__alg >= 50) && (__alg <= 54))
                 DGEMMNVIDIAGlobal(NULL, d_C, d_A, d_B, __m, __n, __multi, &ciErrNum);
@@ -266,7 +264,7 @@ int runDGEMM(const char* program_file){
                 DGEMMAMD(NULL, d_C, d_A, d_B, __m, &ciErrNum);
             else if (__alg == 2)
                 DGEMMNVIDIA(NULL, d_C, d_A, d_B, __m, __n, &ciErrNum);
-            else if (((__alg >= 30) && (__alg <= 35)) || (__alg == 40) || (__alg == 41))
+            else if (((__alg >= 30) && (__alg <= 34)) || (__alg == 40) || (__alg == 41))
                 DGEMMNVIDIAPrivate(NULL, d_C, d_A, d_B, __m, __n, __multi, &ciErrNum);
             else if ((__alg >= 50) && (__alg <= 54))
                 DGEMMNVIDIAGlobal(NULL, d_C, d_A, d_B, __m, __n, __multi, &ciErrNum);
@@ -300,7 +298,7 @@ int runDGEMM(const char* program_file){
         } else if (__alg % 10 == 0) {
             perf = (2.0 + 8.0) * __m;
             perf *= __n * __k;
-        } else if ((__alg == 31) || (__alg == 34) || (__alg == 35) || (__alg == 41) || (__alg == 51) || (__alg == 54)) {
+        } else if ((__alg == 31) || (__alg == 34) || (__alg == 34) || (__alg == 41) || (__alg == 51) || (__alg == 54)) {
             perf = (2.0 + 12.0 * __nbfpe) * __m;
             perf *= __n * __k;
         } else if ((__alg == 32) || (__alg == 52)) {
