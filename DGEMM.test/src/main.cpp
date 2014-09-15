@@ -325,19 +325,19 @@ int runDGEMM(const char* program_file){
                 }
 
             printf(" ...DGEMM on CPU\n");
-                double *C_CPU;
+                /*double *C_CPU;
                 C_CPU = (double *) calloc(__m * __n, sizeof(double));
-                DGEMMCPU(C_CPU, (const double *)A, (const double *)B, __m, __n, __k);
+                DGEMMCPU(C_CPU, (const double *)A, (const double *)B, __m, __n, __k);*/
                 /*printMatrix(C, __m, __n);
                 printf("\n");
                 printMatrix(C_CPU, __m, __n);*/
 
             printf(" ...comparing the results\n");
                 printf("//--------------------------------------------------------\n");
-                PassFailFlag = compare((const double *) C_CPU, (const double *) C, __m * __n, 1e-16);
-                //PassFailFlag = compareDGEMMWithMPFR((const double *)C, (const double *)A, (const double *)B, __m, __n, __k, 1e-16);
+                //PassFailFlag = compare((const double *) C_CPU, (const double *) C, __m * __n, 1e-16);
+                PassFailFlag = compareDGEMMWithMPFR((const double *)C, (const double *)A, (const double *)B, __m, __n, __k, 1e-16);
                 printf("//--------------------------------------------------------\n");
-                free(C_CPU);
+                //free(C_CPU);
 
          //Release kernels and program
          printf("Shutting down...\n\n");
