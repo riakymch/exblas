@@ -40,7 +40,7 @@ static const uint  VECTOR_NUMBER = 1;
 #ifdef AMD
 static char  compileOptions[256] = "-DM_WG=96 -DN_WG=32 -DK_WG=48 -DM_WI=6 -DN_WI=2 -DK_WI=2 -DM_DIMC=16 -DN_DIMC=16 -DM_DIMA=16 -DK_DIMA=16 -DK_DIMB=16 -DN_DIMB=16";
 #else
-static char  compileOptions[256] = "-DM_WG=32 -DN_WG=128 -DK_WG=128 -DNVIDIA -cl-mad-enable -cl-fast-relaxed-math -cl-nv-verbose";
+static char  compileOptions[256] = "-DM_WG=96 -DN_WG=32 -DK_WG=48 -DM_WI=6 -DN_WI=2 -DK_WI=2 -DM_DIMC=16 -DN_DIMC=16 -DM_DIMA=16 -DK_DIMA=16 -DK_DIMB=16 -DN_DIMB=16 -DNVIDIA -cl-mad-enable -cl-fast-relaxed-math -cl-nv-verbose";
 #endif
 
 
@@ -134,7 +134,7 @@ extern "C" size_t DGEMMMatsumoto(
 
     {
         size_t NbThreadsPerWorkGroup[] = {(size_t) (16), (size_t) (16)};
-        size_t TotalNbThreads[] = {(size_t) (n), (size_t) (m)};
+        size_t TotalNbThreads[] = {(size_t) (n / 2), (size_t) (m / 6)};
 
         cl_int i = 0;
         ciErrNum  = clSetKernelArg(ckMatrixMul, i++, sizeof(cl_mem),  (void *)&d_C);
