@@ -38,7 +38,7 @@ static cl_command_queue cqDefaultCommandQue;  //Default command queue for Supera
 static const uint  VECTOR_NUMBER = 1;
 
 #ifdef AMD
-static char  compileOptions[256] = "-DM_WG=96 -DN_WG=32 -DK_WG=48 -DM_WI=6 -DN_WI=2 -DK_WI=2 -DM_DIMC=16 -DN_DIMC=16 -DM_DIMA=16 -DK_DIMA=16 -DK_DIMB=16 -DN_DIMB=16 -cl-auto-vectorize-enable";
+static char  compileOptions[256] = "-DM_WG=96 -DN_WG=32 -DK_WG=48 -DM_WI=6 -DN_WI=2 -DK_WI=2 -DM_DIMC=16 -DN_DIMC=16 -DM_DIMA=16 -DK_DIMA=16 -DK_DIMB=16 -DN_DIMB=16";
 #else
 static char  compileOptions[256] = "-DM_WG=96 -DN_WG=32 -DK_WG=48 -DM_WI=6 -DN_WI=2 -DK_WI=2 -DM_DIMC=16 -DN_DIMC=16 -DM_DIMA=16 -DK_DIMA=16 -DK_DIMB=16 -DN_DIMB=16 -DNVIDIA -cl-mad-enable -cl-fast-relaxed-math -cl-nv-verbose";
 #endif
