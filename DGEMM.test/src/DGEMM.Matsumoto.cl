@@ -29,19 +29,19 @@ __kernel void matrixMulKernel (
 
     data_t C_pm[M_WI * N_WI] = {0.0};
 
-    //__local data_t A_lm[M_WG * K_WG];
-    __local data_t B_lm[K_WG * N_WG];
+    __local data_t A_lm[M_WG * K_WG];
+    //__local data_t B_lm[K_WG * N_WG];
 
     for (int p_wg = 0; p_wg <= k - K_WG; p_wg += K_WG) {
-	/*//load M_wia x K_wia elements of A into A_lm
+	//load M_wia x K_wia elements of A into A_lm
     	for (int i = 0; i < M_wia; i++)
     	    for (int j = 0; j < K_wia; j++)
-		A_lm[tx + i * K_DIMA + (ty + j * M_DIMA) * K_WG] = A[p_wg + k * M_WG * by + tx + i * K_DIMA + (ty + j * M_DIMA) * k];*/
+		A_lm[tx + j * K_DIMA + (ty + i * M_DIMA) * K_WG] = A[p_wg + k * M_WG * by + tx + j * K_DIMA + (ty + i * M_DIMA) * k];
 
-	//load K_wib x N_wib elements of B into B_lm
+	/*//load K_wib x N_wib elements of B into B_lm
     	for (int i = 0; i < K_wib; i++)
     	    for (int j = 0; j < N_wib; j++)
-		B_lm[tx + j * N_DIMB + (ty + i * K_DIMB) * N_WG] = B[bx * N_WG + n * p_wg + tx + j * N_DIMB + (ty + i * K_DIMB) * n];
+		B_lm[tx + j * N_DIMB + (ty + i * K_DIMB) * N_WG] = B[bx * N_WG + n * p_wg + tx + j * N_DIMB + (ty + i * K_DIMB) * n];*/
 
         barrier(CLK_LOCAL_MEM_FENCE);
 
@@ -52,13 +52,14 @@ __kernel void matrixMulKernel (
 	    //load M_WI x K_WI elements of A_lm into A_pm
     	    for (int i = 0; i < M_WI; i++)
     		for (int j = 0; j < K_WI; j++)
-	    	    //A_pm[j + i * K_WI] = A_lm[p_wi + j + (ty + i * M_DIMA) * K_WG];
-		    A_pm[j + i * K_WI] = A[p_wg + p_wi + j + k * M_WG * by + (ty + i * M_DIMA) * k];
+	    	    A_pm[j + i * K_WI] = A_lm[p_wi + j + (ty + i * M_DIMA) * K_WG];
+		    //A_pm[j + i * K_WI] = A[p_wg + p_wi + j + k * M_WG * by + (ty + i * M_DIMA) * k];
 
 	    //load K_WI x N_WI elements of B_lm into B_pm
     	    for (int i = 0; i < K_WI; i++)
     		for (int j = 0; j < N_WI; j++)
-	    	    B_pm[j + i * N_WI] = B_lm[(p_wi + i) * N_WG + tx + j * N_DIMB];
+	    	    //B_pm[j + i * N_WI] = B_lm[(p_wi + i) * N_WG + tx + j * N_DIMB];
+	    	    B_pm[j + i * N_WI] = B[(p_wg + p_wi + i) * n + bx * N_WG + tx + j * N_DIMB];
 
     	    for (int i = 0; i < M_WI; i++)
     		for (int j = 0; j < N_WI; j++) {
