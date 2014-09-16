@@ -32,7 +32,7 @@ __kernel void matrixMulKernel (
     //__local data_t A_lm[M_WG * K_WG];
     __local data_t B_lm[K_WG * N_WG];
 
-    for (int p_wg = 0; p_wg < k - K_WG; p_wg += K_WG) {
+    for (int p_wg = 0; p_wg <= k - K_WG; p_wg += K_WG) {
 	/*//load M_wia x K_wia elements of A into A_lm
     	for (int i = 0; i < M_wia; i++)
     	    for (int j = 0; j < K_wia; j++)
@@ -41,11 +41,11 @@ __kernel void matrixMulKernel (
 	//load K_wib x N_wib elements of B into B_lm
     	for (int i = 0; i < K_wib; i++)
     	    for (int j = 0; j < N_wib; j++)
-		B_lm[tx + i * N_DIMB + (ty + j * K_DIMB) * N_WG] = B[bx * N_WG + n * p_wg + tx + i * N_DIMB + (ty + j * K_DIMB) * n];
+		B_lm[tx + j * N_DIMB + (ty + i * K_DIMB) * N_WG] = B[bx * N_WG + n * p_wg + tx + j * N_DIMB + (ty + i * K_DIMB) * n];
 
         barrier(CLK_LOCAL_MEM_FENCE);
 
-        for (int p_wi = 0; p_wi < K_WG - K_WI; p_wi += K_WI) {
+        for (int p_wi = 0; p_wi <= K_WG - K_WI; p_wi += K_WI) {
 	    data_t A_pm[M_WI * K_WI];
 	    data_t B_pm[K_WI * N_WI];
 
@@ -63,7 +63,7 @@ __kernel void matrixMulKernel (
     	    for (int i = 0; i < M_WI; i++)
     		for (int j = 0; j < N_WI; j++) {
 		    C_pm[j + i * N_WI] += A_pm[i * K_WI] * B_pm[j];
-		    C_pm[j + i * N_WI] += A_pm[1 + i * K_WI] * B_pm[j + N_WI];
+		    C_pm[j + i * N_WI] += A_pm[i * K_WI + 1] * B_pm[j + N_WI];
 		}
 	}
 
@@ -72,6 +72,6 @@ __kernel void matrixMulKernel (
 
     for (int i = 0; i < M_WI; i++)
     	for (int j = 0; j < N_WI; j++)
-            C[bx * N_WG + tx + i * N_DIMC + n * M_WG * by + (ty + j * M_DIMC) * n] = C_pm[j + i * N_WI];
+            C[bx * N_WG + tx + j * N_DIMC + n * M_WG * by + (ty + i * M_DIMC) * n] = C_pm[j + i * N_WI];
 }
 

@@ -328,9 +328,9 @@ int runDGEMM(const char* program_file){
                 double *C_CPU;
                 C_CPU = (double *) calloc(__m * __n, sizeof(double));
                 DGEMMCPU(C_CPU, (const double *)A, (const double *)B, __m, __n, __k);
-                /*printMatrix(C, __m, __n);
-                printf("\n");
-                printMatrix(C_CPU, __m, __n);*/
+                //printMatrix(C, __m, __n);
+                //printf("\n");
+                //printMatrix(C_CPU, __m, __n);
 
             printf(" ...comparing the results\n");
                 printf("//--------------------------------------------------------\n");
