@@ -131,7 +131,7 @@ int main(int argc, char **argv)
     else if (__alg == 54)
         runDGEMM("../src/DGEMM.NVIDIA.FPE.Multi.Global.cl");
     else if (__alg == 6)
-        runDGEMM("../src/DGEMM.Volkov.cl");
+        runDGEMM("../src/DGEMM.Matsumoto.cl");
 }
 
 int runDGEMM(const char* program_file){
@@ -223,7 +223,7 @@ int runDGEMM(const char* program_file){
             else if ((__alg >= 50) && (__alg <= 54))
                 ciErrNum = initDGEMMNVIDIAGlobal(cxGPUContext, cqCommandQueue, cdDevice, program_file, __nbfpe, __m, __n, __multi);
             else if (__alg == 6)
-                ciErrNum = initDGEMMVolkov(cxGPUContext, cqCommandQueue, cdDevice, program_file);
+                ciErrNum = initDGEMMMatsumoto(cxGPUContext, cqCommandQueue, cdDevice, program_file);
 
             if (ciErrNum != CL_SUCCESS)
                 cleanUp(EXIT_FAILURE);
@@ -241,7 +241,7 @@ int runDGEMM(const char* program_file){
             else if ((__alg >= 50) && (__alg <= 54))
                 DGEMMNVIDIAGlobal(NULL, d_C, d_A, d_B, __m, __n, __multi, &ciErrNum);
             else if (__alg == 6)
-                DGEMMVolkov(NULL, d_C, d_A, d_B, __m, __n, __k, &ciErrNum);
+                DGEMMMatsumoto(NULL, d_C, d_A, d_B, __m, __n, __k, &ciErrNum);
 
             if (ciErrNum != CL_SUCCESS)
                 cleanUp(EXIT_FAILURE);
@@ -269,7 +269,7 @@ int runDGEMM(const char* program_file){
             else if ((__alg >= 50) && (__alg <= 54))
                 DGEMMNVIDIAGlobal(NULL, d_C, d_A, d_B, __m, __n, __multi, &ciErrNum);
             else if (__alg == 6)
-                DGEMMVolkov(NULL, d_C, d_A, d_B, __m, __n, __k, &ciErrNum);
+                DGEMMMatsumoto(NULL, d_C, d_A, d_B, __m, __n, __k, &ciErrNum);
 
             ciErrNum  = clEnqueueMarker(cqCommandQueue, &endMark);
             ciErrNum |= clFinish(cqCommandQueue);
@@ -352,7 +352,7 @@ int runDGEMM(const char* program_file){
             else if ((__alg >= 50) && (__alg <= 54))
                 closeDGEMMNVIDIAGlobal();
             if (__alg == 6)
-                closeDGEMMVolkov();
+                closeDGEMMMatsumoto();
 
     // pass or fail
     if (PassFailFlag)

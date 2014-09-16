@@ -123,7 +123,7 @@ extern "C" cl_int initDGEMM(
     const char* program_file
 );
 
-extern "C" cl_int initDGEMMVolkov(
+extern "C" cl_int initDGEMMMatsumoto(
     cl_context cxGPUContext,
     cl_command_queue cqParamCommandQue,
     cl_device_id cdDevice,
@@ -167,7 +167,7 @@ extern "C" void closeDGEMM(
     void
 );
 
-extern "C" void closeDGEMMVolkov(
+extern "C" void closeDGEMMMatsumoto(
     void
 );
 
@@ -239,7 +239,7 @@ extern "C" size_t DGEMMNVIDIAPrivate(
     cl_int *ciErrNum
 );
 
-extern "C" size_t DGEMMVolkov(
+extern "C" size_t DGEMMMatsumoto(
     cl_command_queue cqCommandQueue,
     cl_mem d_C,
     const cl_mem d_A,
