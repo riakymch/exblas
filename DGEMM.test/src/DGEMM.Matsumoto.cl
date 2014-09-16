@@ -50,8 +50,10 @@ __kernel void matrixMulKernel (
 	    A_pm[5] = vload2(0, &A[p_wg + p_wi + k * M_WG * by + (ty + 5 * M_DIMA) * k]);
 
 	    //load K_WI x N_WI elements of B_lm into B_pm
-	    B_pm[0] = vload2(N_WG, &B[p_wi * N_WG + tx]);
-	    B_pm[1] = vload2(N_WG, &B[p_wi * N_WG + tx + N_DIMB]);
+	    B_pm[0].x = B[p_wi * N_WG + tx];
+	    B_pm[0].y = B[(p_wi + 1) * N_WG + tx];
+	    B_pm[1].x = B[p_wi * N_WG + tx + N_DIMB];
+	    B_pm[1].y = B[(p_wi + 1) * N_WG + tx + N_DIMB];
 
 	    //compute
 	    C_pm[0].x = fma(A_pm[0].x, B_pm[0].x, C_pm[0].x);
@@ -86,7 +88,6 @@ __kernel void matrixMulKernel (
     for (int i = 0; i < M_WI; i++) {
         C[bx * N_WG + tx + n * M_WG * by + (ty + i * M_DIMC) * n] = C_pm[i].x;
         C[bx * N_WG + tx + N_DIMC + n * M_WG * by + (ty + i * M_DIMC) * n] = C_pm[i].y;
-        //vstore2(C_pm[i], N_DIMC, &C[bx * N_WG + tx +  n * M_WG * by + (ty + i * M_DIMC) * n]);
     }
 }
 
