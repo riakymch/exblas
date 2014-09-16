@@ -25,7 +25,7 @@ __kernel void matrixMulKernel (
     int K_wib = K_WG / K_DIMB;
     int N_wib = N_WG / N_DIMB;
 
-    double2 C_pm[M_WI] = {0.0};
+    double2 C_pm[M_WI] = {0.0, 0.0};
 
     __local data_t B_lm[K_WG * N_WG];
 
