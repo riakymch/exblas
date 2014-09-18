@@ -289,6 +289,9 @@ __kernel void matrixMul(
 
                 //Multiply the two matrices together;
                 //each thread computes one element of the block sub-matrix
+                #ifdef NVIDIA
+          	  #pragma unroll
+	        #endif
                 for (int k = 0; k < BLOCK_SIZE; ++k) {
                     double r; //residual of multiplication
                     double x = TwoProductFMA(AS(ty, k), BS(k, tx), &r);

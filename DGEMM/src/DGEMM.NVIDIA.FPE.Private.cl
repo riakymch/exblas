@@ -239,13 +239,13 @@ __kernel void matrixMul(
     __local data_t* As,
     __local data_t* Bs
 ) {
-    //Block index
-    int bx = get_group_id(0);
-    int by = get_group_id(1);
-
     //Thread index
     int tx = get_local_id(0);
     int ty = get_local_id(1);
+
+    //Block index
+    int bx = get_group_id(0);
+    int by = get_group_id(1);
 
     //Index of the first sub-matrix of A processed by the block
     int aBegin = m * BLOCK_SIZE * by;
@@ -287,10 +287,9 @@ __kernel void matrixMul(
           #pragma unroll
         #endif
         for (int k = 0; k < BLOCK_SIZE; ++k) {
-            double r = 0.0; //residual of multiplication
-            //double x = TwoProductFMA(AS(ty, k), BS(k, tx), &r);
+            double r; //residual of multiplication
+            double x = TwoProductFMA(AS(ty, k), BS(k, tx), &r);
 
-            double x = AS(ty, k) * BS(k, tx);
             #ifdef NVIDIA
                 #pragma unroll
             #endif
@@ -302,6 +301,17 @@ __kernel void matrixMul(
             }
             if(x != 0.0)
                 Accumulate(p_workingBase, x);
+
+            #ifdef NVIDIA
+                #pragma unroll
+            #endif
+            for(uint l = 0; l != NBFPE; ++l) {
+                double s; //residual of addition
+                sum[l] = KnuthTwoSum(sum[l], r, &s); //Issues on Tesla
+                r = s;
+            }
+            if(r != 0.0)
+            	Accumulate(p_workingBase, r);
         }
 
         //Synchronize to make sure that the preceding computation is done before 
