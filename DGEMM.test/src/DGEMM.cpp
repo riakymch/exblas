@@ -1,6 +1,4 @@
-#include <ostream>
-#include <stdio.h>
-#include <cmath>
+
 #include "DGEMM.hpp"
 
 /*
