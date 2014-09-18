@@ -77,7 +77,7 @@ static void __parse_args(int argc, char **argv) {
 
     uint algs[]= {0,1,2,30,31,32,33,34,40,41,50,51,52,53,54,6};
     int is_alg = 0;
-    for (i = 0; i < 1666666; i++)
+    for (i = 0; i < 16; i++)
         if (algs[i] == __alg) {
             is_alg = 1;
             break;
