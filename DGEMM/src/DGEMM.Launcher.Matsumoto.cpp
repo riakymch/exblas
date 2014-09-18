@@ -43,7 +43,7 @@ static char  compileOptions[256] = "-DBM=64 -DBK=16 -DBN=16 -DNVIDIA -cl-mad-ena
 #endif
 
 
-extern "C" cl_int initDGEMMVolkov(
+extern "C" cl_int initDGEMMMatsumoto(
    cl_context cxGPUContext,
     cl_command_queue cqParamCommandQue,
     cl_device_id cdDevice,
@@ -103,7 +103,7 @@ extern "C" cl_int initDGEMMVolkov(
     return EXIT_SUCCESS;
 }
 
-extern "C" void closeDGEMMVolkov(void){
+extern "C" void closeDGEMMMatsumoto(void){
     cl_int ciErrNum;
 
     ciErrNum = clReleaseKernel(ckMatrixMul);
@@ -116,7 +116,7 @@ extern "C" void closeDGEMMVolkov(void){
 ////////////////////////////////////////////////////////////////////////////////
 // OpenCL launchers for Superaccumulator / mergeSuperaccumulators kernels
 ////////////////////////////////////////////////////////////////////////////////
-extern "C" size_t DGEMMVolkov(
+extern "C" size_t DGEMMMatsumoto(
     cl_command_queue cqCommandQueue,
     cl_mem d_C,
     const cl_mem d_A,

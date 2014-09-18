@@ -12,13 +12,14 @@
 #ifndef COMMON_H
 #define COMMON_H
 
+#include <cfloat>
 #include <cmath>
 #include <cstdio>
 #include <cstdlib>
+#include <cassert>
 #include <string.h>
 
 #include "DGEMM.hpp"
-#include "Superaccumulator.hpp"
 
 // All OpenCL headers
 #if defined (__APPLE__) || defined(MACOSX)
@@ -30,11 +31,11 @@
 ////////////////////////////////////////////////////////////////////////////////
 // Common definitions
 ////////////////////////////////////////////////////////////////////////////////
-#define BIN_COUNT 39U
+#define BIN_COUNT 76U
 
 
-#define E_BITS 1023
-#define F_BITS (1023 + 52)
+#define E_BITS 2 * 1023
+#define F_BITS 2 * (1023 + 52)
 
 typedef cl_long bintype;
 
@@ -123,7 +124,7 @@ extern "C" cl_int initDGEMM(
     const char* program_file
 );
 
-extern "C" cl_int initDGEMMVolkov(
+extern "C" cl_int initDGEMMMatsumoto(
     cl_context cxGPUContext,
     cl_command_queue cqParamCommandQue,
     cl_device_id cdDevice,
@@ -167,7 +168,7 @@ extern "C" void closeDGEMM(
     void
 );
 
-extern "C" void closeDGEMMVolkov(
+extern "C" void closeDGEMMMatsumoto(
     void
 );
 
@@ -239,7 +240,7 @@ extern "C" size_t DGEMMNVIDIAPrivate(
     cl_int *ciErrNum
 );
 
-extern "C" size_t DGEMMVolkov(
+extern "C" size_t DGEMMMatsumoto(
     cl_command_queue cqCommandQueue,
     cl_mem d_C,
     const cl_mem d_A,

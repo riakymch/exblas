@@ -55,7 +55,7 @@ extern "C" bool compareDGEMMWithMPFR(
 
     mpfr_init2(op1, 64);
     mpfr_init2(ddot, 128);
-    mpfr_init2(sum, 2098);
+    mpfr_init2(sum, 4196);
     mpfr_set_d(ddot, 0.0, MPFR_RNDN);
 
     //Produce a result matrix of DGEMM using MPFR

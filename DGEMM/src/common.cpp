@@ -1,9 +1,4 @@
 
-#include <cstdio>
-#include <cstdlib>
-#include <cmath>
-#include <string.h>
-#include <cfloat>
 #include "common.hpp"
 
 ////////////////////////////////////////////////////////////////////////////////

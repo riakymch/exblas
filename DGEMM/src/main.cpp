@@ -37,7 +37,7 @@ static void __usage(int argc __attribute__((unused)), char **argv) {
     printf("              -k nbrows of B,\n");
     printf("              -r range,\n");
     printf("              -e nbfpe,\n");
-    printf("              -a alg (0-mine, 1-amd, 2-nvidia, 30-pr-sa, 31-pr-fpe, 32-pr-fpe-ex-4, 33-pr-fpe-ex-8, 34-pr-fpe-multi, 40-lo-sa, 41-lo-fpe, 50-gl-sa, 51-gl-fpe, 52-gl-fpe-ex-4, 53-gl-fpe-ex-8, 54-gl-fpe-multi, 6-volkov),\n");
+    printf("              -a alg (0-mine, 1-amd, 2-nvidia, 30-pr-sa, 31-pr-fpe, 32-pr-fpe-ex-4, 33-pr-fpe-ex-8, 34-pr-fpe-multi, 40-lo-sa, 41-lo-fpe, 50-gl-sa, 51-gl-fpe, 52-gl-fpe-ex-4, 53-gl-fpe-ex-8, 54-gl-fpe-multi, 6-matsumoto),\n");
     printf("              -ml multi-values] \n");
     printf("  -?, -h:    Display this help and exit\n");
 }
@@ -131,7 +131,7 @@ int main(int argc, char **argv)
     else if (__alg == 54)
         runDGEMM("../src/DGEMM.NVIDIA.FPE.Global.Multi.cl");
     else if (__alg == 6)
-        runDGEMM("../src/DGEMM.Volkov.cl");
+        runDGEMM("../src/DGEMM.Matsumoto.cl");
 }
 
 int runDGEMM(const char* program_file){
@@ -223,7 +223,7 @@ int runDGEMM(const char* program_file){
             else if ((__alg >= 50) && (__alg <= 54))
                 ciErrNum = initDGEMMNVIDIAGlobal(cxGPUContext, cqCommandQueue, cdDevice, program_file, __nbfpe, __m, __n, __multi);
             else if (__alg == 6)
-                ciErrNum = initDGEMMVolkov(cxGPUContext, cqCommandQueue, cdDevice, program_file);
+                ciErrNum = initDGEMMMatsumoto(cxGPUContext, cqCommandQueue, cdDevice, program_file);
 
             if (ciErrNum != CL_SUCCESS)
                 cleanUp(EXIT_FAILURE);
@@ -241,7 +241,7 @@ int runDGEMM(const char* program_file){
             else if ((__alg >= 50) && (__alg <= 54))
                 DGEMMNVIDIAGlobal(NULL, d_C, d_A, d_B, __m, __n, __multi, &ciErrNum);
             else if (__alg == 6)
-                DGEMMVolkov(NULL, d_C, d_A, d_B, __m, __n, __k, &ciErrNum);
+                DGEMMMatsumoto(NULL, d_C, d_A, d_B, __m, __n, __k, &ciErrNum);
 
             if (ciErrNum != CL_SUCCESS)
                 cleanUp(EXIT_FAILURE);
@@ -269,7 +269,7 @@ int runDGEMM(const char* program_file){
             else if ((__alg >= 50) && (__alg <= 54))
                 DGEMMNVIDIAGlobal(NULL, d_C, d_A, d_B, __m, __n, __multi, &ciErrNum);
             else if (__alg == 6)
-                DGEMMVolkov(NULL, d_C, d_A, d_B, __m, __n, __k, &ciErrNum);
+                DGEMMMatsumoto(NULL, d_C, d_A, d_B, __m, __n, __k, &ciErrNum);
 
             ciErrNum  = clEnqueueMarker(cqCommandQueue, &endMark);
             ciErrNum |= clFinish(cqCommandQueue);
@@ -349,7 +349,7 @@ int runDGEMM(const char* program_file){
             else if ((__alg >= 50) && (__alg <= 54))
                 closeDGEMMNVIDIAGlobal();
             if (__alg == 6)
-                closeDGEMMVolkov();
+                closeDGEMMMatsumoto();
 
     // pass or fail
     if (PassFailFlag)

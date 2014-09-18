@@ -16,11 +16,11 @@
   #pragma OPENCL EXTENSION cl_nv_pragma_unroll         : enable
 #endif
 
-#define BIN_COUNT      39
+#define BIN_COUNT      76
 #define K              8                    // High-radix carry-save bits
 #define digits         56
 #define deltaScale     72057594037927936.0  // Assumes K>0
-#define f_words        20
+#define f_words        39
 #define TSAFE          0
 
 #define AS(i, j) As[j + i * BLOCK_SIZE]
@@ -115,7 +115,7 @@ int Normalize(__global long *accumulator, int *imin, int *imax) {
 
 double Round(__global long *accumulator) {
   int imin = 0; 
-  int imax = 38;
+  int imax = 75;
   int negative = Normalize(accumulator, &imin, &imax);
 
   //Find leading word
