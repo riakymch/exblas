@@ -12,13 +12,14 @@
 #ifndef COMMON_H
 #define COMMON_H
 
+#include <cassert>
+#include <cfloat>
 #include <cmath>
 #include <cstdio>
 #include <cstdlib>
 #include <string.h>
 
 #include "DGEMM.hpp"
-#include "Superaccumulator.hpp"
 
 // All OpenCL headers
 #if defined (__APPLE__) || defined(MACOSX)

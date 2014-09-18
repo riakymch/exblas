@@ -290,8 +290,9 @@ int runDGEMM(const char* program_file){
         }
 
         double minTime = min(gpuTime, NUM_ITER);
-        double perf = nbElements * sizeof(double);
-        double throughput = (perf / minTime) * 1e-9;
+        //double perf = nbElements * sizeof(double);
+        //double throughput = (perf / minTime) * 1e-9;
+	double perf = 0.0;
         if ((__alg <= 2) || (__alg == 6)) {
             perf = 2.0 * __m;
             perf *= __n * __k;
