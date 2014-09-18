@@ -9,11 +9,11 @@
 //Data type used for input data fetches
 typedef double data_t;
 
-#define BIN_COUNT  39
+#define BIN_COUNT  76
 #define K          8                    //High-radix carry-save bits
 #define digits     56
 #define deltaScale 72057594037927936.0  //Assumes K > 0
-#define f_words    20 
+#define f_words    39 
 #define TSAFE      0
 
 
@@ -106,7 +106,7 @@ int Normalize(__global long *accumulator, int *imin, int *imax) {
 
 double Round(__global long *accumulator) {
     int imin = 0;
-    int imax = 38;
+    int imax = 75;
     int negative = Normalize(accumulator, &imin, &imax);
 
     //Find leading word

@@ -295,7 +295,7 @@ bool Superaccumulator::CompareSuperaccumulatorWithMPFR(mpfr_t *res_mpfr) {
   mpfr_t result;
   mpfr_exp_t exp_ptr;
 
-  mpfr_init2(result, 2098);
+  mpfr_init2(result, 4196);
   mpfr_set_d(result, 0.0, MPFR_RNDN);
 
   // BUG for negative numbers
@@ -325,10 +325,10 @@ bool Superaccumulator::CompareSuperaccumulatorWithMPFR(mpfr_t *res_mpfr) {
     mpfr_add_d(result, result, xscaled, MPFR_RNDN);
   }
 
-  char *res = mpfr_get_str(NULL, &exp_ptr, 10, 2098, *res_mpfr, MPFR_RNDD);
-  char *res_str = mpfr_get_str(NULL, &exp_ptr, 10, 2098, result, MPFR_RNDD);
-  printf("\tSum MPFR (2098)    : %s\n", res);
-  printf("\tSum Superaccumulator (2098) : %s\n", res_str);
+  char *res = mpfr_get_str(NULL, &exp_ptr, 10, 4196, *res_mpfr, MPFR_RNDD);
+  char *res_str = mpfr_get_str(NULL, &exp_ptr, 10, 4196, result, MPFR_RNDD);
+  printf("\tSum MPFR (4196)    : %s\n", res);
+  printf("\tSum Superaccumulator (4196) : %s\n", res_str);
   mpfr_free_str(res);
   mpfr_free_str(res_str);
 
@@ -384,3 +384,4 @@ void Superaccumulator::PrintAccumulator() {
   for (int i = 0; i < (e_words + f_words); i++)
     printf("bin[%3d]: %lX\n", i, accumulator[i]);
 }
+

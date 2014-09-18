@@ -16,8 +16,8 @@
 //       do we need to? Superaccumulator is scalar.
 struct Superaccumulator
 {
-    Superaccumulator(int e_bits = 1023, int f_bits = 1023 + 52);
-    Superaccumulator(int64_t *acc, int e_bits = 1023, int f_bits = 1023 + 52);
+    Superaccumulator(int e_bits = 2 * 1023, int f_bits = 2 * (1023 + 52));
+    Superaccumulator(int64_t *acc, int e_bits = 2 * 1023, int f_bits = 2 * (1023 + 52));
 
     void Accumulate(int64_t x, int exp);
     void Accumulate(double x);
