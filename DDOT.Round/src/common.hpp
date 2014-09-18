@@ -19,9 +19,6 @@
 #include <cassert>
 #include <string.h>
 
-#include <gmp.h>
-#include <mpfr.h>
-
 #include "DDOT.hpp"
 
 // All OpenCL headers
@@ -121,18 +118,8 @@ extern "C" size_t DDOTStandard(
 );
 
 ////////////////////////////////////////////////////////////////////////////////
-// MPFR and Kahan summation functions
+// Kahan summation functions
 ////////////////////////////////////////////////////////////////////////////////
-extern "C" mpfr_t *ddotWithMPFR(
-    double *h_a,
-    double *h_b,
-    int size);
-
-extern "C" bool CompareWithMPFR(
-    mpfr_t *res_mpfr,
-    double res_rounded
-);
-
 extern "C" double roundKahan(
     double *data,
     int size

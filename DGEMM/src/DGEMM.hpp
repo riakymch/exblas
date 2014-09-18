@@ -9,6 +9,9 @@
     #include <CL/opencl.h>
 #endif
 
+#include <ostream>
+#include <cstdio>
+#include <cmath>
 #include <gmp.h>
 #include <mpfr.h>
 

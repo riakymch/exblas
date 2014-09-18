@@ -234,7 +234,7 @@ int runDDOT(const char* program_file){
 
             printf(" ...comparing the results\n");
                 printf("//--------------------------------------------------------\n");
-                mpfr_t *ddot_mpfr = ddotWithMPFR((double *) h_a, (double *) h_b, __nbElements);
+                mpfr_t *ddot_mpfr = DDOTWithMPFR((double *) h_a, (double *) h_b, __nbElements);
                 PassFailFlag = CompareWithMPFR(ddot_mpfr, h_Res);
 
         //Release kernels and program
@@ -383,7 +383,7 @@ int runDDOTStandard(const char* program_file) {
 
             printf(" ...comparing the results\n");
                 printf("//--------------------------------------------------------\n");
-                mpfr_t *ddot_mpfr = ddotWithMPFR((double *) h_a, (double *) h_b, __nbElements);
+                mpfr_t *ddot_mpfr = DDOTWithMPFR((double *) h_a, (double *) h_b, __nbElements);
                 PassFailFlag = CompareWithMPFR(ddot_mpfr, h_Res);
 
          //Release kernels and program
