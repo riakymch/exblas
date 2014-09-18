@@ -21,7 +21,7 @@ cl_device_id      cdDevice;          //OpenCL device list
 cl_context        cxGPUContext;      //OpenCL context
 cl_command_queue  cqCommandQueue;    //OpenCL command que
 cl_mem            d_a, d_b;          //OpenCL memory buffer objects
-cl_mem            d_Res, d_Superacc;
+cl_mem            d_Res;
 void              *h_a, *h_b;
 double            h_Res;
 
@@ -164,11 +164,6 @@ int runDDOT(const char* program_file){
             printf("Error in clCreateBuffer for d_b, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
             cleanUp(EXIT_FAILURE);
         }
-        d_Superacc = clCreateBuffer(cxGPUContext, CL_MEM_READ_WRITE, BIN_COUNT * sizeof(bintype), NULL, &ciErrNum);
-        if (ciErrNum != CL_SUCCESS) {
-            printf("Error in clCreateBuffer for d_Superacc, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
-            cleanUp(EXIT_FAILURE);
-        }
         d_Res = clCreateBuffer(cxGPUContext, CL_MEM_READ_WRITE, sizeof(cl_double), NULL, &ciErrNum);
         if (ciErrNum != CL_SUCCESS) {
             printf("Error in clCreateBuffer for d_Res, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
@@ -183,7 +178,7 @@ int runDDOT(const char* program_file){
 
         printf("Running OpenCL DDOT with %u elements...\n\n", __nbElements);
             //Just a single launch or a warmup iteration
-            DDOT(NULL, d_Res, d_Superacc, d_a, d_b, __nbElements, &ciErrNum);
+            DDOT(NULL, d_Res, d_a, d_b, __nbElements, &ciErrNum);
 
             if (ciErrNum != CL_SUCCESS)
                 cleanUp(EXIT_FAILURE);
@@ -200,7 +195,7 @@ int runDDOT(const char* program_file){
                 cleanUp(EXIT_FAILURE);
             }
 
-            DDOT(NULL, d_Res, d_Superacc, d_a, d_b, __nbElements, &ciErrNum);
+            DDOT(NULL, d_Res, d_a, d_b, __nbElements, &ciErrNum);
 
             ciErrNum  = clEnqueueMarker(cqCommandQueue, &endMark);
             ciErrNum |= clFinish(cqCommandQueue);
@@ -236,18 +231,6 @@ int runDDOT(const char* program_file){
                     printf("Error in clEnqueueReadBuffer Line %u in file %s !!!\n\n", __LINE__, __FILE__);
                     cleanUp(EXIT_FAILURE);
                 }
-
-            /*printf(" ...SupersuperaccCPU()\n");
-                Superaccumulator superaccCPU(E_BITS, F_BITS);
-                for (uint i = 0; i < __nbElements; i++) {
-                    double r = 0.0;
-                    double x = TwoProductFMA(((double *) h_a)[i], ((double *) h_b)[i], &r);
-                    superaccCPU.Accumulate(x);
-                    superaccCPU.Accumulate(r);
-                }
-                double roundedCPU = superaccCPU.Round();
-                printf("[CPU] Rounded value of the compuation: %.17g\n", roundedCPU);
-                printf("[GPU] Rounded value of the compuation: %.17g\n", h_res);*/
 
             printf(" ...comparing the results\n");
                 printf("//--------------------------------------------------------\n");
@@ -422,8 +405,6 @@ int cleanUp (int exitCode) {
         clReleaseMemObject(d_a);
     if(d_b)
         clReleaseMemObject(d_b);
-    if(d_Superacc)
-        clReleaseMemObject(d_Superacc);
     if(d_Res)
         clReleaseMemObject(d_Res);
     if(cqCommandQueue)

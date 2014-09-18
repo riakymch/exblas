@@ -25,6 +25,7 @@ static cl_program       cpProgram;             //OpenCL program
 static cl_kernel        ckKernel, ckComplete;
 static cl_kernel        ckRound;
 static cl_command_queue cqDefaultCommandQue;   //Default command queue
+static cl_mem           d_Superacc;
 static cl_mem           d_PartialSuperaccs;
 
 static const uint  PARTIAL_SUPERACCS_COUNT    = 2048;
@@ -103,6 +104,11 @@ extern "C" cl_int initDDOT(
         }
 
     printf("...allocating internal buffer\n");
+        d_Superacc = clCreateBuffer(cxGPUContext, CL_MEM_READ_WRITE, BIN_COUNT * sizeof(bintype), NULL, &ciErrNum);
+        if (ciErrNum != CL_SUCCESS) {
+            printf("Error in clCreateBuffer for d_Superacc, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
+            return EXIT_FAILURE;
+        }
         d_PartialSuperaccs = clCreateBuffer(cxGPUContext, CL_MEM_READ_WRITE, PARTIAL_SUPERACCS_COUNT * BIN_COUNT * sizeof(cl_long), NULL, &ciErrNum);
         if (ciErrNum != CL_SUCCESS) {
             printf("Error in clCreateBuffer, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
@@ -122,6 +128,7 @@ extern "C" void closeDDOT(void){
     cl_int ciErrNum;
 
     ciErrNum  = clReleaseMemObject(d_PartialSuperaccs);
+    ciErrNum |= clReleaseMemObject(d_Superacc);
     ciErrNum |= clReleaseKernel(ckKernel);
     ciErrNum |= clReleaseKernel(ckComplete);
     ciErrNum |= clReleaseKernel(ckRound);
@@ -137,7 +144,6 @@ extern "C" void closeDDOT(void){
 extern "C" size_t DDOT(
     cl_command_queue cqCommandQueue,
     cl_mem d_Res,
-    cl_mem d_Superacc,
     const cl_mem d_a,
     const cl_mem d_b,
     uint NbElements,
