@@ -12,7 +12,7 @@
 // standard utilities and systems includes
 #include "common.hpp"
 
-#define NUM_ITER  20
+#define NUM_ITER  10
 ////////////////////////////////////////////////////////////////////////////////
 // Variables used in the program 
 ////////////////////////////////////////////////////////////////////////////////
@@ -314,7 +314,7 @@ int runDGEMM(const char* program_file){
         }
         perf = (perf / minTime) * 1e-9;
         //printf("Alg = %u \t NbFPE = %u \t Range = %u \t Size = %u \t Time = %.8f s \t Throughput = %.4f GB/s\n\n", __alg, __nbfpe, __range, __n, minTime, throughput);
-        printf("Alg = %u \t NbFPE = %u \t Range = %u \t Size = %u \t Time = %.8f s \t Performance = %.4f GFLOPS\n\n", __alg, __nbfpe, __range, __n, minTime, perf);
+        printf("Alg = %u \t NbFPE = %u \t Range = %u \t Multi = %u \t Size = %u \t Time = %.8f s \t Performance = %.4f GFLOPS\n\n", __alg, __nbfpe, __range, __multi, __n, minTime, perf);
 #endif
 
         printf("Validating DGEMM OpenCL results...\n");
@@ -335,8 +335,8 @@ int runDGEMM(const char* program_file){
 
             printf(" ...comparing the results\n");
                 printf("//--------------------------------------------------------\n");
-                PassFailFlag = compare((const double *) C_CPU, (const double *) C, __m * __n, 1e-16);
-                //PassFailFlag = compareDGEMMWithMPFR((const double *)C, (const double *)A, (const double *)B, __m, __n, __k, 1e-16);
+                //PassFailFlag = compare((const double *) C_CPU, (const double *) C, __m * __n, 1e-16);
+                PassFailFlag = compareDGEMMWithMPFR((const double *)C, (const double *)A, (const double *)B, __m, __n, __k, 1e-16);
                 printf("//--------------------------------------------------------\n");
                 free(C_CPU);
 
