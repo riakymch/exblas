@@ -259,15 +259,15 @@ __kernel void matrixMul(
     int bBegin = BLOCK_SIZE * bx;
 
     //Step size used to iterate through the sub-matrices of B
-    int bStep  = BLOCK_SIZE * n;
+    int bStep  = BLOCK_SIZE * m;
 
-    int bdimx = n / BLOCK_SIZE;
-    int bdimy = m / BLOCK_SIZE;
-    int bsizex = get_num_groups(0);
-    int bsizey = get_num_groups(1);
+    //int bdimx = n / BLOCK_SIZE;
+    //int bdimy = m / BLOCK_SIZE;
+    //int bsizex = get_num_groups(0);
+    //int bsizey = get_num_groups(1);
 
-    for (int i = bx; i < bdimx; i += bsizex) {
-        for (int j = by; j < bdimy; j += bsizey) {
+    //for (int i = bx; i < bdimx; i += bsizex) {
+        //for (int j = by; j < bdimy; j += bsizey) {
             //A superaccumulator that corresponds to a single value in the matrix C
             long p_workingBase[BIN_COUNT] = {0};
 
@@ -281,7 +281,7 @@ __kernel void matrixMul(
                 //Load the matrices from device memory to shared memory;
                 //each thread loads one element of each matrix
                 AS(ty, tx) = A[a + m * ty + tx];
-                BS(ty, tx) = B[b + n * ty + tx];
+                BS(ty, tx) = B[b + m * ty + tx];
 
                 //Synchronize to make sure the matrices are loaded
                 barrier(CLK_LOCAL_MEM_FENCE);
@@ -340,9 +340,9 @@ __kernel void matrixMul(
             Accumulate(p_workingBase, sum[3]);
 
             //TODO: the first non-zero from rigth
-            int c = (n * by + bx) * BLOCK_SIZE;
-            C[c + n * ty + tx] = Round(p_workingBase);
-        }
-    }
+            int c = (m * by + bx) * BLOCK_SIZE;
+            C[c + m * ty + tx] = Round(p_workingBase);
+        //}
+    //}
 }
 
