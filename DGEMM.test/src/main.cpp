@@ -37,7 +37,7 @@ static void __usage(int argc __attribute__((unused)), char **argv) {
     printf("              -k nbrows of B,\n");
     printf("              -r range,\n");
     printf("              -e nbfpe,\n");
-    printf("              -a alg (0-mine, 1-amd, 2-nvidia, 30-pr-sa, 31-pr-fpe, 32-pr-fpe-ex-4, 33-pr-fpe-ex-6, 34-pr-fpe-ex-8, 40-lo-sa, 41-lo-fpe, 50-gl-sa, 51-gl-fpe, 52-gl-fpe-ex-4, 53-gl-fpe-ex-8, 54-gl-fpe-multi, 6-volkov),\n");
+    printf("              -a alg (0-mine, 1-amd, 2-nvidia, 30-pr-sa, 31-pr-fpe, 32-pr-fpe-ex-4, 33-pr-fpe-ex-6, 34-pr-fpe-ex-8, 40-lo-sa, 41-lo-fpe, 50-gl-sa, 51-gl-fpe, 52-gl-fpe-ex-4, 53-gl-fpe-ex-6, 54-gl-fpe-ex-8, 6-volkov),\n");
     printf("              -ml multi-values] \n");
     printf("  -?, -h:    Display this help and exit\n");
 }
@@ -127,9 +127,9 @@ int main(int argc, char **argv)
     else if (__alg == 52)
         runDGEMM("../src/DGEMM.NVIDIA.FPE.EX4.Global.cl");
     else if (__alg == 53)
-        runDGEMM("../src/DGEMM.NVIDIA.FPE.EX8.Global.cl");
+        runDGEMM("../src/DGEMM.NVIDIA.FPE.EX6.Global.cl");
     else if (__alg == 54)
-        runDGEMM("../src/DGEMM.NVIDIA.FPE.Multi.Global.cl");
+        runDGEMM("../src/DGEMM.NVIDIA.FPE.EX8.Global.cl");
     else if (__alg == 6)
         runDGEMM("../src/DGEMM.Matsumoto.cl");
 }
@@ -293,25 +293,16 @@ int runDGEMM(const char* program_file){
         //double perf = nbElements * sizeof(double);
         //double throughput = (perf / minTime) * 1e-9;
 	double perf = 0.0;
-        if ((__alg <= 2) || (__alg == 6)) {
-            perf = 2.0 * __m;
-            perf *= __n * __k;
-        } else if (__alg % 10 == 0) {
+        //if ((__alg <= 2) || (__alg == 6)) {
+        perf = 2.0 * __m;
+        perf *= __n * __k;
+        /*} else if (__alg % 10 == 0) {
             perf = (2.0 + 8.0) * __m;
             perf *= __n * __k;
-        } else if ((__alg == 31) || (__alg == 34) || (__alg == 34) || (__alg == 41) || (__alg == 51) || (__alg == 54)) {
+        } else {
             perf = (2.0 + 12.0 * __nbfpe) * __m;
             perf *= __n * __k;
-        } else if ((__alg == 32) || (__alg == 52)) {
-            perf = 50.0 * __m;
-            perf *= __n * __k;
-        } else if (__alg == 33) {
-            perf = 74.0 * __m;
-            perf *= __n * __k;
-        } else if ((__alg == 34) || (__alg == 53)) {
-            perf = 98.0 * __m;
-            perf *= __n * __k;
-        }
+        }*/
         perf = (perf / minTime) * 1e-9;
         //printf("Alg = %u \t NbFPE = %u \t Range = %u \t Size = %u \t Time = %.8f s \t Throughput = %.4f GB/s\n\n", __alg, __nbfpe, __range, __n, minTime, throughput);
         printf("Alg = %u \t NbFPE = %u \t Range = %u \t Multi = %u \t Size = %u \t Time = %.8f s \t Performance = %.4f GFLOPS\n\n", __alg, __nbfpe, __range, __multi, __n, minTime, perf);
@@ -335,8 +326,8 @@ int runDGEMM(const char* program_file){
 
             printf(" ...comparing the results\n");
                 printf("//--------------------------------------------------------\n");
-                //PassFailFlag = compare((const double *) C_CPU, (const double *) C, __m * __n, 1e-16);
-                PassFailFlag = compareDGEMMWithMPFR((const double *)C, (const double *)A, (const double *)B, __m, __n, __k, 1e-16);
+                PassFailFlag = compare((const double *) C_CPU, (const double *) C, __m * __n, 1e-16);
+                //PassFailFlag = compareDGEMMWithMPFR((const double *)C, (const double *)A, (const double *)B, __m, __n, __k, 1e-16);
                 printf("//--------------------------------------------------------\n");
                 free(C_CPU);
 

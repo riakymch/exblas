@@ -32,7 +32,7 @@ do
     do
       for ((multi=16; range>=1; range/=2))
       do
-        for ((n=${begin}; n=>${nMin}; n-=${step}))
+        for ((n=${begin}; n>=${nMin}; n-=${step}))
         do
             $exe -m $n -n $n -k $n -r 1 -e $range -a $alg -ml $multi | tee -a $file
         done
@@ -44,7 +44,7 @@ for alg in 32 34
 do
     for ((multi=16; range>=1; range/=2))
     do
-	for ((n=${begin}; n=>${nMin}; n-=${step}))
+	for ((n=${begin}; n>=${nMin}; n-=${step}))
         do
             $exe -m $n -n $n -k $n -r 1 -e 3 -a $alg -ml $multi | tee -a $file
         done
@@ -53,7 +53,7 @@ done
 
 for alg in 0 2 
 do
-    for ((n=${begin}; n=>${nMin}; n-=${step}))
+    for ((n=${begin}; n>=${nMin}; n-=${step}))
     do
         $exe -m $n -n $n -k $n -r 1 -e 0 -a $alg | tee -a $file
     done

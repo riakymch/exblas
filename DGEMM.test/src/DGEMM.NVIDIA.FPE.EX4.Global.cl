@@ -264,13 +264,13 @@ __kernel void matrixMul(
     //Step size used to iterate through the sub-matrices of B
     int bStep  = BLOCK_SIZE * n;
 
-    int bdimx = n / BLOCK_SIZE;
+    /*int bdimx = n / BLOCK_SIZE;
     int bdimy = m / BLOCK_SIZE;
     int bsizex = get_num_groups(0);
     int bsizey = get_num_groups(1);
 
     for (int i = bx; i < bdimx; i += bsizex) {
-        for (int j = by; j < bdimy; j += bsizey) {
+        for (int j = by; j < bdimy; j += bsizey) {*/
             //A superaccumulator that corresponds to a single value in the matrix C
             int c = (m * by + bx) * BLOCK_SIZE;
             __global long *g_workingBase = Accus + (c + n * ty + tx) * BIN_COUNT;
@@ -346,7 +346,7 @@ __kernel void matrixMul(
             Accumulate(g_workingBase, sum[3]);
 
             C[c + n * ty + tx] = Round(g_workingBase);
-        }
-    }
+    //    }
+    //}
 }
 
