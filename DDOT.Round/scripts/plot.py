@@ -22,12 +22,12 @@ def readDataFromFileAll(filename, str1, str2):
         if line.find("Throughput = ") != -1 and line.find(str1) != -1 and line.find(str2) != -1:
             if line.find("NbFPE") != -1:
                 line = line.split();
-                #results.append([line[11], line[len(line) - 2]])
-                results.append([line[11], float(line[len(line) - 2]) / 8.])
+                results.append([line[11], line[17]])
+                #results.append([line[11], float(line[len(line) - 2]) / 8.])
             else:
                 line = line.split();
-                #results.append([line[8], line[len(line) - 2]])
-                results.append([line[8], float(line[len(line) - 2]) / 8.])
+                results.append([line[8], line[14]])
+                #results.append([line[8], float(line[len(line) - 2]) / 8.])
 
     f.close()  
     return results
@@ -134,12 +134,10 @@ def plotNbElementsVSGbsAll(input, output):
     gp('set terminal postscript eps color enhanced "Times" 26')
     gp('set grid noxtics noytics')
     gp('set xlabel "Array size" font "Times, 26"')
-    gp('set ylabel "Gacc/s" font "Times, 26"')
-    #gp('set xtics (1000,4000000,8000000,16000000)')
-    #gp('set xrange [1000:2.75e+08]')
+    gp('set ylabel "Time [secs]" font "Times, 26"')
     gp('set xrange [1000:1.e+09]')
     gp('set logscale x 10')
-    gp('set yrange [0:]')
+    gp('set yrange [0:0.03]')
     gp('set output "| epstopdf --filter > ' + output + '"')
 
     # legend
@@ -149,7 +147,7 @@ def plotNbElementsVSGbsAll(input, output):
     # margins
     gp('set tmargin .5')
     gp('set rmargin 2.5')
-    gp('set lmargin 6.5')
+    gp('set lmargin 9.5')
 
     plotDDOT = Gnuplot.Data(ddot, with_='lines lt 4 lw 4.0', title="Parallel DDOT")
     plotSuperaccs = Gnuplot.Data(superaccs, with_='lines lt 1 lw 4.0', title="Superaccumulator")    
@@ -165,7 +163,7 @@ def plotNbElementsVSGbsAll(input, output):
     plotfpe8ee = Gnuplot.Data(fpe8ee, with_='lines lt 9 lw 4.0', title="Expansion 8 early-exit")    
     
 #     gp.plot(plotDDOT, plotSuperaccs, plotfpe2, plotfpe3, plotfpe4, plotfpe5, plotfpe6, plotfpe7, plotfpe8, plotfpe8ee)
-    gp.plot(plotDDOT, plotSuperaccs, plotfpe2, plotfpe3, plotfpe4, plotfpe8, plotfpe4ee, plotfpe6ee, plotfpe8ee)    
+    gp.plot(plotDDOT, plotSuperaccs, plotfpe3, plotfpe4, plotfpe8, plotfpe4ee, plotfpe8ee)    
     return
 
 def plotInputRangeVSGbs(input, output): 

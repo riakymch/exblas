@@ -159,7 +159,7 @@ def plotNbElementsVSGbsAll(input, output):
     gp('set output "| epstopdf --filter > ' + output + '"')
 
     # legend
-    gp('set key width 0. samplen 1.8')
+    gp('set key width -7.0 samplen 1.8')
     gp('set key top left')
 
     # margins
@@ -167,17 +167,17 @@ def plotNbElementsVSGbsAll(input, output):
     gp('set rmargin 2.5')
     gp('set lmargin 8.')
 
-    plotmine = Gnuplot.Data(mine, with_='lines lt 3 lw 4.0', title="Mine DGEMM")
+    #plotmine = Gnuplot.Data(mine, with_='lines lt 3 lw 4.0', title="Mine DGEMM")
     #plotamd = Gnuplot.Data(amd, with_='lines lt 1 lw 4.0', title="AMD DGEMM")
-    plotnvidia = Gnuplot.Data(nvidia, with_='lines lt 8 lw 4.0', title="NVIDIA DGEMM")
-    plotsa = Gnuplot.Data(sapr, with_='lines lt 1 lw 4.0', title="Superacc")
-    plotfpe3 = Gnuplot.Data(fpepr3, with_='lines lt 5 lw 4.0', title="FPE 3")
-    plotfpe4 = Gnuplot.Data(fpepr4, with_='lines lt 2 lw 4.0', title="FPE 4")
-    plotfpe5 = Gnuplot.Data(fpepr5, with_='lines lt 6 lw 4.0', title="FPE 5")
-    plotfpe6 = Gnuplot.Data(fpepr6, with_='lines lt 7 lw 4.0', title="FPE 6")
-    plotfpe7 = Gnuplot.Data(fpepr7, with_='lines lt 0 lw 4.0', title="FPE 7")
-    plotfpe8 = Gnuplot.Data(fpepr8, with_='lines lt 4 lw 4.0', title="FPE 8")
-    plotfpe4ex = Gnuplot.Data(fpeexpr4, with_='lines lt 9 lw 4.0', title="FPE 4 EX")               
+    plotnvidia = Gnuplot.Data(nvidia, with_='lines lt 1 lw 4.0', title="DGEMM")
+    plotsa = Gnuplot.Data(sapr, with_='lines lt 8 lw 4.0', title="Superaccumulator")
+    plotfpe3 = Gnuplot.Data(fpepr3, with_='lines lt 5 lw 4.0', title="Expansion 3")
+    plotfpe4 = Gnuplot.Data(fpepr4, with_='lines lt 2 lw 4.0', title="Expansion 4")
+    #plotfpe5 = Gnuplot.Data(fpepr5, with_='lines lt 6 lw 4.0', title="FPE 5")
+    plotfpe6 = Gnuplot.Data(fpepr6, with_='lines lt 7 lw 4.0', title="Expansion 6")
+    #plotfpe7 = Gnuplot.Data(fpepr7, with_='lines lt 0 lw 4.0', title="FPE 7")
+    plotfpe8 = Gnuplot.Data(fpepr8, with_='lines lt 4 lw 4.0', title="Expansion 8")
+    plotfpe4ex = Gnuplot.Data(fpeexpr4, with_='lines lt 9 lw 4.0', title="Expansion 4 early-exit")               
     #plotfpe6ex = Gnuplot.Data(fpeexpr6, with_='lines lt 10 lw 4.0', title="FPE 6 EX")
     #plotsa = Gnuplot.Data(sagl, with_='lines lt 1 lw 4.0', title="Superacc")
     #plotfpe3 = Gnuplot.Data(fpegl3, with_='lines lt 5 lw 4.0', title="FPEGL 3")
@@ -189,7 +189,8 @@ def plotNbElementsVSGbsAll(input, output):
     #plotfpe4ex = Gnuplot.Data(fpeexgl4, with_='lines lt 9 lw 4.0', title="FPEEXGL 4")
     #plotfpe8ex = Gnuplot.Data(fpeexgl8, with_='lines lt 3 lw 4.0', title="FPEEXGL 8")
     
-    gp.plot(plotmine, plotnvidia, plotsa, plotfpe3, plotfpe4, plotfpe5, plotfpe6, plotfpe7, plotfpe8, plotfpe4ex)
+    gp.plot(plotnvidia, plotsa, plotfpe3, plotfpe4, plotfpe6, plotfpe8, plotfpe4ex)
+    #gp.plot(plotmine, plotnvidia, plotsa, plotfpe3, plotfpe4, plotfpe5, plotfpe6, plotfpe7, plotfpe8, plotfpe4ex)
     #gp.plot(plotsa, plotfpe2, plotfpe3, plotfpe4, plotfpe5, plotfpe6, plotfpe7, plotfpe8, plotfpe4ex, plotfpe8ex)
     return
 
