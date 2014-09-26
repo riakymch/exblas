@@ -1,0 +1,13 @@
+BLASDIR	= /opt/clAmdBlas-1.10.321
+OPENCLSDKROOT = /opt/AMDAPP
+
+CC	= gcc
+CXX	= g++
+
+OPTS	= -O2
+CFLAGS	= -I../include -I/usr/include/atlas -I$(BLASDIR)/include -I$(OPENCLSDKROOT)/include -std=c99 $(OPTS) -Wall -DADD_ -DBENCHMARK_AMDCLBLAS
+LDFLAGS = -lOpenCL -L/usr/lib -llapack -L$(BLASDIR)/lib64 -lclAmdBlas -m64 -L$(OPENCLSDKROOT)/lib/x86_64 -lblas
+
+ARCH	= ar
+ARCHFLAGS	= cr
+RANLIB	= ranlib

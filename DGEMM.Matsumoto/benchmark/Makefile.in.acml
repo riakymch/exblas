@@ -1,0 +1,9 @@
+BLASDIR	= /opt/acml5.1.0/gfortran64_fma4_mp
+
+CC	= gcc-4.7
+#CXX	= g++
+
+OPTS	= -O2 -fopenmp -mfma4
+CFLAGS	= -I../include -I$(BLASDIR)/include $(OPTS) -std=c99 $(OPTS) -DADD_ -DBENCHMARK_ACML
+LDFLAGS = -L/usr/lib -lgfortran -llapack -lc -L$(BLASDIR)/lib -lacml_mp -lblas -fopenmp
+

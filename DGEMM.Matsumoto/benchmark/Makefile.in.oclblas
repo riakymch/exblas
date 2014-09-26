@@ -1,0 +1,16 @@
+BLASDIR	= ../../beta/oclblas-0.3.2b
+OCLBLAS_KERNEL_DIR=$(BLASDIR)/clkernel
+OPENCLSDKROOT = /opt/AMDAPP
+
+CC	= gcc
+CXX	= g++
+
+OPTS	= -O2
+CFLAGS	= -I../include -I$(BLASDIR)/include -I$(OPENCLSDKROOT)/include -I/usr/include/atlas -std=c99 $(OPTS) -Wall -DADD_ -DBENCHMARK_OCLBLAS
+LDFLAGS = -lOpenCL -L/usr/lib -llapack -L$(BLASDIR)/lib -m64 -L$(OPENCLSDKROOT)/lib/x86_64 -latlas -loclblas -lblas -lstdc++
+
+ARCH	= ar
+ARCHFLAGS	= cr
+RANLIB	= ranlib
+
+RUNOPTION	= OCLBLAS_KERNEL_DIR=$(OCLBLAS_KERNEL_DIR)
