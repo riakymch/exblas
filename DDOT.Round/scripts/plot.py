@@ -137,7 +137,8 @@ def plotNbElementsVSGbsAll(input, output):
     gp('set ylabel "Time [secs]" font "Times, 26"')
     gp('set xrange [1000:1.e+09]')
     gp('set logscale x 10')
-    gp('set yrange [0:0.03]')
+    gp('set logscale y')
+    #gp('set yrange [0:0.03]')
     gp('set output "| epstopdf --filter > ' + output + '"')
 
     # legend
@@ -147,7 +148,7 @@ def plotNbElementsVSGbsAll(input, output):
     # margins
     gp('set tmargin .5')
     gp('set rmargin 2.5')
-    gp('set lmargin 9.5')
+    gp('set lmargin 10.5')
 
     plotDDOT = Gnuplot.Data(ddot, with_='lines lt 4 lw 4.0', title="Parallel DDOT")
     plotSuperaccs = Gnuplot.Data(superaccs, with_='lines lt 1 lw 4.0', title="Superaccumulator")    
