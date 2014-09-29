@@ -246,12 +246,6 @@ __kernel void matrixMul(
     int bx = get_group_id(0);
     int by = get_group_id(1);
 
-    //Index of the first sub-matrix of A processed by the block
-    int aBegin = m * BLOCK_SIZE * by;
-
-    //Index of the last sub-matrix of A processed by the block
-    int aEnd   = aBegin + m - 1;
-
     //Step size used to iterate through the sub-matrices of A
     int aStep  = BLOCK_SIZE;
 
@@ -262,12 +256,18 @@ __kernel void matrixMul(
     int bStep  = BLOCK_SIZE * m;
 
     //int bdimx = n / BLOCK_SIZE;
-    //int bdimy = m / BLOCK_SIZE;
+    int bdimy = m / BLOCK_SIZE;
     //int bsizex = get_num_groups(0);
-    //int bsizey = get_num_groups(1);
+    int bsizey = get_num_groups(1);
 
     //for (int i = bx; i < bdimx; i += bsizex) {
-        //for (int j = by; j < bdimy; j += bsizey) {
+        for (int j = by; j < bdimy; j += bsizey) {
+    	    //Index of the first sub-matrix of A processed by the block
+	    int aBegin = m * BLOCK_SIZE * by;
+
+	    //Index of the last sub-matrix of A processed by the block
+	    int aEnd   = aBegin + m - 1;
+
             //A superaccumulator that corresponds to a single value in the matrix C
             long p_workingBase[BIN_COUNT] = {0};
 
@@ -342,7 +342,7 @@ __kernel void matrixMul(
             //TODO: the first non-zero from rigth
             int c = (m * by + bx) * BLOCK_SIZE;
             C[c + m * ty + tx] = Round(p_workingBase);
-        //}
+        }
     //}
 }
 

@@ -23,9 +23,9 @@ PLAT	= LINUX
 # Libraries and includs
 #-----------------------------------------------------------------------------
  
-BLLIB	= /usr/lib/atlas/libblas.a
+BLLIB	= $(OPENBLAS_HOME)/libopenblas.a
 CBLIB	= ../lib/cblas_$(PLAT).a
-OPENCLSDKROOT	= /opt/AMDAPP
+OPENCLSDKROOT	= /opt/sdks/amd/current
 #OPENCLSDKROOT	= /usr/local/cuda
 OCLBLASLIBNAME	= liboclblas.a
 OCLBLASLIB	?= $(OCLBLASROOT)/lib/$(OCLBLASLIBNAME)
