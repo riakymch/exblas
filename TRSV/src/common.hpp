@@ -19,7 +19,7 @@
 #include <cassert>
 #include <string.h>
 
-#include "DDOT.hpp"
+#include "TRSV.hpp"
 
 // All OpenCL headers
 #if defined (__APPLE__) || defined(MACOSX)
@@ -74,41 +74,22 @@ double min(
 );
 
 ////////////////////////////////////////////////////////////////////////////////
-// GPU DDOT product related functions
+// GPU TRSV product related functions
 ////////////////////////////////////////////////////////////////////////////////
-extern "C" cl_int initDDOT(
+extern "C" cl_int initTRSV(
     cl_context cxGPUContext,
     cl_command_queue cqParamCommandQue,
     cl_device_id cdDevice,
     const char* program_file,
+    const uint alg,
     const uint NbFPE
 );
 
-extern "C" cl_int initDDOTStandard(
-    cl_context cxGPUContext,
-    cl_command_queue cqParamCommandQue,
-    cl_device_id cdDevice,
-    const char* program_file
-);
-
-extern "C" void closeDDOT(
+extern "C" void closeTRSV(
     void
 );
 
-extern "C" void closeDDOTStandard(
-    void
-);
-
-extern "C" size_t DDOT(
-    cl_command_queue cqCommandQueue,
-    cl_mem d_res,
-    const cl_mem d_a,
-    const cl_mem d_b,
-    uint NbElements,
-    cl_int *ciErrNum
-);
-
-extern "C" size_t DDOTStandard(
+extern "C" size_t TRSV(
     cl_command_queue cqCommandQueue,
     cl_mem d_res,
     const cl_mem d_a,
@@ -140,7 +121,6 @@ extern "C" double KnuthTwoSum(
 ////////////////////////////////////////////////////////////////////////////////
 // Executable functions from main.cpp
 ////////////////////////////////////////////////////////////////////////////////
-int runDDOT(const char*);
-int runDDOTStandard(const char*);
+int runTRSV(const char*);
 
 #endif

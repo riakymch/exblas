@@ -1,6 +1,6 @@
 
-#ifndef DDOT_HPP_INCLUDED
-#define DDOT_HPP_INCLUDED
+#ifndef TRSV_HPP_INCLUDED
+#define TRSV_HPP_INCLUDED
 
 #include <ostream>
 #include <cstdio>
@@ -9,13 +9,13 @@
 #include <gmp.h>
 #include <mpfr.h>
 
-double DDOTCPU(
+double TRSVCPU(
     double *a,
     double *b,
     const unsigned int n
 );
 
-extern "C" mpfr_t *DDOTWithMPFR(
+extern "C" mpfr_t *TRSVWithMPFR(
     double *h_a,
     double *h_b,
     int size);

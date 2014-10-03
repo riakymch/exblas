@@ -213,7 +213,7 @@ void Accumulate(__local volatile long *sa, double x) {
 }
 
 __kernel __attribute__((reqd_work_group_size(WORKGROUP_SIZE, 1, 1)))
-void DDOT(
+void TRSV(
     __global long *d_PartialSuperaccs,
     __global data_t *d_a,
     __global data_t *d_b,
@@ -280,7 +280,7 @@ void DDOT(
 // Merge SuperAccumulators
 ////////////////////////////////////////////////////////////////////////////////
 __kernel __attribute__((reqd_work_group_size(MERGE_WORKGROUP_SIZE, 1, 1)))
-void DDOTComplete(
+void TRSVComplete(
     //__global double *d_Res,
     __global long *d_Superacc,
     __global long *d_PartialSuperaccs,
@@ -318,7 +318,7 @@ void DDOTComplete(
 // Round the results
 ////////////////////////////////////////////////////////////////////////////////
 __kernel __attribute__((reqd_work_group_size(MERGE_WORKGROUP_SIZE, 1, 1)))
-void DDOTRound(
+void TRSVRound(
     __global double *d_res,
     __global long *d_Superacc
 ){

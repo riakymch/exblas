@@ -10,7 +10,7 @@
 // Main computation pass: compute partial reductions
 ////////////////////////////////////////////////////////////////////////////////
 __kernel __attribute__((reqd_work_group_size(WORKGROUP_SIZE, 1, 1)))
-void DDOT(
+void TRSV(
     __global double *d_PartialSuperaccs,
     __global double *d_a,
     __global double *d_b,
@@ -57,7 +57,7 @@ void DDOT(
 // Merging
 ////////////////////////////////////////////////////////////////////////////////
 __kernel __attribute__((reqd_work_group_size(MERGE_WORKGROUP_SIZE, 1, 1)))
-void DDOTComplete(
+void TRSVComplete(
     __global double *d_Superacc,
     __global double *d_PartialSuperaccs,
     uint NbElements

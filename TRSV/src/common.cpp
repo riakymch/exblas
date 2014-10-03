@@ -144,7 +144,7 @@ extern "C" double roundSuperaccumulator(
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// Kahan summation functions
+// Auxiliary functions
 ////////////////////////////////////////////////////////////////////////////////
 extern "C" double KnuthTwoSum(double a, double b, double *s) {
     double r = a + b;
@@ -159,32 +159,3 @@ extern "C" double TwoProductFMA(double a, double b, double *d) {
     return p;
 }
 
-/*
- * Kahan Summation :
- * We use Kahan summation for an accurate sum of large arrays.
- * http://en.wikipedia.org/wiki/Kahan_summation_algorithm
- */
-inline void KahanSummation(double *s, double *c, double d) {
-  double y, t;
-
-  y = d - *c;
-  t = *s + y;
-  *c = (t - *s) - y;
-  *s = t;
-}
-
-extern "C" double roundKahan(double *data, int size) {
-  double r1, r2;
-  int i;
-
-  r1 = 0.;
-  r2 = 0.;
-  for (i = 0; i < size; i++)
-    KahanSummation(&r1, &r2, data[i]);
-
-  //printf("\tKahan Summation  : %a %a \n", r1, r2);
-  printf("\tKahan Result     : %.52g \n", r1);
-  printf("\tKahan Error      : %.52g \n", r2);
-
-  return r1;
-}

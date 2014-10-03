@@ -14,12 +14,12 @@
 ////////////////////////////////////////////////////////////////////////////////
 // OpenCL launcher for bitonic sort kernel
 ////////////////////////////////////////////////////////////////////////////////
-#define DDOT_KERNEL          "DDOT"
-#define DDOT_COMPLETE_KERNEL "DDOTComplete"
-#define DDOT_ROUND_KERNEL    "DDOTRound"
+#define TRSV_KERNEL          "TRSV"
+#define TRSV_COMPLETE_KERNEL "TRSVComplete"
+#define TRSV_ROUND_KERNEL    "TRSVRound"
 
-static size_t szKernelLength;                  // Byte size of kernel code
-static char* cSources = NULL;                  // Buffer to hold source for compilation
+static size_t szKernelLength;                  //Byte size of kernel code
+static char* cSources = NULL;                  //Buffer to hold source for compilation
 
 static cl_program       cpProgram;             //OpenCL program
 static cl_kernel        ckKernel, ckComplete;
@@ -28,10 +28,11 @@ static cl_command_queue cqDefaultCommandQue;   //Default command queue
 static cl_mem           d_Superacc;
 static cl_mem           d_PartialSuperaccs;
 
-static const uint  PARTIAL_SUPERACCS_COUNT    = 2048;
-static const uint  WORKGROUP_SIZE             = 256;
-static const uint  MERGE_WORKGROUP_SIZE       = 256;
-static const uint  VECTOR_NUMBER              = 1;
+static const uint PARTIAL_SUPERACCS_COUNT = 2048;
+static const uint WORKGROUP_SIZE          = 256;
+static const uint MERGE_WORKGROUP_SIZE    = 256;
+static const uint VECTOR_NUMBER           = 1;
+static uint __alg;
 
 #ifdef AMD
 static char  compileOptions[256] = "-DWARP_COUNT=16 -DWORKGROUP_SIZE=256 -DMERGE_WORKGROUP_SIZE=256 -DUSE_KNUTH";
@@ -40,14 +41,16 @@ static char  compileOptions[256] = "-DNVIDIA -DWARP_COUNT=16 -DWORKGROUP_SIZE=25
 #endif
 
 
-extern "C" cl_int initDDOT(
+extern "C" cl_int initTRSV(
     cl_context cxGPUContext,
     cl_command_queue cqParamCommandQue,
     cl_device_id cdDevice,
     const char* program_file,
+    const uint alg,
     const uint NbFPE
 ){
     cl_int ciErrNum;
+    __alg = alg;
 
     // Read the OpenCL kernel in from source file
     FILE *program_handle;
@@ -87,32 +90,42 @@ extern "C" cl_int initDDOT(
         }
 
     printf("...creating Superaccs kernels:\n");
-        ckKernel = clCreateKernel(cpProgram, DDOT_KERNEL, &ciErrNum);
+        ckKernel = clCreateKernel(cpProgram, TRSV_KERNEL, &ciErrNum);
         if (ciErrNum != CL_SUCCESS) {
-            printf("Error in clCreateKernel: DDOT, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
+            printf("Error in clCreateKernel: TRSV, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
             return EXIT_FAILURE;
         }
-        ckComplete = clCreateKernel(cpProgram, DDOT_COMPLETE_KERNEL, &ciErrNum);
+        ckComplete = clCreateKernel(cpProgram, TRSV_COMPLETE_KERNEL, &ciErrNum);
         if (ciErrNum != CL_SUCCESS) {
-            printf("Error in clCreateKernel: DDOTComplete, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
+            printf("Error in clCreateKernel: TRSVComplete, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
             return EXIT_FAILURE;
         }
-        ckRound = clCreateKernel(cpProgram, DDOT_ROUND_KERNEL, &ciErrNum);
-        if (ciErrNum != CL_SUCCESS) {
-            printf("Error in clCreateKernel: DDOTRound, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
-            return EXIT_FAILURE;
+        if (__alg > 0) {
+            ckRound = clCreateKernel(cpProgram, TRSV_ROUND_KERNEL, &ciErrNum);
+            if (ciErrNum != CL_SUCCESS) {
+                printf("Error in clCreateKernel: TRSVRound, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
+                return EXIT_FAILURE;
+            }
         }
 
     printf("...allocating internal buffer\n");
-        d_Superacc = clCreateBuffer(cxGPUContext, CL_MEM_READ_WRITE, BIN_COUNT * sizeof(bintype), NULL, &ciErrNum);
-        if (ciErrNum != CL_SUCCESS) {
-            printf("Error in clCreateBuffer for d_Superacc, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
-            return EXIT_FAILURE;
-        }
-        d_PartialSuperaccs = clCreateBuffer(cxGPUContext, CL_MEM_READ_WRITE, PARTIAL_SUPERACCS_COUNT * BIN_COUNT * sizeof(cl_long), NULL, &ciErrNum);
-        if (ciErrNum != CL_SUCCESS) {
-            printf("Error in clCreateBuffer, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
-            return EXIT_FAILURE;
+        if (__alg > 0) {
+            d_Superacc = clCreateBuffer(cxGPUContext, CL_MEM_READ_WRITE, BIN_COUNT * sizeof(bintype), NULL, &ciErrNum);
+            if (ciErrNum != CL_SUCCESS) {
+                printf("Error in clCreateBuffer for d_Superacc, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
+                return EXIT_FAILURE;
+            }
+            d_PartialSuperaccs = clCreateBuffer(cxGPUContext, CL_MEM_READ_WRITE, PARTIAL_SUPERACCS_COUNT * BIN_COUNT * sizeof(cl_long), NULL, &ciErrNum);
+            if (ciErrNum != CL_SUCCESS) {
+                printf("Error in clCreateBuffer, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
+                return EXIT_FAILURE;
+            }
+        } else { // for reduction
+            d_PartialSuperaccs = clCreateBuffer(cxGPUContext, CL_MEM_READ_WRITE, PARTIAL_SUPERACCS_COUNT * sizeof(cl_double), NULL, &ciErrNum);
+            if (ciErrNum != CL_SUCCESS) {
+                printf("Error in clCreateBuffer, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
+                return EXIT_FAILURE;
+            }
         }
 
     //Save default command queue
@@ -124,26 +137,28 @@ extern "C" cl_int initDDOT(
     return EXIT_SUCCESS;
 }
 
-extern "C" void closeDDOT(void){
+extern "C" void closeTRSV(void){
     cl_int ciErrNum;
 
     ciErrNum  = clReleaseMemObject(d_PartialSuperaccs);
-    ciErrNum |= clReleaseMemObject(d_Superacc);
+    if (__alg > 0) {
+        ciErrNum |= clReleaseMemObject(d_Superacc);
+        ciErrNum |= clReleaseKernel(ckRound);
+    }
     ciErrNum |= clReleaseKernel(ckKernel);
     ciErrNum |= clReleaseKernel(ckComplete);
-    ciErrNum |= clReleaseKernel(ckRound);
     ciErrNum |= clReleaseProgram(cpProgram);
-    if (ciErrNum != CL_SUCCESS) {
-        printf("Error in closeReduction(), Line %u in file %s !!!\n\n", __LINE__, __FILE__);
-    }
+
+    if (ciErrNum != CL_SUCCESS)
+        printf("Error in closeTRSV(), Line %u in file %s !!!\n\n", __LINE__, __FILE__);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // OpenCL launchers for Reduction / mergeReduction kernels
 ////////////////////////////////////////////////////////////////////////////////
-extern "C" size_t DDOT(
+extern "C" size_t TRSV(
     cl_command_queue cqCommandQueue,
-    cl_mem d_Res,
+    cl_mem d_res,
     const cl_mem d_a,
     const cl_mem d_b,
     uint NbElements,
@@ -183,7 +198,10 @@ extern "C" size_t DDOT(
         TotalNbThreads = BIN_COUNT * NbThreadsPerWorkGroup;
 
         uint i = 0;
-        ciErrNum  = clSetKernelArg(ckComplete, i++, sizeof(cl_mem),  (void *)&d_Superacc);
+        if (__alg > 0)
+            ciErrNum  = clSetKernelArg(ckComplete, i++, sizeof(cl_mem),  (void *)&d_Superacc);
+        else
+            ciErrNum  = clSetKernelArg(ckComplete, i++, sizeof(cl_mem),  (void *)&d_res);
         ciErrNum |= clSetKernelArg(ckComplete, i++, sizeof(cl_mem),  (void *)&d_PartialSuperaccs);
         ciErrNum |= clSetKernelArg(ckComplete, i++, sizeof(cl_uint), (void *)&PARTIAL_SUPERACCS_COUNT);
         if (ciErrNum != CL_SUCCESS) {
@@ -199,12 +217,12 @@ extern "C" size_t DDOT(
             return 0;
         }
     }
-    {
+    if (__alg > 0) {
         NbThreadsPerWorkGroup = MERGE_WORKGROUP_SIZE;
         TotalNbThreads = NbThreadsPerWorkGroup;
 
         cl_uint i = 0;
-        ciErrNum  = clSetKernelArg(ckRound, i++, sizeof(cl_mem),  (void *)&d_Res);
+        ciErrNum  = clSetKernelArg(ckRound, i++, sizeof(cl_mem),  (void *)&d_res);
         ciErrNum |= clSetKernelArg(ckRound, i++, sizeof(cl_mem),  (void *)&d_Superacc);
         if (ciErrNum != CL_SUCCESS) {
             printf("Error in clSetKernelArg, Line %u in file %s !!!\n\n", __LINE__, __FILE__);

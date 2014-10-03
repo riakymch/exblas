@@ -1,10 +1,10 @@
 
-#include "DDOT.hpp"
+#include "TRSV.hpp"
 
 /*
- * Naive implementation of DDOT for comparision only; it is much easy to port than the BLAS implementation
+ * Naive implementation of TRSV for comparision only; it is much easy to port than the BLAS implementation
  */
-double DDOTCPU(
+double TRSVCPU(
     double *a,
     double *b,
     const unsigned int n
@@ -16,22 +16,22 @@ double DDOTCPU(
     return res;
 }
 
-extern "C" mpfr_t *DDOTWithMPFR(double *h_a, double *h_b, int size) {
-  mpfr_t *sum, ddot, op1;
+extern "C" mpfr_t *TRSVWithMPFR(double *h_a, double *h_b, int size) {
+  mpfr_t *sum, trsv, op1;
   int i;
   sum = (mpfr_t *) malloc(sizeof(mpfr_t));
 
   mpfr_init2(op1, 64);
-  mpfr_init2(ddot, 128);
+  mpfr_init2(trsv, 128);
   mpfr_init2(*sum, 4196);
 
-  mpfr_set_d(ddot, 0.0, MPFR_RNDN);
+  mpfr_set_d(trsv, 0.0, MPFR_RNDN);
   mpfr_set_d(*sum, 0.0, MPFR_RNDN);
 
   for (i = 0; i < size; i++) {
     mpfr_set_d(op1, h_a[i], MPFR_RNDN);
-    mpfr_mul_d(ddot, op1, h_b[i], MPFR_RNDN);
-    mpfr_add(*sum, *sum, ddot, MPFR_RNDN);
+    mpfr_mul_d(trsv, op1, h_b[i], MPFR_RNDN);
+    mpfr_add(*sum, *sum, trsv, MPFR_RNDN);
   }
 
   mpfr_free_cache();
@@ -41,12 +41,12 @@ extern "C" mpfr_t *DDOTWithMPFR(double *h_a, double *h_b, int size) {
 
 extern "C" bool CompareWithMPFR(mpfr_t *res_mpfr, double res_rounded) {
   double rounded_mpfr = mpfr_get_d(*res_mpfr, MPFR_RNDD);
-  printf("GPU Parallel DDOT: %.17g\n", res_rounded);
-  printf("Rounded value of MPFR: %.17g\n", rounded_mpfr);
+  printf("GPU Parallel TRSV: %.15g\n", res_rounded);
+  printf("Rounded value of MPFR: %.15g\n", rounded_mpfr);
 
   //Compare the results with MPFR using native functions
   bool res_cmp = false;
-  if (rounded_mpfr == res_rounded){
+  if (abs(rounded_mpfr - res_rounded) < 1e-16){
       printf("\t The result is EXACT -- matches the MPFR algorithm!\n\n");
       res_cmp = true;
   } else {
