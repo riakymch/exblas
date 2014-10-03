@@ -81,21 +81,11 @@ extern "C" cl_int initDDOT(
     cl_command_queue cqParamCommandQue,
     cl_device_id cdDevice,
     const char* program_file,
+    const uint alg,
     const uint NbFPE
 );
 
-extern "C" cl_int initDDOTStandard(
-    cl_context cxGPUContext,
-    cl_command_queue cqParamCommandQue,
-    cl_device_id cdDevice,
-    const char* program_file
-);
-
 extern "C" void closeDDOT(
-    void
-);
-
-extern "C" void closeDDOTStandard(
     void
 );
 
@@ -108,23 +98,9 @@ extern "C" size_t DDOT(
     cl_int *ciErrNum
 );
 
-extern "C" size_t DDOTStandard(
-    cl_command_queue cqCommandQueue,
-    cl_mem d_res,
-    const cl_mem d_a,
-    const cl_mem d_b,
-    uint NbElements,
-    cl_int *ciErrNum
-);
-
 ////////////////////////////////////////////////////////////////////////////////
-// Kahan summation functions
+// Auxiliary functions
 ////////////////////////////////////////////////////////////////////////////////
-extern "C" double roundKahan(
-    double *data,
-    int size
-);
-
 extern "C" double TwoProductFMA(
     double a,
     double b,
@@ -141,6 +117,5 @@ extern "C" double KnuthTwoSum(
 // Executable functions from main.cpp
 ////////////////////////////////////////////////////////////////////////////////
 int runDDOT(const char*);
-int runDDOTStandard(const char*);
 
 #endif

@@ -41,12 +41,12 @@ extern "C" mpfr_t *DDOTWithMPFR(double *h_a, double *h_b, int size) {
 
 extern "C" bool CompareWithMPFR(mpfr_t *res_mpfr, double res_rounded) {
   double rounded_mpfr = mpfr_get_d(*res_mpfr, MPFR_RNDD);
-  printf("GPU Parallel DDOT: %.17g\n", res_rounded);
-  printf("Rounded value of MPFR: %.17g\n", rounded_mpfr);
+  printf("GPU Parallel DDOT: %.15g\n", res_rounded);
+  printf("Rounded value of MPFR: %.15g\n", rounded_mpfr);
 
   //Compare the results with MPFR using native functions
   bool res_cmp = false;
-  if (rounded_mpfr == res_rounded){
+  if (abs(rounded_mpfr - res_rounded) < 1e-16){
       printf("\t The result is EXACT -- matches the MPFR algorithm!\n\n");
       res_cmp = true;
   } else {

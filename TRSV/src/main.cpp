@@ -32,9 +32,9 @@ static uint __alg        = 0;
 
 static void __usage(int argc __attribute__((unused)), char **argv) {
     fprintf(stderr, "Usage: %s [-n number of elements,\n", argv[0]);
-    printf("                -r range,\n"); 
-    printf("                -e nbfpe,\n");
-    printf("                -a alg (0-trsv, 1-acc, 2-fpe, 3-fpeex4, 4-fpeex6, 5-fpeex8)] \n");
+    printf("                          -r range,\n");
+    printf("                          -e nbfpe,\n");
+    printf("                          -a alg (0-trsv, 1-acc, 2-fpe, 3-fpeex4, 4-fpeex6, 5-fpeex8)] \n");
     printf("       -?, -h:    Display this help and exit\n");
 }
 
