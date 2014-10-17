@@ -32,7 +32,7 @@ extern "C" bool compare(
     for(uint i = 0; i < length; i++)
         norm += pow(abs(ref_dgemm[i] - dgemm[i]), 2);
     norm = ::sqrt(norm);
-    printf("Norm = %.17g\n", norm);
+    printf("Norm = %.15g\n", norm);
 
     return norm < epsilon ? true : false;
 }

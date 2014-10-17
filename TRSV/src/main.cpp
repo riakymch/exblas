@@ -22,16 +22,16 @@ cl_context        cxGPUContext;      //OpenCL context
 cl_command_queue  cqCommandQueue;    //OpenCL command que
 cl_mem            d_a, d_b;          //OpenCL memory buffer objects
 cl_mem            d_res;
-void              *h_a, *h_b;
-double            h_Res;
+void              *h_A, *h_b;
+void              *h_res;
 
-static uint __nbElements = 0;
-static uint __range      = 0;
-static uint __nbfpe      = 0;
-static uint __alg        = 0;
+static uint __n     = 0;
+static uint __range = 0;
+static uint __nbfpe = 0;
+static uint __alg   = 0;
 
 static void __usage(int argc __attribute__((unused)), char **argv) {
-    fprintf(stderr, "Usage: %s [-n number of elements,\n", argv[0]);
+    fprintf(stderr, "Usage: %s [-n nbrows of A,\n", argv[0]);
     printf("                          -r range,\n");
     printf("                          -e nbfpe,\n");
     printf("                          -a alg (0-trsv, 1-acc, 2-fpe, 3-fpeex4, 4-fpeex6, 5-fpeex8)] \n");
@@ -43,7 +43,7 @@ static void __parse_args(int argc, char **argv) {
 
     for (i = 1; i < argc; i++) {
         if ((strcmp(argv[i], "-n") == 0)) {
-             __nbElements = atoi(argv[++i]);
+             __n = atoi(argv[++i]);
         } if ((strcmp(argv[i], "-r") == 0)) {
             __range = atoi(argv[++i]);
         } if ((strcmp(argv[i], "-e") == 0)) {
@@ -60,7 +60,7 @@ static void __parse_args(int argc, char **argv) {
         }
     }
 
-    if (__nbElements <= 0) {
+    if (__n <= 0) {
         __usage(argc, argv);
         exit(-1);
     }
@@ -80,7 +80,7 @@ int cleanUp (
 int main(int argc, char **argv)
 {
     __parse_args(argc, argv);
-    printf("Starting with two vectors with  %i double elements\n\n", __nbElements); 
+    printf("Starting with a matrix with  %i rows\n\n", __n);
 
     if (__alg == 0) {
         runTRSV("../src/TRSV.cl");
@@ -105,17 +105,14 @@ int runTRSV(const char* program_file){
     bool PassFailFlag = false;
 
     printf("Initializing data...\n");
-        PassFailFlag  = posix_memalign(&h_a, 64, __nbElements * sizeof(double));
-        PassFailFlag |= posix_memalign(&h_b, 64, __nbElements * sizeof(double));
-        if (PassFailFlag != 0) {
-            printf("ERROR: could not allocate memory with posix_memalign!\n");
-            exit(1);
-        }
+        h_A = (double *) malloc(__n * __n * sizeof(double));
+        h_b = (double *) malloc(__n * sizeof(double));
+        h_res = (double *) malloc(__n * sizeof(double));
 
         // init data
-        int emax = E_BITS - log2(__nbElements);// use log in order to stay within [emin, emax]
-        init_fpuniform((double *) h_a, __nbElements, __range, emax);
-        init_fpuniform((double *) h_b, __nbElements, __range, emax);
+        int emax = E_BITS - log2(__n);// use log in order to stay within [emin, emax]
+        init_fpuniform_trmatrix((double *) h_A, __n, __range, emax);
+        init_fpuniform((double *) h_b, __n, __range, emax);
 
     printf("Initializing OpenCL...\n");
         char platform_name[64];
@@ -153,18 +150,19 @@ int runTRSV(const char* program_file){
         }
 
     printf("Allocating OpenCL memory...\n\n");
-        size_t size = __nbElements * sizeof(cl_double);
-        d_a = clCreateBuffer(cxGPUContext, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, size, h_a, &ciErrNum);
+        size_t size = __n * __n * sizeof(cl_double);
+        d_a = clCreateBuffer(cxGPUContext, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, size, h_A, &ciErrNum);
         if (ciErrNum != CL_SUCCESS) {
             printf("Error in clCreateBuffer for d_a, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
             cleanUp(EXIT_FAILURE);
         }
+        size = __n * sizeof(cl_double);
         d_b = clCreateBuffer(cxGPUContext, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, size, h_b, &ciErrNum);
         if (ciErrNum != CL_SUCCESS) {
             printf("Error in clCreateBuffer for d_b, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
             cleanUp(EXIT_FAILURE);
         }
-        d_res = clCreateBuffer(cxGPUContext, CL_MEM_READ_WRITE, sizeof(cl_double), NULL, &ciErrNum);
+        d_res = clCreateBuffer(cxGPUContext, CL_MEM_READ_WRITE, size, NULL, &ciErrNum);
         if (ciErrNum != CL_SUCCESS) {
             printf("Error in clCreateBuffer for d_res, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
             cleanUp(EXIT_FAILURE);
@@ -176,9 +174,9 @@ int runTRSV(const char* program_file){
             if (ciErrNum != CL_SUCCESS)
                 cleanUp(EXIT_FAILURE);
 
-        printf("Running OpenCL TRSV with %u elements...\n\n", __nbElements);
+        printf("Running OpenCL TRSV with %u rows...\n\n", __n);
             //Just a single launch or a warmup iteration
-            TRSV(NULL, d_res, d_a, d_b, __nbElements, &ciErrNum);
+            TRSV(NULL, d_res, d_a, d_b, __n, &ciErrNum);
 
             if (ciErrNum != CL_SUCCESS)
                 cleanUp(EXIT_FAILURE);
@@ -195,7 +193,7 @@ int runTRSV(const char* program_file){
                 cleanUp(EXIT_FAILURE);
             }
 
-            TRSV(NULL, d_res, d_a, d_b, __nbElements, &ciErrNum);
+            TRSV(NULL, d_res, d_a, d_b, __n, &ciErrNum);
 
             ciErrNum  = clEnqueueMarker(cqCommandQueue, &endMark);
             ciErrNum |= clFinish(cqCommandQueue);
@@ -216,26 +214,32 @@ int runTRSV(const char* program_file){
         }
 
         double minTime = min(gpuTime, NUM_ITER);
-        double throughput = 2.0 * __nbElements * sizeof(double);
+        //TODO: not sure about this estimates
+        double throughput = 2.0 * __n * sizeof(double);
         throughput = (throughput / minTime) * 1e-9;
-        double perf = 2.0 * __nbElements;
+        double perf = 2.0 * __n;
         perf = (perf / minTime) * 1e-9;
-        printf("Alg = %u \t NbFPE = %u \t Range = %u \t NbElements = %u \t Size = %lu \t Time = %.8f s \t Throughput = %.4f GB/s\n\n", __alg, __nbfpe, __range, __nbElements, __nbElements * sizeof(double), minTime, throughput);
-        printf("Alg = %u \t NbFPE = %u \t Range = %u \t NbElements = %u \t Size = %lu \t Time = %.8f s \t Performance = %.4f GFLOPS\n\n", __alg, __nbfpe, __range, __nbElements, __nbElements * sizeof(double), minTime, perf);
+        printf("Alg = %u \t NbFPE = %u \t Range = %u \t NbRows = %u \t Time = %.8f s \t Throughput = %.4f GB/s\n\n", __alg, __nbfpe, __range, __n, minTime, throughput);
+        printf("Alg = %u \t NbFPE = %u \t Range = %u \t NbRows = %u \t Time = %.8f s \t Performance = %.4f GFLOPS\n\n", __alg, __nbfpe, __range, __n, minTime, perf);
 #endif
 
         printf("Validating TRSV OpenCL results...\n");
             printf(" ...reading back OpenCL results\n");
-                ciErrNum = clEnqueueReadBuffer(cqCommandQueue, d_res, CL_TRUE, 0, sizeof(cl_double), &h_Res, 0, NULL, NULL);
+                ciErrNum = clEnqueueReadBuffer(cqCommandQueue, d_res, CL_TRUE, 0, sizeof(cl_double), &h_res, 0, NULL, NULL);
                 if (ciErrNum != CL_SUCCESS) {
                     printf("Error in clEnqueueReadBuffer Line %u in file %s !!!\n\n", __LINE__, __FILE__);
                     cleanUp(EXIT_FAILURE);
                 }
 
+            printf(" ...TRSV on CPU\n");
+                double *trsv_cpu;
+                trsv_cpu = (double *) calloc(__n, sizeof(double));
+                TRSVUNN((const double *)h_A, (const double *)h_b, (double *) trsv_cpu, __n);
+
             printf(" ...comparing the results\n");
                 printf("//--------------------------------------------------------\n");
-                mpfr_t *trsv_mpfr = TRSVWithMPFR((double *) h_a, (double *) h_b, __nbElements);
-                PassFailFlag = CompareWithMPFR(trsv_mpfr, h_Res);
+                PassFailFlag = compare((const double *) trsv_cpu, (const double *) h_res, __n, 1e-16);
+                //PassFailFlag = compareTRSVUNNToMPFR((const double *)h_A, (const double *) h_b, (const double *) h_res, __n, 1e-16);
 
         //Release kernels and program
         printf("Shutting down...\n\n");
@@ -264,7 +268,7 @@ int cleanUp (int exitCode) {
         clReleaseContext(cxGPUContext);
 
     //Release host buffers
-    free(h_a);
+    free(h_A);
     free(h_b);
 
     return exitCode;

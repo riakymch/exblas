@@ -62,10 +62,17 @@ void initVectorWithRandomData(
 );
 
 void init_fpuniform(
-    double *array,
-    int size,
-    int range,
-    int emax
+    double *a,
+    const uint n,
+    const int range,
+    const int emax
+);
+
+void init_fpuniform_trmatrix(
+    double *a,
+    const uint n,
+    const int range,
+    const int emax
 );
 
 double min(

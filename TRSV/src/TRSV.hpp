@@ -9,20 +9,37 @@
 #include <gmp.h>
 #include <mpfr.h>
 
-double TRSVCPU(
-    double *a,
-    double *b,
-    const unsigned int n
+extern "C" int TRSVUNN(
+    const double *a,
+    const double *b,
+    double *x,
+    const int n
 );
 
-extern "C" mpfr_t *TRSVWithMPFR(
-    double *h_a,
-    double *h_b,
-    int size);
+extern "C" bool compare(
+    const double *trsv_cpu,
+    const double *trsv_gpu,
+    const uint n,
+    const double epsilon
+);
 
-extern "C" bool CompareWithMPFR(
-    mpfr_t *res_mpfr,
-    double res_rounded
+extern "C" bool compareTRSVUNNToMPFR(
+    const double *u,
+    const double *b,
+    const double *trsv,
+    const int n,
+    const double epsilon
+);
+
+extern "C" void printMatrix(
+    const double *A,
+    const uint m,
+    const uint n
+);
+
+extern "C" void printVector(
+    const double *a,
+    const uint n
 );
 
 #endif

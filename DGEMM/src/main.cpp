@@ -147,9 +147,9 @@ int runDGEMM(const char* program_file){
             printf("ERROR: could not allocate memory with posix_memalign!\n");
             exit(1);
         }*/
-	A = (double *) malloc(__m * __k * sizeof(double));
-	B = (double *) malloc(__k * __n * sizeof(double));
-	C = (double *) malloc(__m * __n * sizeof(double));
+        A = (double *) malloc(__m * __k * sizeof(double));
+        B = (double *) malloc(__k * __n * sizeof(double));
+        C = (double *) malloc(__m * __n * sizeof(double));
         // init data
         nbElements = __m * __k + __k * __n + __m * __n;
         int emax = E_BITS - log2(nbElements);// use log in order to stay within [emin, emax]

@@ -115,17 +115,28 @@ double min(double arr[], int size) {
     return val;
 }
 
-void init_fpuniform(double *array, int size, int range, int emax)
+void init_fpuniform(double *a, const uint n, const int range, const int emax)
 {
     //Generate numbers on several bins starting from emax
-    for(int i = 0; i != size; ++i) {
-        //array[i] = randDouble(emax-range, emax, 1);
-        array[i] = randDouble(0, range, 1);
+    for(uint i = 0; i != n; ++i) {
+        //a[i] = randDouble(emax-range, emax, 1);
+        a[i] = randDouble(0, range, 1);
     }
     /*//Generate numbers on an interval [1, 2]
-    for(int i = 0; i != size; ++i) {
-        array[i] = 1.0 + double(rand()) / double(RAND_MAX);
+    for(uint i = 0; i != n; ++i) {
+        a[i] = 1.0 + double(rand()) / double(RAND_MAX);
     }*/
+}
+
+void init_fpuniform_trmatrix(double *a, const uint n, const int range, const int emax)
+{
+    //Generate numbers on several bins starting from emax
+    for(uint i = 0; i != n; ++i)
+        for(uint j = 0; j != n; ++j)
+            if (j >= i)
+                a[i * n + j] = randDouble(0, range, 1);
+            else
+                a[i * n + j] = 0.0;
 }
 
 void print2Superaccumulators(bintype *binCPU, bintype *binGPU) {
