@@ -33,7 +33,7 @@ static cl_mem           d_Accus;
 #ifdef AMD
 static char  compileOptions[256] = "-DBLOCK_SIZE=16";
 #else
-static char  compileOptions[256] = "-DBLOCK_SIZE=32 -DNVIDIA -cl-mad-enable -cl-fast-relaxed-math -cl-nv-verbose";
+static char  compileOptions[256] = "-DNVIDIA -DBLOCK_SIZE=32 -cl-mad-enable -cl-fast-relaxed-math -cl-nv-verbose";
 #endif
 
 

@@ -53,39 +53,3 @@ void TRSV(
     barrier(CLK_LOCAL_MEM_FENCE);
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Merging
-////////////////////////////////////////////////////////////////////////////////
-__kernel __attribute__((reqd_work_group_size(MERGE_WORKGROUP_SIZE, 1, 1)))
-void TRSVComplete(
-    __global double *d_Superacc,
-    __global double *d_PartialSuperaccs,
-    uint NbElements
-){
-    __local double l_Data[MERGE_WORKGROUP_SIZE];
-    uint lid = get_local_id(0);
-    uint gid = get_group_id(0);
-
-    double sum = 0.0;
-    #ifdef NVIDIA
-        #pragma unroll
-    #endif
-    for(uint i = lid; i < NbElements; i += MERGE_WORKGROUP_SIZE)
-        sum += d_PartialSuperaccs[gid * MERGE_WORKGROUP_SIZE + i];
-    l_Data[lid] = sum;
-
-    #ifdef NVIDIA
-        #pragma unroll
-    #endif
-    for(uint stride = MERGE_WORKGROUP_SIZE / 2; stride > 0; stride /= 2){
-        barrier(CLK_LOCAL_MEM_FENCE);
-        if(lid < stride)
-            l_Data[lid] += l_Data[lid + stride];
-    }
-
-    if(lid == 0)
-        d_Superacc[gid] = l_Data[0];
-
-    barrier(CLK_LOCAL_MEM_FENCE);
-}
-

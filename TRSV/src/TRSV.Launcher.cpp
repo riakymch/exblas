@@ -14,30 +14,24 @@
 ////////////////////////////////////////////////////////////////////////////////
 // OpenCL launcher for bitonic sort kernel
 ////////////////////////////////////////////////////////////////////////////////
-#define TRSV_KERNEL          "TRSV"
-#define TRSV_COMPLETE_KERNEL "TRSVComplete"
-#define TRSV_ROUND_KERNEL    "TRSVRound"
+#define TRSV_KERNEL "TRSV"
+#ifdef AMD
+  #define BLOCK_SIZE 16
+#else
+  #define BLOCK_SIZE 32
+#endif
 
 static size_t szKernelLength;                  //Byte size of kernel code
 static char* cSources = NULL;                  //Buffer to hold source for compilation
 
 static cl_program       cpProgram;             //OpenCL program
-static cl_kernel        ckKernel, ckComplete;
-static cl_kernel        ckRound;
+static cl_kernel        ckKernel;
 static cl_command_queue cqDefaultCommandQue;   //Default command queue
-static cl_mem           d_Superacc;
-static cl_mem           d_PartialSuperaccs;
-
-static const uint PARTIAL_SUPERACCS_COUNT = 2048;
-static const uint WORKGROUP_SIZE          = 256;
-static const uint MERGE_WORKGROUP_SIZE    = 256;
-static const uint VECTOR_NUMBER           = 1;
-static uint __alg;
 
 #ifdef AMD
-static char  compileOptions[256] = "-DWARP_COUNT=16 -DWORKGROUP_SIZE=256 -DMERGE_WORKGROUP_SIZE=256 -DUSE_KNUTH";
+static char  compileOptions[256] = "-DBLOCK_SIZE=32";
 #else
-static char  compileOptions[256] = "-DNVIDIA -DWARP_COUNT=16 -DWORKGROUP_SIZE=256 -DMERGE_WORKGROUP_SIZE=256 -DUSE_KNUTH -cl-mad-enable -cl-fast-relaxed-math"; // -cl-nv-verbose";
+static char  compileOptions[256] = "-DNVIDIA -DBLOCK_SIZE=32 -cl-mad-enable -cl-fast-relaxed-math"; // -cl-nv-verbose";
 #endif
 
 
@@ -46,11 +40,9 @@ extern "C" cl_int initTRSV(
     cl_command_queue cqParamCommandQue,
     cl_device_id cdDevice,
     const char* program_file,
-    const uint alg,
     const uint NbFPE
 ){
     cl_int ciErrNum;
-    __alg = alg;
 
     // Read the OpenCL kernel in from source file
     FILE *program_handle;
@@ -95,38 +87,6 @@ extern "C" cl_int initTRSV(
             printf("Error in clCreateKernel: TRSV, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
             return EXIT_FAILURE;
         }
-        ckComplete = clCreateKernel(cpProgram, TRSV_COMPLETE_KERNEL, &ciErrNum);
-        if (ciErrNum != CL_SUCCESS) {
-            printf("Error in clCreateKernel: TRSVComplete, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
-            return EXIT_FAILURE;
-        }
-        if (__alg > 0) {
-            ckRound = clCreateKernel(cpProgram, TRSV_ROUND_KERNEL, &ciErrNum);
-            if (ciErrNum != CL_SUCCESS) {
-                printf("Error in clCreateKernel: TRSVRound, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
-                return EXIT_FAILURE;
-            }
-        }
-
-    printf("...allocating internal buffer\n");
-        if (__alg > 0) {
-            d_Superacc = clCreateBuffer(cxGPUContext, CL_MEM_READ_WRITE, BIN_COUNT * sizeof(bintype), NULL, &ciErrNum);
-            if (ciErrNum != CL_SUCCESS) {
-                printf("Error in clCreateBuffer for d_Superacc, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
-                return EXIT_FAILURE;
-            }
-            d_PartialSuperaccs = clCreateBuffer(cxGPUContext, CL_MEM_READ_WRITE, PARTIAL_SUPERACCS_COUNT * BIN_COUNT * sizeof(cl_long), NULL, &ciErrNum);
-            if (ciErrNum != CL_SUCCESS) {
-                printf("Error in clCreateBuffer, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
-                return EXIT_FAILURE;
-            }
-        } else { // for reduction
-            d_PartialSuperaccs = clCreateBuffer(cxGPUContext, CL_MEM_READ_WRITE, PARTIAL_SUPERACCS_COUNT * sizeof(cl_double), NULL, &ciErrNum);
-            if (ciErrNum != CL_SUCCESS) {
-                printf("Error in clCreateBuffer, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
-                return EXIT_FAILURE;
-            }
-        }
 
     //Save default command queue
     cqDefaultCommandQue = cqParamCommandQue;
@@ -140,13 +100,7 @@ extern "C" cl_int initTRSV(
 extern "C" void closeTRSV(void){
     cl_int ciErrNum;
 
-    ciErrNum  = clReleaseMemObject(d_PartialSuperaccs);
-    if (__alg > 0) {
-        ciErrNum |= clReleaseMemObject(d_Superacc);
-        ciErrNum |= clReleaseKernel(ckRound);
-    }
-    ciErrNum |= clReleaseKernel(ckKernel);
-    ciErrNum |= clReleaseKernel(ckComplete);
+    ciErrNum  = clReleaseKernel(ckKernel);
     ciErrNum |= clReleaseProgram(cpProgram);
 
     if (ciErrNum != CL_SUCCESS)
@@ -161,83 +115,37 @@ extern "C" size_t TRSV(
     cl_mem d_res,
     const cl_mem d_a,
     const cl_mem d_b,
-    uint NbElements,
+    const uint n,
     cl_int *ciErrNumRes
 ){
     cl_int ciErrNum;
-    size_t NbThreadsPerWorkGroup, TotalNbThreads;
 
     if(!cqCommandQueue)
         cqCommandQueue = cqDefaultCommandQue;
 
     {
-        NbThreadsPerWorkGroup  = WORKGROUP_SIZE;
-        TotalNbThreads = PARTIAL_SUPERACCS_COUNT * NbThreadsPerWorkGroup;
-        NbElements = NbElements / VECTOR_NUMBER;
+        size_t NbThreadsPerWorkGroup[]  = {BLOCK_SIZE, BLOCK_SIZE};
+        size_t TotalNbThreads[] = {n, n / 2};
 
         uint i = 0;
-        ciErrNum  = clSetKernelArg(ckKernel, i++, sizeof(cl_mem),  (void *)&d_PartialSuperaccs);
+        ciErrNum  = clSetKernelArg(ckKernel, i++, sizeof(cl_mem),  (void *)&d_res);
         ciErrNum |= clSetKernelArg(ckKernel, i++, sizeof(cl_mem),  (void *)&d_a);
         ciErrNum |= clSetKernelArg(ckKernel, i++, sizeof(cl_mem),  (void *)&d_b);
-        ciErrNum |= clSetKernelArg(ckKernel, i++, sizeof(cl_uint), (void *)&NbElements);
+        ciErrNum |= clSetKernelArg(ckKernel, i++, sizeof(cl_uint), (void *)&n);
         if (ciErrNum != CL_SUCCESS) {
             printf("Error in clSetKernelArg, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
             *ciErrNumRes = EXIT_FAILURE;
             return 0;
         }
 
-        ciErrNum = clEnqueueNDRangeKernel(cqCommandQueue, ckKernel, 1, NULL, &TotalNbThreads, &NbThreadsPerWorkGroup, 0, NULL, NULL);
+        ciErrNum = clEnqueueNDRangeKernel(cqCommandQueue, ckKernel, 1, NULL, TotalNbThreads, NbThreadsPerWorkGroup, 0, NULL, NULL);
         if (ciErrNum != CL_SUCCESS) {
             printf("Error in clEnqueueNDRangeKernel, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
             *ciErrNumRes = EXIT_FAILURE;
             return 0;
         }
     }
-    {
-        NbThreadsPerWorkGroup = MERGE_WORKGROUP_SIZE;
-        TotalNbThreads = BIN_COUNT * NbThreadsPerWorkGroup;
 
-        uint i = 0;
-        if (__alg > 0)
-            ciErrNum  = clSetKernelArg(ckComplete, i++, sizeof(cl_mem),  (void *)&d_Superacc);
-        else
-            ciErrNum  = clSetKernelArg(ckComplete, i++, sizeof(cl_mem),  (void *)&d_res);
-        ciErrNum |= clSetKernelArg(ckComplete, i++, sizeof(cl_mem),  (void *)&d_PartialSuperaccs);
-        ciErrNum |= clSetKernelArg(ckComplete, i++, sizeof(cl_uint), (void *)&PARTIAL_SUPERACCS_COUNT);
-        if (ciErrNum != CL_SUCCESS) {
-            printf("Error in clSetKernelArg, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
-            *ciErrNumRes = EXIT_FAILURE;
-            return 0;
-        }
-
-        ciErrNum = clEnqueueNDRangeKernel(cqCommandQueue, ckComplete, 1, NULL, &TotalNbThreads, &NbThreadsPerWorkGroup, 0, NULL, NULL);
-        if (ciErrNum != CL_SUCCESS) {
-            printf("Error in clEnqueueNDRangeKernel, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
-            *ciErrNumRes = EXIT_FAILURE;
-            return 0;
-        }
-    }
-    if (__alg > 0) {
-        NbThreadsPerWorkGroup = MERGE_WORKGROUP_SIZE;
-        TotalNbThreads = NbThreadsPerWorkGroup;
-
-        cl_uint i = 0;
-        ciErrNum  = clSetKernelArg(ckRound, i++, sizeof(cl_mem),  (void *)&d_res);
-        ciErrNum |= clSetKernelArg(ckRound, i++, sizeof(cl_mem),  (void *)&d_Superacc);
-        if (ciErrNum != CL_SUCCESS) {
-            printf("Error in clSetKernelArg, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
-           *ciErrNumRes = EXIT_FAILURE;
-            return 0;
-        }
-
-        ciErrNum = clEnqueueNDRangeKernel(cqCommandQueue, ckRound, 1, NULL, &TotalNbThreads, &NbThreadsPerWorkGroup, 0, NULL, NULL);
-        if (ciErrNum != CL_SUCCESS) {
-            printf("Error in clEnqueueNDRangeKernel, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
-           *ciErrNumRes = EXIT_FAILURE;
-            return 0;
-        }
-    }
-
-    return WORKGROUP_SIZE;
+    return EXIT_SUCCESS;
 }
 

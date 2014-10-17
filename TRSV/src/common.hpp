@@ -88,7 +88,6 @@ extern "C" cl_int initTRSV(
     cl_command_queue cqParamCommandQue,
     cl_device_id cdDevice,
     const char* program_file,
-    const uint alg,
     const uint NbFPE
 );
 
@@ -101,7 +100,7 @@ extern "C" size_t TRSV(
     cl_mem d_res,
     const cl_mem d_a,
     const cl_mem d_b,
-    uint NbElements,
+    const uint n,
     cl_int *ciErrNum
 );
 
