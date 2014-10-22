@@ -14,9 +14,9 @@
 ////////////////////////////////////////////////////////////////////////////////
 // OpenCL launcher for bitonic sort kernel
 ////////////////////////////////////////////////////////////////////////////////
-#define TRSV_KERNEL "TRSV"
+#define TRSV_KERNEL "TRSVLNU"
 #ifdef AMD
-  #define BLOCK_SIZE 16
+  #define BLOCK_SIZE 32
 #else
   #define BLOCK_SIZE 32
 #endif
@@ -81,7 +81,7 @@ extern "C" cl_int initTRSV(
             return EXIT_FAILURE;
         }
 
-    printf("...creating Superaccs kernels:\n");
+    printf("...creating kernel(s):\n");
         ckKernel = clCreateKernel(cpProgram, TRSV_KERNEL, &ciErrNum);
         if (ciErrNum != CL_SUCCESS) {
             printf("Error in clCreateKernel: TRSV, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
@@ -112,9 +112,8 @@ extern "C" void closeTRSV(void){
 ////////////////////////////////////////////////////////////////////////////////
 extern "C" size_t TRSV(
     cl_command_queue cqCommandQueue,
-    cl_mem d_res,
+    cl_mem d_x,
     const cl_mem d_a,
-    const cl_mem d_b,
     const uint n,
     cl_int *ciErrNumRes
 ){
@@ -125,12 +124,12 @@ extern "C" size_t TRSV(
 
     {
         size_t NbThreadsPerWorkGroup[]  = {BLOCK_SIZE, BLOCK_SIZE};
-        size_t TotalNbThreads[] = {n, n / 2};
+        //size_t TotalNbThreads[] = {n, (n + 1) / 2};
+        size_t TotalNbThreads[] = {n, n};
 
         uint i = 0;
-        ciErrNum  = clSetKernelArg(ckKernel, i++, sizeof(cl_mem),  (void *)&d_res);
+        ciErrNum  = clSetKernelArg(ckKernel, i++, sizeof(cl_mem),  (void *)&d_x);
         ciErrNum |= clSetKernelArg(ckKernel, i++, sizeof(cl_mem),  (void *)&d_a);
-        ciErrNum |= clSetKernelArg(ckKernel, i++, sizeof(cl_mem),  (void *)&d_b);
         ciErrNum |= clSetKernelArg(ckKernel, i++, sizeof(cl_uint), (void *)&n);
         if (ciErrNum != CL_SUCCESS) {
             printf("Error in clSetKernelArg, Line %u in file %s !!!\n\n", __LINE__, __FILE__);

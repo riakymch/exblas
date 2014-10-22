@@ -6,18 +6,17 @@
  */
 // assume a row-wise storage
 extern "C" int TRSVUNN(
-    const double *u,
-    const double *b,
     double *x,
+    const double *a,
     const int n
 ) {
     double s;
 
     for(int i = n-1; i >= 0; i--) {
-        s = b[i];
+        s = x[i];
         for(int j = i+1; j < n; j++)
-            s = s - u[i * n + j] * x[j];
-        x[i] = s / u[i * (n + 1)];
+            s = s - a[i * n + j] * x[j];
+        x[i] = s / a[i * (n + 1)];
     }
 
     return 1;
@@ -25,19 +24,18 @@ extern "C" int TRSVUNN(
 
 // assume a row-wise storage
 extern "C" int TRSVLNU(
-    const double *l,
-    const double *b,
     double *x,
+    const double *a,
     const int n
 ) {
     double s;
 
-    x[0] = b[0];
+    x[0] = x[0];
     for(int i = 1; i < n; i++) {
-        s = b[i];
+        s = x[i];
         for(int j = 0; j < i; j++)
-            s = s - l[i * n + j] * x[j];
-        x[i] = s / l[i * (n + 1)];
+            s = s - a[i * n + j] * x[j];
+        x[i] = s;// / l[i * (n + 1)];
     }
 
     return 1;
@@ -60,16 +58,13 @@ extern "C" bool compare(
 }
 
 extern "C" bool compareTRSVUNNToMPFR(
-    const double *u,
-    const double *b,
+    const double *a,
+    double *b,
     const double *trsv,
     const int n,
     const double epsilon
 ) {
-    double *trsv_mpfr;
     mpfr_t sum, dot, div, op1;
-
-    trsv_mpfr = (double *) malloc(n * sizeof(double));
 
     mpfr_init2(op1, 64);
     mpfr_init2(dot, 128);
@@ -80,38 +75,34 @@ extern "C" bool compareTRSVUNNToMPFR(
     for(int i = n-1; i >= 0; i--) {
         mpfr_set_d(sum, b[i], MPFR_RNDN);
         for(int j = i+1; j < n; j++) {
-            mpfr_set_d(op1, u[i * n + j], MPFR_RNDN);
-            mpfr_mul_d(dot, op1, trsv_mpfr[j], MPFR_RNDN);
+            mpfr_set_d(op1, a[i * n + j], MPFR_RNDN);
+            mpfr_mul_d(dot, op1, b[j], MPFR_RNDN);
             mpfr_sub(sum, sum, dot, MPFR_RNDN);
         }
-        mpfr_div_d(div, sum, u[i * (n + 1)], MPFR_RNDN);
-        trsv_mpfr[i] = mpfr_get_d(div, MPFR_RNDD);
+        mpfr_div_d(div, sum, a[i * (n + 1)], MPFR_RNDN);
+        b[i] = mpfr_get_d(div, MPFR_RNDD);
     }
 
     double norm = 0.0;
     //Compare the GPU and MPFR results
     for (int i = 0; i < n; i++)
-        norm += pow(abs(trsv[i] - trsv_mpfr[i]), 2);
+        norm += pow(abs(trsv[i] - b[i]), 2);
     norm = ::sqrt(norm);
     printf("Compared to MPFR. Norm = %.17g\n", norm);
 
-    free(trsv_mpfr);
     mpfr_free_cache();
 
     return norm < epsilon ? true : false;
 }
 
 extern "C" bool compareTRSVLNUToMPFR(
-    const double *l,
-    const double *b,
+    const double *a,
+    double *b,
     const double *trsv,
     const int n,
     const double epsilon
 ) {
-    double *trsv_mpfr;
     mpfr_t sum, dot, div, op1;
-
-    trsv_mpfr = (double *) malloc(n * sizeof(double));
 
     mpfr_init2(op1, 64);
     mpfr_init2(dot, 128);
@@ -119,26 +110,24 @@ extern "C" bool compareTRSVLNUToMPFR(
     mpfr_init2(sum, 4196);
 
     //Produce a result matrix of TRSV using MPFR
-    trsv_mpfr[0] = b[0];
     for(int i = 1; i < n; i++) {
         mpfr_set_d(sum, b[i], MPFR_RNDN);
         for(int j = 0; j < i; j++) {
-            mpfr_set_d(op1, l[i * n + j], MPFR_RNDN);
-            mpfr_mul_d(dot, op1, trsv_mpfr[j], MPFR_RNDN);
+            mpfr_set_d(op1, a[i * n + j], MPFR_RNDN);
+            mpfr_mul_d(dot, op1, b[j], MPFR_RNDN);
             mpfr_sub(sum, sum, dot, MPFR_RNDN);
         }
-        mpfr_div_d(div, sum, l[i * (n + 1)], MPFR_RNDN);
-        trsv_mpfr[i] = mpfr_get_d(div, MPFR_RNDD);
+        mpfr_div_d(div, sum, a[i * (n + 1)], MPFR_RNDN);
+        b[i] = mpfr_get_d(div, MPFR_RNDD);
     }
 
     double norm = 0.0;
     //Compare the GPU and MPFR results
     for (int i = 0; i < n; i++)
-        norm += pow(abs(trsv[i] - trsv_mpfr[i]), 2);
+        norm += pow(abs(trsv[i] - b[i]), 2);
     norm = ::sqrt(norm);
     printf("Compared to MPFR. Norm = %.17g\n", norm);
 
-    free(trsv_mpfr);
     mpfr_free_cache();
 
     return norm < epsilon ? true : false;

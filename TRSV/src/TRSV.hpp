@@ -10,16 +10,14 @@
 #include <mpfr.h>
 
 extern "C" int TRSVUNN(
-    const double *u,
-    const double *b,
     double *x,
+    const double *a,
     const int n
 );
 
 extern "C" int TRSVLNU(
-    const double *l,
-    const double *b,
     double *x,
+    const double *a,
     const int n
 );
 
@@ -31,16 +29,16 @@ extern "C" bool compare(
 );
 
 extern "C" bool compareTRSVUNNToMPFR(
-    const double *u,
-    const double *b,
+    const double *a,
+    double *b,
     const double *trsv,
     const int n,
     const double epsilon
 );
 
 extern "C" bool compareTRSVLNUToMPFR(
-    const double *l,
-    const double *b,
+    const double *a,
+    double *b,
     const double *trsv,
     const int n,
     const double epsilon

@@ -68,7 +68,14 @@ void init_fpuniform(
     const int emax
 );
 
-void init_fpuniform_trmatrix(
+void init_fpuniform_lu_matrix(
+    double *a,
+    const uint n,
+    const int range,
+    const int emax
+);
+
+void init_fpuniform_un_matrix(
     double *a,
     const uint n,
     const int range,
@@ -97,9 +104,8 @@ extern "C" void closeTRSV(
 
 extern "C" size_t TRSV(
     cl_command_queue cqCommandQueue,
-    cl_mem d_res,
+    cl_mem d_x,
     const cl_mem d_a,
-    const cl_mem d_b,
     const uint n,
     cl_int *ciErrNum
 );
