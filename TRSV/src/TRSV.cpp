@@ -46,7 +46,7 @@ extern "C" bool compare(
     for(uint i = 0; i < n; i++)
         norm += pow(abs(trsv_cpu[i] - trsv_gpu[i]), 2);
     norm = ::sqrt(norm);
-    printf("Norm = %.15g\n", norm);
+    printf("    Norm = %.15g\n", norm);
 
     return norm < epsilon ? true : false;
 }
@@ -82,7 +82,7 @@ extern "C" bool compareTRSVUNNToMPFR(
     for (int i = 0; i < n; i++)
         norm += pow(abs(trsv[i] - b[i]), 2);
     norm = ::sqrt(norm);
-    printf("Compared to MPFR. Norm = %.17g\n", norm);
+    printf("    Compared to MPFR. Norm = %.17g\n", norm);
 
     mpfr_free_cache();
 
@@ -118,11 +118,35 @@ extern "C" bool compareTRSVLNUToMPFR(
     for (int i = 0; i < n; i++)
         norm += pow(abs(trsv[i] - b[i]), 2);
     norm = ::sqrt(norm);
-    printf("Compared to MPFR. Norm = %.17g\n", norm);
+    printf("    Compared to MPFR. Norm = %.17g\n", norm);
 
     mpfr_free_cache();
 
     return norm < epsilon ? true : false;
+}
+
+extern "C" bool verifyTRSVLNU(
+    const double *a,
+    const double *b,
+    const double *x,
+    const int n,
+    const double epsilon
+) {
+    bool pass = true;
+
+    for(uint i = 0; i < n; i++) {
+        double sum = 0.0;
+        for(uint j = 0; j <= i; j++)
+            sum += a[j * n + i] * x[j];
+
+        if (abs(sum - b[i]) > epsilon) {
+            printf("[%d] %.17g \t %.17g\n", i, b[i], sum);
+            pass = false;
+            break;
+        }
+    }
+
+    return pass;
 }
 
 extern "C" void printMatrix(
