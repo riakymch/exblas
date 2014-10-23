@@ -46,7 +46,6 @@ extern "C" bool compareTRSVLNUToMPFR(
 
 extern "C" void printMatrix(
     const double *A,
-    const uint m,
     const uint n
 );
 

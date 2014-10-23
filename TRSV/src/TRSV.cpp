@@ -127,13 +127,11 @@ extern "C" bool compareTRSVLNUToMPFR(
 
 extern "C" void printMatrix(
     const double *A,
-    const uint m,
     const uint n
 ){
-    for (uint i = 0; i < m; i++) {
-        for (uint j = 0; j < n; j++) {
-             printf("%.4g\t", A[i * m + j]);
-        }
+    for (uint i = 0; i < n; i++) {
+        for (uint j = 0; j < n; j++)
+             printf("%.4g\t", A[j * n + i]);
         printf("\n");
     }
 }

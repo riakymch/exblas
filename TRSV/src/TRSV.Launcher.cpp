@@ -114,6 +114,7 @@ extern "C" size_t TRSV(
     cl_command_queue cqCommandQueue,
     cl_mem d_x,
     const cl_mem d_a,
+    const cl_mem d_b,
     const uint n,
     cl_int *ciErrNumRes
 ){
@@ -123,13 +124,14 @@ extern "C" size_t TRSV(
         cqCommandQueue = cqDefaultCommandQue;
 
     {
-        size_t NbThreadsPerWorkGroup[]  = {BLOCK_SIZE, BLOCK_SIZE};
+        size_t NbThreadsPerWorkGroup = BLOCK_SIZE;
         //size_t TotalNbThreads[] = {n, (n + 1) / 2};
-        size_t TotalNbThreads[] = {n, n};
+        size_t TotalNbThreads = n;
 
         uint i = 0;
         ciErrNum  = clSetKernelArg(ckKernel, i++, sizeof(cl_mem),  (void *)&d_x);
         ciErrNum |= clSetKernelArg(ckKernel, i++, sizeof(cl_mem),  (void *)&d_a);
+        ciErrNum |= clSetKernelArg(ckKernel, i++, sizeof(cl_mem),  (void *)&d_b);
         ciErrNum |= clSetKernelArg(ckKernel, i++, sizeof(cl_uint), (void *)&n);
         if (ciErrNum != CL_SUCCESS) {
             printf("Error in clSetKernelArg, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
@@ -137,7 +139,7 @@ extern "C" size_t TRSV(
             return 0;
         }
 
-        ciErrNum = clEnqueueNDRangeKernel(cqCommandQueue, ckKernel, 1, NULL, TotalNbThreads, NbThreadsPerWorkGroup, 0, NULL, NULL);
+        ciErrNum = clEnqueueNDRangeKernel(cqCommandQueue, ckKernel, 1, NULL, &TotalNbThreads, &NbThreadsPerWorkGroup, 0, NULL, NULL);
         if (ciErrNum != CL_SUCCESS) {
             printf("Error in clEnqueueNDRangeKernel, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
             *ciErrNumRes = EXIT_FAILURE;

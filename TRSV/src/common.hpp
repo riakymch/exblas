@@ -106,6 +106,7 @@ extern "C" size_t TRSV(
     cl_command_queue cqCommandQueue,
     cl_mem d_x,
     const cl_mem d_a,
+    const cl_mem d_b,
     const uint n,
     cl_int *ciErrNum
 );

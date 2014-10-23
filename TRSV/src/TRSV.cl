@@ -9,26 +9,33 @@
 ////////////////////////////////////////////////////////////////////////////////
 // Main computation pass: compute partial reductions
 ////////////////////////////////////////////////////////////////////////////////
-__kernel void TRSVLNU(
-    __global double *d_x,
-    __global double *d_a,
-    const uint n
-){
-    uint tidx = get_local_id(0);
-
-    double s = d_x[tidx];
+double dblkSolver(__global double *a, int lda, double val){
     volatile __local double xs;
+    uint tid = get_local_id(0);
 
     #ifdef NVIDIA
        #pragma unroll
     #endif
-    for (uint i = 0; i < BLOCK_SIZE; i++) {
-        if (tidx == i)
-            xs = s;
-        if (tidx >= (i + 1))
-            s -= d_a[tidx * n + i] * xs;
+    for (uint j = 0; j < BLOCK_SIZE; j++) {
+        if (tid == j)
+            xs = val;
+        if (tid >= (j+1)) {
+            val -= a[j * lda + tid] * xs;
+        }
     }
 
-    d_x[tidx] = s;
+    return val;
+}
+
+__kernel void TRSVLNU(
+    __global double *d_x,
+    __global double *d_a,
+    __global double *d_b,
+    const uint n
+){
+    double val = d_b[get_local_id(0)];
+    volatile __local double xs;
+
+    d_x[get_local_id(0)] = dblkSolver(d_a, n, val);
 }
 

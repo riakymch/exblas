@@ -12,7 +12,7 @@
 // standard utilities and systems includes
 #include "common.hpp"
 
-#define NUM_ITER  20
+#define NUM_ITER  10
 ////////////////////////////////////////////////////////////////////////////////
 // Variables used in the program 
 ////////////////////////////////////////////////////////////////////////////////
@@ -21,6 +21,7 @@ cl_device_id      cdDevice;          //OpenCL device list
 cl_context        cxGPUContext;      //OpenCL context
 cl_command_queue  cqCommandQueue;    //OpenCL command que
 cl_mem            d_a, d_b;          //OpenCL memory buffer objects
+cl_mem            d_x;
 void              *h_A, *h_b;
 void              *h_res;
 double            *trsv_cpu;
@@ -160,9 +161,14 @@ int runTRSV(const char* program_file){
             cleanUp(EXIT_FAILURE);
         }
         size = __n * sizeof(cl_double);
-        d_b = clCreateBuffer(cxGPUContext, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, size, h_b, &ciErrNum);
+        d_b = clCreateBuffer(cxGPUContext, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, size, h_b, &ciErrNum);
         if (ciErrNum != CL_SUCCESS) {
             printf("Error in clCreateBuffer for d_b, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
+            cleanUp(EXIT_FAILURE);
+        }
+        d_x = clCreateBuffer(cxGPUContext, CL_MEM_READ_WRITE, size, NULL, &ciErrNum);
+        if (ciErrNum != CL_SUCCESS) {
+            printf("Error in clCreateBuffer for d_x, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
             cleanUp(EXIT_FAILURE);
         }
 
@@ -174,7 +180,7 @@ int runTRSV(const char* program_file){
 
         printf("Running OpenCL TRSV with %u rows...\n\n", __n);
             //Just a single launch or a warmup iteration
-            TRSV(NULL, d_b, d_a, __n, &ciErrNum);
+            TRSV(NULL, d_x, d_a, d_b, __n, &ciErrNum);
 
             if (ciErrNum != CL_SUCCESS)
                 cleanUp(EXIT_FAILURE);
@@ -191,7 +197,7 @@ int runTRSV(const char* program_file){
                 cleanUp(EXIT_FAILURE);
             }
 
-            TRSV(NULL, d_b, d_a, __n, &ciErrNum);
+            TRSV(NULL, d_x, d_a, d_b, __n, &ciErrNum);
 
             ciErrNum  = clEnqueueMarker(cqCommandQueue, &endMark);
             ciErrNum |= clFinish(cqCommandQueue);
@@ -223,7 +229,7 @@ int runTRSV(const char* program_file){
 
         printf("Validating TRSV OpenCL results...\n");
             printf(" ...reading back OpenCL results\n");
-                ciErrNum = clEnqueueReadBuffer(cqCommandQueue, d_b, CL_TRUE, 0, __n * sizeof(cl_double), h_res, 0, NULL, NULL);
+                ciErrNum = clEnqueueReadBuffer(cqCommandQueue, d_x, CL_TRUE, 0, __n * sizeof(cl_double), h_res, 0, NULL, NULL);
                 if (ciErrNum != CL_SUCCESS) {
                     printf("Error in clEnqueueReadBuffer Line %u in file %s !!!\n\n", __LINE__, __FILE__);
                     cleanUp(EXIT_FAILURE);
@@ -234,8 +240,6 @@ int runTRSV(const char* program_file){
 
             printf(" ...comparing the results\n");
                 printf("//--------------------------------------------------------\n");
-                printVector((const double *)trsv_cpu, __n);
-                printVector((const double *)h_res, __n);
                 PassFailFlag = compare((const double *) trsv_cpu, (const double *) h_res, __n, 1e-16);
                 //PassFailFlag = compareTRSVLNUToMPFR((const double *)h_A, (double *) h_b, (double *) trsv_cpu, __n, 1e-16);
 
@@ -258,6 +262,8 @@ int cleanUp (int exitCode) {
         clReleaseMemObject(d_a);
     if(d_b)
         clReleaseMemObject(d_b);
+    if(d_x)
+        clReleaseMemObject(d_x);
     if(cqCommandQueue)
         clReleaseCommandQueue(cqCommandQueue);
     if(cxGPUContext)
