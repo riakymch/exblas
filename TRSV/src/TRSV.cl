@@ -14,21 +14,21 @@ __kernel void TRSVLNU(
     __global double *d_a,
     const uint n
 ){
-    uint lid = get_local_id(0);
+    uint tidx = get_local_id(0);
 
-    double s = d_x[lid];
+    double s = d_x[tidx];
     volatile __local double xs;
 
     #ifdef NVIDIA
        #pragma unroll
     #endif
     for (uint i = 0; i < BLOCK_SIZE; i++) {
-        if (lid == i)
+        if (tidx == i)
             xs = s;
-        if (lid >= (i + 1))
-            s -= d_a[i * n + lid] * xs;
+        if (tidx >= (i + 1))
+            s -= d_a[tidx * n + i] * xs;
     }
 
-    d_x[lid] = s;
+    d_x[tidx] = s;
 }
 

@@ -134,14 +134,14 @@ void init_fpuniform(double *a, const uint n, const int range, const int emax)
 void init_fpuniform_lu_matrix(double *a, const uint n, const int range, const int emax)
 {
     //Generate numbers on several bins starting from emax
-    for(uint i = 0; i < n; ++i)
-        for(uint j = 0; j < n; ++j)
+    for(uint j = 0; j < n; ++j)
+        for(uint i = 0; i < n; ++i)
             if (j < i)
-                a[i * n + j] = randDouble(0, range, 1);
+                a[j * n + i] = randDouble(0, range, 1);
             else if (j == i)
                 a[i * (n + 1)] = 1.0;
             else
-                a[i * n + j] = 0.0;
+                a[j * n + i] = 0.0;
 }
 
 /*
