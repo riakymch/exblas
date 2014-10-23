@@ -125,6 +125,30 @@ extern "C" bool compareTRSVLNUToMPFR(
     return norm < epsilon ? true : false;
 }
 
+extern "C" bool verifyTRSVUNN(
+    const double *a,
+    const double *b,
+    const double *x,
+    const int n,
+    const double epsilon
+) {
+    bool pass = true;
+
+    for(int i = 0; i < n; i++) {
+        double sum = 0.0;
+        for(int j = i; j < n; j++)
+            sum += a[i * n + j] * x[j];
+
+        if (abs(sum - b[i]) > epsilon) {
+            printf("[%d] %.17g \t %.17g\n", i, b[i], sum);
+            pass = false;
+            break;
+        }
+    }
+
+    return pass;
+}
+
 extern "C" bool verifyTRSVLNU(
     const double *a,
     const double *b,
@@ -134,9 +158,9 @@ extern "C" bool verifyTRSVLNU(
 ) {
     bool pass = true;
 
-    for(uint i = 0; i < n; i++) {
+    for(int i = 0; i < n; i++) {
         double sum = 0.0;
-        for(uint j = 0; j <= i; j++)
+        for(int j = 0; j <= i; j++)
             sum += a[j * n + i] * x[j];
 
         if (abs(sum - b[i]) > epsilon) {

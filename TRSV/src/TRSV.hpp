@@ -44,6 +44,14 @@ extern "C" bool compareTRSVLNUToMPFR(
     const double epsilon
 );
 
+extern "C" bool verifyTRSVUNN(
+    const double *a,
+    const double *b,
+    const double *x,
+    const int n,
+    const double epsilon
+);
+
 extern "C" bool verifyTRSVLNU(
     const double *a,
     const double *b,
