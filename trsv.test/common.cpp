@@ -17,6 +17,7 @@ void init_fpuniform_un_matrix(double *a, const uint n, const int range, const in
                 a[i * n + j] = randDouble(0, range, 1);
             else
                 a[i * n + j] = 0.0;
+    a[(n - 1) * (n + 1)] = a[(n - 1) * (n + 1)] * n * n;
 }
 
 double randDouble(int emin, int emax, int neg_ratio) {

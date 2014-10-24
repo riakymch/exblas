@@ -35,12 +35,14 @@ int main(int argc, char **argv) {
   init_fpuniform(b, n, 1, 1023);
 
   TRSVUNN(a, b, n, x);
-  TRSVUNN_Kulisch(a, b, n, x);
+  //TRSVUNN_Kulisch(a, b, n, x);
 
   //verify trsv and compute error
-  double error = verifyTRSVUNN(a, b, x, n, 1e-16);
-  printf("error = %8.g\n", error);
+  //double error = verifyTRSVUNN(a, b, x, n, 1e-16);
+  //printf("error = %8.g\n", error);
   compareTRSVUNNToMPFR(a, b, x, n, 1e-16);
+
+  printf("condA = %8.g\n", condA(a, n));
 
   //compute condA
 

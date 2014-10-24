@@ -68,6 +68,11 @@ extern "C" bool verifyTRSVLNU(
     const double epsilon
 );
 
+extern "C" double condA(
+    const double *a,
+    const int n
+);
+
 extern "C" double TwoProductFMA(
     double a,
     double b,

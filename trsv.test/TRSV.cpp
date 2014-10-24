@@ -200,6 +200,24 @@ extern "C" bool verifyTRSVLNU(
     return pass;
 }
 
+extern "C" double condA(
+    const double *a,
+    const int n
+) {
+    double min = fabs(a[0]), max = fabs(a[0]);
+
+    for (int i = 1; i < n; i++) {
+        if (fabs(a[i * (n + 1)]) < min)
+            min = fabs(a[i * (n + 1)]);
+        if (fabs(a[i * (n + 1)]) > max)
+            max = fabs(a[i * (n + 1)]);
+    }
+    printf("min = %.4g  %.4g\n", min, a[0]);
+    printf("max = %.4g  %.4g\n", max, a[0]);
+
+    return max / min;
+}
+
 extern "C" double TwoProductFMA(double a, double b, double *d) {
     double p = a * b;
     *d = fma(a, b, -p);
