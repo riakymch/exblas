@@ -166,14 +166,10 @@ extern "C" double verifyTRSVUNN(
         for(int j = i; j < n; j++)
             sum += a[i * n + j] * x[j];
 
-        /*if (fabs(sum - b[i]) > epsilon) {
-            printf("[%d] %.17g \t %.17g\n", i, b[i], sum);
-            break;
-        }*/
-        norm += fabs(sum - b[i]);
+        norm += pow(fabs(sum - b[i]), 2);
     }
 
-    return norm;
+    return ::sqrt(norm);
 }
 
 extern "C" bool verifyTRSVLNU(
@@ -190,7 +186,7 @@ extern "C" bool verifyTRSVLNU(
         for(int j = 0; j <= i; j++)
             sum += a[j * n + i] * x[j];
 
-        if (abs(sum - b[i]) > epsilon) {
+        if (fabs(sum - b[i]) > epsilon) {
             printf("[%d] %.17g \t %.17g\n", i, b[i], sum);
             pass = false;
             break;
