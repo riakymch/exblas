@@ -3,7 +3,7 @@ function trsv_sym()
   err_d = [];
   err_k = [];
 
-  for i = 10:10:60
+  for i = 10:10:20
     A = triu(rand(i));
     alpha = i * i;
     for j=1:i
@@ -31,7 +31,17 @@ function trsv_sym()
 end
 
 function x = trsv_unn_d(n, A, b)
-  x = A \ b;
+  %x = A \ b;
+  x = zeros(n, 1);
+  
+  %trsv for unn matrices
+  for i = n:-1:1
+    s = b(i);
+    for j = i+1:n
+      s = s - A(i,j) * x(j);
+    end
+    x(i) = s / A(i, i);
+  end
 end
 
 function x = trsv_unn_kulisch(n, A, b)
@@ -41,7 +51,7 @@ function x = trsv_unn_kulisch(n, A, b)
   for i = n:-1:1
     s = sym(b(i));
     for j = i+1:n
-      s = s - sym(A(i,j)) * sym(x(j));
+      s = sym(s - sym(A(i,j)) * sym(x(j)));
     end
     x(i) = double(s) / A(i, i);
   end
@@ -54,8 +64,10 @@ function [condA, err_d, err_k] = trsv_unn_exact(n, A, b)
 
   A = sym(A);
   b = sym(b);
+  x_e = sym(zeros(n, 1));
 
   x_e = A \ b;
+  %max(double(abs(A * x_e - b)))
 
   %compute error
   norm_x_e = max(double(abs(x_e)));
