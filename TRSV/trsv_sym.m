@@ -3,12 +3,12 @@ function trsv_sym()
   err_d = [];
   err_k = [];
   
-  for i = 10:10:100
+  for i = 10:10:60
     A = triu(rand(i));
-%     alpha = cond(A, 2)
-%     for j=1:i
-%         A(j,j) = 1 - (1 - alpha^(-1)) * (j - 1) / (i - 1);
-%     end
+    alpha = cond(A, 2)
+    for j=1:i
+        A(j,j) = 1 - (1 - alpha^(-1)) * (j - 1) / (i - 1);
+    end
     
     b = rand(i, 1);
     
@@ -39,9 +39,9 @@ function x = trsv_unn_kulisch(n, A, b)
   for i = n:-1:1
     s = sym(b(i));
     for j = i+1:n
-      s = sym(s - A(i,j) * x(j));
+      s = s - sym(A(i,j)) * sym(x(j));
     end
-    x(i) = sym(s / A(i, i));
+    x(i) = sym(s) / A(i, i);
   end
 end
 
@@ -56,8 +56,9 @@ function [condA, err_d, err_k] = trsv_unn_exact(n, A, b)
   x_e = A \ b;
   
   %compute error
-  err_d = max(double(abs(x_e - x_d))) / max(double(abs(x_e)));
-  err_k = max(double(abs(x_e - x_k))) / max(double(abs(x_e)));
+  norm_x_e = max(double(abs(x_e)));
+  err_k = max(double(abs(x_e - x_k))) / norm_x_e;
+  err_d = max(double(abs(x_e - x_d))) / norm_x_e;  
   
   %compute cond number
   A_inv = inv(A);
