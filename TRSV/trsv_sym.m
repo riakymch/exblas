@@ -1,62 +1,63 @@
 function trsv_sym()
   condA = [];
-  condA_kulisch = [];
-  err = [];
-  err_kulisch = [];
+  err_d = [];
+  err_k = [];
   
-  for i = 1:10
-    [condA(i), err(i)] = trsv_unn_kulisch(i * 10);
+  for i = 10:10:100
+    A = triu(rand(i));
+%     alpha = cond(A, 2)
+%     for j=1:i
+%         A(j,j) = 1 - (1 - alpha^(-1)) * (j - 1) / (i - 1);
+%     end
+    
+    b = rand(i, 1);
+    
+    [condA(i/10), err_d(i/10), err_k(i/10)] = trsv_unn_exact(i, A, b);
     i
   end
 
-  err
+  err_d
+  err_k
   condA
 
-  %figure(1, "visible", "off");
-  ax = plot(condA, err);
+  %ax = plotyy(condA, err_d, condA, err_k);
+  plot(condA, err_d, condA, err_k);
   xlabel('CondA');
-  ylabel('Error');
+  ylabel('Error Double');
+  legend('err_d','err_k')
+  %ylabel(ax(2), 'Error Kulisch');
 end
 
-function x = trsv_unn(n)
-  A = triu(rand(n));
-  b = rand(n, 1);
-  x = rand(n, 1);
+function x = trsv_unn_d(n, A, b)
+  x = A \ b;
+end
+
+function x = trsv_unn_kulisch(n, A, b)
+  x = zeros(n, 1);
   
   %trsv for unn matrices
   for i = n:-1:1
-    s = b(i);
+    s = sym(b(i));
     for j = i+1:n
-      s = s - A(i,j) * x(j);
+      s = sym(s - A(i,j) * x(j));
     end
-    x(i) = s / A(i, i);
+    x(i) = sym(s / A(i, i));
   end
-  %x = A \ b;
-  
-  %verify
-  %err = norm(A * x - b, Inf);
-  %condA = cond(A, Inf);
 end
 
-function [condA, err] = trsv_unn_kulisch(n)
-  A = sym(triu(rand(n)));
-  b = sym(rand(n, 1));
-  x = sym(rand(n, 1)); 
- 
-  %trsv for unn matrices
-  for i = n:-1:1
-    s = b(i);
-    for j = i+1:n
-      s = s - A(i,j) * x(j);
-    end
-    x(i) = s / A(i, i);
-  end
+function [condA, err_d, err_k] = trsv_unn_exact(n, A, b)
+  %double
+  x_k = sym(trsv_unn_kulisch(n, A, b));  
+  x_d = sym(trsv_unn_d(n, A, b));
+  
+  A = sym(A);
+  b = sym(b);
+  
+  x_e = A \ b;
   
   %compute error
-  %err_v = A * x - b;
-  %err = max(double(abs(err_v)));
-  x_comp = sym(trsv_unn(n));
-  err = max(double(abs(x - x_comp))) / max(double(abs(x)));
+  err_d = max(double(abs(x_e - x_d))) / max(double(abs(x_e)));
+  err_k = max(double(abs(x_e - x_k))) / max(double(abs(x_e)));
   
   %compute cond number
   A_inv = inv(A);
