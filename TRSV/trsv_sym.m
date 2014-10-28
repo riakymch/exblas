@@ -7,11 +7,13 @@ function trsv_sym()
     A = triu(rand(i));
     alpha = cond(A, 2)
     for j=1:i
-        A(j,j) = 1 - (1 - alpha^(-1)) * (j - 1) / (i - 1);
+        %A(j,j) = 1 - (1 - alpha^(-1)) * (j - 1) / (i - 1);
+        A(j,j) = 1.0;
     end
-    
+    A(i/2,i/2) = alpha^(-1);
+
     b = rand(i, 1);
-    
+
     [condA(i/10), err_d(i/10), err_k(i/10)] = trsv_unn_exact(i, A, b);
     i
   end
