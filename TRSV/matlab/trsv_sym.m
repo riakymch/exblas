@@ -3,7 +3,8 @@ function trsv_sym()
   err_d = [];
   err_k = [];
   
-  for alpha = 30:5:100
+  alpha = 224;
+  for i = 10:5:20
 %     A = triu(rand(i));
 %     alpha = i * i;
 %     for j=1:i
@@ -11,9 +12,10 @@ function trsv_sym()
 %     end
 %     b = rand(i, 1);
 
-    [A, b] = trsv_gen_unn(alpha, 10);
-    [condA(alpha/5), err_d(alpha/5), err_k(alpha/5)] = trsv_unn_exact(10, A, b);
-    alpha
+    %[A, b] = trsv_gen_unn(i, i);
+    [A, b] = trsv_gen_lnu(alpha, i);
+    [condA(i/5), err_d(i/5), err_k(i/5)] = trsv_unn_exact(i, A, b);
+    i
   end
 
   err_d
@@ -21,11 +23,31 @@ function trsv_sym()
   condA
 
   %ax = plotyy(condA, err_d, condA, err_k);
-  plot(condA, err_d, condA, err_k);
+  semilogx(condA, err_d, condA, err_k);
   xlabel('CondA');
   ylabel('Error');
   legend('err_d','err_k')
   %ylabel(ax(2), 'Error Kulisch');
+end
+
+function [A, b] = trsv_gen_lnu(alpha, n)
+    A = zeros(n,n);
+    
+    A(1,1) = 100;
+    for i = 2:n
+        A(i,i) = 1;
+    end
+    for i = 2:n
+        for j = 1:i-1
+            A(i,j) = (-1)^(i+j) * alpha;
+        end
+    end
+    
+    b = zeros(n, 1);
+    b(1) = 1;
+    for i = 2:n
+        b(i) = -((alpha+1)/100) * (-2)^(i-2);
+    end    
 end
 
 function [A, b] = trsv_gen_unn(alpha, n)
