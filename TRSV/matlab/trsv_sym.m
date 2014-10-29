@@ -6,7 +6,7 @@ function trsv_sym()
   alpha = 24;
   j=1;
   alpha=224;
-  for i = 1:20
+  for i = 1:21
 %     A = triu(rand(i));
 %     alpha = i * i;
 %     for j=1:i
@@ -31,7 +31,8 @@ function trsv_sym()
   xlim([1, 10^50]);
   xlabel('CondA');
   ylabel('Error');
-  legend('err_d','err_k')
+  legend('err_d','err_k');
+  grid on;
   %ylabel(ax(2), 'Error Kulisch');
 end
 
@@ -85,17 +86,17 @@ function [A, b] = trsv_gen_unn(alpha, n)
 end
 
 function x = trsv_lnu_d(n, A, b)
-  %x = A \ b;
-  x = zeros(n, 1);
-  
-  %trsv for lnu matrices
-  for i = 1:n
-    s = b(i);
-    for j = 1:i-1
-      s = s - A(i,j) * x(j);
-    end
-    x(i) = s / A(i, i);
- end
+  x = A \ b;
+%   x = zeros(n, 1);
+%   
+%   %trsv for lnu matrices
+%   for i = 1:n
+%     s = b(i);
+%     for j = 1:i-1
+%       s = s - A(i,j) * x(j);
+%     end
+%     x(i) = s / A(i, i);
+%  end
 end
 
 function x = trsv_unn_d(n, A, b)
@@ -119,7 +120,7 @@ function x = trsv_lnu_kulisch(n, A, b)
   for i = 1:n
     s = sym(b(i));
     for j = 1:i-1
-        s = sym(s - A(i,j) * x(j));
+        s = s - sym(A(i,j)) * sym(x(j));
     end
     x(i) = double(s) / A(i, i);
   end
@@ -143,17 +144,20 @@ function [condA, err_d, err_k] = trsv_lnu_exact(n, A, b)
   x_k = trsv_lnu_kulisch(n, A, b);
   x_d = trsv_lnu_d(n, A, b);
 
-  A = sym(A);
-  b = sym(b);
-  x_e = sym(zeros(n, 1));
-
+  A = sym(A, 'd');
+  b = sym(b, 'd');
+  
   x_e = A \ b;
 
   %compute error
   norm_x_e = max(double(abs(x_e)));
   err_k = max(double(abs(x_e - x_k))) / norm_x_e;
   err_d = max(double(abs(x_e - x_d))) / norm_x_e;
-
+%   x_e = double(x_e);
+%   norm_x_e = max(abs(x_e));
+%   err_k = max(abs(x_e - x_k)) / norm_x_e;
+%   err_d = max(abs(x_e - x_d)) / norm_x_e;
+  
   %compute cond number
   A_inv = inv(A);
   %condA = cond(double(A), Inf);
