@@ -3,8 +3,10 @@ function trsv_sym()
   err_d = [];
   err_k = [];
   
-  alpha = 224;
-  for i = 10:5:20
+  alpha = 24;
+  j=1;
+  alpha=224;
+  for i = 1:20
 %     A = triu(rand(i));
 %     alpha = i * i;
 %     for j=1:i
@@ -14,8 +16,8 @@ function trsv_sym()
 
     %[A, b] = trsv_gen_unn(i, i);
     [A, b] = trsv_gen_lnu(alpha, i);
-    [condA(i/5), err_d(i/5), err_k(i/5)] = trsv_unn_exact(i, A, b);
-    i
+    [condA(j), err_d(j), err_k(j)] = trsv_lnu_exact(i, A, b);
+    j = j+1;
   end
 
   err_d
@@ -23,7 +25,10 @@ function trsv_sym()
   condA
 
   %ax = plotyy(condA, err_d, condA, err_k);
-  semilogx(condA, err_d, condA, err_k);
+  loglog(condA, err_d, condA, err_k);
+  %loglog(condA, err_k);
+  %ax = plotyy(condA, err_d, condA, err_k, 'loglog');
+  xlim([1, 10^50]);
   xlabel('CondA');
   ylabel('Error');
   legend('err_d','err_k')
@@ -79,6 +84,20 @@ function [A, b] = trsv_gen_unn(alpha, n)
     end    
 end
 
+function x = trsv_lnu_d(n, A, b)
+  %x = A \ b;
+  x = zeros(n, 1);
+  
+  %trsv for lnu matrices
+  for i = 1:n
+    s = b(i);
+    for j = 1:i-1
+      s = s - A(i,j) * x(j);
+    end
+    x(i) = s / A(i, i);
+ end
+end
+
 function x = trsv_unn_d(n, A, b)
   %x = A \ b;
   x = zeros(n, 1);
@@ -90,6 +109,19 @@ function x = trsv_unn_d(n, A, b)
       s = s - A(i,j) * x(j);
     end
     x(i) = s / A(i, i);
+  end
+end
+
+function x = trsv_lnu_kulisch(n, A, b)
+  x = zeros(n, 1);
+
+  %trsv for lnu matrices
+  for i = 1:n
+    s = sym(b(i));
+    for j = 1:i-1
+        s = sym(s - A(i,j) * x(j));
+    end
+    x(i) = double(s) / A(i, i);
   end
 end
 
@@ -106,6 +138,28 @@ function x = trsv_unn_kulisch(n, A, b)
   end
 end
 
+function [condA, err_d, err_k] = trsv_lnu_exact(n, A, b)
+  %double
+  x_k = trsv_lnu_kulisch(n, A, b);
+  x_d = trsv_lnu_d(n, A, b);
+
+  A = sym(A);
+  b = sym(b);
+  x_e = sym(zeros(n, 1));
+
+  x_e = A \ b;
+
+  %compute error
+  norm_x_e = max(double(abs(x_e)));
+  err_k = max(double(abs(x_e - x_k))) / norm_x_e;
+  err_d = max(double(abs(x_e - x_d))) / norm_x_e;
+
+  %compute cond number
+  A_inv = inv(A);
+  %condA = cond(double(A), Inf);
+  condA = norminf_m(A, n) * norminf_m(A_inv, n);
+end
+
 function [condA, err_d, err_k] = trsv_unn_exact(n, A, b)
   %double
   x_k = trsv_unn_kulisch(n, A, b);
@@ -116,7 +170,6 @@ function [condA, err_d, err_k] = trsv_unn_exact(n, A, b)
   x_e = sym(zeros(n, 1));
 
   x_e = A \ b;
-  
 
   %compute error
   norm_x_e = max(double(abs(x_e)));
@@ -134,7 +187,7 @@ function res = norminf_m(A, n)
 
   for i = 1:n
       sum = sym(0.0);
-      for j = i:n
+      for j = 1:n
           sum = sum + abs(A(i,j));
       end
       sum_d = double(abs(sum));
