@@ -6,18 +6,14 @@ function trsv_sym()
   alpha = 24;
   j=1;
   alpha=224;
-  for i = 1:21
-%     A = triu(rand(i));
-%     alpha = i * i;
-%     for j=1:i
-%         A(j,j) = 1 - (1 - alpha^(-1)) * (j - 1) / (i - 1);
-%     end
-%     b = rand(i, 1);
-
+  for i = 1:20
     %[A, b] = trsv_gen_unn(i, i);
-    [A, b] = trsv_gen_lnu(alpha, i);
-    [condA(j), err_d(j), err_k(j)] = trsv_lnu_exact(i, A, b);
+    [A, b] = trsv_gen_unn_my(i);
+    %[A, b] = trsv_gen_lnu(alpha, i);
+    
+    [condA(j), err_d(j), err_k(j)] = trsv_unn_exact(i, A, b);
     j = j+1;
+    i
   end
 
   err_d
@@ -54,6 +50,23 @@ function [A, b] = trsv_gen_lnu(alpha, n)
     for i = 2:n
         b(i) = -((alpha+1)/100) * (-2)^(i-2);
     end    
+end
+
+function [A, b] = trsv_gen_unn_my(n)
+    A = triu(rand(n));
+    A = A * 10;
+    
+    for i = 1:n
+        A(i,i) = 10^(10*i/n);
+    end
+    
+    b = rand(n, 1);
+%     A = triu(rand(i));
+%     alpha = i * i;
+%     for j=1:i
+%         A(j,j) = 1 - (1 - alpha^(-1)) * (j - 1) / (i - 1);
+%     end
+%     b = rand(i, 1);    
 end
 
 function [A, b] = trsv_gen_unn(alpha, n)
@@ -100,17 +113,17 @@ function x = trsv_lnu_d(n, A, b)
 end
 
 function x = trsv_unn_d(n, A, b)
-  %x = A \ b;
-  x = zeros(n, 1);
-  
-  %trsv for unn matrices
-  for i = n:-1:1
-    s = b(i);
-    for j = i+1:n
-      s = s - A(i,j) * x(j);
-    end
-    x(i) = s / A(i, i);
-  end
+  x = A \ b;
+%   x = zeros(n, 1);
+%   
+%   %trsv for unn matrices
+%   for i = n:-1:1
+%     s = b(i);
+%     for j = i+1:n
+%       s = s - A(i,j) * x(j);
+%     end
+%     x(i) = s / A(i, i);
+%   end
 end
 
 function x = trsv_lnu_kulisch(n, A, b)
@@ -200,4 +213,3 @@ function res = norminf_m(A, n)
       end
   end
 end
-
