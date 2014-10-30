@@ -3,18 +3,27 @@ function trsv_sym()
   err_d = [];
   err_k = [];
   
-  alpha = 24;
   j=1;
+  %unn
+%   alpha=50;
+%   for i = 1:10
+%     [A, b] = trsv_gen_unn(alpha, i);
+%     %[A, b] = trsv_gen_unn_my(i);
+%     
+%     [condA(j), err_d(j), err_k(j)] = trsv_unn_exact(i, A, b);
+%     j = j+1;
+%     i
+%   end
+  
+  %lnu
   alpha=224;
-  for i = 1:20
-    %[A, b] = trsv_gen_unn(i, i);
-    [A, b] = trsv_gen_unn_my(i);
-    %[A, b] = trsv_gen_lnu(alpha, i);
+  for i = 1:21
+    [A, b] = trsv_gen_lnu(alpha, i)
     
-    [condA(j), err_d(j), err_k(j)] = trsv_unn_exact(i, A, b);
+    [condA(j), err_d(j), err_k(j)] = trsv_lnu_exact(i, A, b);
     j = j+1;
     i
-  end
+  end  
 
   err_d
   err_k
@@ -160,7 +169,7 @@ function [condA, err_d, err_k] = trsv_lnu_exact(n, A, b)
   A = sym(A, 'd');
   b = sym(b, 'd');
   
-  x_e = A \ b;
+  x_e = A \ b
 
   %compute error
   norm_x_e = max(double(abs(x_e)));
@@ -182,9 +191,8 @@ function [condA, err_d, err_k] = trsv_unn_exact(n, A, b)
   x_k = trsv_unn_kulisch(n, A, b);
   x_d = trsv_unn_d(n, A, b);
 
-  A = sym(A);
-  b = sym(b);
-  x_e = sym(zeros(n, 1));
+  A = sym(A, 'd');
+  b = sym(b, 'd');
 
   x_e = A \ b;
 
