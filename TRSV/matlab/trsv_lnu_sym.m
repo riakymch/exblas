@@ -1,4 +1,4 @@
-function trsv_sym()
+function trsv_lnu_sym()
   condA = [];
   err_d = [];
   err_k = [];
@@ -24,6 +24,7 @@ function trsv_sym()
   %loglog(condA, err_k);
   %ax = plotyy(condA, err_d, condA, err_k, 'loglog');
   xlim([1, 10^50]);
+  ylim([10^(-40), 10]);
   xlabel('CondA');
   ylabel('Error');
   legend('err_d','err_k');
@@ -52,22 +53,18 @@ function [A, b] = trsv_gen_lnu(alpha, n)
 end
 
 function x = trsv_lnu_d(n, A, b)
-  x = A \ b;
-%   x = zeros(n, 1);
-%   
-%   %trsv for lnu matrices
-%   for i = 1:n
-%     s = b(i);
-%     for j = 1:i-1
-%       s = s - A(i,j) * x(j);
-%     end
-%     x(i) = s / A(i, i);
-%  end
+  %trsv for lnu matrices
+  %x = A \ b;   
+  for i = 1:n
+    s = b(i);
+    for j = 1:i-1
+      s = s - A(i,j) * x(j);
+    end
+    x(i) = s / A(i, i);
+  end
 end
 
 function x = trsv_lnu_kulisch(n, A, b)
-  x = zeros(n, 1);
-
   %trsv for lnu matrices
   for i = 1:n
     s = sym(b(i));
@@ -86,16 +83,19 @@ function [condA, err_d, err_k] = trsv_lnu_exact(n, A, b)
   A = sym(A, 'd');
   b = sym(b, 'd');
   
-  x_e = A \ b;
+  %x_e = A \ b;
+  for i = 1:n
+    s = b(i);
+    for j = 1:i-1
+      s = s - A(i,j) * x_e(j);
+    end
+    x_e(i) = s / A(i, i);
+  end
 
   %compute error
   norm_x_e = max(double(abs(x_e)));
   err_k = max(double(abs(x_e - x_k))) / norm_x_e;
   err_d = max(double(abs(x_e - x_d))) / norm_x_e;
-%   x_e = double(x_e);
-%   norm_x_e = max(abs(x_e));
-%   err_k = max(abs(x_e - x_k)) / norm_x_e;
-%   err_d = max(abs(x_e - x_d)) / norm_x_e;
   
   %compute cond number
   A_inv = inv(A);
