@@ -3,7 +3,7 @@ function trsv_unn_sym()
   err_d = [];
   err_k = [];
   
-  n = 4;
+  n = 40;
   c = 20 * sort(rand(n,1));
   for i = 1:n
     %[A, b] = trsv_gen_unn_my(i);
@@ -21,7 +21,8 @@ function trsv_unn_sym()
   loglog(condA, err_d, '+', condA, err_k, 'o');
   %loglog(condA, err_k);
   %ax = plotyy(condA, err_d, condA, err_k, 'loglog');
-  xlim([1, 10^40]);
+  hold on;
+  xlim([1, 10^50]);
   ylim([10^(-18), 10]);
   xlabel('CondA');
   ylabel('Error');
@@ -29,11 +30,12 @@ function trsv_unn_sym()
   %grid on;
   xlims = get(gca,'XLim');
   ylims = get(gca,'YLim');
-  hold on;
   u = 2^(-53);
-  loglog([u^(-1) u^(-1)], ylims, 'color', [0,0,0] + 1.0, '--');
-  loglog([u^(-2) u^(-2)], ylims, 'color', [0,0,0] + 1.0, '--');
-  loglog(xlims, [u u], 'color', [0,0,0] + 1.0, '--');
+  loglog([u^(-1) u^(-1)], ylims, '--k');
+  hold on;
+  loglog([u^(-2) u^(-2)], ylims, '--k');
+  hold on;
+  loglog(xlims, [u u], '--k');
   %ylabel(ax(2), 'Error Kulisch');
 end
 
@@ -57,7 +59,8 @@ function x = trsv_unn_kulisch(n, A, b)
     for j = i+1:n
       s = s - sym(A(i,j)) * sym(x(j));
     end
-    x(i) = double(s) / A(i, i);
+    s = double(s);
+    x(i) = s / A(i, i);
   end
 end
 
@@ -65,10 +68,9 @@ function [condA, err_d, err_k] = trsv_unn_exact(n, A, b)
   %double
   x_k = sym(trsv_unn_kulisch(n, A, b), 'd');
   x_d = sym(trsv_unn_d(n, A, b), 'd');
-
+  
   A = sym(A);
   b = sym(b);
-
   %x_e = A \ b;
   %trsv for unn matrices
   for i = n:-1:1

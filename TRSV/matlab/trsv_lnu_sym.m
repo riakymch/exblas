@@ -20,36 +20,25 @@ function trsv_lnu_sym()
   condA
 
   %ax = plotyy(condA, err_d, condA, err_k);
-  loglog(condA, err_d, condA, err_k);
+  loglog(condA, err_d, '+', condA, err_k, 'o');
   %loglog(condA, err_k);
   %ax = plotyy(condA, err_d, condA, err_k, 'loglog');
+  hold on;
   xlim([1, 10^50]);
-  %ylim([10^(-20), 10^2]);
+  ylim([10^(-18), 10]);
   xlabel('CondA');
   ylabel('Error');
   legend('err_d','err_k');
-  grid on;
+  %grid on;
+  u = 2^(-53);
+  xlims = get(gca,'XLim');
+  ylims = get(gca,'YLim');
+  loglog([u^(-1) u^(-1)], ylims, '--k');
+  hold on;
+  loglog([u^(-2) u^(-2)], ylims, '--k');
+  hold on;
+  loglog(xlims, [u u], '--k');
   %ylabel(ax(2), 'Error Kulisch');
-end
-
-function [A, b] = trsv_gen_lnu(alpha, n)
-    A = zeros(n,n);
-    
-    A(1,1) = 100;
-    for i = 2:n
-        A(i,i) = 1;
-    end
-    for i = 2:n
-        for j = 1:i-1
-            A(i,j) = (-1)^(i+j) * alpha;
-        end
-    end
-    
-    b = zeros(n, 1);
-    b(1) = 1;
-    for i = 2:n
-        b(i) = -((alpha+1)/100) * (-2)^(i-2);
-    end    
 end
 
 function x = trsv_lnu_d(n, A, b)
@@ -71,7 +60,8 @@ function x = trsv_lnu_kulisch(n, A, b)
     for j = 1:i-1
         s = s - sym(A(i,j)) * sym(x(j));
     end
-    x(i) = double(s) / A(i, i);
+    s = double(s);
+    x(i) = s / A(i, i);
   end
 end
 
@@ -116,4 +106,24 @@ function res = norminf_m(A, n)
           res = sum_d;
       end
   end
+end
+
+function [A, b] = trsv_gen_lnu(alpha, n)
+    A = zeros(n,n);
+    
+    A(1,1) = 100;
+    for i = 2:n
+        A(i,i) = 1;
+    end
+    for i = 2:n
+        for j = 1:i-1
+            A(i,j) = (-1)^(i+j) * alpha;
+        end
+    end
+    
+    b = zeros(n, 1);
+    b(1) = 1;
+    for i = 2:n
+        b(i) = -((alpha+1)/100) * (-2)^(i-2);
+    end    
 end
