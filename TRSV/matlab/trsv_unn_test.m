@@ -3,7 +3,7 @@ function trsv_unn_sym()
   err_d = [];
   err_k = [];
   
-  n = 20;
+  n = 40;
   c = 20 * sort(rand(n,1));
   for i = 1:n
     %[A, b] = trsv_gen_unn_my(i);
@@ -51,24 +51,24 @@ function x = trsv_unn_d(n, A, b)
 end
 
 function x = trsv_unn_kulisch(n, A, b)
-  b = sym(b, 'f');
+  b = sym(b);
   
   %trsv for unn matrices
   for i = n:-1:1
     s = b(i);
     for j = i+1:n
-      s = s - sym(A(i,j), 'f') * sym(x(j), 'f');
+      s = s - sym(A(i,j)) * sym(x(j));
     end
     x(i) = double(s) / A(i, i);
   end
 end
 
 function [condA, err_d, err_k] = trsv_unn_exact(n, A, b)
-  x_k = trsv_unn_kulisch(n, A, b);
-  x_d = trsv_unn_d(n, A, b);
+  x_k = sym(trsv_unn_kulisch(n, A, b), 'd');
+  x_d = sym(trsv_unn_d(n, A, b), 'd');
   
-  A = sym(A, 'f');
-  b = sym(b, 'f');
+  A = sym(A);
+  b = sym(b);
   %x_e = A \ b;
   for i = n:-1:1
     s = b(i);
@@ -88,7 +88,6 @@ function [condA, err_d, err_k] = trsv_unn_exact(n, A, b)
   %condA = norminf_m(A, n) * norminf_m(A_inv, n);
   condA = condAx(A,x_e,n);
 end
-
 
 function res = condAx(A, x, n)
   A_inv = inv(A);

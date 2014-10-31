@@ -52,12 +52,12 @@ function x = trsv_lnu_d(n, A, b)
 end
 
 function x = trsv_lnu_kulisch(n, A, b)
-  b = sym(b, 'f');
+  b = sym(b);
 
   for i = 1:n
     s = b(i);
     for j = 1:i-1
-        s = s - sym(A(i,j), 'f') * sym(x(j), 'f');
+        s = s - sym(A(i,j)) * sym(x(j));
     end
     x(i) = double(s) / A(i, i);
   end
@@ -65,11 +65,11 @@ end
 
 function [condA, err_d, err_k] = trsv_lnu_exact(n, A, b)
   %double
-  x_k = trsv_lnu_kulisch(n, A, b);
-  x_d = trsv_lnu_d(n, A, b);
+  x_k = sym(trsv_lnu_kulisch(n, A, b), 'd');
+  x_d = sym(trsv_lnu_d(n, A, b), 'd');
 
-  A = sym(A, 'f');
-  b = sym(b, 'f');
+  A = sym(A);
+  b = sym(b);
   %x_e = A \ b;
   for i = 1:n
     s = b(i);
