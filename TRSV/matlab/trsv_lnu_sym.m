@@ -42,8 +42,6 @@ function trsv_lnu_sym()
 end
 
 function x = trsv_lnu_d(n, A, b)
-  %trsv for lnu matrices
-  %x = A \ b;   
   for i = 1:n
     s = b(i);
     for j = 1:i-1
@@ -54,25 +52,24 @@ function x = trsv_lnu_d(n, A, b)
 end
 
 function x = trsv_lnu_kulisch(n, A, b)
-  %trsv for lnu matrices
+  b = sym(b, 'f');
+
   for i = 1:n
-    s = sym(b(i), 'f');
+    s = b(i);
     for j = 1:i-1
         s = s - sym(A(i,j), 'f') * sym(x(j), 'f');
     end
-    s = double(s);
-    x(i) = s / A(i, i);
+    x(i) = double(s) / A(i, i);
   end
 end
 
 function [condA, err_d, err_k] = trsv_lnu_exact(n, A, b)
   %double
-  x_k = sym(trsv_lnu_kulisch(n, A, b), 'f');
-  x_d = sym(trsv_lnu_d(n, A, b), 'f');
+  x_k = trsv_lnu_kulisch(n, A, b);
+  x_d = trsv_lnu_d(n, A, b);
 
   A = sym(A, 'f');
   b = sym(b, 'f');
-  
   %x_e = A \ b;
   for i = 1:n
     s = b(i);
@@ -88,9 +85,15 @@ function [condA, err_d, err_k] = trsv_lnu_exact(n, A, b)
   err_d = max(double(abs(x_e - x_d))) / norm_x_e;
   
   %compute cond number
+  %condA = norminf_m(A, n) * norminf_m(inv(A), n);
+  condA = condAx(A,x_e,n);
+end
+
+function res = condAx(A, x, n)
   A_inv = inv(A);
-  %condA = cond(double(A), Inf);
-  condA = norminf_m(A, n) * norminf_m(A_inv, n);
+  y = abs(A_inv) * abs(A) * abs(x)';
+
+  res = max(double(abs(y))) / max(double(abs(x)));
 end
 
 function res = norminf_m(A, n)
