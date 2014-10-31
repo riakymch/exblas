@@ -3,8 +3,8 @@ function trsv_unn_sym()
   err_d = [];
   err_k = [];
   
-  n = 20;
-  c = 20 * sort(rand(n,1))
+  n = 4;
+  c = 20 * sort(rand(n,1));
   for i = 1:n
     %[A, b] = trsv_gen_unn_my(i);
     [A, b] = trsv_gen_unn_nico(40, c(i));
@@ -21,12 +21,19 @@ function trsv_unn_sym()
   loglog(condA, err_d, '+', condA, err_k, 'o');
   %loglog(condA, err_k);
   %ax = plotyy(condA, err_d, condA, err_k, 'loglog');
-  xlim([1, 10^50]);
-  ylim([10^(-40), 10]);
+  xlim([1, 10^40]);
+  ylim([10^(-18), 10]);
   xlabel('CondA');
   ylabel('Error');
   legend('err_d','err_k');
-  grid on;
+  %grid on;
+  xlims = get(gca,'XLim');
+  ylims = get(gca,'YLim');
+  hold on;
+  u = 2^(-53);
+  loglog([u^(-1) u^(-1)], ylims, 'color', [0,0,0] + 1.0, '--');
+  loglog([u^(-2) u^(-2)], ylims, 'color', [0,0,0] + 1.0, '--');
+  loglog(xlims, [u u], 'color', [0,0,0] + 1.0, '--');
   %ylabel(ax(2), 'Error Kulisch');
 end
 
