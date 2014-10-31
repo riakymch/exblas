@@ -6,8 +6,7 @@ function trsv_unn_sym()
   j=1;
   %unn
   alpha=50;
-  for i = 1:21
-    %[A, b] = trsv_gen_unn(alpha + 2*i, i);
+  for i = 10:10:100
     [A, b] = trsv_gen_unn_my(i);
     
     [condA(j), err_d(j), err_k(j)] = trsv_unn_exact(i, A, b);
@@ -56,9 +55,9 @@ end
 function x = trsv_unn_kulisch(n, A, b)
   %trsv for unn matrices
   for i = n:-1:1
-    s = sym(b(i), 'd');
+    s = sym(b(i));
     for j = i+1:n
-      s = s - sym(A(i,j), 'd') * sym(x(j), 'd');
+      s = s - sym(A(i,j)) * sym(x(j));
     end
     x(i) = double(s) / A(i, i);
   end
@@ -69,8 +68,8 @@ function [condA, err_d, err_k] = trsv_unn_exact(n, A, b)
   x_k = sym(trsv_unn_kulisch(n, A, b), 'd');
   x_d = sym(trsv_unn_d(n, A, b), 'd');
 
-  A = sym(A, 'd');
-  b = sym(b, 'd');
+  A = sym(A);
+  b = sym(b);
 
   %x_e = A \ b;
   %trsv for unn matrices
@@ -107,33 +106,3 @@ function res = norminf_m(A, n)
       end
   end
 end
-
-function [A, b] = trsv_gen_unn(alpha, n)
-    A = zeros(n,n);
-    
-    for i = 1:n
-        A(i,i) = 1;
-    end
-    for i = n-1:-2:1
-        A(i,n) = 1;
-    end    
-    for i = n-2:-2:1
-        for j = i+1:n
-            A(i,j) = (-1)^(i+j+1) * 2^alpha;
-        end
-    end
-    for i = n-3:-2:1
-        for j = i+1:n-1
-            A(i,j) = (-1)^(i+j);
-        end
-    end
-    
-    b = zeros(n, 1);
-    for i = n:-2:1
-        b(i) = 1;
-    end
-    for i = n-1:-2:1
-        b(i) = 2;
-    end    
-end
-

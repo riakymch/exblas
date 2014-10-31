@@ -24,7 +24,7 @@ function trsv_lnu_sym()
   %loglog(condA, err_k);
   %ax = plotyy(condA, err_d, condA, err_k, 'loglog');
   xlim([1, 10^50]);
-  ylim([10^(-40), 10]);
+  %ylim([10^(-20), 10^2]);
   xlabel('CondA');
   ylabel('Error');
   legend('err_d','err_k');
@@ -77,11 +77,11 @@ end
 
 function [condA, err_d, err_k] = trsv_lnu_exact(n, A, b)
   %double
-  x_k = trsv_lnu_kulisch(n, A, b);
-  x_d = trsv_lnu_d(n, A, b);
+  x_k = sym(trsv_lnu_kulisch(n, A, b), 'd');
+  x_d = sym(trsv_lnu_d(n, A, b), 'd');
 
-  A = sym(A, 'd');
-  b = sym(b, 'd');
+  A = sym(A);
+  b = sym(b);
   
   %x_e = A \ b;
   for i = 1:n
