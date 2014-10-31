@@ -7,9 +7,9 @@ function trsv_unn_sym()
   c = 20 * sort(rand(n,1));
   for i = 1:n
     %[A, b] = trsv_gen_unn_my(i);
-    [A, b] = trsv_gen_unn_nico(40, c(i));
-    
-    [condA(i), err_d(i), err_k(i)] = trsv_unn_exact(40, A, b);
+    [A, b] = trsv_gen_unn_nico(n, c(i));
+
+    [condA(i), err_d(i), err_k(i)] = trsv_unn_exact(n, A, b);
     i
   end
 
