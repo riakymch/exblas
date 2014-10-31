@@ -56,9 +56,9 @@ end
 function x = trsv_lnu_kulisch(n, A, b)
   %trsv for lnu matrices
   for i = 1:n
-    s = sym(b(i));
+    s = sym(b(i), 'f');
     for j = 1:i-1
-        s = s - sym(A(i,j)) * sym(x(j));
+        s = s - sym(A(i,j), 'f') * sym(x(j), 'f');
     end
     s = double(s);
     x(i) = s / A(i, i);
@@ -67,11 +67,11 @@ end
 
 function [condA, err_d, err_k] = trsv_lnu_exact(n, A, b)
   %double
-  x_k = sym(trsv_lnu_kulisch(n, A, b), 'd');
-  x_d = sym(trsv_lnu_d(n, A, b), 'd');
+  x_k = sym(trsv_lnu_kulisch(n, A, b), 'f');
+  x_d = sym(trsv_lnu_d(n, A, b), 'f');
 
-  A = sym(A);
-  b = sym(b);
+  A = sym(A, 'f');
+  b = sym(b, 'f');
   
   %x_e = A \ b;
   for i = 1:n
@@ -97,7 +97,7 @@ function res = norminf_m(A, n)
   res = 0.0;
 
   for i = 1:n
-      sum = sym(0.0);
+      sum = sym(0.0, 'f');
       for j = 1:n
           sum = sum + abs(A(i,j));
       end

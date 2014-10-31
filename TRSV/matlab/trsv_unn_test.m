@@ -3,7 +3,7 @@ function trsv_unn_sym()
   err_d = [];
   err_k = [];
   
-  n = 60;
+  n = 20;
   c = 20 * sort(rand(n,1));
   for i = 1:n
     %[A, b] = trsv_gen_unn_my(i);
@@ -64,7 +64,6 @@ function x = trsv_unn_kulisch(n, A, b)
 end
 
 function [condA, err_d, err_k] = trsv_unn_exact(n, A, b)
-  %double
   x_k = trsv_unn_kulisch(n, A, b);
   x_d = trsv_unn_d(n, A, b);
   
@@ -77,7 +76,7 @@ function [condA, err_d, err_k] = trsv_unn_exact(n, A, b)
       s = s - A(i,j) * x_e(j);
     end
     x_e(i) = s / A(i, i);
-  end  
+  end
 
   %compute error
   norm_e = max(double(abs(x_e)));
@@ -95,7 +94,7 @@ function res = condAx(A, x, n)
   A_inv = inv(A);
   y = abs(A_inv) * abs(A) * abs(x)';
 
-  res = max(double(abs(y))) / max(double(abs(x)));
+  res = max(double(y)) / max(double(abs(x)));
 end
 
 function res = norminf_m(A, n)
