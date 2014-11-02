@@ -50,12 +50,12 @@ function x = trsv_unn_d(n, A, b)
 end
 
 function x = trsv_unn_kulisch(n, A, b)
-  b = sym(b);
+  b = sym(b, 'f');
   
   for i = n:-1:1
     s = b(i);
     for j = i+1:n
-      s = s - sym(A(i,j)) * sym(x(j));
+      s = s - sym(A(i,j), 'f') * sym(x(j), 'f');
     end
     x(i) = double(s) / A(i, i);
   end
@@ -63,11 +63,11 @@ end
 
 function [condA, err_d, err_k] = trsv_unn_exact(n, A, b)
   %double
-  x_k = sym(trsv_unn_kulisch(n, A, b), 'd');
-  x_d = sym(trsv_unn_d(n, A, b), 'd');
+  x_k = sym(trsv_unn_kulisch(n, A, b), 'f');
+  x_d = sym(trsv_unn_d(n, A, b), 'f');
   
-  A = sym(A);
-  b = sym(b);
+  A = sym(A, 'f');
+  b = sym(b, 'f');
   %x_e = A \ b;
   for i = n:-1:1
     s = b(i);
