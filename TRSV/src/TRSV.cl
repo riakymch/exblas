@@ -16,12 +16,11 @@ double dblkSolver(__local double *a, int lda, double val){
     #ifdef NVIDIA
        #pragma unroll
     #endif
-    for (uint j = 0; j < BLOCK_SIZE; j++) {
-        if (lidx == j)
+    for (uint i = 0; i < BLOCK_SIZE; i++) {
+        if (lidx == i)
             xs = val;
-        if (lidx >= (j+1)) {
-            val -= a[j * lda + lidx] * xs;
-        }
+        if (lidx > i)
+            val -= a[i * lda + lidx] * xs;
     }
 
     return val;
@@ -109,6 +108,33 @@ __kernel void trsv_lnn(
     double __local cache[BLOCK_SIZE * BLOCK_SIZE];
     double regcache[BLOCK_SIZE / threadsy];
     double __local partSum[threadsy * BLOCK_SIZE];
+
+    int lidx = get_local_id(0);
+    int lidy = get_local_id(1);
+    //int tid = BLOCK_SIZE * lidy + lidx;
+
+    // Get row handled by this block
+    int row = 0;//nextRow(&sync[1]);
+
+    // Copy diagonal block to shared memory
+    tocache (&d_a[row * BLOCK_SIZE * n + row * BLOCK_SIZE], 0, 0, n, BLOCK_SIZE, tid, BLOCK_SIZE * threadsy, cache);
+    barrier(CLK_LOCAL_MEM_FENCE);
+
+    double val = d_b[row * BLOCK_SIZE + tid];
+    d_x[row * BLOCK_SIZE + tid] = dblkSolver(cache, BLOCK_SIZE, val);
+}
+
+/*__kernel void trsv_lnn_bak(
+    __global double *d_x,
+    __global double *d_a,
+    __global double *d_b,
+    __global int *sync,
+    const uint n
+){
+    int nblk = n / BLOCK_SIZE;
+    double __local cache[BLOCK_SIZE * BLOCK_SIZE];
+    double regcache[BLOCK_SIZE / threadsy];
+    double __local partSum[threadsy * BLOCK_SIZE];
     //double __local xlocal[BLOCK_SIZE];
 
     int lidx = get_local_id(0);
@@ -158,5 +184,4 @@ __kernel void trsv_lnn(
     if(tid==0)
         atomic_add(&sync[0], 1); // Use atomicAdd to bypass L1 miss
     barrier(CLK_GLOBAL_MEM_FENCE); // Flush sync[0] asap
-}
-
+}*/

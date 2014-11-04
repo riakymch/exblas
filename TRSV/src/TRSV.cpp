@@ -22,7 +22,7 @@ extern "C" int TRSVUNN(
     return 1;
 }
 
-// assume a row-wise storage
+// assume a column-wise storage
 extern "C" int TRSVLNU(
     double *x,
     const double *a,
