@@ -52,8 +52,7 @@ int nextRow(__global volatile int *address) {
 }
 
 /* Sets sync values correctly prior to call to trsv_ln_exec */
-__kernel __attribute__((reqd_work_group_size(BLOCK_SIZE, BLOCK_SIZE, 1)))
-void trsv_init(
+__kernel void trsv_init(
     __global int *sync
 ) {
    sync[0] = -1; // Last ready column
@@ -98,8 +97,8 @@ void tocache(
    }
 }
 
-__kernel __attribute__((reqd_work_group_size(BLOCK_SIZE, threadsy, 1)))
-void trsv_lnn(
+//__attribute__((reqd_work_group_size(BLOCK_SIZE, threadsy, 1)))
+__kernel void trsv_lnn(
     __global double *d_x,
     __global double *d_a,
     __global double *d_b,
@@ -144,17 +143,17 @@ void trsv_lnn(
         for (int j = 0; j < BLOCK_SIZE; j += threadsy)
             val += regcache[j / threadsy] * d_x[col * BLOCK_SIZE + j];
     }
-    partSum[lidy * BLOCK_SIZE + lidx] = val;
+    partSum[tid] = val;
     barrier(CLK_GLOBAL_MEM_FENCE);
 
-    /* Apply update from diagonal block (row, row) */
+    // Apply update from diagonal block (row, row)
     if (lidy == 0) {
         for(int i = 1; i < BLOCK_SIZE; i++)
             val += partSum[i * BLOCK_SIZE + lidx];
         d_x[row * BLOCK_SIZE + tid] = dblkSolver(cache, BLOCK_SIZE, val);
     }
 
-   // Notify other blocks that soln is ready for this row
+    // Notify other blocks that soln is ready for this row
     barrier(CLK_GLOBAL_MEM_FENCE); // Wait for d_x to be visible to other blocks
     if(tid==0)
         atomic_add(&sync[0], 1); // Use atomicAdd to bypass L1 miss

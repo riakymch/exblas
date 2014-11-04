@@ -219,9 +219,9 @@ int runTRSV(const char* program_file){
 
         double minTime = min(gpuTime, NUM_ITER);
         //TODO: not sure about this estimates
-        double throughput = 2.0 * __n * sizeof(double);
+        double throughput = __n * __n * sizeof(double);
         throughput = (throughput / minTime) * 1e-9;
-        double perf = 2.0 * __n;
+        double perf = __n * __n;
         perf = (perf / minTime) * 1e-9;
         printf("Alg = %u \t NbFPE = %u \t Range = %u \t NbRows = %u \t Time = %.8f s \t Throughput = %.4f GB/s\n\n", __alg, __nbfpe, __range, __n, minTime, throughput);
         printf("Alg = %u \t NbFPE = %u \t Range = %u \t NbRows = %u \t Time = %.8f s \t Performance = %.4f GFLOPS\n\n", __alg, __nbfpe, __range, __n, minTime, perf);
