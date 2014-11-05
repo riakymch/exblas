@@ -66,35 +66,21 @@ void tocache(
     const uint trans,
     const uint isunit,
     const uint lda,
-    const uint nbi,
-    uint tid,
-    const uint ntid,
     __local double *cache
 ) {
-   int x = tid % nbi;
-   int y = tid / nbi;
-   int ty = ntid / nbi;
+    int lidx = get_local_id(0);
+    int lidy = get_local_id(1);
 
-   if(trans == 0) {
-      for(int i = 0; i < nbi; i += ty) {
-         if(x > (i+y))
-            cache[(i+y) * nbi + x] = a[(i+y) * lda + x];
-         else if ((i+y) < nbi)
-            cache[(i+y) * nbi + x] = 0.0;
-         if ((!isunit) && (x == (i+y)))
-            cache[(i+y) * nbi + x] = 1 / a[(i+y) * lda + x];
-      }
+    if(trans == 0) {
+        for (int i = 0; i < BLOCK_SIZE; i++) {
+            if (lidx < (i + lidy))
+                cache[BLOCK_SIZE * lidx + lidy + i] = a[BLOCK_SIZE * lidx + lidy + i];
+            else
+                cache[BLOCK_SIZE * lidx + lidy + i] = 0.0;
+            if (isunit && (lidx == (i + lidy)))
+                cache[BLOCK_SIZE * lidx + lidy + i] = 1.0;
+        }
    }
-   /*} else {
-      for(int i=0; i<nbi; i+=ty) {
-         if (x > (i+y))
-            cache[(i+y)+nbi*x] = -a[(i+y)*lda+x];
-         else if((i+y)<nbi)
-            cache[(i+y)+nbi*x] = 0.0;
-         if ((isunit == 0) && (x==(i+y)))
-            cache[(i+y)+nbi*x] = 1 / a[(i+y)*lda+x];
-      }
-   }*/
 }
 
 //__attribute__((reqd_work_group_size(BLOCK_SIZE, threadsy, 1)))
@@ -114,7 +100,7 @@ __kernel void trsv_lnn(
     int tid  = BLOCK_SIZE * lidy + lidx;
 
     // Get row handled by this block
-    int row = nextRow(&sync[1]);
+    int row = 0; //nextRow(&sync[1]);
 
     /*if(row != 0)
         #pragma unroll
@@ -123,11 +109,7 @@ __kernel void trsv_lnn(
     */
 
     // Copy diagonal block to shared memory
-    //tocache(&d_a[row * BLOCK_SIZE * n + row * BLOCK_SIZE], 0, 0, n, BLOCK_SIZE, tid, BLOCK_SIZE * threadsy, &cache[0]);
-    //if (lidy == 0)
-    //    for (int i = 0; i < BLOCK_SIZE; i++)
-    //        cache[BLOCK_SIZE * i + lidx] = d_a[BLOCK_SIZE * i + lidx];
-    cache[BLOCK_SIZE * lidx + lidy] = d_a[BLOCK_SIZE * lidx + lidy];
+    tocache(&d_a[row * BLOCK_SIZE * n + row * BLOCK_SIZE], 0, 0, n, cache);
     barrier(CLK_LOCAL_MEM_FENCE);
 
     // Loop over blocks as they become available
