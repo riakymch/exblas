@@ -61,6 +61,7 @@ __kernel void trsv_init(
 /* Copies a nbi x nbi block of a to provided cache.
  * Copies -a and only the half triangle
  */
+//__attribute__((reqd_work_group_size(threadsx, threadsy, 1)))
 void tocache(
     __global const double *a,
     const uint trans,
@@ -72,16 +73,15 @@ void tocache(
     int lidy = get_local_id(1);
 
     if(trans == 0) {
-        // TODO: Improve -- should be threads only without the loop
-        for (int i = 0; i < threadsx; i++) {
-            if (lidx < (i + lidy))
-                cache[threadsx * lidx + lidy + i] = a[lda * lidx + lidy + i];
-            else
-                cache[threadsx * lidx + lidy + i] = 0.0;
-            if (isunit && (lidx == (i + lidy)))
-                cache[threadsx * lidx + lidy + i] = 1.0;
+        for (int j = 0; j < BLOCK_SIZE; j+=threadsy) {
+            if (lidx > (lidy + j))
+                cache[threadsx * (lidy + j) + lidx] = a[lda * (lidy + j) + lidx];
+            else if ((lidy + j) < BLOCK_SIZE)
+                cache[threadsx * (lidy + j) + lidx] = 0.0;
+            if (isunit && (lidx == (lidy + j)))
+                cache[threadsx * (lidy + j) + lidx] = 1.0;
         }
-   }
+    }
 }
 
 //__attribute__((reqd_work_group_size(threadsx, threadsy, 1)))
@@ -93,7 +93,6 @@ __kernel void trsv_lnn(
     const uint n
 ){
     __local double cache[threadsx * threadsx];
-    //double regcache[threadsx / threadsy];
     double __local partSum[threadsy * threadsx];
 
     int lidx = get_local_id(0);
@@ -102,12 +101,6 @@ __kernel void trsv_lnn(
 
     // Get row handled by this block
     int row = nextRow(&sync[1]);
-
-    /*if(row != 0)
-        #pragma unroll
-        for(int j = 0; j < threadsx; j += threadsy)
-            regcache[j / threadsy] = d_a[((row - 1) * threadsx + lidy) * n + row * threadsx + lidx + j * n];
-            */
 
     // Copy diagonal block to shared memory
     tocache(&d_a[row * threadsx * n + row * threadsx], 0, 0, n, cache);
@@ -121,12 +114,12 @@ __kernel void trsv_lnn(
 
     for (int col = 0; col < row; col++) {
         wait_until_ge(tid, &sync[0], col, &col_done); // Wait for diagonal block to be done
-        #ifdef NVIDIA
+        /*#ifdef NVIDIA
             #pragma unroll
-        #endif
-        for (int j = 0; j < threadsy; j++)
-            //val -= d_a[(col * threadsx + lidy) * n + row * n + lidx + j * n] * d_x[col * threadsx + lidy + j];
+        #endif*/
+        for (int j = 0; j < BLOCK_SIZE; j+=threadsy)
             val -= d_a[(col * threadsx + lidy) * n + row * threadsx + lidx + j * n] * d_x[col * threadsx + lidy + j];
+        //val -= d_a[(col * threadsx + lidy) * n + row * threadsx + lidx] * d_x[col * threadsx + lidy];
     }
     /*if (row != 0) {
         const int col = row - 1;
@@ -141,10 +134,7 @@ __kernel void trsv_lnn(
     if (lidy == 0) {
         for(int i = 1; i < threadsy; i++)
             val += partSum[i * threadsx + lidx];
-        if (row == 0)
-            d_x[row * threadsx + tid] = dblkSolver(cache, threadsx, val);
-        else
-            d_x[row * threadsx + tid] = dblkSolver(cache, threadsx, val);
+        d_x[row * threadsx + tid] = dblkSolver(cache, threadsx, val);
     }
 
     // Notify other blocks that soln is ready for this row

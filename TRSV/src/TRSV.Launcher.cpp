@@ -17,9 +17,11 @@
 #define TRSV_INIT "trsv_init"
 #define TRSV_KERNEL "trsv_lnn"
 #ifdef AMD
-  #define BLOCK_SIZE 32
+  #define THREADSX 32
+  #define THREADSY  8
 #else
-  #define BLOCK_SIZE 32
+  #define THREADSX 32
+  #define THREADSY  8
 #endif
 
 static size_t szKernelLength;                  //Byte size of kernel code
@@ -33,7 +35,7 @@ static cl_mem           d_sync;
 #ifdef AMD
 static char  compileOptions[256] = "-DBLOCK_SIZE=32";
 #else
-static char  compileOptions[256] = "-DNVIDIA -Dthreadsx=32 -Dthreadsy=8 -cl-mad-enable -cl-fast-relaxed-math"; // -cl-nv-verbose";
+static char  compileOptions[256] = "-DNVIDIA -DBLOCK_SIZE=32 -Dthreadsx=32 -Dthreadsy=8 -cl-mad-enable -cl-fast-relaxed-math"; // -cl-nv-verbose";
 #endif
 
 
@@ -159,9 +161,8 @@ extern "C" size_t TRSV(
         }
     }
     {
-        size_t NbThreadsPerWorkGroup[] = {BLOCK_SIZE, BLOCK_SIZE / 4};
-        //size_t TotalNbThreads[] = {n, (n + 1) / 2};
-        size_t TotalNbThreads[] = {n, BLOCK_SIZE};
+        size_t NbThreadsPerWorkGroup[] = {THREADSX, THREADSY};
+        size_t TotalNbThreads[] = {n, THREADSY};
 
         uint i = 0;
         ciErrNum  = clSetKernelArg(ckKernel, i++, sizeof(cl_mem),  (void *)&d_x);
@@ -175,7 +176,7 @@ extern "C" size_t TRSV(
             return 0;
         }
 
-        ciErrNum = clEnqueueNDRangeKernel(cqCommandQueue, ckKernel, 1, NULL, TotalNbThreads, NbThreadsPerWorkGroup, 0, NULL, NULL);
+        ciErrNum = clEnqueueNDRangeKernel(cqCommandQueue, ckKernel, 2, NULL, TotalNbThreads, NbThreadsPerWorkGroup, 0, NULL, NULL);
         if (ciErrNum != CL_SUCCESS) {
             printf("Error in clEnqueueNDRangeKernel, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
             *ciErrNumRes = EXIT_FAILURE;
