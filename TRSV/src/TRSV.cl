@@ -16,7 +16,7 @@ double dblkSolver(__local double *a, int lda, double val){
     #ifdef NVIDIA
        #pragma unroll
     #endif
-    for (uint i = 0; i < BLOCK_SIZE; i++) {
+    for (uint i = 0; i < threadsx; i++) {
         if (lidx == i)
             xs = val;
         if (lidx > i)
@@ -72,18 +72,18 @@ void tocache(
     int lidy = get_local_id(1);
 
     if(trans == 0) {
-        for (int i = 0; i < BLOCK_SIZE; i++) {
+        for (int i = 0; i < threadsx; i++) {
             if (lidx < (i + lidy))
-                cache[BLOCK_SIZE * lidx + lidy + i] = a[lda * lidx + lidy + i];
+                cache[threadsx * lidx + lidy + i] = a[lda * lidx + lidy + i];
             else
-                cache[BLOCK_SIZE * lidx + lidy + i] = 0.0;
+                cache[threadsx * lidx + lidy + i] = 0.0;
             if (isunit && (lidx == (i + lidy)))
-                cache[BLOCK_SIZE * lidx + lidy + i] = 1.0;
+                cache[threadsx * lidx + lidy + i] = 1.0;
         }
    }
 }
 
-//__attribute__((reqd_work_group_size(BLOCK_SIZE, threadsy, 1)))
+//__attribute__((reqd_work_group_size(threadsx, threadsy, 1)))
 __kernel void trsv_lnn(
     __global double *d_x,
     __global double *d_a,
@@ -91,43 +91,47 @@ __kernel void trsv_lnn(
     __global int *sync,
     const uint n
 ){
-    __local double cache[BLOCK_SIZE * BLOCK_SIZE];
-    //double regcache[BLOCK_SIZE / threadsy];
-    double __local partSum[threadsy * BLOCK_SIZE];
+    __local double cache[threadsx * threadsx];
+    //double regcache[threadsx / threadsy];
+    //double __local partSum[threadsy * threadsx];
 
     int lidx = get_local_id(0);
     int lidy = get_local_id(1);
-    int tid  = BLOCK_SIZE * lidy + lidx;
+    int tid  = threadsx * lidy + lidx;
 
     // Get row handled by this block
     int row = nextRow(&sync[1]);
 
     /*if(row != 0)
         #pragma unroll
-        for(int j = 0; j < BLOCK_SIZE; j += threadsy)
-            regcache[j / threadsy] = d_a[((row - 1) * BLOCK_SIZE + lidy) * n + row * BLOCK_SIZE + lidx + j * n];
+        for(int j = 0; j < threadsx; j += threadsy)
+            regcache[j / threadsy] = d_a[((row - 1) * threadsx + lidy) * n + row * threadsx + lidx + j * n];
             */
 
     // Copy diagonal block to shared memory
-    tocache(&d_a[row * BLOCK_SIZE * n + row * BLOCK_SIZE], 0, 0, n, cache);
+    tocache(&d_a[row * threadsx * n + row * threadsx], 0, 0, n, cache);
     barrier(CLK_LOCAL_MEM_FENCE);
 
     // Loop over blocks as they become available
     double val = 0.0;
     if(lidy == 0)
-        val = d_b[row * BLOCK_SIZE + lidx];
+        val = d_b[row * threadsx + lidx];
     int col_done = -1;
 
     /*for (int col = 0; col < row; col++) {
         wait_until_ge(tid, &sync[0], col, &col_done); // Wait for diagonal block to be done
-        for (int j = 0; j < BLOCK_SIZE; j += threadsy)
-            val -= d_a[(col * BLOCK_SIZE + lidy) * n + row * n + lidx + j * n] * d_x[col * BLOCK_SIZE + j];
+        #ifdef NVIDIA
+            #pragma unroll
+        #endif
+        for (int j = 0; j < threadsx; j += threadsy)
+            val -= d_a[(col * threadsx + lidy) * n + row * n + lidx + j * n] * d_x[col * threadsx + lidy + j];
+        val = 100;
     }*/
     /*if (row != 0) {
         const int col = row - 1;
         wait_until_ge(tid, &sync[0], col, &col_done); // Wait for diagonal block to be done
-        for (int j = 0; j < BLOCK_SIZE; j += threadsy)
-            val += regcache[j / threadsy] * d_x[col * BLOCK_SIZE + j];
+        for (int j = 0; j < threadsx; j += threadsy)
+            val += regcache[j / threadsy] * d_x[col * threadsx + j];
     }*/
     //partSum[tid] = val;
     barrier(CLK_GLOBAL_MEM_FENCE);
@@ -135,13 +139,13 @@ __kernel void trsv_lnn(
     // Apply update from diagonal block (row, row)
     if (lidy == 0) {
         /*for(int i = 1; i < threadsy; i++)
-            val += partSum[i * BLOCK_SIZE + lidx];*/
-        d_x[row * BLOCK_SIZE + lidx] = dblkSolver(cache, BLOCK_SIZE, val);
+            val += partSum[i * threadsx + lidx];*/
+        d_x[row * threadsx + tid] = dblkSolver(cache, threadsx, val);
     }
 
     // Notify other blocks that soln is ready for this row
     barrier(CLK_GLOBAL_MEM_FENCE); // Wait for d_x to be visible to other blocks
-    if(tid==0)
+    if(tid == 0)
         atomic_add(&sync[0], 1);   // Use atomicAdd to bypass L1 miss
     barrier(CLK_GLOBAL_MEM_FENCE); // Flush sync[0] asap
 }
@@ -153,52 +157,52 @@ __kernel void trsv_lnn(
     __global int *sync,
     const uint n
 ){
-    int nblk = n / BLOCK_SIZE;
-    double __local cache[BLOCK_SIZE * BLOCK_SIZE];
-    double regcache[BLOCK_SIZE / threadsy];
-    double __local partSum[threadsy * BLOCK_SIZE];
-    //double __local xlocal[BLOCK_SIZE];
+    int nblk = n / threadsx;
+    double __local cache[threadsx * threadsx];
+    double regcache[threadsx / threadsy];
+    double __local partSum[threadsy * threadsx];
+    //double __local xlocal[threadsx];
 
     int lidx = get_local_id(0);
     int lidy = get_local_id(1);
-    int tid = BLOCK_SIZE * lidy + lidx;
+    int tid = threadsx * lidy + lidx;
 
     // Get row handled by this block
     int row = nextRow(&sync[1]);
 
     if(row != 0)
         #pragma unroll
-        for(int j = 0; j < BLOCK_SIZE; j += threadsy)
-            regcache[j / threadsy] = d_a[((row - 1) * BLOCK_SIZE + lidy) * n + row * BLOCK_SIZE + lidx + j * n];
+        for(int j = 0; j < threadsx; j += threadsy)
+            regcache[j / threadsy] = d_a[((row - 1) * threadsx + lidy) * n + row * threadsx + lidx + j * n];
 
     // Copy diagonal block to shared memory
-    tocache (&d_a[row * BLOCK_SIZE * n + row * BLOCK_SIZE], 0, 0, n, BLOCK_SIZE, tid, BLOCK_SIZE * threadsy, cache);
+    tocache (&d_a[row * threadsx * n + row * threadsx], 0, 0, n, BLOCK_SIZE, tid, BLOCK_SIZE * threadsy, cache);
     barrier(CLK_GLOBAL_MEM_FENCE);
 
     // Loop over blocks as they become available
     double val = 0.0;
     if(lidy == 0)
-        val = -d_b[row * BLOCK_SIZE + lidx];
+        val = -d_b[row * threadsx + lidx];
     int col_done = -1;
     for (int col = 0; col < row - 1; col++) {
         wait_until_ge(tid, &sync[0], col, &col_done); // Wait for diagonal block to be done
-        for (int j = 0; j < BLOCK_SIZE; j += threadsy)
-            val -= d_a[(col * BLOCK_SIZE + lidy) * n + row * n + lidx + j * n] * d_x[col * BLOCK_SIZE + j];
+        for (int j = 0; j < threadsx; j += threadsy)
+            val -= d_a[(col * threadsx + lidy) * n + row * n + lidx + j * n] * d_x[col * threadsx + j];
     }
     if (row != 0) {
         const int col = row - 1;
         wait_until_ge(tid, &sync[0], col, &col_done); // Wait for diagonal block to be done
-        for (int j = 0; j < BLOCK_SIZE; j += threadsy)
-            val += regcache[j / threadsy] * d_x[col * BLOCK_SIZE + j];
+        for (int j = 0; j < threadsx; j += threadsy)
+            val += regcache[j / threadsy] * d_x[col * threadsx + j];
     }
     partSum[tid] = val;
     barrier(CLK_GLOBAL_MEM_FENCE);
 
     // Apply update from diagonal block (row, row)
     if (lidy == 0) {
-        for(int i = 1; i < BLOCK_SIZE; i++)
-            val += partSum[i * BLOCK_SIZE + lidx];
-        d_x[row * BLOCK_SIZE + tid] = dblkSolver(cache, BLOCK_SIZE, val);
+        for(int i = 1; i < threadsx; i++)
+            val += partSum[i * threadsx + lidx];
+        d_x[row * threadsx + tid] = dblkSolver(cache, threadsx, val);
     }
 
     // Notify other blocks that soln is ready for this row

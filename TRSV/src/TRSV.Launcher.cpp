@@ -33,7 +33,7 @@ static cl_mem           d_sync;
 #ifdef AMD
 static char  compileOptions[256] = "-DBLOCK_SIZE=32";
 #else
-static char  compileOptions[256] = "-DNVIDIA -DBLOCK_SIZE=32 -Dthreadsy=32 -cl-mad-enable -cl-fast-relaxed-math"; // -cl-nv-verbose";
+static char  compileOptions[256] = "-DNVIDIA -Dthreadsx=32 -Dthreadsy=32 -cl-mad-enable -cl-fast-relaxed-math"; // -cl-nv-verbose";
 #endif
 
 
