@@ -33,7 +33,7 @@ static cl_mem           d_sync;
 #ifdef AMD
 static char  compileOptions[256] = "-DBLOCK_SIZE=32";
 #else
-static char  compileOptions[256] = "-DNVIDIA -Dthreadsx=32 -Dthreadsy=32 -cl-mad-enable -cl-fast-relaxed-math"; // -cl-nv-verbose";
+static char  compileOptions[256] = "-DNVIDIA -Dthreadsx=32 -Dthreadsy=8 -cl-mad-enable -cl-fast-relaxed-math"; // -cl-nv-verbose";
 #endif
 
 
@@ -159,7 +159,7 @@ extern "C" size_t TRSV(
         }
     }
     {
-        size_t NbThreadsPerWorkGroup[] = {BLOCK_SIZE, BLOCK_SIZE};
+        size_t NbThreadsPerWorkGroup[] = {BLOCK_SIZE, BLOCK_SIZE / 4};
         //size_t TotalNbThreads[] = {n, (n + 1) / 2};
         size_t TotalNbThreads[] = {n, BLOCK_SIZE};
 

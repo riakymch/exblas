@@ -72,6 +72,7 @@ void tocache(
     int lidy = get_local_id(1);
 
     if(trans == 0) {
+        // TODO: Improve -- should be threads only without the loop
         for (int i = 0; i < threadsx; i++) {
             if (lidx < (i + lidy))
                 cache[threadsx * lidx + lidy + i] = a[lda * lidx + lidy + i];
@@ -123,9 +124,9 @@ __kernel void trsv_lnn(
         #ifdef NVIDIA
             #pragma unroll
         #endif
-        for (int j = 0; j < threadsx; j++)
+        for (int j = 0; j < threadsy; j++)
             //val -= d_a[(col * threadsx + lidy) * n + row * n + lidx + j * n] * d_x[col * threadsx + lidy + j];
-            val -= d_a[(col * threadsx + lidx) * n + row * threadsx + lidy + j] * d_x[col * threadsx + lidy + j];
+            val -= d_a[(col * threadsx + lidy) * n + row * threadsx + lidx + j * n] * d_x[col * threadsx + lidy + j];
     }
     /*if (row != 0) {
         const int col = row - 1;
