@@ -161,7 +161,7 @@ extern "C" size_t TRSV(
     {
         size_t NbThreadsPerWorkGroup[] = {BLOCK_SIZE, BLOCK_SIZE};
         //size_t TotalNbThreads[] = {n, (n + 1) / 2};
-        size_t TotalNbThreads[] = {BLOCK_SIZE, BLOCK_SIZE};
+        size_t TotalNbThreads[] = {n, BLOCK_SIZE};
 
         uint i = 0;
         ciErrNum  = clSetKernelArg(ckKernel, i++, sizeof(cl_mem),  (void *)&d_x);

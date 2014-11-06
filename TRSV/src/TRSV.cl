@@ -93,7 +93,7 @@ __kernel void trsv_lnn(
 ){
     __local double cache[threadsx * threadsx];
     //double regcache[threadsx / threadsy];
-    //double __local partSum[threadsy * threadsx];
+    double __local partSum[threadsy * threadsx];
 
     int lidx = get_local_id(0);
     int lidy = get_local_id(1);
@@ -118,29 +118,32 @@ __kernel void trsv_lnn(
         val = d_b[row * threadsx + lidx];
     int col_done = -1;
 
-    /*for (int col = 0; col < row; col++) {
+    for (int col = 0; col < row; col++) {
         wait_until_ge(tid, &sync[0], col, &col_done); // Wait for diagonal block to be done
         #ifdef NVIDIA
             #pragma unroll
         #endif
-        for (int j = 0; j < threadsx; j += threadsy)
-            val -= d_a[(col * threadsx + lidy) * n + row * n + lidx + j * n] * d_x[col * threadsx + lidy + j];
-        val = 100;
-    }*/
+        for (int j = 0; j < threadsx; j++)
+            //val -= d_a[(col * threadsx + lidy) * n + row * n + lidx + j * n] * d_x[col * threadsx + lidy + j];
+            val -= d_a[(col * threadsx + lidx) * n + row * threadsx + lidy + j] * d_x[col * threadsx + lidy + j];
+    }
     /*if (row != 0) {
         const int col = row - 1;
         wait_until_ge(tid, &sync[0], col, &col_done); // Wait for diagonal block to be done
         for (int j = 0; j < threadsx; j += threadsy)
             val += regcache[j / threadsy] * d_x[col * threadsx + j];
     }*/
-    //partSum[tid] = val;
-    barrier(CLK_GLOBAL_MEM_FENCE);
+    partSum[tid] = val;
+    barrier(CLK_LOCAL_MEM_FENCE);
 
     // Apply update from diagonal block (row, row)
     if (lidy == 0) {
-        /*for(int i = 1; i < threadsy; i++)
-            val += partSum[i * threadsx + lidx];*/
-        d_x[row * threadsx + tid] = dblkSolver(cache, threadsx, val);
+        for(int i = 1; i < threadsy; i++)
+            val += partSum[i * threadsx + lidx];
+        if (row == 0)
+            d_x[row * threadsx + tid] = dblkSolver(cache, threadsx, val);
+        else
+            d_x[row * threadsx + tid] = dblkSolver(cache, threadsx, val);
     }
 
     // Notify other blocks that soln is ready for this row
