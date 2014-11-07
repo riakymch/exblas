@@ -11,7 +11,8 @@
 ////////////////////////////////////////////////////////////////////////////////
 double dblkSolver(
     __local double *a,
-    int lda,
+    const uint isunit,
+    const int lda,
     double val
 ){
     volatile __local double xs;
@@ -21,10 +22,13 @@ double dblkSolver(
        #pragma unroll
     #endif
     for (uint i = 0; i < BLOCK_SIZE; i++) {
-        if (lidx == i)
+        if (lidx == i) {
+            if (!isunit)
+                val *= a[i * (lda + 1)];
             xs = val;
+        }
         if (lidx > i)
-            val -= a[i * lda + lidx] * xs;
+            val += a[i * lda + lidx] * xs;
     }
 
     return val;
@@ -99,11 +103,11 @@ void tocache(
         }*/
         for (int i = 0; i < nbi; i += ty) {
             if (x > (i + y))
-                cache[(i + y) * nbi + x] = a[(i + y) * lda + x];
+                cache[(i + y) * nbi + x] = -a[(i + y) * lda + x];
             else if ((i + y) < nbi)
                 cache[(i + y) * nbi + x] = 0.0;
-            if (isunit && (x == (i + y)))
-                cache[(i + y) * nbi + x] = 1.0 / a[(i + y) * lda + x];
+            if (!isunit && (x == (i + y)))
+                cache[x * (nbi + 1)] = 1.0 / a[x * (lda + 1)];
         }
     }
 }
@@ -124,6 +128,7 @@ __kernel void trsv_lnn(
     int lidx = get_local_id(0);
     int lidy = get_local_id(1);
     int tid  = threadsx * lidy + lidx;
+    int isunit = 0;
 
     // Get row handled by this block
     int row = nextRow(&sync[1]);
@@ -136,7 +141,7 @@ __kernel void trsv_lnn(
             regcache[j / threadsy] = d_a[((row - 1) * BLOCK_SIZE + lidy) * n + row * BLOCK_SIZE + lidx + j * n];
     */
     // Copy diagonal block to shared memory
-    tocache(&d_a[row * BLOCK_SIZE * n + row * BLOCK_SIZE], BLOCK_SIZE, threadsx * threadsy, 0, 0, tid, n, cache);
+    tocache(&d_a[row * BLOCK_SIZE * n + row * BLOCK_SIZE], BLOCK_SIZE, threadsx * threadsy, 0, isunit, tid, n, cache);
     barrier(CLK_LOCAL_MEM_FENCE);
 
     // Loop over blocks as they become available
@@ -177,7 +182,7 @@ __kernel void trsv_lnn(
         val = -val;
 
         barrier(CLK_LOCAL_MEM_FENCE);
-        val = dblkSolver(cache, BLOCK_SIZE, val);
+        val = dblkSolver(cache, isunit, BLOCK_SIZE, val);
         d_x[row * BLOCK_SIZE + tid] = val;
     }
 

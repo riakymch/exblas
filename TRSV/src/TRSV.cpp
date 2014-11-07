@@ -28,10 +28,11 @@ extern "C" int TRSVLNU(
     const double *a,
     const int n
 ) {
-    for(int j = 0; j < n - 1; j++)
+    for(int j = 0; j < n - 1; j++) {
+        x[j] = x[j] / a[j * (n + 1)];
         for(int i = j + 1; i < n; i++)
-            x[i] = x[i] - a[j * n + i] * x[j];
-
+            x[i]  = x[i] - a[j * n + i] * x[j];
+    }
     return 1;
 }
 
@@ -96,10 +97,11 @@ extern "C" bool compareTRSVLNUToMPFR(
     const int n,
     const double epsilon
 ) {
-    mpfr_t sum, dot, op1;
+    mpfr_t sum, dot, div, op1;
 
     mpfr_init2(op1, 64);
     mpfr_init2(dot, 128);
+    mpfr_init2(div, 128);
     mpfr_init2(sum, 4196);
 
     //Produce a result matrix of TRSV using MPFR
@@ -110,7 +112,9 @@ extern "C" bool compareTRSVLNUToMPFR(
             mpfr_mul_d(dot, op1, b[j], MPFR_RNDN);
             mpfr_sub(sum, sum, dot, MPFR_RNDN);
         }
-        b[i] = mpfr_get_d(sum, MPFR_RNDD);
+        mpfr_div_d(div, sum, a[i * (n + 1)], MPFR_RNDN);
+        b[i] = mpfr_get_d(div, MPFR_RNDD);
+        //b[i] = mpfr_get_d(sum, MPFR_RNDD);
     }
 
     double norm = 0.0;
