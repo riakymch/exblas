@@ -21,7 +21,7 @@
   #define THREADSY  8
 #else
   #define THREADSX 32
-  #define THREADSY  8
+  #define THREADSY  4
 #endif
 
 static size_t szKernelLength;                  //Byte size of kernel code
@@ -35,7 +35,7 @@ static cl_mem           d_sync;
 #ifdef AMD
 static char  compileOptions[256] = "-DBLOCK_SIZE=32";
 #else
-static char  compileOptions[256] = "-DNVIDIA -DBLOCK_SIZE=32 -Dthreadsx=32 -Dthreadsy=8 -cl-mad-enable -cl-fast-relaxed-math"; // -cl-nv-verbose";
+static char  compileOptions[256] = "-DNVIDIA -DBLOCK_SIZE=32 -Dthreadsx=32 -Dthreadsy=4 -cl-mad-enable -cl-fast-relaxed-math"; // -cl-nv-verbose";
 #endif
 
 
