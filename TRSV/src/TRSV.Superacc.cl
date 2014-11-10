@@ -59,7 +59,7 @@ double OddRoundSumNonnegative(double th, double tl) {
     return thdb.d;
 }
 
-int Normalize(__global long *accumulator, int *imin, int *imax) {
+int Normalize(__local long *accumulator, int *imin, int *imax) {
     if (*imin > *imax)
         return 0;
 
@@ -94,7 +94,7 @@ int Normalize(__global long *accumulator, int *imin, int *imax) {
     return carry_in < 0;
 }
 
-double Round(__global long *accumulator) {
+double Round(__local long *accumulator) {
     int imin = 0;
     int imax = 75;
     int negative = Normalize(accumulator, &imin, &imax);
@@ -211,17 +211,42 @@ double dblkSolver(
     volatile __local double xs;
     uint lidx = get_local_id(0);
 
+    __local long l_sa[BLOCK_SIZE * BIN_COUNT] __attribute__((aligned(8)));
+    __local long *l_working = l_sa + (get_local_id(0) & (BLOCK_SIZE - 1));
+
+    //Initialize accumulators
+    for (uint i = 0; i < BIN_COUNT; i++)
+        l_working[i * BLOCK_SIZE] = 0;
+    //Accumulate val
+    Accumulate(l_working, val);
+    barrier(CLK_LOCAL_MEM_FENCE);
+
     #ifdef NVIDIA
        #pragma unroll
     #endif
     for (uint i = 0; i < BLOCK_SIZE; i++) {
         if (lidx == i) {
-            if (!isunit)
+            val = Round(l_working);
+            if (!isunit) {
+                /*//TODO: this part could be and should be done without using Kulisch accumulator
+                double r = 0.0;
+                double x = TwoProductFMA(val, a[i * (lda + 1)], &r);
+
+                Accumulate(l_working, x);
+                if (r != 0.0)
+                    Accumulate(l_working, r);*/
                 val *= a[i * (lda + 1)];
+            }
             xs = val;
         }
-        if (lidx > i)
-            val += a[i * lda + lidx] * xs;
+        if (lidx > i) {
+            double r = 0.0;
+            double x = TwoProductFMA(xs, a[i * lda + lidx], &r);
+
+            Accumulate(l_working, x);
+            if (r != 0.0)
+                Accumulate(l_working, r);
+        }
     }
 
     return val;
@@ -307,6 +332,7 @@ void tocache(
 
 //__attribute__((reqd_work_group_size(threadsx, threadsy, 1)))
 __kernel void trsv_lnn(
+    //__global long *d_Superaccs,
     __global double *d_x,
     __global double *d_a,
     __global double *d_b,
@@ -315,8 +341,6 @@ __kernel void trsv_lnn(
 ){
     __local double cache[BLOCK_SIZE * BLOCK_SIZE];
     __local double partSum[threadsy * threadsx];
-    //__local double xlocal[BLOCK_SIZE];
-    //double regcache[threadsx / threadsy];
 
     int lidx = get_local_id(0);
     int lidy = get_local_id(1);
@@ -326,13 +350,6 @@ __kernel void trsv_lnn(
     // Get row handled by this block
     int row = nextRow(&sync[1]);
 
-    /*if(row != 0)
-        #ifdef NVIDIA
-            #pragma unroll
-        #endif
-        for(int j = 0; j < BLOCK_SIZE; j += threadsy)
-            regcache[j / threadsy] = d_a[((row - 1) * BLOCK_SIZE + lidy) * n + row * BLOCK_SIZE + lidx + j * n];
-    */
     // Copy diagonal block to shared memory
     tocache(&d_a[row * BLOCK_SIZE * n + row * BLOCK_SIZE], BLOCK_SIZE, threadsx * threadsy, 0, isunit, tid, n, cache);
     barrier(CLK_LOCAL_MEM_FENCE);
@@ -345,26 +362,12 @@ __kernel void trsv_lnn(
 
     for (int col = 0; col < row; col++) {
         wait_until_ge(tid, &sync[0], col, &col_done); // Wait for diagonal block to be done
-        //__local double *xl = xlocal + lidy;
-        //xlocal[tid] = d_x[col * BLOCK_SIZE + tid];
-        //barrier(CLK_LOCAL_MEM_FENCE);
         #ifdef NVIDIA
             #pragma unroll
         #endif
         for (int j = 0; j < BLOCK_SIZE; j+=threadsy)
             val += d_a[(col * BLOCK_SIZE + lidy) * n + row * BLOCK_SIZE + lidx + j * n] * d_x[col * BLOCK_SIZE + lidy + j];
-            //val += d_a[(col * BLOCK_SIZE + lidy) * n + row * BLOCK_SIZE + lidx + j * n] * xl[j];
     }
-    /*if (row != 0) {
-        const int col = row - 1;
-        wait_until_ge(tid, &sync[0], col, &col_done); // Wait for diagonal block to be done
-        //__local double *xl = xlocal + lidy;
-        //xlocal[tid] = d_x[col * BLOCK_SIZE + tid];
-        //barrier(CLK_LOCAL_MEM_FENCE);
-        for (int j = 0; j < BLOCK_SIZE; j += threadsy)
-            val += regcache[j / threadsy] * d_x[col * BLOCK_SIZE + lidy + j];
-            //val += regcache[j / threadsy] * xl[j];
-    }*/
     partSum[lidy * threadsx + lidx] = val;
     barrier(CLK_LOCAL_MEM_FENCE);
 
