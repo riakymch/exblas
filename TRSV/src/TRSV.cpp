@@ -28,11 +28,19 @@ extern "C" int TRSVLNU(
     const double *a,
     const int n
 ) {
-    for(int j = 0; j < n - 1; j++) {
+    /*//fails
+     for(int j = 0; j < n - 1; j++) {
         x[j] = x[j] / a[j * (n + 1)];
         for(int i = j + 1; i < n; i++)
             x[i]  = x[i] - a[j * n + i] * x[j];
+    }*/
+    for(int i = 0; i < n; i++) {
+        double sum = x[i];
+        for(int j = 0; j < i; j++)
+            sum = sum - a[j * n + i] * x[j];
+        x[i] = sum / a[i * (n + 1)];
     }
+
     return 1;
 }
 
@@ -111,7 +119,7 @@ extern "C" bool compareTRSVLNUToMPFR(
     mpfr_init2(sum, 4196);
 
     //Produce a result matrix of TRSV using MPFR
-    for(int i = 1; i < n; i++) {
+    for(int i = 0; i < n; i++) {
         mpfr_set_d(sum, b[i], MPFR_RNDN);
         for(int j = 0; j < i; j++) {
             mpfr_set_d(op1, a[j * n + i], MPFR_RNDN);
@@ -123,7 +131,6 @@ extern "C" bool compareTRSVLNUToMPFR(
         //b[i] = mpfr_get_d(sum, MPFR_RNDN);
     }
 
-    printVector(trsv, n);
     printVector(b, n);
     double norm_diff = 0.0;
     double norm_exact = 0.0;
