@@ -173,7 +173,7 @@ int runTRSV(const char* program_file){
         }
 
         printf("Initializing OpenCL TRSV...\n");
-            ciErrNum = initTRSV(cxGPUContext, cqCommandQueue, cdDevice, program_file, __nbfpe);
+            ciErrNum = initTRSV(cxGPUContext, cqCommandQueue, cdDevice, program_file, __n, __alg, __nbfpe);
 
             if (ciErrNum != CL_SUCCESS)
                 cleanUp(EXIT_FAILURE);

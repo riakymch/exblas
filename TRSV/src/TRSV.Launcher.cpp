@@ -25,12 +25,14 @@
 #endif
 
 static size_t szKernelLength;                  //Byte size of kernel code
-static char* cSources = NULL;                  //Buffer to hold source for compilation
+static char*  cSources = NULL;                 //Buffer to hold source for compilation
 
 static cl_program       cpProgram;             //OpenCL program
 static cl_kernel        ckInit, ckKernel;
 static cl_command_queue cqDefaultCommandQue;   //Default command queue
 static cl_mem           d_sync;
+static cl_mem           d_Superaccs;
+static uint             __alg;
 
 #ifdef AMD
 static char  compileOptions[256] = "-DBLOCK_SIZE=32";
@@ -44,6 +46,8 @@ extern "C" cl_int initTRSV(
     cl_command_queue cqParamCommandQue,
     cl_device_id cdDevice,
     const char* program_file,
+    const uint n,
+    const uint alg,
     const uint NbFPE
 ){
     cl_int ciErrNum;
@@ -98,14 +102,22 @@ extern "C" cl_int initTRSV(
         }
 
     printf("...allocating internal buffer\n");
+        if (alg) {
+            d_Superaccs = clCreateBuffer(cxGPUContext, CL_MEM_READ_WRITE, n * BIN_COUNT * sizeof(cl_long), NULL, &ciErrNum);
+            if (ciErrNum != CL_SUCCESS) {
+                printf("Error in clCreateBuffer, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
+                return EXIT_FAILURE;
+            }
+        }
         d_sync = clCreateBuffer(cxGPUContext, CL_MEM_READ_WRITE, 2 * sizeof(cl_int), NULL, &ciErrNum);
         if (ciErrNum != CL_SUCCESS) {
             printf("Error in clCreateBuffer, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
             return EXIT_FAILURE;
         }
 
-    //Save default command queue
+    //Save default command queue and algorithm's number
     cqDefaultCommandQue = cqParamCommandQue;
+    __alg = alg;
 
     //Discard temp storage
     free(cSources);
@@ -117,6 +129,8 @@ extern "C" void closeTRSV(void){
     cl_int ciErrNum;
 
     ciErrNum  = clReleaseMemObject(d_sync);
+    if (__alg)
+        ciErrNum  = clReleaseMemObject(d_Superaccs);
     ciErrNum |= clReleaseKernel(ckInit);
     ciErrNum |= clReleaseKernel(ckKernel);
     ciErrNum |= clReleaseProgram(cpProgram);
@@ -169,6 +183,8 @@ extern "C" size_t TRSV(
         ciErrNum |= clSetKernelArg(ckKernel, i++, sizeof(cl_mem),  (void *)&d_a);
         ciErrNum |= clSetKernelArg(ckKernel, i++, sizeof(cl_mem),  (void *)&d_b);
         ciErrNum |= clSetKernelArg(ckKernel, i++, sizeof(cl_mem),  (void *)&d_sync);
+        if (__alg)
+            ciErrNum |= clSetKernelArg(ckKernel, i++, sizeof(cl_mem),  (void *)&d_Superaccs);
         ciErrNum |= clSetKernelArg(ckKernel, i++, sizeof(cl_uint), (void *)&n);
         if (ciErrNum != CL_SUCCESS) {
             printf("Error in clSetKernelArg, Line %u in file %s !!!\n\n", __LINE__, __FILE__);

@@ -95,6 +95,8 @@ extern "C" cl_int initTRSV(
     cl_command_queue cqParamCommandQue,
     cl_device_id cdDevice,
     const char* program_file,
+    const uint n,
+    const uint alg,
     const uint NbFPE
 );
 
