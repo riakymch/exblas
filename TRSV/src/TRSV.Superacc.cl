@@ -306,7 +306,6 @@ __kernel void trsv_lnn(
     barrier(CLK_LOCAL_MEM_FENCE);
 
     // Loop over blocks as they become available
-    double val = 0.0;
     if(lidy == 0) {
         //Initialize accumulators
         for (uint i = 0; i < BIN_COUNT; i++)
@@ -316,14 +315,17 @@ __kernel void trsv_lnn(
     barrier(CLK_LOCAL_MEM_FENCE);
     int col_done = -1;
 
+    double x, r, xp;
     for (int col = 0; col < row; col++) {
         wait_until_ge(tid, &sync[0], col, &col_done); // Wait for diagonal block to be done
         #ifdef NVIDIA
             #pragma unroll
         #endif
         for (int j = 0; j < BLOCK_SIZE; j+=threadsy) {
-            double r = 0.0;
-            double x = TwoProductFMA(d_a[(col * BLOCK_SIZE + lidy) * n + row * BLOCK_SIZE + lidx + j * n], d_x[col * BLOCK_SIZE + lidy + j], &r);
+            r = 0.0;
+            xp = -d_x[col * BLOCK_SIZE + lidy + j];
+            x = TwoProductFMA(d_a[(col * BLOCK_SIZE + lidy) * n + row * BLOCK_SIZE + lidx + j * n], xp, &r);
+            //x = TwoProductFMA(d_a[(col * BLOCK_SIZE + lidy) * n + row * BLOCK_SIZE + lidx + j * n], d_x[col * BLOCK_SIZE + lidy + j], &r);
 
             Accumulate(l_working, x);
             if (r != 0.0)
@@ -339,6 +341,7 @@ __kernel void trsv_lnn(
         //    l_working[i * BIN_COUNT] = -l_working[i * BIN_COUNT];
         //barrier(CLK_LOCAL_MEM_FENCE);
 
+        double val = 0.0;
         __local volatile double xs;
         #ifdef NVIDIA
             #pragma unroll
@@ -351,8 +354,8 @@ __kernel void trsv_lnn(
                 xs = val;
             }
             if (lidx > i) {
-                double r = 0.0;
-                double x = TwoProductFMA(xs, cache[i * BLOCK_SIZE + lidx], &r);
+                r = 0.0;
+                x = TwoProductFMA(xs, cache[i * BLOCK_SIZE + lidx], &r);
 
                 Accumulate(l_working, x);
                 if (r != 0.0)
