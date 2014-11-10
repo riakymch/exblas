@@ -271,7 +271,7 @@ void tocache(
         }*/
         for (int i = 0; i < nbi; i += ty) {
             if (x > (i + y))
-                cache[(i + y) * nbi + x] = a[(i + y) * lda + x];
+                cache[(i + y) * nbi + x] = -a[(i + y) * lda + x];
             else if ((i + y) < nbi)
                 cache[(i + y) * nbi + x] = 0.0;
             if (!isunit && (x == (i + y)))
@@ -295,12 +295,8 @@ __kernel void trsv_lnn(
     int tid  = threadsx * lidy + lidx;
     int isunit = 0;
 
+    //__global long *l_working = d_Superaccs + get_group_id(1) * threadsy * threadsx * BIN_COUNT + (get_local_id(0) & (BLOCK_SIZE - 1));
     __global long *l_working = d_Superaccs + get_group_id(1) * threadsy * threadsx * BIN_COUNT + (get_local_id(0) & (BLOCK_SIZE - 1));
-
-    //Initialize accumulators
-    for (uint i = 0; i < BIN_COUNT; i++)
-        l_working[i * BLOCK_SIZE] = 0;
-    barrier(CLK_LOCAL_MEM_FENCE);
 
     // Get row handled by this block
     int row = nextRow(&sync[1]);
@@ -311,8 +307,13 @@ __kernel void trsv_lnn(
 
     // Loop over blocks as they become available
     double val = 0.0;
-    //if(lidy == 0)
-    //    Accumulate(l_working, d_b[row * BLOCK_SIZE + lidx]);
+    if(lidy == 0) {
+        //Initialize accumulators
+        for (uint i = 0; i < BIN_COUNT; i++)
+            l_working[i * BLOCK_SIZE] = 0;
+        Accumulate(l_working, d_b[row * BLOCK_SIZE + lidx]);
+    }
+    barrier(CLK_LOCAL_MEM_FENCE);
     int col_done = -1;
 
     for (int col = 0; col < row; col++) {
@@ -329,12 +330,15 @@ __kernel void trsv_lnn(
                 Accumulate(l_working, r);
         }
     }
-    //partSum[lidy * threadsx + lidx] = val;
     barrier(CLK_LOCAL_MEM_FENCE);
 
     // Apply update from diagonal block (row, row)
     if (lidy == 0) {
-        Accumulate(l_working, d_b[row * BLOCK_SIZE + lidx]);
+        //multiple the whole accumulator by -1
+        //for (uint i = 0; i < BIN_COUNT; i++)
+        //    l_working[i * BIN_COUNT] = -l_working[i * BIN_COUNT];
+        //barrier(CLK_LOCAL_MEM_FENCE);
+
         __local volatile double xs;
         #ifdef NVIDIA
             #pragma unroll

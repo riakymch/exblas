@@ -180,8 +180,8 @@ __kernel void trsv_lnn(
         for(int i = 1; i < threadsy; i++)
             val += partSum[i * threadsx + lidx];
         val = -val;
-
         barrier(CLK_LOCAL_MEM_FENCE);
+
         val = dblkSolver(cache, isunit, BLOCK_SIZE, val);
         d_x[row * BLOCK_SIZE + tid] = val;
     }
