@@ -42,12 +42,15 @@ extern "C" bool compare(
     const uint n,
     const double epsilon
 ) {
-    double norm = 0.0;
+    double norm_diff = 0.0;
+    double norm_cpu = 0.0;
 
-    for(uint i = 0; i < n; i++)
-        norm += pow(abs(trsv_cpu[i] - trsv_gpu[i]), 2);
-    norm = ::sqrt(norm);
-    printf("    Norm = %.15g\n", norm);
+    for(uint i = 0; i < n; i++) {
+        norm_diff += pow(fabs(trsv_cpu[i] - trsv_gpu[i]), 2);
+        norm_cpu  += pow(fabs(trsv_cpu[i]), 2);
+    }
+    double norm = ::sqrt(norm_diff) / ::sqrt(norm_cpu);
+    printf("    Norm = %.17g\n", norm);
 
     return norm < epsilon ? true : false;
 }
@@ -75,14 +78,17 @@ extern "C" bool compareTRSVUNNToMPFR(
             mpfr_sub(sum, sum, dot, MPFR_RNDN);
         }
         mpfr_div_d(div, sum, a[i * (n + 1)], MPFR_RNDN);
-        b[i] = mpfr_get_d(div, MPFR_RNDD);
+        b[i] = mpfr_get_d(div, MPFR_RNDN);
     }
 
-    double norm = 0.0;
+    double norm_diff = 0.0;
+    double norm_exact = 0.0;
     //Compare the GPU and MPFR results
-    for (int i = 0; i < n; i++)
-        norm += pow(abs(trsv[i] - b[i]), 2);
-    norm = ::sqrt(norm);
+    for (int i = 0; i < n; i++) {
+        norm_exact += pow(fabs(b[i]), 2);
+        norm_diff += pow(fabs(trsv[i] - b[i]), 2);
+    }
+    double norm = ::sqrt(norm_diff) / ::sqrt(norm_exact);
     printf("    Compared to MPFR. Norm = %.17g\n", norm);
 
     mpfr_free_cache();
@@ -113,15 +119,20 @@ extern "C" bool compareTRSVLNUToMPFR(
             mpfr_sub(sum, sum, dot, MPFR_RNDN);
         }
         mpfr_div_d(div, sum, a[i * (n + 1)], MPFR_RNDN);
-        b[i] = mpfr_get_d(div, MPFR_RNDD);
-        //b[i] = mpfr_get_d(sum, MPFR_RNDD);
+        b[i] = mpfr_get_d(div, MPFR_RNDN);
+        //b[i] = mpfr_get_d(sum, MPFR_RNDN);
     }
 
-    double norm = 0.0;
+    printVector(trsv, n);
+    printVector(b, n);
+    double norm_diff = 0.0;
+    double norm_exact = 0.0;
     //Compare the GPU and MPFR results
-    for (int i = 0; i < n; i++)
-        norm += pow(abs(trsv[i] - b[i]), 2);
-    norm = ::sqrt(norm);
+    for (int i = 0; i < n; i++) {
+        norm_exact += pow(fabs(b[i]), 2);
+        norm_diff += pow(fabs(trsv[i] - b[i]), 2);
+    }
+    double norm = ::sqrt(norm_diff) / ::sqrt(norm_exact);
     printf("    Compared to MPFR. Norm = %.17g\n", norm);
 
     mpfr_free_cache();
@@ -143,7 +154,7 @@ extern "C" bool verifyTRSVUNN(
         for(int j = i; j < n; j++)
             sum += a[i * n + j] * x[j];
 
-        if (abs(sum - b[i]) > epsilon) {
+        if (fabs(sum - b[i]) > epsilon) {
             printf("[%d] %.17g \t %.17g\n", i, b[i], sum);
             pass = false;
             break;
@@ -167,7 +178,7 @@ extern "C" bool verifyTRSVLNU(
         for(int j = 0; j <= i; j++)
             sum += a[j * n + i] * x[j];
 
-        if (abs(sum - b[i]) > epsilon) {
+        if (fabs(sum - b[i]) > epsilon) {
             printf("[%d] %.17g \t %.17g\n", i, b[i], sum);
             pass = false;
             break;

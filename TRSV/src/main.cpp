@@ -233,8 +233,8 @@ int runTRSV(const char* program_file){
                     printf("Error in clEnqueueReadBuffer Line %u in file %s !!!\n\n", __LINE__, __FILE__);
                     cleanUp(EXIT_FAILURE);
                 }
-                //printVector((const double *) h_res, __n);
-                PassFailFlag = verifyTRSVLNU((const double *) h_A, (const double *) h_b, (const double *) h_res, (const int) __n, 1e-16);
+                printVector((const double *) h_res, __n);
+                PassFailFlag = verifyTRSVLNU((const double *) h_A, (const double *) h_b, (const double *) h_res, (const int) __n, 1e-15);
                 if (PassFailFlag)
                     printf(" ...results on GPU are VERIFIED\n");
                 else
@@ -242,12 +242,12 @@ int runTRSV(const char* program_file){
 
             printf(" ...TRSV on CPU\n");
                 TRSVLNU((double *) trsv_cpu, (const double *)h_A, __n);
-                //printVector((const double *) trsv_cpu, __n);
+                printVector((const double *) trsv_cpu, __n);
 
             printf(" ...comparing the results\n");
                 //printf("//--------------------------------------------------------\n");
-                PassFailFlag |= compare((const double *) trsv_cpu, (const double *) h_res, __n, 1e-16);
-                //PassFailFlag |= compareTRSVLNUToMPFR((const double *)h_A, (double *) h_b, (double *) h_res, __n, 1e-16);
+                PassFailFlag &= compare((const double *) trsv_cpu, (const double *) h_res, __n, 1e-15);
+                //PassFailFlag &= compareTRSVLNUToMPFR((const double *)h_A, (double *) h_b, (double *) h_res, __n, 1e-15);
 
         //Release kernels and program
         printf("Shutting down...\n\n");

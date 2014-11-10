@@ -131,9 +131,9 @@ extern "C" void closeTRSV(void){
     ciErrNum  = clReleaseMemObject(d_sync);
     if (__alg)
         ciErrNum  = clReleaseMemObject(d_Superaccs);
-    ciErrNum |= clReleaseKernel(ckInit);
-    ciErrNum |= clReleaseKernel(ckKernel);
-    ciErrNum |= clReleaseProgram(cpProgram);
+    ciErrNum &= clReleaseKernel(ckInit);
+    ciErrNum &= clReleaseKernel(ckKernel);
+    ciErrNum &= clReleaseProgram(cpProgram);
 
     if (ciErrNum != CL_SUCCESS)
         printf("Error in closeTRSV(), Line %u in file %s !!!\n\n", __LINE__, __FILE__);
@@ -180,12 +180,12 @@ extern "C" size_t TRSV(
 
         uint i = 0;
         ciErrNum  = clSetKernelArg(ckKernel, i++, sizeof(cl_mem),  (void *)&d_x);
-        ciErrNum |= clSetKernelArg(ckKernel, i++, sizeof(cl_mem),  (void *)&d_a);
-        ciErrNum |= clSetKernelArg(ckKernel, i++, sizeof(cl_mem),  (void *)&d_b);
-        ciErrNum |= clSetKernelArg(ckKernel, i++, sizeof(cl_mem),  (void *)&d_sync);
+        ciErrNum &= clSetKernelArg(ckKernel, i++, sizeof(cl_mem),  (void *)&d_a);
+        ciErrNum &= clSetKernelArg(ckKernel, i++, sizeof(cl_mem),  (void *)&d_b);
+        ciErrNum &= clSetKernelArg(ckKernel, i++, sizeof(cl_mem),  (void *)&d_sync);
         if (__alg)
-            ciErrNum |= clSetKernelArg(ckKernel, i++, sizeof(cl_mem),  (void *)&d_Superaccs);
-        ciErrNum |= clSetKernelArg(ckKernel, i++, sizeof(cl_uint), (void *)&n);
+            ciErrNum &= clSetKernelArg(ckKernel, i++, sizeof(cl_mem),  (void *)&d_Superaccs);
+        ciErrNum &= clSetKernelArg(ckKernel, i++, sizeof(cl_uint), (void *)&n);
         if (ciErrNum != CL_SUCCESS) {
             printf("Error in clSetKernelArg, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
             *ciErrNumRes = EXIT_FAILURE;
