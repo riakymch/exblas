@@ -202,6 +202,56 @@ void Accumulate(__local volatile long *sa, double x) {
 ////////////////////////////////////////////////////////////////////////////////
 // Substitution algorithm
 ////////////////////////////////////////////////////////////////////////////////
+double dblkSolver(
+    __local double *a,
+    const uint isunit,
+    const int lda,
+    double val
+){
+    volatile __local double xs;
+    uint lidx = get_local_id(0);
+
+    __local long l_sa[BLOCK_SIZE * BIN_COUNT] __attribute__((aligned(8)));
+    __local long *l_working = l_sa + (get_local_id(0) & (BLOCK_SIZE - 1));
+
+    //Initialize accumulators
+    for (uint i = 0; i < BIN_COUNT; i++)
+        l_working[i * BLOCK_SIZE] = 0;
+    //Accumulate val
+    Accumulate(l_working, val);
+    barrier(CLK_LOCAL_MEM_FENCE);
+
+    #ifdef NVIDIA
+       #pragma unroll
+    #endif
+    for (uint i = 0; i < BLOCK_SIZE; i++) {
+        if (lidx == i) {
+            val = Round(l_working);
+            if (!isunit) {
+                /*//TODO: this part could be and should be done without using Kulisch accumulator
+                double r = 0.0;
+                double x = TwoProductFMA(val, a[i * (lda + 1)], &r);
+
+                Accumulate(l_working, x);
+                if (r != 0.0)
+                    Accumulate(l_working, r);*/
+                val *= a[i * (lda + 1)];
+            }
+            xs = val;
+        }
+        if (lidx > i) {
+            double r = 0.0;
+            double x = TwoProductFMA(xs, a[i * lda + lidx], &r);
+
+            Accumulate(l_working, x);
+            if (r != 0.0)
+                Accumulate(l_working, r);
+        }
+    }
+
+    return val;
+}
+
 /* loops until *sync > val.
  * Needs to be seperate function to force volatile onto *sync.
  */
@@ -326,38 +376,9 @@ __kernel void trsv_lnn(
         for(int i = 1; i < threadsy; i++)
             val += partSum[i * threadsx + lidx];
         val = -val;
+
         barrier(CLK_LOCAL_MEM_FENCE);
-
-        __local volatile double xs;
-        __local long l_sa[BLOCK_SIZE * BIN_COUNT] __attribute__((aligned(8)));
-        __local long *l_working = l_sa + (get_local_id(0) & (BLOCK_SIZE - 1));
-
-        //Initialize accumulators
-        for (uint i = 0; i < BIN_COUNT; i++)
-            l_working[i * BLOCK_SIZE] = 0;
-        //Accumulate val
-        Accumulate(l_working, val);
-        barrier(CLK_LOCAL_MEM_FENCE);
-
-        #ifdef NVIDIA
-            #pragma unroll
-        #endif
-        for (uint i = 0; i < BLOCK_SIZE; i++) {
-            if (lidx == i) {
-                val = Round(l_working);
-                if (!isunit)
-                    val *= cache[i * (BLOCK_SIZE + 1)];
-                xs = val;
-            }
-            if (lidx > i) {
-                double r = 0.0;
-                double x = TwoProductFMA(xs, cache[i * BLOCK_SIZE + lidx], &r);
-
-                Accumulate(l_working, x);
-                if (r != 0.0)
-                    Accumulate(l_working, r);
-            }
-        }
+        val = dblkSolver(cache, isunit, BLOCK_SIZE, val);
         d_x[row * BLOCK_SIZE + tid] = val;
     }
 
