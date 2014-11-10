@@ -1,13 +1,206 @@
 
 #pragma OPENCL EXTENSION cl_khr_fp64                   : enable  //For double precision numbers
+#pragma OPENCL EXTENSION cl_khr_int64_base_atomics     : enable  //For 64 atomic operations
 #pragma OPENCL EXTENSION cl_khr_byte_addressable_store : enable
 #ifdef NVIDIA
-  #pragma OPENCL EXTENSION cl_nv_pragma_unroll         : enable
+    #pragma OPENCL EXTENSION cl_nv_pragma_unroll       : enable
 #endif
+
+#define BIN_COUNT  76
+#define K          8                    //High-radix carry-save bits
+#define digits     56
+#define deltaScale 72057594037927936.0  //Assumes K > 0
+#define f_words    39 
+#define TSAFE      0
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// Main computation pass: compute partial reductions
+// Auxiliary functions
+////////////////////////////////////////////////////////////////////////////////
+double TwoProductFMA(double a, double b, double *d) {
+    double p = a * b;
+    *d = fma(a, b, -p);
+    return p;
+}
+
+// signedcarry in {-1, 0, 1}
+long xadd(__local volatile long *sa, long x, uchar *of) {
+    // OF and SF  -> carry=1
+    // OF and !SF -> carry=-1
+    // !OF        -> carry=0
+    long y = atom_add(sa, x);
+    long z = y + x; // since the value sa->accumulator[i] can be changed by another work item
+
+    // TODO: cover also underflow
+    *of = 0;
+    if(x > 0 && y > 0 && z < 0)
+        *of = 1;
+    if(x < 0 && y < 0 && z > 0)
+        *of = 1;
+
+    return y;
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
+// Kulisch accumulator: rounding and accumulation functions
+////////////////////////////////////////////////////////////////////////////////
+double OddRoundSumNonnegative(double th, double tl) {
+    union {
+        double d;
+        long l;
+    } thdb;
+
+    thdb.d = th + tl;
+    // - if the mantissa of th is odd, there is nothing to do
+    // - otherwise, round up as both tl and th are positive
+    // in both cases, this means setting the msb to 1 when tl>0
+    thdb.l |= (tl != 0.0);
+    return thdb.d;
+}
+
+int Normalize(__global long *accumulator, int *imin, int *imax) {
+    if (*imin > *imax)
+        return 0;
+
+    long carry_in = accumulator[*imin] >> digits;
+    accumulator[*imin] -= carry_in << digits;
+    int i;
+    // Sign-extend all the way
+    for (i = *imin + 1; i < BIN_COUNT; ++i) {
+#if 1
+        long carry_out = accumulator[i] >> digits;    // Arithmetic shift
+        accumulator[i] += carry_in - (carry_out << digits);
+#else
+        // BUGGY
+        // get carry of accumulator[i] + carry_in
+        unsigned char overflow;
+        long oldword = xadd(&accumulator[i], carry_in, &overflow);
+        int s = oldword > 0;
+        long carrybit = (s ? 1ll << K : -1ll << K);
+
+        long carry_out = (accumulator[i] >> digits) + carrybit;// Arithmetic shift
+        accumulator[i] -= carry_out << digits;
+#endif
+        carry_in = carry_out;
+    }
+    *imax = i - 1;
+
+    if ((carry_in != 0) && (carry_in != -1)) {
+        //TODO: handle overflow
+        //status = Overflow;
+    }
+
+    return carry_in < 0;
+}
+
+double Round(__global long *accumulator) {
+    int imin = 0;
+    int imax = 75;
+    int negative = Normalize(accumulator, &imin, &imax);
+
+    //Find leading word
+    int i;
+    //Skip zeroes
+    for (i = imax; accumulator[i] == 0 && i >= imin; --i) {
+    }
+    if (negative) {
+        //Skip ones
+        for (; accumulator[i] == ((1 << digits) - 1) && i >= imin; --i) {
+        }
+    }
+    if (i < 0)
+        //TODO: should we preserve sign of zero?
+        return 0.0;
+
+    long hiword = negative ? (1 << digits) - accumulator[i] : accumulator[i];
+    double rounded = (double) hiword;
+    double hi = ldexp(rounded, (i - f_words) * digits);
+    if (i == 0)
+        return negative ? -hi : hi;  // Correct rounding achieved
+    hiword -= (long) rint(rounded);
+    double mid = ldexp((double) hiword, (i - f_words) * digits);
+
+    //Compute sticky
+    long sticky = 0;
+    for (int j = imin; j != i - 1; ++j)
+        sticky |= negative ? (1 << digits) - accumulator[j] : accumulator[j];
+
+    long loword = negative ? (1 << digits) - accumulator[i - 1] : accumulator[i - 1];
+    loword |= !!sticky;
+    double lo = ldexp((double) loword, (i - 1 - f_words) * digits);
+
+    //Now add3(hi, mid, lo)
+    //No overlap, we have already normalized
+    if (mid != 0)
+        lo = OddRoundSumNonnegative(mid, lo);
+
+    //Final rounding
+    hi = hi + lo;
+    return negative ? -hi : hi;
+}
+
+void AccumulateWord(__local volatile long *sa, int i, long x) {
+    // With atomic accumulator updates
+    // accumulation and carry propagation can happen in any order,
+    // as long as addition is atomic
+    // only constraint is: never forget an overflow bit
+    uchar overflow;
+    long carry = x;
+    long carrybit;
+    long oldword = xadd(&sa[i * BLOCK_SIZE], x, &overflow);
+
+    // To propagate over- or underflow
+    while (overflow) {
+        // Carry or borrow
+        // oldword has sign S
+        // x has sign S
+        // accumulator[i] has sign !S (just after update)
+        // carry has sign !S
+        // carrybit has sign S
+        carry = (oldword + carry) >> digits;    // Arithmetic shift
+        bool s = oldword > 0;
+        carrybit = (s ? 1l << K : -1l << K);
+
+        // Cancel carry-save bits
+        xadd(&sa[i * BLOCK_SIZE], (long) -(carry << digits), &overflow);
+        if (TSAFE && (s ^ overflow))
+            carrybit *= 2;
+        carry += carrybit;
+
+        ++i;
+        if (i >= BIN_COUNT)
+            return;
+        oldword = xadd(&sa[i * BLOCK_SIZE], carry, &overflow);
+    }
+}
+
+void Accumulate(__local volatile long *sa, double x) {
+    if (x == 0)
+        return;
+
+    int e;
+    frexp(x, &e);
+    int exp_word = e / digits;  // Word containing MSbit
+    int iup = exp_word + f_words;
+
+    double xscaled = ldexp(x, -digits * exp_word);
+
+    int i;
+    for (i = iup; xscaled != 0; --i) {
+        double xrounded = rint(xscaled);
+        long xint = (long) xrounded;
+
+        AccumulateWord(sa, i, xint);
+
+        xscaled -= xrounded;
+        xscaled *= deltaScale;
+    }
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
+// Substitution algorithm
 ////////////////////////////////////////////////////////////////////////////////
 double dblkSolver(
     __local double *a,
@@ -192,65 +385,3 @@ __kernel void trsv_lnn(
         atomic_add(&sync[0], 1);   // Use atomicAdd to bypass L1 miss
     barrier(CLK_GLOBAL_MEM_FENCE); // Flush sync[0] asap
 }
-
-/*__kernel void trsv_lnn_bak(
-    __global double *d_x,
-    __global double *d_a,
-    __global double *d_b,
-    __global int *sync,
-    const uint n
-){
-    int nblk = n / threadsx;
-    double __local cache[threadsx * threadsx];
-    double regcache[threadsx / threadsy];
-    double __local partSum[threadsy * threadsx];
-    //double __local xlocal[threadsx];
-
-    int lidx = get_local_id(0);
-    int lidy = get_local_id(1);
-    int tid = threadsx * lidy + lidx;
-
-    // Get row handled by this block
-    int row = nextRow(&sync[1]);
-
-    if(row != 0)
-        #pragma unroll
-        for(int j = 0; j < threadsx; j += threadsy)
-            regcache[j / threadsy] = d_a[((row - 1) * threadsx + lidy) * n + row * threadsx + lidx + j * n];
-
-    // Copy diagonal block to shared memory
-    tocache (&d_a[row * threadsx * n + row * threadsx], 0, 0, n, BLOCK_SIZE, tid, BLOCK_SIZE * threadsy, cache);
-    barrier(CLK_GLOBAL_MEM_FENCE);
-
-    // Loop over blocks as they become available
-    double val = 0.0;
-    if(lidy == 0)
-        val = -d_b[row * threadsx + lidx];
-    int col_done = -1;
-    for (int col = 0; col < row - 1; col++) {
-        wait_until_ge(tid, &sync[0], col, &col_done); // Wait for diagonal block to be done
-        for (int j = 0; j < threadsx; j += threadsy)
-            val -= d_a[(col * threadsx + lidy) * n + row * n + lidx + j * n] * d_x[col * threadsx + j];
-    }
-    if (row != 0) {
-        const int col = row - 1;
-        wait_until_ge(tid, &sync[0], col, &col_done); // Wait for diagonal block to be done
-        for (int j = 0; j < threadsx; j += threadsy)
-            val += regcache[j / threadsy] * d_x[col * threadsx + j];
-    }
-    partSum[tid] = val;
-    barrier(CLK_GLOBAL_MEM_FENCE);
-
-    // Apply update from diagonal block (row, row)
-    if (lidy == 0) {
-        for(int i = 1; i < threadsx; i++)
-            val += partSum[i * threadsx + lidx];
-        d_x[row * threadsx + tid] = dblkSolver(cache, threadsx, val);
-    }
-
-    // Notify other blocks that soln is ready for this row
-    barrier(CLK_GLOBAL_MEM_FENCE); // Wait for d_x to be visible to other blocks
-    if(tid==0)
-        atomic_add(&sync[0], 1); // Use atomicAdd to bypass L1 miss
-    barrier(CLK_GLOBAL_MEM_FENCE); // Flush sync[0] asap
-}*/
