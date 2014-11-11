@@ -334,11 +334,6 @@ __kernel void trsv_lnn(
 
     // Apply update from diagonal block (row, row)
     if (lidy == 0) {
-        //multiple the whole accumulator by -1
-        //for (uint i = 0; i < BIN_COUNT; i++)
-        //    l_working[i * BIN_COUNT] = -l_working[i * BIN_COUNT];
-        //barrier(CLK_LOCAL_MEM_FENCE);
-
         double val = 0.0;
         __local volatile double xs;
         #ifdef NVIDIA
