@@ -23,12 +23,24 @@ double TwoProductFMA(double a, double b, double *d) {
     return p;
 }
 
-double KnuthTwoSum(double a, double b, double *s) {
-    double r = a + b;
-    double z = r - a;
-    *s = (a - (r - z)) + (b - z);
-    return r;
-}
+#ifdef USE_KNUTH
+    double KnuthTwoSum(double a, double b, double *s) {
+        double r = a + b;
+        double z = r - a;
+        *s = (a - (r - z)) + (b - z);
+        return r;
+    }
+#else
+    //twosum
+    double KnuthTwoSum(double a, double b, double *s) {
+        double r = a + b;
+        int doswap = fabs(b) > fabs(a);
+        double a2 = doswap ? b : a;
+        double b2 = doswap ? a : b;
+        *s = (a2 - r) + b2;
+        return r;
+    }
+#endif
 
 // signedcarry in {-1, 0, 1}
 long xadd(__global volatile long *sa, long x, uchar *of) {
@@ -367,13 +379,6 @@ __kernel void trsv_lnn(
         }
     }
     barrier(CLK_LOCAL_MEM_FENCE);
-                //Flush to the accumulator
-                #ifdef NVIDIA
-                    #pragma unroll
-                #endif
-                for(uint i = 0; i != NBFPE; ++i)
-                    Accumulate(l_working, fpe[i]);
-                barrier(CLK_LOCAL_MEM_FENCE);
 
     // Apply update from diagonal block (row, row)
     if (lidy == 0) {
@@ -384,13 +389,14 @@ __kernel void trsv_lnn(
         #endif
         for (uint i = 0; i < BLOCK_SIZE; i++) {
             if (lidx == i) {
+                //TODO: round only fpes when accumulator was not used
                 //Flush to the accumulator
-                /*#ifdef NVIDIA
+                #ifdef NVIDIA
                     #pragma unroll
                 #endif
                 for(uint i = 0; i != NBFPE; ++i)
                     Accumulate(l_working, fpe[i]);
-                barrier(CLK_LOCAL_MEM_FENCE);*/
+                barrier(CLK_LOCAL_MEM_FENCE);
 
                 val = Round(l_working);
                 if (!isunit)
@@ -401,10 +407,7 @@ __kernel void trsv_lnn(
                 r = 0.0;
                 x = TwoProductFMA(cache[i * BLOCK_SIZE + lidx], xs, &r);
 
-                Accumulate(l_working, x);
-                if (r != 0.0)
-                    Accumulate(l_working, r);
-                /*#ifdef NVIDIA
+                #ifdef NVIDIA
                     #pragma unroll
                 #endif
                 for(uint i = 0; i != NBFPE; ++i) {
@@ -424,7 +427,7 @@ __kernel void trsv_lnn(
                     r = s;
                 }
                 if(r != 0.0)
-                    Accumulate(l_working, r);*/
+                    Accumulate(l_working, r);
             }
         }
         d_x[row * BLOCK_SIZE + tid] = val;
