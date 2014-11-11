@@ -63,14 +63,14 @@ int Normalize(__global long *accumulator, int *imin, int *imax) {
     if (*imin > *imax)
         return 0;
 
-    long carry_in = accumulator[*imin] >> digits;
-    accumulator[*imin] -= carry_in << digits;
+    long carry_in = accumulator[*imin * BLOCK_SIZE] >> digits;
+    accumulator[*imin * BLOCK_SIZE] -= carry_in << digits;
     int i;
     // Sign-extend all the way
     for (i = *imin + 1; i < BIN_COUNT; ++i) {
 #if 1
-        long carry_out = accumulator[i] >> digits;    // Arithmetic shift
-        accumulator[i] += carry_in - (carry_out << digits);
+        long carry_out = accumulator[i * BLOCK_SIZE] >> digits;    // Arithmetic shift
+        accumulator[i * BLOCK_SIZE] += carry_in - (carry_out << digits);
 #else
         // BUGGY
         // get carry of accumulator[i] + carry_in
@@ -102,18 +102,18 @@ double Round(__global long *accumulator) {
     //Find leading word
     int i;
     //Skip zeroes
-    for (i = imax; accumulator[i] == 0 && i >= imin; --i) {
+    for (i = imax; accumulator[i * BLOCK_SIZE] == 0 && i >= imin; --i) {
     }
     if (negative) {
         //Skip ones
-        for (; accumulator[i] == ((1 << digits) - 1) && i >= imin; --i) {
+        for (; accumulator[i * BLOCK_SIZE] == ((1 << digits) - 1) && i >= imin; --i) {
         }
     }
     if (i < 0)
         //TODO: should we preserve sign of zero?
         return 0.0;
 
-    long hiword = negative ? (1 << digits) - accumulator[i] : accumulator[i];
+    long hiword = negative ? (1 << digits) - accumulator[i * BLOCK_SIZE] : accumulator[i * BLOCK_SIZE];
     double rounded = (double) hiword;
     double hi = ldexp(rounded, (i - f_words) * digits);
     if (i == 0)
@@ -124,9 +124,9 @@ double Round(__global long *accumulator) {
     //Compute sticky
     long sticky = 0;
     for (int j = imin; j != i - 1; ++j)
-        sticky |= negative ? (1 << digits) - accumulator[j] : accumulator[j];
+        sticky |= negative ? (1 << digits) - accumulator[j * BLOCK_SIZE] : accumulator[j * BLOCK_SIZE];
 
-    long loword = negative ? (1 << digits) - accumulator[i - 1] : accumulator[i - 1];
+    long loword = negative ? (1 << digits) - accumulator[(i - 1) * BLOCK_SIZE] : accumulator[(i - 1) * BLOCK_SIZE];
     loword |= !!sticky;
     double lo = ldexp((double) loword, (i - 1 - f_words) * digits);
 
@@ -295,12 +295,8 @@ __kernel void trsv_lnn(
     int tid  = threadsx * lidy + lidx;
     int isunit = 0;
 
+    //__global long *l_working = d_Superaccs + get_group_id(1) * threadsy * threadsx * BIN_COUNT + (get_local_id(0) & (BLOCK_SIZE - 1));
     __global long *l_working = d_Superaccs + get_group_id(1) * threadsy * threadsx * BIN_COUNT + (get_local_id(0) & (BLOCK_SIZE - 1));
-
-    //Initialize accumulators
-    for (uint i = 0; i < BIN_COUNT; i++)
-        l_working[i * BLOCK_SIZE] = 0;
-    //barrier(CLK_LOCAL_MEM_FENCE);
 
     // Get row handled by this block
     int row = nextRow(&sync[1]);
@@ -310,35 +306,42 @@ __kernel void trsv_lnn(
     barrier(CLK_LOCAL_MEM_FENCE);
 
     // Loop over blocks as they become available
-    double val = 0.0;
-    if(lidy == 0)
-        val = -d_b[row * BLOCK_SIZE + lidx];
+    if(lidy == 0) {
+        //Initialize accumulators
+        for (uint i = 0; i < BIN_COUNT; i++)
+            l_working[i * BLOCK_SIZE] = 0;
+        Accumulate(l_working, d_b[row * BLOCK_SIZE + lidx]);
+    }
+    barrier(CLK_LOCAL_MEM_FENCE);
     int col_done = -1;
 
+    double x, r, xp;
     for (int col = 0; col < row; col++) {
         wait_until_ge(tid, &sync[0], col, &col_done); // Wait for diagonal block to be done
         #ifdef NVIDIA
             #pragma unroll
         #endif
         for (int j = 0; j < BLOCK_SIZE; j+=threadsy) {
-            double r = 0.0;
-            double x = TwoProductFMA(d_a[(col * BLOCK_SIZE + lidy) * n + row * BLOCK_SIZE + lidx + j * n], d_x[col * BLOCK_SIZE + lidy + j], &r);
+            r = 0.0;
+            xp = -d_x[col * BLOCK_SIZE + lidy + j];
+            x = TwoProductFMA(d_a[(col * BLOCK_SIZE + lidy) * n + row * BLOCK_SIZE + lidx + j * n], xp, &r);
+            //x = TwoProductFMA(d_a[(col * BLOCK_SIZE + lidy) * n + row * BLOCK_SIZE + lidx + j * n], d_x[col * BLOCK_SIZE + lidy + j], &r);
 
             Accumulate(l_working, x);
             if (r != 0.0)
                 Accumulate(l_working, r);
         }
     }
-    //partSum[lidy * threadsx + lidx] = val;
     barrier(CLK_LOCAL_MEM_FENCE);
 
     // Apply update from diagonal block (row, row)
     if (lidy == 0) {
-        /*for(int i = 1; i < threadsy; i++)
-            val += partSum[i * threadsx + lidx];*/
-        Accumulate(l_working, -val);
+        //multiple the whole accumulator by -1
+        //for (uint i = 0; i < BIN_COUNT; i++)
+        //    l_working[i * BIN_COUNT] = -l_working[i * BIN_COUNT];
         //barrier(CLK_LOCAL_MEM_FENCE);
 
+        double val = 0.0;
         __local volatile double xs;
         #ifdef NVIDIA
             #pragma unroll
@@ -351,8 +354,8 @@ __kernel void trsv_lnn(
                 xs = val;
             }
             if (lidx > i) {
-                double r = 0.0;
-                double x = TwoProductFMA(xs, cache[i * BLOCK_SIZE + lidx], &r);
+                r = 0.0;
+                x = TwoProductFMA(xs, cache[i * BLOCK_SIZE + lidx], &r);
 
                 Accumulate(l_working, x);
                 if (r != 0.0)

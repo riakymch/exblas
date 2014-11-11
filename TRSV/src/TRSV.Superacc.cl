@@ -256,7 +256,7 @@ void tocache(
 ){
     int x = tid % nbi;
     int y = tid / nbi;
-    int ty = ntid/nbi;
+    int ty = ntid / nbi;
     //int lidx = get_local_id(0);
     //int lidy = get_local_id(1);
 
@@ -295,7 +295,6 @@ __kernel void trsv_lnn(
     int tid  = threadsx * lidy + lidx;
     int isunit = 0;
 
-    //__global long *l_working = d_Superaccs + get_group_id(1) * threadsy * threadsx * BIN_COUNT + (get_local_id(0) & (BLOCK_SIZE - 1));
     __global long *l_working = d_Superaccs + get_group_id(1) * threadsy * threadsx * BIN_COUNT + (get_local_id(0) & (BLOCK_SIZE - 1));
 
     // Get row handled by this block
@@ -306,12 +305,11 @@ __kernel void trsv_lnn(
     barrier(CLK_LOCAL_MEM_FENCE);
 
     // Loop over blocks as they become available
-    if(lidy == 0) {
-        //Initialize accumulators
-        for (uint i = 0; i < BIN_COUNT; i++)
-            l_working[i * BLOCK_SIZE] = 0;
+    //Initialize accumulators
+    for (uint i = 0; i < BIN_COUNT; i++)
+        l_working[i * BLOCK_SIZE] = 0;
+    if(lidy == 0)
         Accumulate(l_working, d_b[row * BLOCK_SIZE + lidx]);
-    }
     barrier(CLK_LOCAL_MEM_FENCE);
     int col_done = -1;
 

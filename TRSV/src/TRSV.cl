@@ -147,7 +147,7 @@ __kernel void trsv_lnn(
     // Loop over blocks as they become available
     double val = 0.0;
     if(lidy == 0)
-        val = -d_b[row * BLOCK_SIZE + lidx];
+        val = d_b[row * BLOCK_SIZE + lidx];
     int col_done = -1;
 
     for (int col = 0; col < row; col++) {
@@ -159,7 +159,7 @@ __kernel void trsv_lnn(
             #pragma unroll
         #endif
         for (int j = 0; j < BLOCK_SIZE; j+=threadsy)
-            val += d_a[(col * BLOCK_SIZE + lidy) * n + row * BLOCK_SIZE + lidx + j * n] * d_x[col * BLOCK_SIZE + lidy + j];
+            val -= d_a[(col * BLOCK_SIZE + lidy) * n + row * BLOCK_SIZE + lidx + j * n] * d_x[col * BLOCK_SIZE + lidy + j];
             //val += d_a[(col * BLOCK_SIZE + lidy) * n + row * BLOCK_SIZE + lidx + j * n] * xl[j];
     }
     /*if (row != 0) {
@@ -179,7 +179,6 @@ __kernel void trsv_lnn(
     if (lidy == 0) {
         for(int i = 1; i < threadsy; i++)
             val += partSum[i * threadsx + lidx];
-        val = -val;
         barrier(CLK_LOCAL_MEM_FENCE);
 
         val = dblkSolver(cache, isunit, BLOCK_SIZE, val);

@@ -88,7 +88,7 @@ int main(int argc, char **argv)
     } else if (__alg == 1) {
         runTRSV("../src/TRSV.Superacc.cl");
     } else if (__alg == 2) {
-        runTRSV("../src/TRSV.FPE.cl");
+        runTRSV("../src/TRSV.Superacc.bak.cl");
     } else if (__alg == 3) {
         __nbfpe = 8;
         runTRSV("../src/TRSV.FPE.EX.4.cl");
@@ -234,11 +234,11 @@ int runTRSV(const char* program_file){
                     cleanUp(EXIT_FAILURE);
                 }
                 printVector((const double *) h_res, __n);
-                PassFailFlag = verifyTRSVLNU((const double *) h_A, (const double *) h_b, (const double *) h_res, (const int) __n, 1e-15);
+                /*PassFailFlag = verifyTRSVLNU((const double *) h_A, (const double *) h_b, (const double *) h_res, (const int) __n, 1e-15);
                 if (PassFailFlag)
                     printf(" ...results on GPU are VERIFIED\n");
                 else
-                    printf(" ...results on GPU do NOT match\n");
+                    printf(" ...results on GPU do NOT match\n");*/
 
             printf(" ...TRSV on CPU\n");
                 //TRSVLNU((double *) trsv_cpu, (const double *)h_A, __n);
@@ -247,7 +247,7 @@ int runTRSV(const char* program_file){
             printf(" ...comparing the results\n");
                 //printf("//--------------------------------------------------------\n");
                 //PassFailFlag &= compare((const double *) trsv_cpu, (const double *) h_res, __n, 1e-15);
-                PassFailFlag &= compareTRSVLNUToMPFR((const double *)h_A, (double *) h_b, (double *) h_res, __n, 1e-15);
+                PassFailFlag = compareTRSVLNUToMPFR((const double *)h_A, (double *) h_b, (double *) h_res, __n, 1e-15);
 
         //Release kernels and program
         printf("Shutting down...\n\n");
