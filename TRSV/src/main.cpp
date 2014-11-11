@@ -88,7 +88,7 @@ int main(int argc, char **argv)
     } else if (__alg == 1) {
         runTRSV("../src/TRSV.Superacc.cl");
     } else if (__alg == 2) {
-        runTRSV("../src/TRSV.Superacc.bak.cl");
+        runTRSV("../src/TRSV.FPE.cl");
     } else if (__alg == 3) {
         __nbfpe = 8;
         runTRSV("../src/TRSV.FPE.EX.4.cl");
