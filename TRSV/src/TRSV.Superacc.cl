@@ -295,7 +295,7 @@ __kernel void trsv_lnn(
     int tid  = threadsx * lidy + lidx;
     int isunit = 0;
 
-    __global long *l_working = d_Superaccs + get_group_id(1) * threadsy * threadsx * BIN_COUNT + (get_local_id(0) & (BLOCK_SIZE - 1));
+    __global long *l_working = d_Superaccs + get_group_id(0) * threadsy * threadsx * BIN_COUNT + (get_local_id(0) & (BLOCK_SIZE - 1));
 
     // Get row handled by this block
     int row = nextRow(&sync[1]);
@@ -353,7 +353,7 @@ __kernel void trsv_lnn(
             }
             if (lidx > i) {
                 r = 0.0;
-                x = TwoProductFMA(xs, cache[i * BLOCK_SIZE + lidx], &r);
+                x = TwoProductFMA(cache[i * BLOCK_SIZE + lidx], xs, &r);
 
                 Accumulate(l_working, x);
                 if (r != 0.0)

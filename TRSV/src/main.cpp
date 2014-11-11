@@ -233,7 +233,7 @@ int runTRSV(const char* program_file){
                     printf("Error in clEnqueueReadBuffer Line %u in file %s !!!\n\n", __LINE__, __FILE__);
                     cleanUp(EXIT_FAILURE);
                 }
-                printVector((const double *) h_res, __n);
+                //printVector((const double *) h_res, __n);
                 /*PassFailFlag = verifyTRSVLNU((const double *) h_A, (const double *) h_b, (const double *) h_res, (const int) __n, 1e-15);
                 if (PassFailFlag)
                     printf(" ...results on GPU are VERIFIED\n");

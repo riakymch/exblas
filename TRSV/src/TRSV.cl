@@ -181,7 +181,20 @@ __kernel void trsv_lnn(
             val += partSum[i * threadsx + lidx];
         barrier(CLK_LOCAL_MEM_FENCE);
 
-        val = dblkSolver(cache, isunit, BLOCK_SIZE, val);
+        //val = dblkSolver(cache, isunit, BLOCK_SIZE, val);
+        volatile __local double xs;
+        #ifdef NVIDIA
+           #pragma unroll
+        #endif
+        for (uint i = 0; i < BLOCK_SIZE; i++) {
+            if (lidx == i) {
+                if (!isunit)
+                    val *= cache[i * (BLOCK_SIZE + 1)];
+                xs = val;
+            }
+            if (lidx > i)
+                val += cache[i * BLOCK_SIZE + lidx] * xs;
+        }
         d_x[row * BLOCK_SIZE + tid] = val;
     }
 
