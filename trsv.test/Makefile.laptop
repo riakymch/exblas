@@ -1,4 +1,4 @@
-SRCS = main.cpp superaccumulator.c
+SRCS = main.cpp
 EXE_NAME = main.out
 
 SOURCES = $(abspath $(SRCS))

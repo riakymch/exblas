@@ -19,15 +19,6 @@
 #include <cassert>
 #include <string.h>
 
-#include "TRSV.hpp"
-
-// All OpenCL headers
-#if defined (__APPLE__) || defined(MACOSX)
-    #include <OpenCL/opencl.h>
-#else
-    #include <CL/opencl.h>
-#endif
-
 ////////////////////////////////////////////////////////////////////////////////
 // Common definitions
 ////////////////////////////////////////////////////////////////////////////////
@@ -37,30 +28,10 @@
 #define E_BITS 2 * 1023
 #define F_BITS 2 * (1023 + 52)
 
-typedef cl_long bintype;
-
 
 ////////////////////////////////////////////////////////////////////////////////
 // Common functions
 ////////////////////////////////////////////////////////////////////////////////
-cl_platform_id GetOCLPlatform(
-    char name[]
-);
-
-cl_device_id GetOCLDevice(
-    cl_platform_id pPlatform
-);
-
-cl_device_id GetOCLDevice(
-    cl_platform_id pPlatform,
-    char name[]
-);
-
-void initVectorWithRandomData(
-    double *data,
-    int size
-);
-
 void init_fpuniform(
     double *a,
     const uint n,
@@ -82,42 +53,15 @@ void init_fpuniform_un_matrix(
     const int emax
 );
 
+void generate_ill_cond_system(
+    double *a,
+    double *b,
+    const int n,
+    const double c
+);
+
 double min(
     double arr[],
-    int size
-);
-
-////////////////////////////////////////////////////////////////////////////////
-// GPU TRSV product related functions
-////////////////////////////////////////////////////////////////////////////////
-extern "C" cl_int initTRSV(
-    cl_context cxGPUContext,
-    cl_command_queue cqParamCommandQue,
-    cl_device_id cdDevice,
-    const char* program_file,
-    const uint n,
-    const uint alg,
-    const uint NbFPE
-);
-
-extern "C" void closeTRSV(
-    void
-);
-
-extern "C" size_t TRSV(
-    cl_command_queue cqCommandQueue,
-    cl_mem d_x,
-    const cl_mem d_a,
-    const cl_mem d_b,
-    const uint n,
-    cl_int *ciErrNum
-);
-
-////////////////////////////////////////////////////////////////////////////////
-// Kahan summation functions
-////////////////////////////////////////////////////////////////////////////////
-extern "C" double roundKahan(
-    double *data,
     int size
 );
 
@@ -132,10 +76,5 @@ extern "C" double KnuthTwoSum(
     double b,
     double *d
 );
-
-////////////////////////////////////////////////////////////////////////////////
-// Executable functions from main.cpp
-////////////////////////////////////////////////////////////////////////////////
-int runTRSV(const char*);
 
 #endif
