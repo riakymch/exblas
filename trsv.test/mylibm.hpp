@@ -25,7 +25,8 @@
 #define unlikely(x) (x)
 #endif
 
-inline uint64_t rdtsc() {
+inline uint64_t rdtsc()
+{
     uint32_t hi, lo;
     asm volatile ("rdtsc" : "=a"(lo), "=d"(hi));
     return lo | ((uint64_t)hi << 32);
@@ -56,11 +57,33 @@ inline int32_t mylrint<int32_t>(double x) {
 }
 
 
-inline double myrint(double x) {
+inline double myrint(double x)
+{
     return rint(x);
+/*
+#if 0
+    // Workaround gcc bug 51033
+    union {
+        __m128d v;
+        double d[2];
+    } r;
+    //_mm_round_sd(_mm_undefined_pd(), _mm_set_sd(x));
+    //__m128d undefined;
+    //r.v = _mm_round_sd(_mm_setzero_pd(), _mm_set_sd(x), _MM_FROUND_TO_NEAREST_INT);
+    //r.v = _mm_round_sd(undefined, _mm_set_sd(x), _MM_FROUND_TO_NEAREST_INT);
+    r.v = _mm_round_pd(_mm_set_sd(x), _MM_FROUND_TO_NEAREST_INT);
+    return r.d[0];
+#else
+    double r;
+    //asm("roundsd $0, %1, %0" : "=x" (r) : "x" (x));
+    asm(ASM_BEGIN "roundsd %0, %1, 0" ASM_END : "=x" (r) : "x" (x));
+    return r;
+#endif
+*/
 }
 
-inline int exponent(double x) {
+inline int exponent(double x)
+{
     // simpler frexp
     union {
         double d;
@@ -71,7 +94,8 @@ inline int exponent(double x) {
     return e;
 }
 
-inline int biased_exponent(double x) {
+inline int biased_exponent(double x)
+{
     union {
         double d;
         uint64_t i;
@@ -81,7 +105,8 @@ inline int biased_exponent(double x) {
     return e;
 }
 
-inline double myldexp(double x, int e) {
+inline double myldexp(double x, int e)
+{
     // Scale x by e
     union {
         double d;
@@ -93,7 +118,8 @@ inline double myldexp(double x, int e) {
     return caster.d;
 }
 
-inline double exp2i(int e) {
+inline double exp2i(int e)
+{
     // simpler ldexp
     union {
         double d;
@@ -105,7 +131,8 @@ inline double exp2i(int e) {
 }
 
 // Assumptions: th>tl>=0, no overlap between th and tl
-inline static double OddRoundSumNonnegative(double th, double tl) {
+inline static double OddRoundSumNonnegative(double th, double tl)
+{
     // Adapted from:
     // Sylvie Boldo, and Guillaume Melquiond. "Emulation of a FMA and correctly rounded sums: proved algorithms using rounding to odd." IEEE Transactions on Computers, 57, no. 4 (2008): 462-471.
     union {
@@ -130,10 +157,24 @@ inline static double OddRoundSumNonnegative(double th, double tl) {
 #endif
 
 // signedcarry in {-1, 0, 1}
-inline static int64_t xadd(int64_t &memref, int64_t x, unsigned char &of) {
+inline static int64_t xadd(int64_t &memref, int64_t x, unsigned char &of)
+{
     // OF and SF  -> carry=1
     // OF and !SF -> carry=-1
     // !OF        -> carry=0
+/*
+    int64_t oldword = x;
+#ifdef ATT_SYNTAX
+    asm volatile (LOCK_PREFIX"xaddq %1, %0\n"
+        "setob %2"
+     : "+m" (memref), "+r" (oldword), "=q" (of) : : "cc", "memory");
+#else
+    asm volatile (LOCK_PREFIX"xadd %0, %1\n"
+        "seto %2"
+     : "+m" (memref), "+r" (oldword), "=q" (of) : : "cc", "memory");
+#endif
+    return oldword;
+*/
     int64_t y = memref;
     memref += x;
 
@@ -147,4 +188,3 @@ inline static int64_t xadd(int64_t &memref, int64_t x, unsigned char &of) {
     return y;
 }
 #endif
-
