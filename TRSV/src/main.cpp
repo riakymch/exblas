@@ -91,7 +91,7 @@ int main(int argc, char **argv)
         runTRSV("../src/TRSV.FPE.cl");
     } else if (__alg == 3) {
         __nbfpe = 8;
-        runTRSV("../src/TRSV.FPE.EX.4.cl");
+        runTRSV("../src/TRSV.double-double.cl");
     } else if (__alg == 4) {
         __nbfpe = 4;
         runTRSV("../src/TRSV.FPE.EX.6.cl");

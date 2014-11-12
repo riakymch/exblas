@@ -355,14 +355,14 @@ __kernel void trsv_lnn(
             double xp = -d_x[col * BLOCK_SIZE + lidy + j];
             x = TwoProductFMA(d_a[(col * BLOCK_SIZE + lidy) * n + row * BLOCK_SIZE + lidx + j * n], xp, &r);
 
-            /*#ifdef NVIDIA
+            #ifdef NVIDIA
                 #pragma unroll
             #endif
             for(uint i = 0; i != NBFPE; ++i) {
                 fpe[i] = KnuthTwoSum(fpe[i], x, &s);
                 x = s;
             }
-            if(x != 0.0)*/
+            if(x != 0.0)
                 Accumulate(l_working, x);
 
             #ifdef NVIDIA
