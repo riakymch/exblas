@@ -352,9 +352,8 @@ __kernel void trsv_lnn(
         #endif
         for (int j = 0; j < BLOCK_SIZE; j+=threadsy) {
             r = 0.0;
-            double ap = d_a[(col * BLOCK_SIZE + lidy) * n + row * BLOCK_SIZE + lidx + j * n];
             double xp = -d_x[col * BLOCK_SIZE + lidy + j];
-            x = TwoProductFMA(ap, xp, &r);
+            x = TwoProductFMA(d_a[(col * BLOCK_SIZE + lidy) * n + row * BLOCK_SIZE + lidx + j * n], xp, &r);
 
             /*#ifdef NVIDIA
                 #pragma unroll
@@ -366,14 +365,14 @@ __kernel void trsv_lnn(
             if(x != 0.0)*/
                 Accumulate(l_working, x);
 
-            /*#ifdef NVIDIA
+            #ifdef NVIDIA
                 #pragma unroll
             #endif
             for(uint i = 0; i != NBFPE; ++i) {
                 s = 0.0;
                 fpe[i] = KnuthTwoSum(fpe[i], r, &s);
                 r = s;
-            }*/
+            }
             if(r != 0.0)
                 Accumulate(l_working, r);
         }
