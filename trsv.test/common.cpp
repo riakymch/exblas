@@ -77,12 +77,6 @@ void init_fpuniform_un_matrix(double *a, const uint n, const int range, const in
                 a[i * n + j] = 0.0;
 }
 
-inline void zeros(double *a, const uint m, const uint n) {
-    for(uint i = 0; i < m; i++)
-        for(uint j = 0; j < n; j++)
-            a[i * n + j] = 0.0;
-}
-
 inline void linspace(double *b, double x, double y, uint n) {
     double val;
     double h = (y - x) / (n - 1);
@@ -194,9 +188,6 @@ extern "C" void generate_ill_cond_system(
                 if (j >= i)
                     A[i * n + j] = 1 - 2 * U[i * n + j];
             }
-    printf("----------------\n");
-    printMatrix(islower, A, n, n);
-    printf("----------------\n");
     // b(p+1:n) est le resultat du produit A(p+1:n,p+1:n) * ones(p-1,1)
     // calcule avec une grande precision
     mpfr_t sum;

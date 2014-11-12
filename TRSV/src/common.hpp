@@ -82,45 +82,23 @@ void init_fpuniform_un_matrix(
     const int emax
 );
 
+extern "C" void generate_ill_cond_system(
+    int islower,
+    double *a,
+    double *b,
+    uint n,
+    const double c
+);
+
 double min(
     double arr[],
     int size
 );
 
-////////////////////////////////////////////////////////////////////////////////
-// GPU TRSV product related functions
-////////////////////////////////////////////////////////////////////////////////
-extern "C" cl_int initTRSV(
-    cl_context cxGPUContext,
-    cl_command_queue cqParamCommandQue,
-    cl_device_id cdDevice,
-    const char* program_file,
-    const uint n,
-    const uint alg,
-    const uint NbFPE
-);
-
-extern "C" void closeTRSV(
-    void
-);
-
-extern "C" size_t TRSV(
-    cl_command_queue cqCommandQueue,
-    cl_mem d_x,
-    const cl_mem d_a,
-    const cl_mem d_b,
-    const uint n,
-    cl_int *ciErrNum
-);
 
 ////////////////////////////////////////////////////////////////////////////////
 // Kahan summation functions
 ////////////////////////////////////////////////////////////////////////////////
-extern "C" double roundKahan(
-    double *data,
-    int size
-);
-
 extern "C" double TwoProductFMA(
     double a,
     double b,
