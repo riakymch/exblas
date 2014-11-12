@@ -239,14 +239,16 @@ extern "C" void printMatrix(
     const uint lda,
     const uint n
 ){
+    printf("[ ");
     for (uint i = 0; i < n; i++) {
         for (uint j = 0; j < n; j++)
             if (iscolumnwise)
-                printf("%.4g\t", A[j * lda + i]);
+                printf("%.4g, ", A[j * lda + i]);
             else
-                printf("%.4g\t", A[i * lda + j]);
-        printf("\n");
+                printf("%.4g, ", A[i * lda + j]);
+        printf(";\n");
     }
+    printf("]\n");
 }
 
 extern "C" void printVector(
