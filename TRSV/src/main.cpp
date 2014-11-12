@@ -106,8 +106,8 @@ int runTRSV(const char* program_file){
     bool PassFailFlag = false;
 
     printf("Initializing data...\n");
-        h_A = (double *) malloc(__n * __n * sizeof(double));
-        h_b = (double *) malloc(__n * sizeof(double));
+        h_A = (double *) calloc(__n * __n, sizeof(double));
+        h_b = (double *) calloc(__n, sizeof(double));
         h_res = (double *) malloc(__n * sizeof(double));
         trsv_cpu = (double *) malloc(__n * sizeof(double));
 
@@ -115,6 +115,12 @@ int runTRSV(const char* program_file){
         int emax = E_BITS - log2(__n);// use log in order to stay within [emin, emax]
         init_fpuniform_lu_matrix((double *) h_A, __n, __range, emax);
         init_fpuniform((double *) h_b, __n, __range, emax);
+        //upper is row-wise
+        //double c = 10;
+        //int is_lower_column_wise = 1;
+        //generate_ill_cond_system(is_lower_column_wise, (double *) h_A, (double *) h_b, __n, c);
+        //printMatrix(is_lower_column_wise, (double *) h_A, __n, __n);
+        //printVector((double *) h_b, __n);
         for (uint i = 0; i < __n; i++)
             trsv_cpu[i] = ((double *) h_b)[i];
 
