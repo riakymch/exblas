@@ -134,7 +134,7 @@ end
 function [A, b] = trsv_gen_unn_nico(n, c)
     A = zeros(n);
     b = zeros(n, 1);
-    
+
     % Si n est impair, on se ramene au cas pair
     if ~mod(n,2)
         A(n,n) = 1.0;
@@ -142,7 +142,7 @@ function [A, b] = trsv_gen_unn_nico(n, c)
         n = n-1;
     end
     p = (n+1)/2; % n = 2*p - 1
-    
+
     %  On commence par generer A(1:p, 1:n) et b(1:p)
     D = diag((ones(1,p) - 2*rand(1,p)) .* linspace(10^(-c),10^(c),p));
     U = triu((1 - 2*rand(p)) .* (10.^round(c*(1 - 2*rand(p)))), 1);
@@ -154,7 +154,7 @@ function [A, b] = trsv_gen_unn_nico(n, c)
         A(i,p+1:2*p-1) = -t(1:p-1);
         b(i) = t(p);
     end
-    
+
     % On genere maintenant A(p+1:n,p+1:n) et b(p+1:n)
     % A(p+1:n,p+1:n) est generee aleatoirement avec des coefficient 
     % compris entre -1 et 1

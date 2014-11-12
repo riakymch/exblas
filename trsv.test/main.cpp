@@ -1,8 +1,6 @@
 /*
  * main.c
  *
- *  Created on: Nov 20, 2013
- *      Author: riakym
  */
 #include <cassert>
 #include <cstdlib>
@@ -26,13 +24,17 @@ int main(int argc, char **argv) {
     usage(argv[0]);
   int n = atoi(argv[1]);
 
-  double *a = (double *) malloc(n * n * sizeof(double));
-  double *b = (double *) malloc(n * sizeof(double));
+  double *a = (double *) calloc(n * n, sizeof(double));
+  double *b = (double *) calloc(n, sizeof(double));
 
   double c = 10;//20 * double(rand()) / double(RAND_MAX * .99) + 1.;
-  printf("c = %.4g\n", c);
 
-  generate_ill_cond_system(a, b, n, c);
+  //upper is row-wise
+  int is_lower_column_wise = 0;
+  generate_ill_cond_system(is_lower_column_wise, a, b, n, c);
+
+  printMatrix(is_lower_column_wise, a, n, n);
+  printVector(b, n);
 
   //printf("condA = %8.g\n", condA(a, n));
 

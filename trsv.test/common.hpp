@@ -53,10 +53,11 @@ void init_fpuniform_un_matrix(
     const int emax
 );
 
-void generate_ill_cond_system(
+extern "C" void generate_ill_cond_system(
+    int islower,
     double *a,
     double *b,
-    const int n,
+    uint n,
     const double c
 );
 
@@ -75,6 +76,18 @@ extern "C" double KnuthTwoSum(
     double a,
     double b,
     double *d
+);
+
+extern "C" void printMatrix(
+    const int iscolumnwise,
+    const double *A,
+    const uint lda,
+    const uint n
+);
+
+extern "C" void printVector(
+    const double *a,
+    const uint n
 );
 
 #endif
