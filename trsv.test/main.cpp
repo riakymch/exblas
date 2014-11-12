@@ -27,7 +27,7 @@ int main(int argc, char **argv) {
   double *a = (double *) calloc(n * n, sizeof(double));
   double *b = (double *) calloc(n, sizeof(double));
 
-  double c = 0;//20 * double(rand()) / double(RAND_MAX * .99) + 1.;
+  double c = 10;//20 * double(rand()) / double(RAND_MAX * .99) + 1.;
 
   //upper is row-wise
   int is_lower_column_wise = 1;
