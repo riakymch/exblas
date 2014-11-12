@@ -11,6 +11,12 @@ function trsv_lnu_sym()
     [A, b] = trsv_gen_lnu(alpha, i);
     
     [condA(j), err_d(j), err_k(j)] = trsv_lnu_exact(i, A, b);
+    if err_d(j) > 1.0
+        err_d(j) = 1.0;
+    end
+    if err_k(j) > 1.0
+        err_k(j) = 1.0;
+    end
     j = j+1;
     i
   end 
@@ -65,8 +71,8 @@ end
 
 function [condA, err_d, err_k] = trsv_lnu_exact(n, A, b)
   %double
-  x_k = sym(trsv_lnu_kulisch(n, A, b), 'd');
-  x_d = sym(trsv_lnu_d(n, A, b), 'd');
+  x_k = sym(trsv_lnu_kulisch(n, A, b), 'f');
+  x_d = sym(trsv_lnu_d(n, A, b), 'f');
 
   A = sym(A);
   b = sym(b);

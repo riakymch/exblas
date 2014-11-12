@@ -10,6 +10,12 @@ function trsv_unn_sym()
     [A, b] = trsv_gen_unn_nico(n, c(i));
 
     [condA(i), err_d(i), err_k(i)] = trsv_unn_exact(n, A, b);
+    if err_d(i) > 1.0
+        err_d(i) = 1.0;
+    end
+    if err_k(i) > 1.0
+        err_k(i) = 1.0;
+    end    
     i
   end
 
@@ -50,12 +56,12 @@ function x = trsv_unn_d(n, A, b)
 end
 
 function x = trsv_unn_kulisch(n, A, b)
-  b = sym(b, 'f');
+  b = sym(b);
   
   for i = n:-1:1
     s = b(i);
     for j = i+1:n
-      s = s - sym(A(i,j), 'f') * sym(x(j), 'f');
+      s = s - sym(A(i,j)) * sym(x(j));
     end
     x(i) = double(s) / A(i, i);
   end
@@ -66,8 +72,8 @@ function [condA, err_d, err_k] = trsv_unn_exact(n, A, b)
   x_k = sym(trsv_unn_kulisch(n, A, b), 'f');
   x_d = sym(trsv_unn_d(n, A, b), 'f');
   
-  A = sym(A, 'f');
-  b = sym(b, 'f');
+  A = sym(A);
+  b = sym(b);
   %x_e = A \ b;
   for i = n:-1:1
     s = b(i);
