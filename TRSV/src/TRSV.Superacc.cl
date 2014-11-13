@@ -274,7 +274,7 @@ __kernel void trsv_lnn(
     int isunit = 0;
     int lda = threadsx * threadsy;
 
-    __global long *l_working = d_Superaccs + get_group_id(0) * threadsy * threadsx * BIN_COUNT + tid; //(tid & (lda - 1));
+    __global long *l_working = d_Superaccs + get_group_id(0) * threadsy * threadsx * BIN_COUNT + tid;
 
     // Get row handled by this block
     int row = nextRow(&sync[1]);
@@ -315,7 +315,7 @@ __kernel void trsv_lnn(
 	for (int i = 0; i < BIN_COUNT; i++) {
         	long sum = 0.0;
 	        for(int j = 0; j < threadsy; j++)
-        	    //sum += l_working[i * lda + j * threadsx * threadsy * BIN_COUNT];
+        	    //sum += l_working[i * lda + j * threadsx * BIN_COUNT];
         	    sum += l_working[i * lda + j * threadsx];
 		l_working[i * lda] = sum;
 	}

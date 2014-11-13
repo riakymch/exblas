@@ -310,7 +310,7 @@ __kernel void trsv_lnn(
     double x, s, r;
     double fpe[NBFPE] = {0.0};
     if(lidy == 0) {
-        x = d_b[row * BLOCK_SIZE + lidx];
+        x = d_b[row * threadsx + lidx];
         #ifdef NVIDIA
           #pragma unroll
         #endif
