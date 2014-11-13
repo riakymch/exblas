@@ -69,8 +69,10 @@ end
 
 function [condA, err_d, err_k] = trsv_unn_exact(n, A, b)
   %double
-  x_k = sym(trsv_unn_kulisch(n, A, b), 'f');
-  x_d = sym(trsv_unn_d(n, A, b), 'f');
+  %x_k = sym(trsv_unn_kulisch(n, A, b), 'f');
+  %x_d = sym(trsv_unn_d(n, A, b), 'f');
+  x_k = trsv_unn_kulisch(n, A, b);
+  x_d = trsv_unn_d(n, A, b);
   
   A = sym(A);
   b = sym(b);
@@ -85,8 +87,8 @@ function [condA, err_d, err_k] = trsv_unn_exact(n, A, b)
 
   %compute error
   norm_e = max(double(abs(x_e)));
-  err_k = max(double(abs(x_e - x_k))) / norm_e;
-  err_d = max(double(abs(x_e - x_d))) / norm_e;
+  err_k  = max(double(abs(x_e - x_k))) / norm_e;
+  err_d  = max(double(abs(x_e - x_d))) / norm_e;
   
   %compute cond number
   %condA = norminf_m(A, n) * norminf_m(inv(A), n);
@@ -112,6 +114,7 @@ function res = norminf_m(A, n)
       if res < sum_d
           res = sum_d;
       end
+
   end
 end
 
@@ -133,6 +136,7 @@ function t = VecSum(p, n)
     s(1) = p(1);
     for i = 2:n
         [s(i), t(i-1)] = TwoSum(s(i-1),p(i));
+
     end
     t(n) = s(n);
 end
