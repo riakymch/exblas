@@ -103,7 +103,7 @@ extern "C" cl_int initTRSV(
 
     printf("...allocating internal buffer\n");
         if (alg) {
-            d_Superaccs = clCreateBuffer(cxGPUContext, CL_MEM_READ_WRITE, n * BIN_COUNT * sizeof(cl_long), NULL, &ciErrNum);
+            d_Superaccs = clCreateBuffer(cxGPUContext, CL_MEM_READ_WRITE, n * THREADSY * BIN_COUNT * sizeof(cl_long), NULL, &ciErrNum);
             if (ciErrNum != CL_SUCCESS) {
                 printf("Error in clCreateBuffer, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
                 return EXIT_FAILURE;

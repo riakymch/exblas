@@ -231,7 +231,7 @@ __kernel void trsv_lnn(
             regcache[j / threadsy] = d_a[((row - 1) * threadsx + lidy) * n + row * threadsx + lidx + j * n];
 
     // Copy diagonal block to shared memory
-    tocache (&d_a[row * threadsx * n + row * threadsx], 0, 0, n, BLOCK_SIZE, tid, BLOCK_SIZE * threadsy, cache);
+    tocache(&d_a[row * threadsx * n + row * threadsx], 0, 0, n, BLOCK_SIZE, tid, threadsx * threadsy, cache);
     barrier(CLK_GLOBAL_MEM_FENCE);
 
     // Loop over blocks as they become available
@@ -239,6 +239,7 @@ __kernel void trsv_lnn(
     if(lidy == 0)
         val = -d_b[row * threadsx + lidx];
     int col_done = -1;
+
     for (int col = 0; col < row - 1; col++) {
         wait_until_ge(tid, &sync[0], col, &col_done); // Wait for diagonal block to be done
         for (int j = 0; j < threadsx; j += threadsy)

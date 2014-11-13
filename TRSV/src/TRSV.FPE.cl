@@ -78,29 +78,17 @@ double OddRoundSumNonnegative(double th, double tl) {
     return thdb.d;
 }
 
-int Normalize(__global long *accumulator, int *imin, int *imax) {
+int Normalize(__global long *accumulator, int lda, int *imin, int *imax) {
     if (*imin > *imax)
         return 0;
 
-    long carry_in = accumulator[*imin * BLOCK_SIZE] >> digits;
-    accumulator[*imin * BLOCK_SIZE] -= carry_in << digits;
+    long carry_in = accumulator[*imin * lda] >> digits;
+    accumulator[*imin * lda] -= carry_in << digits;
     int i;
     // Sign-extend all the way
     for (i = *imin + 1; i < BIN_COUNT; ++i) {
-#if 1
-        long carry_out = accumulator[i * BLOCK_SIZE] >> digits;    // Arithmetic shift
-        accumulator[i * BLOCK_SIZE] += carry_in - (carry_out << digits);
-#else
-        // BUGGY
-        // get carry of accumulator[i] + carry_in
-        unsigned char overflow;
-        long oldword = xadd(&accumulator[i], carry_in, &overflow);
-        int s = oldword > 0;
-        long carrybit = (s ? 1ll << K : -1ll << K);
-
-        long carry_out = (accumulator[i] >> digits) + carrybit;// Arithmetic shift
-        accumulator[i] -= carry_out << digits;
-#endif
+        long carry_out = accumulator[i * lda] >> digits;    // Arithmetic shift
+        accumulator[i * lda] += carry_in - (carry_out << digits);
         carry_in = carry_out;
     }
     *imax = i - 1;
@@ -113,26 +101,26 @@ int Normalize(__global long *accumulator, int *imin, int *imax) {
     return carry_in < 0;
 }
 
-double Round(__global long *accumulator) {
+double Round(__global long *accumulator, int lda) {
     int imin = 0;
     int imax = 75;
-    int negative = Normalize(accumulator, &imin, &imax);
+    int negative = Normalize(accumulator, lda, &imin, &imax);
 
     //Find leading word
     int i;
     //Skip zeroes
-    for (i = imax; accumulator[i * BLOCK_SIZE] == 0 && i >= imin; --i) {
+    for (i = imax; accumulator[i * lda] == 0 && i >= imin; --i) {
     }
     if (negative) {
         //Skip ones
-        for (; accumulator[i * BLOCK_SIZE] == ((1 << digits) - 1) && i >= imin; --i) {
+        for (; accumulator[i * lda] == ((1 << digits) - 1) && i >= imin; --i) {
         }
     }
     if (i < 0)
         //TODO: should we preserve sign of zero?
         return 0.0;
 
-    long hiword = negative ? (1 << digits) - accumulator[i * BLOCK_SIZE] : accumulator[i * BLOCK_SIZE];
+    long hiword = negative ? (1 << digits) - accumulator[i * lda] : accumulator[i * lda];
     double rounded = (double) hiword;
     double hi = ldexp(rounded, (i - f_words) * digits);
     if (i == 0)
@@ -143,9 +131,9 @@ double Round(__global long *accumulator) {
     //Compute sticky
     long sticky = 0;
     for (int j = imin; j != i - 1; ++j)
-        sticky |= negative ? (1 << digits) - accumulator[j * BLOCK_SIZE] : accumulator[j * BLOCK_SIZE];
+        sticky |= negative ? (1 << digits) - accumulator[j * lda] : accumulator[j * lda];
 
-    long loword = negative ? (1 << digits) - accumulator[(i - 1) * BLOCK_SIZE] : accumulator[(i - 1) * BLOCK_SIZE];
+    long loword = negative ? (1 << digits) - accumulator[(i - 1) * lda] : accumulator[(i - 1) * lda];
     loword |= !!sticky;
     double lo = ldexp((double) loword, (i - 1 - f_words) * digits);
 
@@ -159,7 +147,7 @@ double Round(__global long *accumulator) {
     return negative ? -hi : hi;
 }
 
-void AccumulateWord(__global volatile long *sa, int i, long x) {
+void AccumulateWord(__global volatile long *sa, int lda, int i, long x) {
     // With atomic accumulator updates
     // accumulation and carry propagation can happen in any order,
     // as long as addition is atomic
@@ -167,7 +155,7 @@ void AccumulateWord(__global volatile long *sa, int i, long x) {
     uchar overflow;
     long carry = x;
     long carrybit;
-    long oldword = xadd(&sa[i * BLOCK_SIZE], x, &overflow);
+    long oldword = xadd(&sa[i * lda], x, &overflow);
 
     // To propagate over- or underflow
     while (overflow) {
@@ -182,7 +170,7 @@ void AccumulateWord(__global volatile long *sa, int i, long x) {
         carrybit = (s ? 1l << K : -1l << K);
 
         // Cancel carry-save bits
-        xadd(&sa[i * BLOCK_SIZE], (long) -(carry << digits), &overflow);
+        xadd(&sa[i * lda], (long) -(carry << digits), &overflow);
         if (TSAFE && (s ^ overflow))
             carrybit *= 2;
         carry += carrybit;
@@ -190,11 +178,11 @@ void AccumulateWord(__global volatile long *sa, int i, long x) {
         ++i;
         if (i >= BIN_COUNT)
             return;
-        oldword = xadd(&sa[i * BLOCK_SIZE], carry, &overflow);
+        oldword = xadd(&sa[i * lda], carry, &overflow);
     }
 }
 
-void Accumulate(__global volatile long *sa, double x) {
+void Accumulate(__global volatile long *sa, int lda, double x) {
     if (x == 0)
         return;
 
@@ -210,7 +198,7 @@ void Accumulate(__global volatile long *sa, double x) {
         double xrounded = rint(xscaled);
         long xint = (long) xrounded;
 
-        AccumulateWord(sa, i, xint);
+        AccumulateWord(sa, lda, i, xint);
 
         xscaled -= xrounded;
         xscaled *= deltaScale;
@@ -276,18 +264,8 @@ void tocache(
     int x = tid % nbi;
     int y = tid / nbi;
     int ty = ntid / nbi;
-    //int lidx = get_local_id(0);
-    //int lidy = get_local_id(1);
 
     if(trans == 0) {
-        /*for (int j = 0; j < BLOCK_SIZE; j+=threadsy) {
-            if (lidx > (lidy + j))
-                cache[threadsx * (lidy + j) + lidx] = a[lda * (lidy + j) + lidx];
-            else if ((lidy + j) < BLOCK_SIZE)
-                cache[threadsx * (lidy + j) + lidx] = 0.0;
-            if (isunit && (lidx == (lidy + j)))
-                cache[threadsx * (lidy + j) + lidx] = 1.0;
-        }*/
         for (int i = 0; i < nbi; i += ty) {
             if (x > (i + y))
                 cache[(i + y) * nbi + x] = -a[(i + y) * lda + x];
@@ -313,8 +291,9 @@ __kernel void trsv_lnn(
     int lidy = get_local_id(1);
     int tid  = threadsx * lidy + lidx;
     int isunit = 0;
+    int lda = threadsx * threadsy;
 
-    __global long *l_working = d_Superaccs + get_group_id(0) * threadsy * threadsx * BIN_COUNT + (get_local_id(0) & (BLOCK_SIZE - 1));
+    __global long *l_working = d_Superaccs + get_group_id(0) * threadsy * threadsx * BIN_COUNT + tid;
 
     // Get row handled by this block
     int row = nextRow(&sync[1]);
@@ -326,7 +305,7 @@ __kernel void trsv_lnn(
     // Loop over blocks as they become available
     // Initialize accumulators
     for (uint i = 0; i < BIN_COUNT; i++)
-        l_working[i * BLOCK_SIZE] = 0;
+        l_working[i * lda] = 0;
     // FPEs
     double x, s, r;
     double fpe[NBFPE] = {0.0};
@@ -340,7 +319,7 @@ __kernel void trsv_lnn(
             x = s;
         }
         if(x != 0.0)
-            Accumulate(l_working, x);
+            Accumulate(l_working, lda, x);
     }
     barrier(CLK_LOCAL_MEM_FENCE);
     int col_done = -1;
@@ -352,8 +331,8 @@ __kernel void trsv_lnn(
         #endif
         for (int j = 0; j < BLOCK_SIZE; j+=threadsy) {
             r = 0.0;
-            double xp = -d_x[col * BLOCK_SIZE + lidy + j];
-            x = TwoProductFMA(d_a[(col * BLOCK_SIZE + lidy) * n + row * BLOCK_SIZE + lidx + j * n], xp, &r);
+            double xp = -d_x[col * threadsx + lidy + j];
+            x = TwoProductFMA(d_a[(col * threadsx + lidy) * n + row * BLOCK_SIZE + lidx + j * n], xp, &r);
 
             #ifdef NVIDIA
                 #pragma unroll
@@ -363,7 +342,7 @@ __kernel void trsv_lnn(
                 x = s;
             }
             if(x != 0.0)
-                Accumulate(l_working, x);
+                Accumulate(l_working, lda, x);
 
             #ifdef NVIDIA
                 #pragma unroll
@@ -374,13 +353,21 @@ __kernel void trsv_lnn(
                 r = s;
             }
             if(r != 0.0)
-                Accumulate(l_working, r);
+                Accumulate(l_working, lda, r);
         }
     }
     barrier(CLK_LOCAL_MEM_FENCE);
 
     // Apply update from diagonal block (row, row)
     if (lidy == 0) {
+	/*for (int i = 0; i < BIN_COUNT; i++) {
+        	long sum = 0.0;
+	        for(int j = 0; j < threadsy; j++)
+        	    sum += l_working[i * lda + j * threadsx];
+		l_working[i * lda] = sum;
+	}
+        barrier(CLK_LOCAL_MEM_FENCE);*/
+
         double val = 0.0;
         __local volatile double xs;
         #ifdef NVIDIA
@@ -394,10 +381,10 @@ __kernel void trsv_lnn(
                     #pragma unroll
                 #endif
                 for(uint i = 0; i != NBFPE; ++i)
-                    Accumulate(l_working, fpe[i]);
+                    Accumulate(l_working, lda, fpe[i]);
                 barrier(CLK_LOCAL_MEM_FENCE);
 
-                val = Round(l_working);
+                val = Round(l_working, lda);
                 if (!isunit)
                     val *= cache[i * (BLOCK_SIZE + 1)];
                 xs = val;
@@ -415,7 +402,7 @@ __kernel void trsv_lnn(
                     x = s;
                 }
                 if(x != 0.0)
-                    Accumulate(l_working, x);
+                    Accumulate(l_working, lda, x);
 
                 #ifdef NVIDIA
                     #pragma unroll
@@ -426,7 +413,7 @@ __kernel void trsv_lnn(
                     r = s;
                 }
                 if(r != 0.0)
-                    Accumulate(l_working, r);
+                    Accumulate(l_working, lda, r);
             }
         }
         d_x[row * BLOCK_SIZE + tid] = val;
