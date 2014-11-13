@@ -330,7 +330,6 @@ __kernel void trsv_lnn(
             #pragma unroll
         #endif
         for (int j = 0; j < BLOCK_SIZE; j+=threadsy) {
-            r = 0.0;
             double xp = -d_x[col * threadsx + lidy + j];
             x = TwoProductFMA(d_a[(col * threadsx + lidy) * n + row * BLOCK_SIZE + lidx + j * n], xp, &r);
 
@@ -348,7 +347,6 @@ __kernel void trsv_lnn(
                 #pragma unroll
             #endif
             for(uint i = 0; i != NBFPE; ++i) {
-                s = 0.0;
                 fpe[i] = KnuthTwoSum(fpe[i], r, &s);
                 r = s;
             }
@@ -358,9 +356,16 @@ __kernel void trsv_lnn(
     }
     barrier(CLK_LOCAL_MEM_FENCE);
 
+    /*//merge fpes
+    if (lidy != 0) {
+    	for(uint i = 0; i != NBFPE; ++i)
+            Accumulate(l_working, lda, fpe[i]);
+    }
+    barrier(CLK_LOCAL_MEM_FENCE);*/
     // Apply update from diagonal block (row, row)
     if (lidy == 0) {
-	/*for (int i = 0; i < BIN_COUNT; i++) {
+	/*//merge superaccs
+	for (int i = 0; i < BIN_COUNT; i++) {
         	long sum = 0.0;
 	        for(int j = 0; j < threadsy; j++)
         	    sum += l_working[i * lda + j * threadsx];
@@ -390,14 +395,12 @@ __kernel void trsv_lnn(
                 xs = val;
             }
             if (lidx > i) {
-                r = 0.0;
                 x = TwoProductFMA(cache[i * BLOCK_SIZE + lidx], xs, &r);
 
                 #ifdef NVIDIA
                     #pragma unroll
                 #endif
                 for(uint i = 0; i != NBFPE; ++i) {
-                    s = 0.0;
                     fpe[i] = KnuthTwoSum(fpe[i], x, &s);
                     x = s;
                 }
@@ -408,7 +411,6 @@ __kernel void trsv_lnn(
                     #pragma unroll
                 #endif
                 for(uint i = 0; i != NBFPE; ++i) {
-                    s = 0.0;
                     fpe[i] = KnuthTwoSum(fpe[i], r, &s);
                     r = s;
                 }

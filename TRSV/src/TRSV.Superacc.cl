@@ -299,7 +299,6 @@ __kernel void trsv_lnn(
             #pragma unroll
         #endif
         for (int j = 0; j < threadsx; j+=threadsy) {
-            r = 0.0;
             xp = -d_x[col * threadsx + lidy + j];
             x = TwoProductFMA(d_a[(col * threadsx + lidy) * n + row * BLOCK_SIZE + lidx + j * n], xp, &r);
 
