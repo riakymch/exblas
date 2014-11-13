@@ -3,7 +3,7 @@ function trsv_unn_sym()
   err_d = [];
   err_k = [];
   
-  n = 100;
+  n = 10;
   c = 20 * sort(rand(n,1));
   for i = 1:n
     %[A, b] = trsv_gen_unn_my(i);
