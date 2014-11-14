@@ -318,8 +318,17 @@ __kernel void trsv_lnn(
             fpe[i] = KnuthTwoSum(fpe[i], x, &s);
             x = s;
         }
-        if(x != 0.0)
+        if(x != 0.0) {
             Accumulate(l_working, lda, x);
+            //So, there is not space in FPEs -- need to flush to the accumulator
+            #ifdef NVIDIA
+                #pragma unroll
+            #endif
+            for(uint i = 0; i != NBFPE; ++i) {
+                Accumulate(l_working, lda, fpe[i]);
+                fpe[i] = 0.0;
+            }
+        }
     }
     barrier(CLK_LOCAL_MEM_FENCE);
     int col_done = -1;
@@ -329,7 +338,7 @@ __kernel void trsv_lnn(
         #ifdef NVIDIA
             #pragma unroll
         #endif
-        for (int j = 0; j < BLOCK_SIZE; j+=threadsy) {
+        for (int j = 0; j < threadsx; j+=threadsy) {
             double xp = -d_x[col * threadsx + lidy + j];
             x = TwoProductFMA(d_a[(col * threadsx + lidy) * n + row * BLOCK_SIZE + lidx + j * n], xp, &r);
 
@@ -340,8 +349,17 @@ __kernel void trsv_lnn(
                 fpe[i] = KnuthTwoSum(fpe[i], x, &s);
                 x = s;
             }
-            if(x != 0.0)
+            if(x != 0.0) {
                 Accumulate(l_working, lda, x);
+                //So, there is not space in FPEs -- need to flush to the accumulator
+                #ifdef NVIDIA
+                    #pragma unroll
+                #endif
+                for(uint i = 0; i != NBFPE; ++i) {
+                    Accumulate(l_working, lda, fpe[i]);
+                    fpe[i] = 0.0;
+                }
+            }
 
             #ifdef NVIDIA
                 #pragma unroll
@@ -358,19 +376,20 @@ __kernel void trsv_lnn(
 
     /*//merge fpes
     if (lidy != 0) {
-    	for(uint i = 0; i != NBFPE; ++i)
+        for(uint i = 0; i != NBFPE; ++i)
             Accumulate(l_working, lda, fpe[i]);
     }
     barrier(CLK_LOCAL_MEM_FENCE);*/
+
     // Apply update from diagonal block (row, row)
     if (lidy == 0) {
-	/*//merge superaccs
-	for (int i = 0; i < BIN_COUNT; i++) {
-        	long sum = 0.0;
-	        for(int j = 0; j < threadsy; j++)
-        	    sum += l_working[i * lda + j * threadsx];
-		l_working[i * lda] = sum;
-	}
+        /*//merge superaccs
+        for (int i = 0; i < BIN_COUNT; i++) {
+            long sum = 0.0;
+            for(int j = 0; j < threadsy; j++)
+                sum += l_working[i * lda + j * threadsx];
+            l_working[i * lda] = sum;
+        }
         barrier(CLK_LOCAL_MEM_FENCE);*/
 
         double val = 0.0;
@@ -385,9 +404,10 @@ __kernel void trsv_lnn(
                 #ifdef NVIDIA
                     #pragma unroll
                 #endif
-                for(uint i = 0; i != NBFPE; ++i)
+                for(uint i = 0; i != NBFPE; ++i) {
                     Accumulate(l_working, lda, fpe[i]);
-                barrier(CLK_LOCAL_MEM_FENCE);
+                    fpe[i] = 0.0;
+                }
 
                 val = Round(l_working, lda);
                 if (!isunit)
@@ -404,8 +424,17 @@ __kernel void trsv_lnn(
                     fpe[i] = KnuthTwoSum(fpe[i], x, &s);
                     x = s;
                 }
-                if(x != 0.0)
+                if(x != 0.0) {
                     Accumulate(l_working, lda, x);
+                    //So, there is not space in FPEs -- need to flush to the accumulator
+                    #ifdef NVIDIA
+                        #pragma unroll
+                    #endif
+                    for(uint i = 0; i != NBFPE; ++i) {
+                        Accumulate(l_working, lda, fpe[i]);
+                        fpe[i] = 0.0;
+                    }
+                }
 
                 #ifdef NVIDIA
                     #pragma unroll

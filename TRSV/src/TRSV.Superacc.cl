@@ -311,16 +311,16 @@ __kernel void trsv_lnn(
 
     // Apply update from diagonal block (row, row)
     if (lidy == 0) {
-	for (int i = 0; i < BIN_COUNT; i++) {
-        	long sum = 0.0;
-	        for(int j = 0; j < threadsy; j++)
-        	    //sum += l_working[i * lda + j * threadsx * BIN_COUNT];
-        	    sum += l_working[i * lda + j * threadsx];
-		l_working[i * lda] = sum;
-	}
+        for (int i = 0; i < BIN_COUNT; i++) {
+            long sum = 0.0;
+            for(int j = 0; j < threadsy; j++)
+                //sum += l_working[i * lda + j * threadsx * BIN_COUNT];
+                sum += l_working[i * lda + j * threadsx];
+            l_working[i * lda] = sum;
+        }
         barrier(CLK_LOCAL_MEM_FENCE);
 
-	double val = 0.0;
+        double val = 0.0;
         __local volatile double xs;
         #ifdef NVIDIA
             #pragma unroll
@@ -333,7 +333,6 @@ __kernel void trsv_lnn(
                 xs = val;
             }
             if (lidx > i) {
-                r = 0.0;
                 x = TwoProductFMA(cache[i * BLOCK_SIZE + lidx], xs, &r);
 
                 Accumulate(l_working, lda, x);
