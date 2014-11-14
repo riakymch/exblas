@@ -325,8 +325,6 @@ __kernel void trsv_lnn(
                 }
             }
         }
-        if(x != 0.0)
-            Accumulate(l_working, lda, x);
     }
     barrier(CLK_LOCAL_MEM_FENCE);
     int col_done = -1;
