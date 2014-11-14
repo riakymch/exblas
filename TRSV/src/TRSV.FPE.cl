@@ -318,17 +318,6 @@ __kernel void trsv_lnn(
             fpe[i] = KnuthTwoSum(fpe[i], x, &s);
             x = s;
         }
-        if(x != 0.0) {
-            Accumulate(l_working, lda, x);
-            //So, there is not space in FPEs -- need to flush to the accumulator
-            #ifdef NVIDIA
-                #pragma unroll
-            #endif
-            for(uint i = 0; i != NBFPE; ++i) {
-                Accumulate(l_working, lda, fpe[i]);
-                fpe[i] = 0.0;
-            }
-        }
     }
     barrier(CLK_LOCAL_MEM_FENCE);
     int col_done = -1;
