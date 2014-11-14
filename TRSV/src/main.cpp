@@ -90,10 +90,10 @@ int main(int argc, char **argv)
     } else if (__alg == 2) {
         runTRSV("../src/TRSV.FPE.cl");
     } else if (__alg == 3) {
-        __nbfpe = 8;
-        runTRSV("../src/TRSV.double-double.cl");
-    } else if (__alg == 4) {
         __nbfpe = 4;
+        runTRSV("../src/TRSV.FPE.EX.4.cl");
+    } else if (__alg == 4) {
+        __nbfpe = 6;
         runTRSV("../src/TRSV.FPE.EX.6.cl");
     } else if (__alg == 5) {
         __nbfpe = 6;
