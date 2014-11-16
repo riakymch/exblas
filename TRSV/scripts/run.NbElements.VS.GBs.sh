@@ -10,8 +10,8 @@ fi
 
 nbMax=32768
 step=2
-exe=./../src/main.out
-file=../results/NbElements.VS.GBs.NVIDIA.2014.04.29.Round.dat
+exe=./../src/main.out.nvidia
+file=../results/NbElements_VS_Time_NVIDIA_K20c_2014_11_16_Round.dat
 
 touch $file
 echo -n "" > $file
