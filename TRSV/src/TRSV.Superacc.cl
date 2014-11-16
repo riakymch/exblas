@@ -292,14 +292,14 @@ __kernel void trsv_lnn(
     barrier(CLK_LOCAL_MEM_FENCE);
     int col_done = -1;
 
-    double x, r, xp;
+    double x, r;
     for (int col = 0; col < row; col++) {
         wait_until_ge(tid, &sync[0], col, &col_done); // Wait for diagonal block to be done
         #ifdef NVIDIA
             #pragma unroll
         #endif
         for (int j = 0; j < threadsx; j+=threadsy) {
-            xp = -d_x[col * threadsx + lidy + j];
+            double xp = -d_x[col * threadsx + lidy + j];
             x = TwoProductFMA(d_a[(col * threadsx + lidy) * n + row * BLOCK_SIZE + lidx + j * n], xp, &r);
 
             Accumulate(l_working, lda, x);

@@ -340,7 +340,7 @@ __kernel void trsv_lnn(
             }
             if(x != 0.0) {
                 Accumulate(l_working, lda, x);
-                //So, there is not space in FPEs -- need to flush to the accumulator
+                //So, there is not space in FPEs, meaning we need to flush to the accumulator
                 #ifdef NVIDIA
                     #pragma unroll
                 #endif
