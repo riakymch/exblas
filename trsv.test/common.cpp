@@ -246,8 +246,9 @@ extern "C" void printVector(
     const double *a,
     const uint n
 ){
+    printf("[ ");
     for (uint i = 0; i < n; i++)
-        printf("%.4g\t", a[i]);
-    printf("\n");
+        printf("%.4g, ", a[i]);
+    printf("]\n");
 }
 
