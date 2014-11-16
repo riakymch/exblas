@@ -84,7 +84,8 @@ int main(int argc, char **argv)
     printf("Starting with a matrix with  %i rows\n\n", __n);
 
     if (__alg == 0) {
-        runTRSV("../src/TRSV.Superacc.local.cl");
+        //runTRSV("../src/TRSV.Superacc.local.cl");
+        runTRSV("../src/TRSV.cl");
     } else if (__alg == 1) {
         runTRSV("../src/TRSV.Superacc.cl");
     } else if (__alg == 2) {
@@ -96,7 +97,7 @@ int main(int argc, char **argv)
         __nbfpe = 6;
         runTRSV("../src/TRSV.FPE.EX.6.cl");
     } else if (__alg == 5) {
-        __nbfpe = 6;
+        __nbfpe = 8;
         runTRSV("../src/TRSV.FPE.EX.8.cl");
     }
 }
@@ -190,7 +191,6 @@ int runTRSV(const char* program_file){
 
             if (ciErrNum != CL_SUCCESS)
                 cleanUp(EXIT_FAILURE);
-
 #ifdef GPU_PROFILING
         double gpuTime[NUM_ITER];
         cl_event startMark, endMark;
@@ -239,9 +239,9 @@ int runTRSV(const char* program_file){
                     printf("Error in clEnqueueReadBuffer Line %u in file %s !!!\n\n", __LINE__, __FILE__);
                     cleanUp(EXIT_FAILURE);
                 }
-                printMatrix(1, (const double *) h_A, __n, __n);
-                printVector((const double *) h_b, __n);
-                printVector((const double *) h_res, __n);
+                //printMatrix(1, (const double *) h_A, __n, __n);
+                //printVector((const double *) h_b, __n);
+                //printVector((const double *) h_res, __n);
                 /*PassFailFlag = verifyTRSVLNU((const double *) h_A, (const double *) h_b, (const double *) h_res, (const int) __n, 1e-15);
                 if (PassFailFlag)
                     printf(" ...results on GPU are VERIFIED\n");
@@ -249,13 +249,13 @@ int runTRSV(const char* program_file){
                     printf(" ...results on GPU do NOT match\n");*/
 
             printf(" ...TRSV on CPU\n");
-                //TRSVLNU((double *) trsv_cpu, (const double *)h_A, __n);
+                TRSVLNU((double *) trsv_cpu, (const double *)h_A, __n);
                 //printVector((const double *) trsv_cpu, __n);
 
             printf(" ...comparing the results\n");
                 //printf("//--------------------------------------------------------\n");
-                //PassFailFlag &= compare((const double *) trsv_cpu, (const double *) h_res, __n, 1e-15);
-                PassFailFlag = compareTRSVLNUToMPFR((const double *)h_A, (double *) h_b, (double *) h_res, __n, 1e-15);
+                PassFailFlag &= compare((const double *) trsv_cpu, (const double *) h_res, __n, 1e-15);
+                //PassFailFlag = compareTRSVLNUToMPFR((const double *)h_A, (double *) h_b, (double *) h_res, __n, 1e-15);
 
         //Release kernels and program
         printf("Shutting down...\n\n");

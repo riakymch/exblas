@@ -139,7 +139,7 @@ void init_fpuniform_lu_matrix(double *a, const uint n, const int range, const in
             if (j < i)
                 a[j * n + i] = randDouble(0, range, 1);
             else if (j == i)
-                a[i * (n + 1)] = randDouble(0, range, 1) * 1;
+                a[i * (n + 1)] = randDouble(0, range, 1) * 100;
             else
                 a[j * n + i] = 0.0;
 }

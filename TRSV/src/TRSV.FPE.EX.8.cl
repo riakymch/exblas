@@ -322,6 +322,22 @@ __kernel void trsv_lnn(
                 if(x != 0.0) {
                     fpe[3] = KnuthTwoSum(fpe[3], x, &s);
                     x = s;
+                    if(x != 0.0) {
+                        fpe[4] = KnuthTwoSum(fpe[4], x, &s);
+                        x = s;
+                        if(x != 0.0) {
+                            fpe[5] = KnuthTwoSum(fpe[5], x, &s);
+                            x = s;
+                            if(x != 0.0) {
+                                fpe[6] = KnuthTwoSum(fpe[6], x, &s);
+                                x = s;
+                                if(x != 0.0) {
+                                    fpe[7] = KnuthTwoSum(fpe[7], x, &s);
+                                    x = s;
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -349,6 +365,22 @@ __kernel void trsv_lnn(
                     if(x != 0.0) {
                         fpe[3] = KnuthTwoSum(fpe[3], x, &s);
                         x = s;
+                        if(x != 0.0) {
+                            fpe[4] = KnuthTwoSum(fpe[4], x, &s);
+                            x = s;
+                            if(x != 0.0) {
+                                fpe[5] = KnuthTwoSum(fpe[5], x, &s);
+                                x = s;
+                                if(x != 0.0) {
+                                    fpe[6] = KnuthTwoSum(fpe[6], x, &s);
+                                    x = s;
+                                    if(x != 0.0) {
+                                        fpe[7] = KnuthTwoSum(fpe[7], x, &s);
+                                        x = s;
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -375,6 +407,22 @@ __kernel void trsv_lnn(
                     if(r != 0.0) {
                         fpe[3] = KnuthTwoSum(fpe[3], r, &s);
                         r = s;
+                        if(r != 0.0) {
+                            fpe[4] = KnuthTwoSum(fpe[4], r, &s);
+                            r = s;
+                            if(r != 0.0) {
+                                fpe[5] = KnuthTwoSum(fpe[5], r, &s);
+                                r = s;
+                                if(r != 0.0) {
+                                    fpe[6] = KnuthTwoSum(fpe[6], r, &s);
+                                    r = s;
+                                    if(r != 0.0) {
+                                        fpe[7] = KnuthTwoSum(fpe[7], r, &s);
+                                        r = s;
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -438,6 +486,22 @@ __kernel void trsv_lnn(
                         if(x != 0.0) {
                             fpe[3] = KnuthTwoSum(fpe[3], x, &s);
                             x = s;
+                            if(x != 0.0) {
+                                fpe[4] = KnuthTwoSum(fpe[4], x, &s);
+                                x = s;
+                                if(x != 0.0) {
+                                    fpe[5] = KnuthTwoSum(fpe[5], x, &s);
+                                    x = s;
+                                    if(x != 0.0) {
+                                        fpe[6] = KnuthTwoSum(fpe[6], x, &s);
+                                        x = s;
+                                        if(x != 0.0) {
+                                            fpe[7] = KnuthTwoSum(fpe[7], x, &s);
+                                            x = s;
+                                        }
+                                    }
+                                }
+                            }
                         }
                     }
                 }
@@ -464,6 +528,22 @@ __kernel void trsv_lnn(
                         if(r != 0.0) {
                             fpe[3] = KnuthTwoSum(fpe[3], r, &s);
                             r = s;
+                            if(r != 0.0) {
+                                fpe[4] = KnuthTwoSum(fpe[4], r, &s);
+                                r = s;
+                                if(r != 0.0) {
+                                    fpe[5] = KnuthTwoSum(fpe[5], r, &s);
+                                    r = s;
+                                    if(r != 0.0) {
+                                        fpe[6] = KnuthTwoSum(fpe[6], r, &s);
+                                        r = s;
+                                        if(r != 0.0) {
+                                            fpe[7] = KnuthTwoSum(fpe[7], r, &s);
+                                            r = s;
+                                        }
+                                    }
+                                }
+                            }
                         }
                     }
                 }
