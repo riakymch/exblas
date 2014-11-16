@@ -307,8 +307,8 @@ __kernel void trsv_lnn(
     for (uint i = 0; i < BIN_COUNT; i++)
         l_working[i * lda] = 0;
     // FPEs
-    double x, s, r;
     double fpe[NBFPE] = {0.0};
+    double x, s, r;
     if(lidy == 0) {
         x = d_b[row * threadsx + lidx];
         #ifdef NVIDIA

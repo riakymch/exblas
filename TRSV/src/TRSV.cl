@@ -78,13 +78,13 @@ __kernel void trsv_init(
  */
 void tocache(
     __global const double *a,
+    __local double *cache,
     const uint nbi,
     const uint ntid,
     const uint trans,
     const uint isunit,
     const uint tid,
-    const uint lda,
-    __local double *cache
+    const uint lda
 ){
     int x = tid % nbi;
     int y = tid / nbi;
@@ -141,7 +141,7 @@ __kernel void trsv_lnn(
             regcache[j / threadsy] = d_a[((row - 1) * BLOCK_SIZE + lidy) * n + row * BLOCK_SIZE + lidx + j * n];
     */
     // Copy diagonal block to shared memory
-    tocache(&d_a[row * BLOCK_SIZE * n + row * BLOCK_SIZE], BLOCK_SIZE, threadsx * threadsy, 0, isunit, tid, n, cache);
+    tocache(&d_a[row * BLOCK_SIZE * n + row * BLOCK_SIZE], cache, BLOCK_SIZE, threadsx * threadsy, 0, isunit, tid, n);
     barrier(CLK_LOCAL_MEM_FENCE);
 
     // Loop over blocks as they become available

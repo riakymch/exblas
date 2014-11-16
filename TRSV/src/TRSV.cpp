@@ -131,7 +131,7 @@ extern "C" bool compareTRSVLNUToMPFR(
         //b[i] = mpfr_get_d(sum, MPFR_RNDN);
     }
 
-    //printVector(b, n);
+    printVector(b, n);
     double norm_diff = 0.0;
     double norm_exact = 0.0;
     //Compare the GPU and MPFR results
