@@ -35,7 +35,7 @@ static void __usage(int argc __attribute__((unused)), char **argv) {
     fprintf(stderr, "Usage: %s [-n nbrows of A,\n", argv[0]);
     printf("                          -r range,\n");
     printf("                          -e nbfpe,\n");
-    printf("                          -a alg (0-trsv, 1-acc, 2-fpe, 3-fpeex4, 4-fpeex6, 5-fpeex8, 6-accloc)] \n");
+    printf("                          -a alg (0-trsv, 1-acc, 2-fpe, 3-fpeex4, 4-fpeex6, 5-fpeex8, 6-accpr, 7-accloc)] \n");
     printf("       -?, -h:    Display this help and exit\n");
 }
 
@@ -65,7 +65,7 @@ static void __parse_args(int argc, char **argv) {
         __usage(argc, argv);
         exit(-1);
     }
-    if (__alg > 6) {
+    if (__alg > 7) {
         __usage(argc, argv);
         exit(-1);
     }
@@ -100,6 +100,8 @@ int main(int argc, char **argv)
         __nbfpe = 8;
         runTRSV("../src/TRSV.FPE.EX.8.cl");
     } else if (__alg == 6) {
+        runTRSV("../src/TRSV.Superacc.private.cl");
+    } else if (__alg == 7) {
         runTRSV("../src/TRSV.Superacc.local.cl");
     }
 }
