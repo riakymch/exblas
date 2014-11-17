@@ -35,7 +35,7 @@ static void __usage(int argc __attribute__((unused)), char **argv) {
     fprintf(stderr, "Usage: %s [-n nbrows of A,\n", argv[0]);
     printf("                          -r range,\n");
     printf("                          -e nbfpe,\n");
-    printf("                          -a alg (0-trsv, 1-acc, 2-fpe, 3-fpeex4, 4-fpeex6, 5-fpeex8)] \n");
+    printf("                          -a alg (0-trsv, 1-acc, 2-fpe, 3-fpeex4, 4-fpeex6, 5-fpeex8, 6-accloc)] \n");
     printf("       -?, -h:    Display this help and exit\n");
 }
 
@@ -65,7 +65,7 @@ static void __parse_args(int argc, char **argv) {
         __usage(argc, argv);
         exit(-1);
     }
-    if (__alg > 5) {
+    if (__alg > 6) {
         __usage(argc, argv);
         exit(-1);
     }
@@ -99,6 +99,8 @@ int main(int argc, char **argv)
     } else if (__alg == 5) {
         __nbfpe = 8;
         runTRSV("../src/TRSV.FPE.EX.8.cl");
+    } else if (__alg == 6) {
+        runTRSV("../src/TRSV.Superacc.local.cl");
     }
 }
 
@@ -249,13 +251,13 @@ int runTRSV(const char* program_file){
                     printf(" ...results on GPU do NOT match\n");*/
 
             printf(" ...TRSV on CPU\n");
-                TRSVLNU((double *) trsv_cpu, (const double *)h_A, __n);
+                //TRSVLNU((double *) trsv_cpu, (const double *)h_A, __n);
                 //printVector((const double *) trsv_cpu, __n);
 
             printf(" ...comparing the results\n");
                 //printf("//--------------------------------------------------------\n");
-                PassFailFlag &= compare((const double *) trsv_cpu, (const double *) h_res, __n, 1e-15);
-                //PassFailFlag = compareTRSVLNUToMPFR((const double *)h_A, (double *) h_b, (double *) h_res, __n, 1e-15);
+                //PassFailFlag &= compare((const double *) trsv_cpu, (const double *) h_res, __n, 1e-15);
+                PassFailFlag = compareTRSVLNUToMPFR((const double *)h_A, (double *) h_b, (double *) h_res, __n, 1e-15);
 
         //Release kernels and program
         printf("Shutting down...\n\n");

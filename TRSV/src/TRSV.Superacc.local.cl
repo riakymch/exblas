@@ -274,7 +274,7 @@ __kernel void trsv_lnn(
     int lda = threadsx * threadsy;
 
     __local long d_Superaccs[threadsx * threadsy * BIN_COUNT];
-    __local long *l_working = d_Superaccs + get_group_id(0) * threadsy * threadsx * BIN_COUNT + (get_local_id(0) & (threadsx - 1));
+    __local long *l_working = d_Superaccs + tid;
 
     // Get row handled by this block
     int row = nextRow(&sync[1]);
@@ -289,11 +289,10 @@ __kernel void trsv_lnn(
         l_working[i * lda] = 0;
     if(lidy == 0)
         Accumulate(l_working, lda, d_b[row * threadsx + lidx]);
-    barrier(CLK_LOCAL_MEM_FENCE);
     int col_done = -1;
 
     double x, r;
-    /*for (int col = 0; col < row; col++) {
+    for (int col = 0; col < row; col++) {
         wait_until_ge(tid, &sync[0], col, &col_done); // Wait for diagonal block to be done
         #ifdef NVIDIA
             #pragma unroll
@@ -307,7 +306,7 @@ __kernel void trsv_lnn(
                 Accumulate(l_working, lda, r);
         }
     }
-    barrier(CLK_LOCAL_MEM_FENCE);*/
+    barrier(CLK_LOCAL_MEM_FENCE);
 
     // Apply update from diagonal block (row, row)
     if (lidy == 0) {
@@ -327,16 +326,13 @@ __kernel void trsv_lnn(
         #endif
         for (uint i = 0; i < BLOCK_SIZE; i++) {
             if (lidx == i) {
-                if (lidx == 1)
-                    Accumulate(l_working, lda, 1.0);
                 val = Round(l_working, lda);
-                //if (!isunit)
-                //    val *= cache[i * (BLOCK_SIZE + 1)];
+                if (!isunit)
+                    val *= cache[i * (BLOCK_SIZE + 1)];
                 xs = val;
             }
             if (lidx > i) {
-                //x = TwoProductFMA(cache[i * BLOCK_SIZE + lidx], xs, &r);
-                x = cache[i * BLOCK_SIZE + lidx];// * xs;
+                x = TwoProductFMA(cache[i * BLOCK_SIZE + lidx], xs, &r);
 
                 Accumulate(l_working, lda, x);
                 if (r != 0.0)

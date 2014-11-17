@@ -102,7 +102,7 @@ extern "C" cl_int initTRSV(
         }
 
     printf("...allocating internal buffer\n");
-        if (alg) {
+        if ((alg > 0) && (alg < 6)) {
             d_Superaccs = clCreateBuffer(cxGPUContext, CL_MEM_READ_WRITE, n * THREADSY * BIN_COUNT * sizeof(cl_long), NULL, &ciErrNum);
             if (ciErrNum != CL_SUCCESS) {
                 printf("Error in clCreateBuffer, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
@@ -129,7 +129,7 @@ extern "C" void closeTRSV(void){
     cl_int ciErrNum;
 
     ciErrNum  = clReleaseMemObject(d_sync);
-    if (__alg)
+    if ((__alg > 0) && (__alg < 6))
         ciErrNum  = clReleaseMemObject(d_Superaccs);
     ciErrNum &= clReleaseKernel(ckInit);
     ciErrNum &= clReleaseKernel(ckKernel);
@@ -183,7 +183,7 @@ extern "C" size_t TRSV(
         ciErrNum &= clSetKernelArg(ckKernel, i++, sizeof(cl_mem),  (void *)&d_a);
         ciErrNum &= clSetKernelArg(ckKernel, i++, sizeof(cl_mem),  (void *)&d_b);
         ciErrNum &= clSetKernelArg(ckKernel, i++, sizeof(cl_mem),  (void *)&d_sync);
-        if (__alg)
+        if ((__alg > 0) && (__alg < 6))
             ciErrNum &= clSetKernelArg(ckKernel, i++, sizeof(cl_mem),  (void *)&d_Superaccs);
         ciErrNum &= clSetKernelArg(ckKernel, i++, sizeof(cl_uint), (void *)&n);
         if (ciErrNum != CL_SUCCESS) {
