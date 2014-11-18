@@ -94,14 +94,14 @@ double Round(__local long *accumulator, int lda) {
     }
     if (negative) {
         //Skip ones
-        for (; accumulator[i * lda] == ((1 << digits) - 1) && i >= imin; --i) {
+        for (; accumulator[i * lda] == ((1l << digits) - 1) && i >= imin; --i) {
         }
     }
     if (i < 0)
         //TODO: should we preserve sign of zero?
         return 0.0;
 
-    long hiword = negative ? (1 << digits) - accumulator[i * lda] : accumulator[i * lda];
+    long hiword = negative ? (1l << digits) - accumulator[i * lda] : accumulator[i * lda];
     double rounded = (double) hiword;
     double hi = ldexp(rounded, (i - f_words) * digits);
     if (i == 0)
@@ -112,9 +112,9 @@ double Round(__local long *accumulator, int lda) {
     //Compute sticky
     long sticky = 0;
     for (int j = imin; j != i - 1; ++j)
-        sticky |= negative ? (1 << digits) - accumulator[j * lda] : accumulator[j * lda];
+        sticky |= negative ? (1l << digits) - accumulator[j * lda] : accumulator[j * lda];
 
-    long loword = negative ? (1 << digits) - accumulator[(i - 1) * lda] : accumulator[(i - 1) * lda];
+    long loword = negative ? (1l << digits) - accumulator[(i - 1) * lda] : accumulator[(i - 1) * lda];
     loword |= !!sticky;
     double lo = ldexp((double) loword, (i - 1 - f_words) * digits);
 
