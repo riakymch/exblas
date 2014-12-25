@@ -11,11 +11,12 @@
 ////////////////////////////////////////////////////////////////////////////////
 double dblkSolver(
     __local double *a,
+    volatile __local double xs,
     const uint isunit,
     const int lda,
     double val
 ){
-    volatile __local double xs;
+    //volatile __local double xs;
     uint lidx = get_local_id(0);
 
     #ifdef NVIDIA
