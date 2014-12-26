@@ -1,12 +1,7 @@
+
 /*
- * Copyright 1993-2010 NVIDIA Corporation.  All rights reserved.
- *
- * Please refer to the NVIDIA end user license agreement (EULA) associated
- * with this source code for terms and conditions that govern your use of
- * this software. Any use, reproduction, disclosure, or distribution of
- * this software and related documentation outside the terms of the EULA
- * is strictly prohibited.
- *
+ *  Copyright (c) 2014 University Pierre and Marie Curie 
+ *  All rights reserved.
  */
 
 #pragma OPENCL EXTENSION cl_khr_int64_base_atomics     : enable  // For 64 atomic operations
@@ -83,28 +78,12 @@ int Normalize(long *accumulator, int *imin, int *imax) {
     int i;
     // Sign-extend all the way
     for (i = *imin + 1; i < BIN_COUNT; ++i) {
-#if 1
-        long carry_out = accumulator[i] >> digits;    // Arithmetic shift
-        accumulator[i] += carry_in - (carry_out << digits);
-#else
-        // BUGGY
-        // get carry of accumulator[i] + carry_in
-        unsigned char overflow;
-        long oldword = xadd(&accumulator[i], carry_in, &overflow);
-        int s = oldword > 0;
-        long carrybit = (s ? 1ll << K : -1ll << K);
-
-        long carry_out = (accumulator[i] >> digits) + carrybit;// Arithmetic shift
-        accumulator[i] -= carry_out << digits;
-#endif
+        accumulator[i] += carry_in;
+        long carry_out = (accumulator[i] >> digits);    // Arithmetic shift
+        accumulator[i] -= (carry_out << digits);
         carry_in = carry_out;
     }
     *imax = i - 1;
-
-    if ((carry_in != 0) && (carry_in != -1)) {
-        //TODO: handle overflow
-        //status = Overflow;
-    }
 
     return carry_in < 0;
 }
@@ -121,14 +100,14 @@ double Round(long *accumulator) {
     }
     if (negative) {
         //Skip ones
-        for (; accumulator[i] == ((1 << digits) - 1) && i >= imin; --i) {
+	for(; (accumulator[i] & ((1l << digits) - 1)) == ((1l << digits) - 1) && i >= imin; --i) {
         }
     }
     if (i < 0)
         //TODO: should we preserve sign of zero?
         return 0.0;
 
-    long hiword = negative ? (1 << digits) - accumulator[i] : accumulator[i];
+    long hiword = negative ? ((1l << digits) - 1) - accumulator[i] : accumulator[i];
     double rounded = (double) hiword;
     double hi = ldexp(rounded, (i - f_words) * digits);
     if (i == 0)
@@ -139,9 +118,9 @@ double Round(long *accumulator) {
     //Compute sticky
     long sticky = 0;
     for (int j = imin; j != i - 1; ++j)
-        sticky |= negative ? (1 << digits) - accumulator[j] : accumulator[j];
+        sticky |= negative ? (1l << digits) - accumulator[j] : accumulator[j];
 
-    long loword = negative ? (1 << digits) - accumulator[i - 1] : accumulator[i - 1];
+    long loword = negative ? (1l << digits) - accumulator[i - 1] : accumulator[i - 1];
     loword |= !!sticky;
     double lo = ldexp((double) loword, (i - 1 - f_words) * digits);
 
