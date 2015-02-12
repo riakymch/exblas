@@ -41,12 +41,12 @@ def plotNbElementsVSGbs(input, output):
     gp('set output "| epstopdf --filter > ' + output + '"')    
 
     # legend
-    gp('set key width -2. samplen 1.8')
+    gp('set key width -3.5 samplen 1.8')
     gp('set key top left')
 
     # margins
     gp('set tmargin .5')
-    gp('set rmargin 1.')
+    gp('set rmargin .5')
     gp('set lmargin 5.7')
 
     plot1 = Gnuplot.Data(results, with_='linespoints lt 1 lw 3.0 lc rgb "black" pt 2', title=None)
@@ -84,25 +84,25 @@ def plotNbElementsVSGbsAll(input, output):
     gp('set output "| epstopdf --filter > ' + output + '"')
 
     # legend
-    gp('set key width -7. samplen 1.8')
+    gp('set key width -3.5 samplen 1.8')
     gp('set key top left')
 
     # margins
     gp('set tmargin .5')
-    gp('set rmargin 2.5')
+    gp('set rmargin 1.')
     gp('set lmargin 7.5')
 
     plotNaive = Gnuplot.Data(naive, with_='lines lt 1 lw 4.0', title="Parallel DTRSV")
-    plotSuperaccs = Gnuplot.Data(superaccs, with_='lines lt 7 lw 4.0', title="Superaccumulator")
+    plotSuperaccs = Gnuplot.Data(superaccs, with_='lines lt 7 lw 4.0', title="Superacc")
     plotfpe2 = Gnuplot.Data(fpe2, with_='lines lt 8 lw 4.0', title="Expansion 2")
-    plotfpe3 = Gnuplot.Data(fpe3, with_='lines lt 5 lw 4.0', title="Expansion 3")
-    plotfpe4 = Gnuplot.Data(fpe4, with_='lines lt 2 lw 4.0', title="Expansion 4")
+    plotfpe3 = Gnuplot.Data(fpe3, with_='lines lt 5 lw 4.0', title="FPE3 + Superacc")
+    plotfpe4 = Gnuplot.Data(fpe4, with_='lines lt 2 lw 4.0', title="FPE4 + Superacc")
     plotfpe5 = Gnuplot.Data(fpe5, with_='lines lt 6 lw 4.0', title="Expansion 5")
-    plotfpe6 = Gnuplot.Data(fpe6, with_='lines lt 8 lw 4.0', title="Expansion 6")
+    plotfpe6 = Gnuplot.Data(fpe6, with_='lines lt 8 lw 4.0', title="FPE6 + Superacc")
     plotfpe7 = Gnuplot.Data(fpe7, with_='lines lt 0 lw 4.0', title="Expansion 7")
-    plotfpe8 = Gnuplot.Data(fpe8, with_='lines lt 4 lw 4.0', title="Expansion 8")
+    plotfpe8 = Gnuplot.Data(fpe8, with_='lines lt 4 lw 4.0', title="FPE8 + Superacc")
     plotfpe4ee = Gnuplot.Data(fpe4ee, with_='lines lt 0 lw 4.0', title="Expansion 4 early-exit")
-    plotfpe6ee = Gnuplot.Data(fpe6ee, with_='lines lt 9 lw 4.0', title="Expansion 6 early-exit")
+    plotfpe6ee = Gnuplot.Data(fpe6ee, with_='lines lt 9 lw 4.0', title="FPE6EE + Superacc")
     plotfpe8ee = Gnuplot.Data(fpe8ee, with_='lines lt 3 lw 4.0', title="Expansion 8 early-exit")
 
     #gp.plot(plotNaive, plotSuperaccs, plotfpe2, plotfpe3, plotfpe4, plotfpe5, plotfpe6, plotfpe7, plotfpe8, plotfpe8ee)
