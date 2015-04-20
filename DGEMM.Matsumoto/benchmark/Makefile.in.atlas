@@ -1,8 +1,0 @@
-BLASDIR	= /usr/local/atlas
-
-CC	= gcc
-CXX	= g++
-
-OPTS	= -O2 -fopenmp -mavx
-CFLAGS	= -I../include -I$(BLASDIR)/include  -std=c99 $(OPTS) -Wall -DADD_ -DBENCHMARK_ATLAS
-LDFLAGS = -fopenmp -L/usr/lib -llapack -L$(BLASDIR)/lib -lptcblas -latlas -lblas
