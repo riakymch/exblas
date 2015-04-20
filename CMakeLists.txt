@@ -1,0 +1,61 @@
+# Copyright (c) 2013-2015 Inria and University Pierre and Marie Curie
+
+cmake_minimum_required (VERSION 2.8.8)
+include(CheckCSourceCompiles)
+include(CheckCXXSourceCompiles)
+include(CheckFunctionExists)
+
+project (EXBLAS)
+enable_language (CXX)
+
+# The version number.
+set (EXBLAS_VERSION_MAJOR 0)
+set (EXBLAS_VERSION_MINOR 1)
+set (EXBLAS_SOURCE_DIR ${PROJECT_SOURCE_DIR})
+set (EXBLAS_BINARY_DIR ${PROJECT_BINARY_DIR})
+
+# configure a header file to pass some of the CMake settings
+# to the source code
+configure_file (
+  "${PROJECT_SOURCE_DIR}/cmake/config.h.in"
+  "${PROJECT_BINARY_DIR}/include/config.h"
+)
+
+# include dir with config.h.in
+list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake/")
+
+# enable testing
+enable_testing ()
+
+# Recurse into the "src" subdirectory. This does not actually
+# cause another cmake executable to run. The same process will walk through
+# the project's entire directory structure.
+add_subdirectory (src)
+
+# build a CPack driven installer package
+include (InstallRequiredSystemLibraries)
+set (CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE")
+set (CPACK_PACKAGE_VERSION_MAJOR "${EXBLAS_VERSION_MAJOR}")
+set (CPACK_PACKAGE_VERSION_MINOR "${EXBLAS_VERSION_MINOR}")
+include (CPack)
+
+# add a target to generate API documentation with Doxygen
+find_package (Doxygen)
+if (DOXYGEN_FOUND)
+    configure_file (${PROJECT_SOURCE_DIR}/doc/Doxyfile.in ${PROJECT_BINARY_DIR}/doc/Doxyfile @ONLY)
+    add_custom_target (doc
+        ${DOXYGEN_EXECUTABLE} ${PROJECT_BINARY_DIR}/doc/Doxyfile
+        WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/doc
+        COMMENT "Generating API documentation with Doxygen" VERBATIM
+    )
+
+#include(UseLATEX)
+#    ADD_LATEX_DOCUMENT(${PROJECT_BINARY_DIR}/doc/latex/refman.tex
+#            DEFAULT_PDF
+#        )
+#    add_custom_command(TARGET pdf POST_BUILD
+#        COMMAND ${CMAKE_COMMAND} -E copy
+#        ${CMAKE_CURRENT_BINARY_DIR}/refman.pdf
+#        ${PROJECT_BINARY_DIR}/refman.pdf)
+endif (DOXYGEN_FOUND)
+
