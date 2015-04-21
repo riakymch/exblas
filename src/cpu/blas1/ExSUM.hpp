@@ -88,7 +88,7 @@ public:
  * \param inca specifies the increment for the elements of a
  * \return Contains the reproducible and accurate sum of elements of a real vector
  */
-double ExSumSuperacc(int N, double *a, int inca);
+double ExSUMSuperacc(int N, double *a, int inca);
 
 /**
  * \ingroup ExSUM

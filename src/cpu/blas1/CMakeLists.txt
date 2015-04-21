@@ -2,7 +2,7 @@
 # All rights reserved.
 
 # Testing
-add_executable (test.exsum ${PROJECT_SOURCE_DIR}/tests/test.sum.cpu.cpp)
+add_executable (test.exsum ${PROJECT_SOURCE_DIR}/tests/test.exsum.cpu.cpp)
 target_link_libraries (test.exsum ${EXTRA_LIBS})
 
 # add the install targets
