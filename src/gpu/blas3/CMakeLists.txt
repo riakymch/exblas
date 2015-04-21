@@ -2,17 +2,17 @@
 # All rights reserved.
 
 # Testing
-add_executable (test.exsum ${PROJECT_SOURCE_DIR}/tests/test.exsum.gpu.cpp)
-target_link_libraries (test.exsum ${EXTRA_LIBS})
+add_executable (test.exgemm ${PROJECT_SOURCE_DIR}/tests/test.exgemm.gpu.cpp)
+target_link_libraries (test.exgemm ${EXTRA_LIBS})
 
 # add the install targets
-install (TARGETS test.exsum DESTINATION ${PROJECT_BINARY_DIR}/tests)
+install (TARGETS test.exgemm DESTINATION ${PROJECT_BINARY_DIR}/tests)
 
-add_test (TestSumNaiveNumbers test.exsum 24)
+add_test (TestSumNaiveNumbers test.exgemm 24)
 set_tests_properties (TestSumNaiveNumbers PROPERTIES PASS_REGULAR_EXPRESSION "TestPassed; ALL OK!")
-add_test (TestSumStdDynRange test.exsum 24 2 0 n)
+add_test (TestSumStdDynRange test.exgemm 24 2 0 n)
 set_tests_properties (TestSumStdDynRange PROPERTIES PASS_REGULAR_EXPRESSION "TestPassed; ALL OK")
-add_test (TestSumLargeDynRange test.exsum 24 50 0 n)
+add_test (TestSumLargeDynRange test.exgemm 24 50 0 n)
 set_tests_properties (TestSumLargeDynRange PROPERTIES PASS_REGULAR_EXPRESSION "TestPassed; ALL OK!")
-add_test (TestSumIllConditioned test.exsum 24 1e+50 0 i)
+add_test (TestSumIllConditioned test.exgemm 24 1e+50 0 i)
 set_tests_properties (TestSumIllConditioned PROPERTIES PASS_REGULAR_EXPRESSION "TestPassed; ALL OK!")

@@ -263,7 +263,7 @@ void Accumulate(__local volatile long *sa, double x) {
 }
 
 __kernel __attribute__((reqd_work_group_size(WORKGROUP_SIZE, 1, 1)))
-void Reduction(
+void ExSUM(
     __global long *d_PartialSuperaccs,
     __global data_t *d_Data,
     const uint NbElements
@@ -367,7 +367,7 @@ void Reduction(
 // Merging
 ////////////////////////////////////////////////////////////////////////////////
 __kernel __attribute__((reqd_work_group_size(MERGE_WORKGROUP_SIZE, 1, 1)))
-void ReductionComplete(
+void ExSUMComplete(
     __global long *d_Superacc,
     __global long *d_PartialSuperaccs,
     uint PartialSuperaccusCount
@@ -409,7 +409,7 @@ void ReductionComplete(
 // Round the results
 ////////////////////////////////////////////////////////////////////////////////
 __kernel __attribute__((reqd_work_group_size(MERGE_WORKGROUP_SIZE, 1, 1)))
-void RoundSuperacc(
+void ExSUMRound(
     __global double *d_Res,
     __global long *d_Superacc
 ){

@@ -8,7 +8,7 @@
 #include <cstdio>
 #include <iostream>
 
-#include "dsum.hpp"
+#include "ExSUM.hpp"
 #include "blas1.hpp"
 
 
@@ -18,7 +18,7 @@
  * Otherwise, use floating-point expansions of size FPE with superaccumulators when needed
  * early_exit corresponds to the early-exit technique
  */
-double dsum(int Ng, double *ag, int inca, int fpe, bool early_exit) {
+double exsum(int Ng, double *ag, int inca, int fpe, bool early_exit) {
 #ifdef EXBLAS_MPI
     int np = 1, p, err;
     MPI_Comm_rank(MPI_COMM_WORLD, &p);
@@ -28,7 +28,7 @@ double dsum(int Ng, double *ag, int inca, int fpe, bool early_exit) {
     tbb::task_scheduler_init tbbinit(nthread);
 
     if (fpe < 0) {
-	fprintf(stderr, "Size of floating-point expansion should be a positive number. Preferably, it should be in the interval [2, 8]\n");
+        fprintf(stderr, "Size of floating-point expansion should be a positive number. Preferably, it should be in the interval [2, 8]\n");
         exit(1);
     }
 
@@ -37,26 +37,26 @@ double dsum(int Ng, double *ag, int inca, int fpe, bool early_exit) {
 #ifdef EXBLAS_MPI
     Superaccumulator acc, acc_fin;
     N = Ng / np + Ng % np;
-    
+
     a = (double *)_mm_malloc(N * sizeof(double), 32);
     if (!a)
         fprintf(stderr, "Cannot allocate memory for per process array\n");
-  
+
     int i;
     if (p == 0) {
-	//distribute
-	a = ag;
-	ag = ag + N;
-	for (i = 1; i < np; i++) {
-	    err = MPI_Send(ag + (i - 1)  * (N - Ng % np), N - Ng % np, MPI_DOUBLE, i, 0, MPI_COMM_WORLD);
-    	    if (err != MPI_SUCCESS)
-    	        fprintf(stderr, "MPI_Send does not word properly %d\n", err);
-	}
+        //distribute
+        a = ag;
+        ag = ag + N;
+        for (i = 1; i < np; i++) {
+            err = MPI_Send(ag + (i - 1)  * (N - Ng % np), N - Ng % np, MPI_DOUBLE, i, 0, MPI_COMM_WORLD);
+            if (err != MPI_SUCCESS)
+                fprintf(stderr, "MPI_Send does not word properly %d\n", err);
+        }
     } else {
-	MPI_Status status;
-	err = MPI_Recv(a, N - Ng % np, MPI_DOUBLE, 0, 0, MPI_COMM_WORLD, &status);
-    	if (err != MPI_SUCCESS)
-    	    fprintf(stderr, "MPI_Recv does not word properly %d\n", err);
+        MPI_Status status;
+        err = MPI_Recv(a, N - Ng % np, MPI_DOUBLE, 0, 0, MPI_COMM_WORLD, &status);
+        if (err != MPI_SUCCESS)
+            fprintf(stderr, "MPI_Recv does not word properly %d\n", err);
     }
 #else
     N = Ng;
@@ -65,46 +65,46 @@ double dsum(int Ng, double *ag, int inca, int fpe, bool early_exit) {
 
     // with superaccumulators only
     if (fpe < 2)
-        return xTBBSuperacc(N, a, inca);
+        return ExSUMSuperacc(N, a, inca);
     // there is no need and no improvement at all in using the early-exit technique for FPE of size 2
     if (fpe == 2)
-        return (xOMPFPE<FPExpansionVect<Vec4d, 2> >)(N, a, inca);
-   
+        return (ExSUMFPE<FPExpansionVect<Vec4d, 2> >)(N, a, inca);
+
     if (early_exit) {
         if (fpe == 3)
-	    return (xOMPFPE<FPExpansionVect<Vec4d, 3, FPExpansionTraits<true> > >)(N, a, inca);
+            return (ExSUMFPE<FPExpansionVect<Vec4d, 3, FPExpansionTraits<true> > >)(N, a, inca);
         if (fpe == 4)
-	    return (xOMPFPE<FPExpansionVect<Vec4d, 4, FPExpansionTraits<true> > >)(N, a, inca);
+            return (ExSUMFPE<FPExpansionVect<Vec4d, 4, FPExpansionTraits<true> > >)(N, a, inca);
         if (fpe == 5)
-	    return (xOMPFPE<FPExpansionVect<Vec4d, 5, FPExpansionTraits<true> > >)(N, a, inca);
+            return (ExSUMFPE<FPExpansionVect<Vec4d, 5, FPExpansionTraits<true> > >)(N, a, inca);
         if (fpe == 6)
-	    return (xOMPFPE<FPExpansionVect<Vec4d, 6, FPExpansionTraits<true> > >)(N, a, inca);
+            return (ExSUMFPE<FPExpansionVect<Vec4d, 6, FPExpansionTraits<true> > >)(N, a, inca);
         if (fpe == 7)
-	    return (xOMPFPE<FPExpansionVect<Vec4d, 7, FPExpansionTraits<true> > >)(N, a, inca);
+            return (ExSUMFPE<FPExpansionVect<Vec4d, 7, FPExpansionTraits<true> > >)(N, a, inca);
         if (fpe == 8)
-	    return (xOMPFPE<FPExpansionVect<Vec4d, 8, FPExpansionTraits<true> > >)(N, a, inca);
+            return (ExSUMFPE<FPExpansionVect<Vec4d, 8, FPExpansionTraits<true> > >)(N, a, inca);
     } else { // ! early_exit
         if (fpe == 3)
-            return (xOMPFPE<FPExpansionVect<Vec4d, 3> >)(N, a, inca);
+            return (ExSUMFPE<FPExpansionVect<Vec4d, 3> >)(N, a, inca);
         if (fpe == 4)
-            return (xOMPFPE<FPExpansionVect<Vec4d, 4> >)(N, a, inca);
+            return (ExSUMFPE<FPExpansionVect<Vec4d, 4> >)(N, a, inca);
         if (fpe == 5)
-            return (xOMPFPE<FPExpansionVect<Vec4d, 5> >)(N, a, inca);
+            return (ExSUMFPE<FPExpansionVect<Vec4d, 5> >)(N, a, inca);
         if (fpe == 6)
-            return (xOMPFPE<FPExpansionVect<Vec4d, 6> >)(N, a, inca);
+            return (ExSUMFPE<FPExpansionVect<Vec4d, 6> >)(N, a, inca);
         if (fpe == 7)
-            return (xOMPFPE<FPExpansionVect<Vec4d, 7> >)(N, a, inca);
+            return (ExSUMFPE<FPExpansionVect<Vec4d, 7> >)(N, a, inca);
         if (fpe == 8)
-            return (xOMPFPE<FPExpansionVect<Vec4d, 8> >)(N, a, inca);
+            return (ExSUMFPE<FPExpansionVect<Vec4d, 8> >)(N, a, inca);
     }
-    
+
     return 0.0;
 }
 
 /*
  * Our alg with superaccumulators only
  */
-double xTBBSuperacc(int N, double *a, int inca) {
+double ExSUMSuperacc(int N, double *a, int inca) {
     double dacc;
 #ifndef EXBLAS_MPI
  #ifdef EXBLAS_TIMING
@@ -124,7 +124,7 @@ double xTBBSuperacc(int N, double *a, int inca) {
     dacc = acc_fin.Round();
 #else
     dacc = tbbsum.acc.Round();
-#endif    
+#endif
 
 #ifdef EXBLAS_TIMING
     uint64_t tend = rdtsc();
@@ -134,6 +134,7 @@ double xTBBSuperacc(int N, double *a, int inca) {
 
     return dacc;
 }
+
 /**
  * \brief Parallel reduction step
  *
@@ -181,7 +182,7 @@ inline static void Reduction(unsigned int tid, unsigned int tnum, std::vector<in
     }
 }
 
-template<typename CACHE> double xOMPFPE(int N, double *a, int inca) {
+template<typename CACHE> double ExSUMFPE(int N, double *a, int inca) {
     // OpenMP sum+reduction
     int const linesize = 16;    // * sizeof(int32_t)
     int maxthreads = omp_get_max_threads();

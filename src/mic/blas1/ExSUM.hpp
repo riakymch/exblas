@@ -4,7 +4,7 @@
  */
 
 /**
- *  \file dsum.hpp
+ *  \file ExSUM.hpp
  *  \brief Provides a set of summation routines
  *
  *  \authors
@@ -17,8 +17,8 @@
 #define DSUM_H_
 
 #include "superaccumulator.hpp"
-#include "fplargebasemic.hpp"
-#include "fpexpansionmic.hpp"
+#include "ExSUM.MIC.hpp"
+#include "ExSUM.FPE.hpp"
 #include <omp.h>
 #include <tbb/blocked_range.h>
 #include <tbb/parallel_reduce.h>
@@ -28,7 +28,7 @@
 
 /**
  * \class TBBlongsum
- * \ingroup xsum
+ * \ingroup ExSUM
  * \brief This class is meant to be used in our multi-level reproducible and 
  *  accurate algorithm with superaccumulators only
  */
@@ -68,7 +68,7 @@ public:
 };
 
 /**
- * \ingroup xsum
+ * \ingroup ExSUM
  * \brief Parallel summation computes the sum of elements of a real vector with our 
  *     multi-level reproducible and accurate algorithm that solely relies upon superaccumulators
  *
@@ -77,10 +77,10 @@ public:
  * \param inca specifies the increment for the elements of a
  * \return Contains the reproducible and accurate sum of elements of a real vector
  */
-double xSuperacc(int N, double *a, int inca);
+double ExSUMSuperaccBack(int N, double *a, int inca);
 
 /**
- * \ingroup xsum
+ * \ingroup ExSUM
  * \brief Parallel summation computes the sum of elements of a real vector with our 
  *     multi-level reproducible and accurate algorithm that solely relies upon 
  *     superaccumulators. This algorithm is based on TBB
@@ -90,10 +90,10 @@ double xSuperacc(int N, double *a, int inca);
  * \param inca specifies the increment for the elements of a
  * \return Contains the reproducible and accurate sum of elements of a real vector
  */
-double xTBBSuperacc(int N, double *a, int inca);
+double ExSUMSuperacc(int N, double *a, int inca);
 
 /**
- * \ingroup xsum
+ * \ingroup ExSUM
  * \brief Parallel summation computes the sum of elements of a real vector with our 
  *     multi-level reproducible and accurate algorithm that relies upon 
  *     floating-point expansions of size CACHE and superaccumulators when needed
@@ -104,6 +104,6 @@ double xTBBSuperacc(int N, double *a, int inca);
  * TODO: not done for inca
  * \return Contains the reproducible and accurate sum of elements of a real vector
  */
-template<typename CACHE> double xOMPFPE(int N, double *a, int inca);
+template<typename CACHE> double ExSUMFPE(int N, double *a, int inca);
 
-#endif // DSUM_H_
+#endif // EXSUM_H_

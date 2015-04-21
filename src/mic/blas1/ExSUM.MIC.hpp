@@ -4,7 +4,7 @@
  */
 
 /**
- *  \file fplargebasemic.hpp
+ *  \file ExSUM.MIC.hpp
  *  \brief Provides a set of routines for working with vector types on MIC
  *
  *  \authors
@@ -12,8 +12,8 @@
  *        Roman Iakymchuk  -- roman.iakymchuk@lip6.fr \n
  *        Sylvain Collange -- sylvain.collange@inria.fr \n
  */
-#ifndef FPLARGEBASEMIC_HPP_INCLUDED
-#define FPLARGEBASEMIC_HPP_INCLUDED
+#ifndef EXSUM_MIC_HPP_INCLUDED
+#define EXSUM_MIC_HPP_INCLUDED
 
 #include <algorithm>
 #include <cmath>
@@ -30,7 +30,7 @@ struct FPLargeBaseMIC
     typedef Vec16i limb_t; /**< sort of floating-point expansion */
     static constexpr unsigned int K = 4; /**< size of secure digits that hold overflows */
     static constexpr unsigned int digits = 32 - K; /**< size of working digits */
-    
+
     /**
      * Constructor
      * \param sa superaccumulator

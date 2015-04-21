@@ -10,9 +10,9 @@
 #include <cstring>
 
 #include "config.h"
-#include "dsum.hpp"
+#include "ExSUM.hpp"
 #include "blas1.hpp"
-#include "Reduction.Launcher.hpp"
+#include "ExSUM.Launcher.hpp"
 
 #define NUM_ITER 20
 
@@ -42,47 +42,47 @@ double min(double arr[], int size) {
  * Otherwise, use floating-point expansions of size FPE with superaccumulators when needed
  * early_exit corresponds to the early-exit technique
  */
-double dsum(int N, double *a, int inca, int fpe, bool early_exit) {
+double exsum(int N, double *a, int inca, int fpe, bool early_exit) {
     char path[256];
     strcpy(path, EXBLAS_BINARY_DIR);
     strcat(path, "/include/cl/");
 
     // with superaccumulators only
     if (fpe < 2) {
-    //    return runReduction(N, a, inca, 0, strcat(path, "Reduction.Superacc.cl"));
+    //    return runExSUM(N, a, inca, 0, strcat(path, "ExSUM.Superacc.cl"));
         printf("Please use the size of FPE from this range [2, 8]\n");
         exit(0);
     }
     // there is no need and no improvement at all in using the early-exit technique for FPE of size 2
     if (fpe == 2)
-        return runReduction(N, a, inca, 2, strcat(path, "Reduction.FPE.cl"));
+        return runExSUM(N, a, inca, 2, strcat(path, "ExSUM.FPE.cl"));
 
     if (early_exit) {
         if (fpe <= 4)
-            return runReduction(N, a, inca, 4, strcat(path, "Reduction.FPE.EX.4.cl"));
+            return runExSUM(N, a, inca, 4, strcat(path, "ExSUM.FPE.EX.4.cl"));
         if (fpe <= 6)
-            return runReduction(N, a, inca, 6, strcat(path, "Reduction.FPE.EX.6.cl"));
+            return runExSUM(N, a, inca, 6, strcat(path, "ExSUM.FPE.EX.6.cl"));
         if (fpe <= 8)
-            return runReduction(N, a, inca, 8, strcat(path, "Reduction.FPE.EX.8.cl"));
+            return runExSUM(N, a, inca, 8, strcat(path, "ExSUM.FPE.EX.8.cl"));
     } else { // ! early_exit
         if (fpe == 3)
-            return runReduction(N, a, inca, 3, strcat(path, "Reduction.FPE.cl"));
+            return runExSUM(N, a, inca, 3, strcat(path, "ExSUM.FPE.cl"));
         if (fpe == 4)
-            return runReduction(N, a, inca, 4, strcat(path, "Reduction.FPE.cl"));
+            return runExSUM(N, a, inca, 4, strcat(path, "ExSUM.FPE.cl"));
         if (fpe == 5)
-            return runReduction(N, a, inca, 5, strcat(path, "Reduction.FPE.cl"));
+            return runExSUM(N, a, inca, 5, strcat(path, "ExSUM.FPE.cl"));
         if (fpe == 6)
-            return runReduction(N, a, inca, 6, strcat(path, "Reduction.FPE.cl"));
+            return runExSUM(N, a, inca, 6, strcat(path, "ExSUM.FPE.cl"));
         if (fpe == 7)
-            return runReduction(N, a, inca, 7, strcat(path, "Reduction.FPE.cl"));
+            return runExSUM(N, a, inca, 7, strcat(path, "ExSUM.FPE.cl"));
         if (fpe == 8)
-            return runReduction(N, a, inca, 8, strcat(path, "Reduction.FPE.cl"));
+            return runExSUM(N, a, inca, 8, strcat(path, "ExSUM.FPE.cl"));
     }
 
     return 0.0;
 }
 
-double runReduction(int N, double *h_a, int inca, int fpe, const char* program_file){
+double runExSUM(int N, double *h_a, int inca, int fpe, const char* program_file){
     double h_Res;
     cl_int ciErrNum;
 
@@ -135,13 +135,13 @@ double runReduction(int N, double *h_a, int inca, int fpe, const char* program_f
 
     {
         //Initializing OpenCL dSum...
-            ciErrNum = initReduction(cxGPUContext, cqCommandQueue, cdDevice, program_file, N, fpe);
+            ciErrNum = initExSUM(cxGPUContext, cqCommandQueue, cdDevice, program_file, N, fpe);
             if (ciErrNum != CL_SUCCESS)
                 exit(EXIT_FAILURE);
 
         //Running OpenCL dSum with %u elements...
             //Just a single launch or a warmup iteration
-            Reduction(NULL, d_Res, d_a, &ciErrNum);
+            ExSUM(NULL, d_Res, d_a, &ciErrNum);
             if (ciErrNum != CL_SUCCESS)
                 exit(EXIT_FAILURE);
 
@@ -157,7 +157,7 @@ double runReduction(int N, double *h_a, int inca, int fpe, const char* program_f
                 exit(EXIT_FAILURE);
             }
 
-            Reduction(NULL, d_Res, d_a, &ciErrNum);
+            ExSUM(NULL, d_Res, d_a, &ciErrNum);
 
             ciErrNum  = clEnqueueMarker(cqCommandQueue, &endMark);
             ciErrNum |= clFinish(cqCommandQueue);
@@ -190,7 +190,7 @@ double runReduction(int N, double *h_a, int inca, int fpe, const char* program_f
 
          //Release kernels and program
          //Shutting down and freeing memory...
-            closeReduction();
+            closeExSUM();
             if(d_a)
                 clReleaseMemObject(d_a);
             if(d_Res)

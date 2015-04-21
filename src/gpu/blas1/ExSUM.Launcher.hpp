@@ -3,8 +3,8 @@
  *  All rights reserved.
  */
 
-#ifndef REDUCTION_LAUNCHER_H
-#define REDUCTION_LAUNCHER_H
+#ifndef EXSUM_LAUNCHER_H
+#define EXSUM_LAUNCHER_H
 
 #include <cmath>
 #include <cstdio>
@@ -46,7 +46,7 @@ cl_device_id GetOCLDevice(
 ////////////////////////////////////////////////////////////////////////////////
 // GPU reduction related functions
 ////////////////////////////////////////////////////////////////////////////////
-extern "C" cl_int initReduction(
+extern "C" cl_int initExSUM(
     cl_context cxGPUContext,
     cl_command_queue cqParamCommandQue,
     cl_device_id cdDevice,
@@ -55,11 +55,11 @@ extern "C" cl_int initReduction(
     const uint NbFPE
 );
 
-extern "C" void closeReduction(
+extern "C" void closeExSUM(
     void
 );
 
-extern "C" size_t Reduction(
+extern "C" size_t ExSUM(
     cl_command_queue cqCommandQueue,
     cl_mem d_Res,
     cl_mem d_Data,

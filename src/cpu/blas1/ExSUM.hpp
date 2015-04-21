@@ -13,11 +13,11 @@
  *        Sylvain Collange -- sylvain.collange@inria.fr \n
  */
 
-#ifndef DSUM_H_
-#define DSUM_H_
+#ifndef EXSUM_H_
+#define EXSUM_H_
 
 #include "superaccumulator.hpp"
-#include "fpexpansionvect.hpp"
+#include "ExSUM.FPE.hpp"
 #define TBB_PREVIEW_DETERMINISTIC_REDUCE 1
 #include <tbb/blocked_range.h>
 #include <tbb/parallel_reduce.h>
@@ -38,7 +38,7 @@ double const freq = 2.6; // GHz
 
 /**
  * \class TBBlongsum
- * \ingroup xsum
+ * \ingroup ExSUM
  * \brief This class is meant to be used in our multi-level reproducible and 
  *  accurate algorithm with superaccumulators only
  */
@@ -79,7 +79,7 @@ public:
 
 
 /**
- * \ingroup xsum
+ * \ingroup ExSUM
  * \brief Parallel summation computes the sum of elements of a real vector with our 
  *     multi-level reproducible and accurate algorithm that solely relies upon superaccumulators
  *
@@ -88,10 +88,10 @@ public:
  * \param inca specifies the increment for the elements of a
  * \return Contains the reproducible and accurate sum of elements of a real vector
  */
-double xTBBSuperacc(int N, double *a, int inca);
+double ExSumSuperacc(int N, double *a, int inca);
 
 /**
- * \ingroup xsum
+ * \ingroup ExSUM
  * \brief Parallel summation computes the sum of elements of a real vector with our 
  *     multi-level reproducible and accurate algorithm that relies upon 
  *     floating-point expansions of size CACHE and superaccumulators when needed
@@ -102,6 +102,6 @@ double xTBBSuperacc(int N, double *a, int inca);
  * TODO: not done for inca
  * \return Contains the reproducible and accurate sum of elements of a real vector
  */
-template<typename CACHE> double xOMPFPE(int N, double *a, int inca);
+template<typename CACHE> double ExSUMFPE(int N, double *a, int inca);
 
-#endif // DSUM_H_
+#endif // EXSUM_H_

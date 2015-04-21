@@ -24,12 +24,12 @@
  */
 
 /**
- * \defgroup xgemm GEMM Functions
+ * \defgroup ExGEMM GEMM Functions
  * \ingroup blas3
  */
 
 /**
- * \ingroup xgemm
+ * \ingroup ExGEMM
  * \brief ExGEMM computes the matrix-matrix multiplication, which are composed of real numbers, using our 
  *     multi-level reproducible and accurate algorithm.
  *
@@ -43,6 +43,6 @@
  * \param early_exit specifies the optimization technique. By default, it is disabled
  * \return Contains the reproducible and accurate sum of elements of a real vector
  */
-double dsum(int N, double *a, int inca, int fpe, bool early_exit = false);
+double exgemm(int N, double *a, int inca, int fpe, bool early_exit = false);
 
 #endif // BLAS3_H_

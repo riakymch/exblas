@@ -4,7 +4,7 @@
  */
 
 /**
- *  \file fpexpansionmic.hpp
+ *  \file ExSUM.FPE.hpp
  *  \brief Provides a set of routines concerning floating-point expansions
  *
  *  \authors
@@ -12,12 +12,12 @@
  *        Roman Iakymchuk  -- roman.iakymchuk@lip6.fr \n
  *        Sylvain Collange -- sylvain.collange@inria.fr \n
  */
-#ifndef FPEXPANSIONMIC_HPP_INCLUDED
-#define FPEXPANSIONMIC_HPP_INCLUDED
+#ifndef ExSUM.FPE_HPP_INCLUDED
+#define ExSUM.FPE_HPP_INCLUDED
 
 /**
  * \struct FPExpansionVect
- * \ingroup xsum
+ * \ingroup ExSUM
  * \brief This struct is meant to introduce functionality for working with
  *  floating-point expansions in conjuction with superaccumulators
  */

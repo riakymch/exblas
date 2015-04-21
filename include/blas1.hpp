@@ -24,12 +24,12 @@
  */
 
 /**
- * \defgroup xsum Summation Functions
+ * \defgroup ExSUM Summation Functions
  * \ingroup blas1
  */
 
 /**
- * \ingroup xsum
+ * \ingroup ExSUM
  * \brief Parallel summation computes the sum of elements of a real vector with our 
  *     multi-level reproducible and accurate algorithm.
  *
@@ -43,6 +43,6 @@
  * \param early_exit specifies the optimization technique. By default, it is disabled
  * \return Contains the reproducible and accurate sum of elements of a real vector
  */
-double dsum(int N, double *a, int inca, int fpe, bool early_exit = false);
+double exsum(int N, double *a, int inca, int fpe, bool early_exit = false);
 
 #endif // BLAS1_H_

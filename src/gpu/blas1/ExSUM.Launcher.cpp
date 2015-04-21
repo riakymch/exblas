@@ -3,15 +3,15 @@
  *  All rights reserved.
  */
 
-#include "Reduction.Launcher.hpp"
+#include "ExSUM.Launcher.hpp"
 #include "common.hpp"
 
 ////////////////////////////////////////////////////////////////////////////////
 // OpenCL launcher for bitonic sort kernel
 ////////////////////////////////////////////////////////////////////////////////
-#define REDUCTION_KERNEL              "Reduction"
-#define REDUCTION_COMPLETE_KERNEL     "ReductionComplete"
-#define ROUND_KERNEL                  "RoundSuperacc"
+#define EXSUM_KERNEL          "ExSUM"
+#define EXSUM_COMPLETE_KERNEL "ExSUMComplete"
+#define ROUND_KERNEL          "ExSUMRound"
 
 static size_t szKernelLength;                // Byte size of kernel code
 static char* cSources = NULL;                // Buffer to hold source for compilation
@@ -124,7 +124,7 @@ cl_device_id GetOCLDevice(cl_platform_id pPlatform, char name[]) {
 ////////////////////////////////////////////////////////////////////////////////
 // GPU reduction related functions
 ////////////////////////////////////////////////////////////////////////////////
-extern "C" cl_int initReduction(
+extern "C" cl_int initExSUM(
     cl_context cxGPUContext,
     cl_command_queue cqParamCommandQue,
     cl_device_id cdDevice,
@@ -159,7 +159,7 @@ extern "C" cl_int initReduction(
             return EXIT_FAILURE;
         }
 
-    //printf("...building Reduction program\n");
+    //printf("...building ExSUM program\n");
         sprintf(compileOptions, "%s -DNBFPE=%d", compileOptions, NbFPE);
         ciErrNum = clBuildProgram(cpProgram, 0, NULL, compileOptions, NULL, NULL);
         if (ciErrNum != CL_SUCCESS) {
@@ -173,15 +173,15 @@ extern "C" cl_int initReduction(
             return EXIT_FAILURE;
         }
 
-    //printf("...creating Reduction kernels:\n");
-        ckKernel = clCreateKernel(cpProgram, REDUCTION_KERNEL, &ciErrNum);
+    //printf("...creating ExSUM kernels:\n");
+        ckKernel = clCreateKernel(cpProgram, EXSUM_KERNEL, &ciErrNum);
         if (ciErrNum != CL_SUCCESS) {
-            printf("Error in clCreateKernel: Reduction, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
+            printf("Error in clCreateKernel: ExSUM, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
             return EXIT_FAILURE;
         }
-        ckComplete = clCreateKernel(cpProgram, REDUCTION_COMPLETE_KERNEL, &ciErrNum);
+        ckComplete = clCreateKernel(cpProgram, EXSUM_COMPLETE_KERNEL, &ciErrNum);
         if (ciErrNum != CL_SUCCESS) {
-            printf("Error in clCreateKernel: ReductionComplete, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
+            printf("Error in clCreateKernel: ExSUMComplete, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
             return EXIT_FAILURE;
         }
         ckRound = clCreateKernel(cpProgram, ROUND_KERNEL, &ciErrNum);
@@ -213,7 +213,7 @@ extern "C" cl_int initReduction(
     return EXIT_SUCCESS;
 }
 
-extern "C" void closeReduction(void){
+extern "C" void closeExSUM(void){
     cl_int ciErrNum;
 
     ciErrNum = clReleaseMemObject(d_PartialSuperaccs);
@@ -223,14 +223,14 @@ extern "C" void closeReduction(void){
     ciErrNum |= clReleaseKernel(ckComplete);
     ciErrNum |= clReleaseProgram(cpProgram);
     if (ciErrNum != CL_SUCCESS) {
-        printf("Error in closeReduction(), Line %u in file %s !!!\n\n", __LINE__, __FILE__);
+        printf("Error in closeExSUM(), Line %u in file %s !!!\n\n", __LINE__, __FILE__);
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // OpenCL launchers for Superaccumulator / mergeSuperaccumulators kernels
 ////////////////////////////////////////////////////////////////////////////////
-extern "C" size_t Reduction(
+extern "C" size_t ExSUM(
     cl_command_queue cqCommandQueue,
     cl_mem d_Res,
     cl_mem d_Data,

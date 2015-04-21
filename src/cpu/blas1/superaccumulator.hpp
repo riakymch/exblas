@@ -26,7 +26,7 @@
 
 /**
  * \struct Superaccumulator
- * \ingroup xsum
+ * \ingroup ExSUM
  * \brief This class is meant to provide functionality for working with superaccumulators
  */
 struct Superaccumulator

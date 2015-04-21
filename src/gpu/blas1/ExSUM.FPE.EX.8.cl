@@ -6,9 +6,6 @@
 #pragma OPENCL EXTENSION cl_khr_fp64                   : enable  // For double precision numbers
 #pragma OPENCL EXTENSION cl_khr_int64_base_atomics     : enable  // For 64 atomic operations
 #pragma OPENCL EXTENSION cl_khr_byte_addressable_store : enable
-#ifdef NVIDIA
-    #pragma OPENCL EXTENSION cl_nv_pragma_unroll       : enable
-#endif
 
 //Data type used for input data fetches
 typedef double2 data_t;
@@ -19,6 +16,7 @@ typedef double2 data_t;
 #define deltaScale     72057594037927936.0  // Assumes K>0
 #define f_words        20
 #define TSAFE          0
+#define EARLY_EXIT     1
 #define WORKGROUP_SIZE (WARP_COUNT * WARP_SIZE)
 
 
@@ -101,17 +99,22 @@ int Normalize(__global long *accumulator, int *imin, int *imax) {
     if (*imin > *imax)
         return 0;
 
-    long carry_in = (accumulator[*imin] >> digits);
-    accumulator[*imin] -= (carry_in << digits);
+    long carry_in = accumulator[*imin] >> digits;
+    accumulator[*imin] -= carry_in << digits;
     int i;
     // Sign-extend all the way
     for (i = *imin + 1; i < BIN_COUNT; ++i) {
         accumulator[i] += carry_in;
-        long carry_out = (accumulator[i] >> digits);    // Arithmetic shift
+        long carry_out = accumulator[i] >> digits;    // Arithmetic shift
         accumulator[i] -= (carry_out << digits);
         carry_in = carry_out;
     }
     *imax = i - 1;
+
+    if ((carry_in != 0) && (carry_in != -1)) {
+        //TODO: handle overflow
+        //status = Overflow;
+    }
 
     return carry_in < 0;
 }
@@ -128,7 +131,7 @@ double Round(__global long *accumulator) {
     }
     if (negative) {
         //Skip ones
-        for(; (accumulator[i] & ((1l << digits) - 1)) == ((1l << digits) - 1) && i >= imin; --i) {
+        for (; (accumulator[i] & ((1l << digits) - 1)) == ((1l << digits) - 1) && i >= imin; --i) {
         }
     }
     if (i < 0)
@@ -146,9 +149,9 @@ double Round(__global long *accumulator) {
     //Compute sticky
     long sticky = 0;
     for (int j = imin; j != i - 1; ++j)
-        sticky |= negative ? ((1l << digits) - accumulator[j]) : accumulator[j];
+        sticky |= negative ? (1l << digits) - accumulator[j] : accumulator[j];
 
-    long loword = negative ? ((1l << digits) - accumulator[i - 1]) : accumulator[i - 1];
+    long loword = negative ? (1l << digits) - accumulator[i - 1] : accumulator[i - 1];
     loword |= !!sticky;
     double lo = ldexp((double) loword, (i - 1 - f_words) * digits);
 
@@ -260,11 +263,11 @@ void Accumulate(__local volatile long *sa, double x) {
 }
 
 __kernel __attribute__((reqd_work_group_size(WORKGROUP_SIZE, 1, 1)))
-void Reduction(
+void ExSUM(
     __global long *d_PartialSuperaccs,
     __global data_t *d_Data,
     const uint NbElements
-) {
+){
     __local long l_sa[WARP_COUNT * BIN_COUNT] __attribute__((aligned(8)));
     __local long *l_workingBase = l_sa + (get_local_id(0) & (WARP_COUNT - 1));
 
@@ -274,38 +277,85 @@ void Reduction(
     barrier(CLK_LOCAL_MEM_FENCE);
 
     //Read data from global memory and scatter it to sub-superaccs
-    double a[NBFPE] = {0.0};
+    double a[8] = {0.0};
     for(uint pos = get_global_id(0); pos < NbElements; pos += get_global_size(0)){
         data_t x = d_Data[pos];
-#ifdef NVIDIA
-        #pragma unroll
-#endif
-        for(uint i = 0; i != NBFPE; ++i) {
-            double s;
-            a[i] = KnuthTwoSum(a[i], x.x, &s);
+        double s;
+        a[0] = KnuthTwoSum(a[0], x.x, &s);
+        x.x = s;
+        if (x.x != 0.0) {
+            a[1] = KnuthTwoSum(a[1], x.x, &s);
             x.x = s;
+            if (x.x != 0.0) {
+                a[2] = KnuthTwoSum(a[2], x.x, &s);
+                x.x = s;
+                if (x.x != 0.0) {
+                    a[3] = KnuthTwoSum(a[3], x.x, &s);
+                    x.x = s;
+                    if (x.x != 0.0) {
+                        a[4] = KnuthTwoSum(a[4], x.x, &s);
+                        x.x = s;
+                        if (x.x != 0.0) {
+                            a[5] = KnuthTwoSum(a[5], x.x, &s);
+                            x.x = s;
+                            if (x.x != 0.0) {
+                                a[6] = KnuthTwoSum(a[6], x.x, &s);
+                                x.x = s;
+                                if (x.x != 0.0) {
+                                    a[7] = KnuthTwoSum(a[7], x.x, &s);
+                                    x.x = s;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
         if(x.x != 0.0)
-            //TODO: do NOT propagate NaNs
             Accumulate(l_workingBase, x.x);
-#ifdef NVIDIA
-        #pragma unroll
-#endif
-        for(uint i = 0; i != NBFPE; ++i) {
-            double s;
-            a[i] = KnuthTwoSum(a[i], x.y, &s);
+
+        a[0] = KnuthTwoSum(a[0], x.y, &s);
+        x.y = s;
+        if (x.y != 0.0) {
+            a[1] = KnuthTwoSum(a[1], x.y, &s);
             x.y = s;
+            if (x.y != 0.0) {
+                a[2] = KnuthTwoSum(a[2], x.y, &s);
+                x.y = s;
+                if (x.y != 0.0) {
+                    a[3] = KnuthTwoSum(a[3], x.y, &s);
+                    x.y = s;
+                    if (x.y != 0.0) {
+                        a[4] = KnuthTwoSum(a[4], x.y, &s);
+                        x.y = s;
+                        if (x.y != 0.0) {
+                            a[5] = KnuthTwoSum(a[5], x.y, &s);
+                            x.y = s;
+                            if (x.y != 0.0) {
+                                a[6] = KnuthTwoSum(a[6], x.y, &s);
+                                x.y = s;
+                                if (x.y != 0.0) {
+                                    a[7] = KnuthTwoSum(a[7], x.y, &s);
+                                    x.y = s;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
         if(x.y != 0.0)
-            //TODO: do NOT propagate NaNs
             Accumulate(l_workingBase, x.y);
     }
     //Flush FPEs to the superacc
-#ifdef NVIDIA
-    #pragma unroll
-#endif
-    for(uint i = 0; i != NBFPE; ++i)
-        Accumulate(l_workingBase, a[i]);
+    Accumulate(l_workingBase, a[0]);
+    Accumulate(l_workingBase, a[1]);
+    Accumulate(l_workingBase, a[2]);
+    Accumulate(l_workingBase, a[3]);
+    Accumulate(l_workingBase, a[4]);
+    Accumulate(l_workingBase, a[5]);
+    Accumulate(l_workingBase, a[6]);
+    Accumulate(l_workingBase, a[7]);
     barrier(CLK_LOCAL_MEM_FENCE);
 
     //Merge sub-superaccs into work-group partial-accumulator
@@ -335,7 +385,7 @@ void Reduction(
 // Merging
 ////////////////////////////////////////////////////////////////////////////////
 __kernel __attribute__((reqd_work_group_size(MERGE_WORKGROUP_SIZE, 1, 1)))
-void ReductionComplete(
+void ExSUMComplete(
     __global long *d_Superacc,
     __global long *d_PartialSuperaccs,
     uint PartialSuperaccusCount
@@ -387,7 +437,7 @@ void ReductionComplete(
 // Round the results
 ////////////////////////////////////////////////////////////////////////////////
 __kernel __attribute__((reqd_work_group_size(MERGE_WORKGROUP_SIZE, 1, 1)))
-void RoundSuperacc(
+void ExSUMRound(
     __global double *d_Res,
     __global long *d_Superacc
 ){

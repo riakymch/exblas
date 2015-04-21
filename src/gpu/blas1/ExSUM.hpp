@@ -20,7 +20,7 @@
 
 
 /**
- * \ingroup xsum
+ * \ingroup ExSUM
  * \brief Executes parallel summation/reduction on elements of a real vector with our 
  *     multi-level reproducible and accurate algorithm that relies upon
  *     floating-point expansions in conjuction with superaccumulators or superaccumulators
@@ -33,6 +33,6 @@
  * \param program_file path to the file with kernels
  * \return Contains the reproducible and accurate sum of elements of a real vector
  */
-double runReduction(int N, double *a, int inca, int fpe, const char* program_file);
+double runExSUM(int N, double *a, int inca, int fpe, const char* program_file);
 
 #endif // DSUM_H_

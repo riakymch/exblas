@@ -263,11 +263,11 @@ void Accumulate(__local volatile long *sa, double x) {
 }
 
 __kernel __attribute__((reqd_work_group_size(WORKGROUP_SIZE, 1, 1)))
-void Reduction(
+void ExSUM(
     __global long *d_PartialSuperaccs,
     __global data_t *d_Data,
     const uint NbElements
-){
+) {
     __local long l_sa[WARP_COUNT * BIN_COUNT] __attribute__((aligned(8)));
     __local long *l_workingBase = l_sa + (get_local_id(0) & (WARP_COUNT - 1));
 
@@ -277,7 +277,7 @@ void Reduction(
     barrier(CLK_LOCAL_MEM_FENCE);
 
     //Read data from global memory and scatter it to sub-superaccs
-    double a[8] = {0.0};
+    double a[4] = {0.0};
     for(uint pos = get_global_id(0); pos < NbElements; pos += get_global_size(0)){
         data_t x = d_Data[pos];
         double s;
@@ -292,22 +292,6 @@ void Reduction(
                 if (x.x != 0.0) {
                     a[3] = KnuthTwoSum(a[3], x.x, &s);
                     x.x = s;
-                    if (x.x != 0.0) {
-                        a[4] = KnuthTwoSum(a[4], x.x, &s);
-                        x.x = s;
-                        if (x.x != 0.0) {
-                            a[5] = KnuthTwoSum(a[5], x.x, &s);
-                            x.x = s;
-                            if (x.x != 0.0) {
-                                a[6] = KnuthTwoSum(a[6], x.x, &s);
-                                x.x = s;
-                                if (x.x != 0.0) {
-                                    a[7] = KnuthTwoSum(a[7], x.x, &s);
-                                    x.x = s;
-                                }
-                            }
-                        }
-                    }
                 }
             }
         }
@@ -325,37 +309,17 @@ void Reduction(
                 if (x.y != 0.0) {
                     a[3] = KnuthTwoSum(a[3], x.y, &s);
                     x.y = s;
-                    if (x.y != 0.0) {
-                        a[4] = KnuthTwoSum(a[4], x.y, &s);
-                        x.y = s;
-                        if (x.y != 0.0) {
-                            a[5] = KnuthTwoSum(a[5], x.y, &s);
-                            x.y = s;
-                            if (x.y != 0.0) {
-                                a[6] = KnuthTwoSum(a[6], x.y, &s);
-                                x.y = s;
-                                if (x.y != 0.0) {
-                                    a[7] = KnuthTwoSum(a[7], x.y, &s);
-                                    x.y = s;
-                                }
-                            }
-                        }
-                    }
                 }
             }
         }
         if(x.y != 0.0)
             Accumulate(l_workingBase, x.y);
     }
-    //Flush FPEs to the superacc
+    //Flush to the superacc
     Accumulate(l_workingBase, a[0]);
     Accumulate(l_workingBase, a[1]);
     Accumulate(l_workingBase, a[2]);
     Accumulate(l_workingBase, a[3]);
-    Accumulate(l_workingBase, a[4]);
-    Accumulate(l_workingBase, a[5]);
-    Accumulate(l_workingBase, a[6]);
-    Accumulate(l_workingBase, a[7]);
     barrier(CLK_LOCAL_MEM_FENCE);
 
     //Merge sub-superaccs into work-group partial-accumulator
@@ -385,7 +349,7 @@ void Reduction(
 // Merging
 ////////////////////////////////////////////////////////////////////////////////
 __kernel __attribute__((reqd_work_group_size(MERGE_WORKGROUP_SIZE, 1, 1)))
-void ReductionComplete(
+void ExSUMComplete(
     __global long *d_Superacc,
     __global long *d_PartialSuperaccs,
     uint PartialSuperaccusCount
@@ -414,15 +378,6 @@ void ReductionComplete(
         d_Superacc[gid] = l_Data[0];
 #else
 
-#if 0
-    uint gid = get_group_id(0);
-    for(uint i = lid; i < PartialSuperaccusCount; i += MERGE_WORKGROUP_SIZE) {
-        if ((lid == 0) && (i == 0))
-            continue;
-
-        AccumulateWordGlobal(d_PartialSuperaccs, gid, d_PartialSuperaccs[gid + i * BIN_COUNT]);
-    }
-#else
     if (lid < BIN_COUNT) {
         for(uint i = 1; i < PartialSuperaccusCount; i++) {
             AccumulateWordGlobal(d_PartialSuperaccs, lid, d_PartialSuperaccs[lid + i * BIN_COUNT]);
@@ -430,14 +385,13 @@ void ReductionComplete(
         d_Superacc[lid] = d_PartialSuperaccs[lid];
     }
 #endif
-#endif
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Round the results
 ////////////////////////////////////////////////////////////////////////////////
 __kernel __attribute__((reqd_work_group_size(MERGE_WORKGROUP_SIZE, 1, 1)))
-void RoundSuperacc(
+void ExSUMRound(
     __global double *d_Res,
     __global long *d_Superacc
 ){
