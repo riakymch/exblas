@@ -12,8 +12,8 @@
  *        Roman Iakymchuk  -- roman.iakymchuk@lip6.fr \n
  *        Sylvain Collange -- sylvain.collange@inria.fr \n
  */
-#ifndef ExSUM.FPE_HPP_INCLUDED
-#define ExSUM.FPE_HPP_INCLUDED
+#ifndef ExSUM_FPE_HPP_INCLUDED
+#define ExSUM_FPE_HPP_INCLUDED
 
 /**
  * \struct FPExpansionVect
