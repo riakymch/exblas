@@ -40,7 +40,7 @@ if (EXBLAS_TIMING)
 endif (EXBLAS_TIMING)
 
 # Grab the .c and .cpp files
-file (GLOB_RECURSE EXBLAS_C_CPP_SOURCE "*.cpp" "../common/*.cpp")
+file (GLOB_RECURSE EXBLAS_C_CPP_SOURCE "*.cpp" "${PROJECT_SOURCE_DIR}/src/common/*.cpp")
 # Grab the .cl files
 file (GLOB_RECURSE EXBLAS_CL_SOURCE "*.cl")
 # Grab the C/C++ headers

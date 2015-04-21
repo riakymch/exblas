@@ -26,7 +26,7 @@ set (EXTRA_LIBS ${EXTRA_LIBS} tbb)
 set (EXTRA_LIBS ${EXTRA_LIBS} pthread)
 
 # Grab the .c and .cpp files
-file (GLOB_RECURSE EXBLAS_C_CPP_SOURCE "../common/*.cpp" "../common/*.h" "*.hpp" "*.cpp")
+file (GLOB_RECURSE EXBLAS_C_CPP_SOURCE "${PROJECT_SOURCE_DIR}/src/common/*.cpp" "${PROJECT_SOURCE_DIR}/src/common/*.h" "*.hpp" "*.cpp")
 # Grab the C/C++ headers
 file (GLOB_RECURSE EXBLAS_C_CPP_HEADERS "${PROJECT_SOURCE_DIR}/include/*.h" "${PROJECT_SOURCE_DIR}/include/*.hpp")
 set (EXBLAS_C_CPP_FILES "${EXBLAS_C_CPP_SOURCE};${EXBLAS_C_CPP_HEADERS}")
