@@ -4,8 +4,8 @@
  */
 
 /**
- *  \file blas3.hpp
- *  \brief Provides a set of Basic Linear Algera Subprograms level-3 to work with matrices
+ *  \file ExGEMM.hpp
+ *  \brief Provides a set of summation routines
  *
  *  \authors
  *    Developers : \n
@@ -13,28 +13,17 @@
  *        Sylvain Collange -- sylvain.collange@inria.fr \n
  */
 
-#ifndef BLAS3_HPP_
-#define BLAS3_HPP_
+#ifndef EXGEMM_HPP_
+#define EXGEMM_HPP_
 
-// config from cmake
-#include "config.h"
+#include "common.hpp"
 
-/**
- * \defgroup blas3 BLAS Level-3 Functions
- */
-
-/**
- * \defgroup ExGEMM GEMM Functions
- * \ingroup blas3
- */
 
 /**
  * \ingroup ExGEMM
- * \brief ExGEMM computes the matrix-matrix multiplication (three matrices are composed of real numbers) 
- *     using our multi-level reproducible and accurate algorithm.
- *
- *     If fpe < 2, it relies on superaccumulators only. Otherwise, it relies on floating-point expansions
- *     of size FPE with superaccumulators when needed
+ * \brief Parallel matrix-matrix multiplication (C := beta * C + alpha * op(A) * op(B), where op(X) = X or op(X) = X^T)
+ *     with our multi-level reproducible and accurate algorithm that relies upon floating-point expansions in conjuction
+ *     with superaccumulators
  *
  * \param transa 'T' or 'N' -- transpose or non-transpose matrix A
  * \param transb 'T' or 'N' -- transpose or non-transpose matrix B
@@ -55,4 +44,4 @@
  */
 double runExGEMM(char transa, char transb, int m, int n, int k, double alpha, double *a, int lda, double *b, int ldb, double beta, double *c, double ldc, int fpe, const char* program_file);
 
-#endif // BLAS3_HPP_
+#endif // EXGEMM_HPP_

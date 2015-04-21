@@ -4,7 +4,7 @@
  */
 
 /**
- *  \file dsum.hpp
+ *  \file ExSUM.hpp
  *  \brief Provides a set of summation routines
  *
  *  \authors
@@ -13,8 +13,8 @@
  *        Sylvain Collange -- sylvain.collange@inria.fr \n
  */
 
-#ifndef DSUM_H_
-#define DSUM_H_
+#ifndef EXSUM_HPP_
+#define EXSUM_HPP_
 
 #include "common.hpp"
 
@@ -35,4 +35,4 @@
  */
 double runExSUM(int N, double *a, int inca, int fpe, const char* program_file);
 
-#endif // DSUM_H_
+#endif // EXSUM_HPP_
