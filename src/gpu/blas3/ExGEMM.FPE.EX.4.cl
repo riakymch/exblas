@@ -200,15 +200,21 @@ void Accumulate(long *sa, double x) {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// Matrix multiplication on the device: C = A * B
-// m is A's width and n is B's width
+// Matrix multiplication on the device: C := beta * C + alpha * A * B.
+//     So far just C = A * B
 ////////////////////////////////////////////////////////////////////////////////
 __kernel void matrixMul(
-    __global data_t* C,
+    uint m,
+    uint n,
+    uint k,
+    double alpha,
     __global data_t* A,
+    uint lda,
     __global data_t* B,
-    int m,
-    int n,
+    uint ldb,
+    double beta,
+    __global data_t* C,
+    uint ldc,
     __local data_t* As,
     __local data_t* Bs
 ) {

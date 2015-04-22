@@ -219,17 +219,17 @@ extern "C" size_t runExDGEMM(
         size_t neededLocalMemory = BLOCK_SIZE * BLOCK_SIZE * sizeof(cl_double);
 
         cl_int i = 0;
-        ciErrNum  = clSetKernelArg(ckMatrixMul, i++, sizeof(cl_int), (void *)&m);
-        ciErrNum |= clSetKernelArg(ckMatrixMul, i++, sizeof(cl_int), (void *)&n);
-        ciErrNum |= clSetKernelArg(ckMatrixMul, i++, sizeof(cl_int), (void *)&k);
+        ciErrNum  = clSetKernelArg(ckMatrixMul, i++, sizeof(cl_uint), (void *)&m);
+        ciErrNum |= clSetKernelArg(ckMatrixMul, i++, sizeof(cl_uint), (void *)&n);
+        ciErrNum |= clSetKernelArg(ckMatrixMul, i++, sizeof(cl_uint), (void *)&k);
         ciErrNum |= clSetKernelArg(ckMatrixMul, i++, sizeof(cl_double), (void *)&alpha);
         ciErrNum |= clSetKernelArg(ckMatrixMul, i++, sizeof(cl_mem), (void *)&d_a);
-        ciErrNum |= clSetKernelArg(ckMatrixMul, i++, sizeof(cl_int), (void *)&lda);
+        ciErrNum |= clSetKernelArg(ckMatrixMul, i++, sizeof(cl_uint), (void *)&lda);
         ciErrNum |= clSetKernelArg(ckMatrixMul, i++, sizeof(cl_mem), (void *)&d_b);
-        ciErrNum |= clSetKernelArg(ckMatrixMul, i++, sizeof(cl_int), (void *)&ldb);
+        ciErrNum |= clSetKernelArg(ckMatrixMul, i++, sizeof(cl_uint), (void *)&ldb);
         ciErrNum |= clSetKernelArg(ckMatrixMul, i++, sizeof(cl_double), (void *)&beta);
         ciErrNum |= clSetKernelArg(ckMatrixMul, i++, sizeof(cl_mem), (void *)&d_c);
-        ciErrNum |= clSetKernelArg(ckMatrixMul, i++, sizeof(cl_int), (void *)&ldc);
+        ciErrNum |= clSetKernelArg(ckMatrixMul, i++, sizeof(cl_uint), (void *)&ldc);
         ciErrNum |= clSetKernelArg(ckMatrixMul, i++, neededLocalMemory,  NULL);
         ciErrNum |= clSetKernelArg(ckMatrixMul, i++, neededLocalMemory,  NULL);
         if (ciErrNum != CL_SUCCESS) {
