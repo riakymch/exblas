@@ -30,12 +30,7 @@ double randDouble(int emin, int emax, int neg_ratio) {
 void init_fpuniform(double *a, int n, int range, int emax) {
     for(int i = 0; i != n; ++i) {
         a[i] = randDouble(emax-range, emax, 1);
-        //a[i] = randDoubleUniform();
-        //printf("%a ", a[i]);
     }
-}
-
-void init_fpuniform(double *a, int m, int n, int range, int emax) {
 }
 
 void init_lognormal(double * a, int n, double mean, double stddev) {
@@ -43,14 +38,11 @@ void init_lognormal(double * a, int n, double mean, double stddev) {
     std::default_random_engine gen(rd());
     std::lognormal_distribution<> d(mean, stddev);
 
-    printf("min=%a, max=%a\n", d.min(), d.max());
+    //printf("min=%a, max=%a\n", d.min(), d.max());
 
     for(int i = 0; i != n; ++i) {
         a[i] = d(gen);
     }
-}
-
-void init_lognormal(double *a, int m, int n, double mean, double stddev) {
 }
 
 void init_ill_cond(double *a, int n, double c) {
@@ -87,16 +79,8 @@ void init_ill_cond(double *a, int n, double c) {
     free(e);
 }
 
-void init_ill_cond(double *a, int m, int n, double c) {
-}
-
 void init_naive(double *a, int n) {
     for(int i = 0; i != n; ++i)
         a[i] = 1.0;
 }
 
-void init_naive(double *a, int m, int n) {
-    for(int j = 0; j != n; ++j)
-        for(int i = 0; i != m; ++i)
-            a[j * m + i] = 1.0;
-}

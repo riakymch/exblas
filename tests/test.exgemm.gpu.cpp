@@ -76,22 +76,22 @@ int main(int argc, char *argv[]) {
     if ((!a) || (!b) || (!c))
         fprintf(stderr, "Cannot allocate memory for the main array\n");
     if(lognormal) {
-        init_lognormal(a, m, k, mean, stddev);
-        init_lognormal(b, k, n, mean, stddev);
-        init_lognormal(c, m, n, mean, stddev);
+        init_lognormal(a, m * k, mean, stddev);
+        init_lognormal(b, k * n, mean, stddev);
+        init_lognormal(c, m * n, mean, stddev);
     } else if ((argc > 6) && (argv[6][0] == 'i')) {
-        init_ill_cond(a, m, k, range);
-        init_ill_cond(b, k, n, range);
-        init_ill_cond(c, m, n, range);
+        init_ill_cond(a, m * k, range);
+        init_ill_cond(b, k * n, range);
+        init_ill_cond(c, m * n, range);
     } else {
         if(range == 1){
-            init_naive(a, m, k);
-            init_naive(b, k, n);
-            init_naive(c, m, n);
+            init_naive(a, m * k);
+            init_naive(b, k * n);
+            init_naive(c, m * n);
         } else {
-            init_fpuniform(a, m, k, range, emax);
-            init_fpuniform(b, k, n, range, emax);
-            init_fpuniform(c, m, n, range, emax);
+            init_fpuniform(a, m * k, range, emax);
+            init_fpuniform(b, k * n, range, emax);
+            init_fpuniform(c, m * n, range, emax);
         }
     }
 
