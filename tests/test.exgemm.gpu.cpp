@@ -21,20 +21,51 @@
 #include <cstddef>
 #include <mpfr.h>
 
-double exgemmWithMPFR(int N, double *a) {
-    mpfr_t mpaccum;
-    mpfr_init2(mpaccum, 2098);
-    mpfr_set_zero(mpaccum, 0);
+double exgemmVsMPFR(double *exgemm, uint m, uint n, uint k, double alpha, double *a, uint lda, double *b, uint ldb) {
+    double *exgemm_mpfr;
+    mpfr_t sum, dot, op1;
 
-    for(int i = 0; i != N; ++i) {
-        mpfr_add_d(mpaccum, mpaccum, a[i], MPFR_RNDN);
+    exgemm_mpfr = (double *) malloc(m * n * sizeof(double));
+
+    mpfr_init2(op1, 64);
+    mpfr_init2(dot, 128);
+    mpfr_init2(sum, 2098);
+    mpfr_set_d(dot, 0.0, MPFR_RNDN);
+
+    //Produce a result matrix of DGEMM using MPFR
+    for(uint i = 0; i < m; i++) {
+        for(uint j = 0; j < n; j++) {
+            mpfr_set_d(sum, 0.0, MPFR_RNDN);
+            for(uint l = 0; l < k; l++) {
+                mpfr_set_d(op1, a[i * k + l], MPFR_RNDN);
+                mpfr_mul_d(dot, op1, b[l * n + j], MPFR_RNDN);
+                mpfr_add(sum, sum, dot, MPFR_RNDN);
+            }
+            exgemm_mpfr[i * n + j] = mpfr_get_d(sum, MPFR_RNDD);
+        }
     }
-    double dacc = mpfr_get_d(mpaccum, MPFR_RNDN);
 
-    //mpfr_printf("%Ra\n", mpaccum);
-    mpfr_clear(mpaccum);
+    double norm = 0.0;
+    //Compare the GPU and MPFR results
+    for (uint i = 0; i < m * n; i++)
+        norm += pow(abs(exgemm[i] - exgemm_mpfr[i]), 2);
+    norm = ::sqrt(norm);
+    //printf("Compared to MPFR. Norm = %.17g\n", norm);
 
-    return dacc;
+    free(exgemm_mpfr);
+    mpfr_free_cache();
+
+    return norm;
+}
+#else
+double exgemmVsSuperacc(double *exgemm, double *superacc, uint m, uint n, uint k) {
+    double norm = 0.0;
+    for (uint i = 0; i < m * n; i++)
+        norm += pow(abs(superacc[i] - exgemm[i]), 2);
+    norm = ::sqrt(norm);
+    //printf("Compared to results with superaccs only. Norm = %.17g\n", norm);
+
+    return norm;
 }
 #endif
 
@@ -98,22 +129,82 @@ int main(int argc, char *argv[]) {
     fprintf(stderr, "%d \t %d \t %d\n", m, n, k);
 
     bool is_pass = true;
-    exgemm('N', 'N', m, n, k, 1.0, a, k, b, n, 0.0, c, n, 1);
-    exgemm('N', 'N', m, n, k, 1.0, a, k, b, n, 0.0, c, n, 3);
-    exgemm('N', 'N', m, n, k, 1.0, a, k, b, n, 0.0, c, n, 4);
-    exgemm('N', 'N', m, n, k, 1.0, a, k, b, n, 0.0, c, n, 8);
-    exgemm('N', 'N', m, n, k, 1.0, a, k, b, n, 0.0, c, n, 4, true);
-    exgemm('N', 'N', m, n, k, 1.0, a, k, b, n, 0.0, c, n, 6, true);
-    exgemm('N', 'N', m, n, k, 1.0, a, k, b, n, 0.0, c, n, 8, true);
+    double eps = 1e-16;
+    double *superacc;
+    posix_memalign((void **) &superacc, 64, m * n * sizeof(double));
 
-/*#ifdef EXBLAS_VS_MPFR
-    double exgemmMPFR = exgemmWithMPFR(N, a);
-    if ((fabs(exgemmMPFR - exgemm_fpe2) != 0) || (fabs(exgemmMPFR - exgemm_fpe4) != 0) || (fabs(exgemmMPFR - exgemm_fpe8ee) != 0) || (fabs(exgemmMPFR - exgemm_fpe4ee) != 0) || (fabs(exgemmMPFR - exgemm_fpe6ee) != 0)) {
+    exgemm('N', 'N', m, n, k, 1.0, a, k, b, n, 0.0, superacc, n, 1);
+#ifdef EXBLAS_VS_MPFR
+    if (exgemmVsMPFR(superacc, m, n, k, 1.0, a, k, b, n) > eps) {
         is_pass = false;
-        printf("FAILED: %.16g \t %.16g \t %.16g \t %.16g \t %.16g\n", fabs(exgemmMPFR - exgemm_fpe2), fabs(exgemmMPFR - exgemm_fpe4), fabs(exgemmMPFR - exgemm_fpe4ee), fabs(exgemmMPFR - exgemm_fpe6ee), fabs(exgemmMPFR - exgemm_fpe8ee));
+    }
+#endif
+
+    exgemm('N', 'N', m, n, k, 1.0, a, k, b, n, 0.0, c, n, 3);
+#ifdef EXBLAS_VS_MPFR
+    if (exgemmVsMPFR(c, m, n, k, 1.0, a, k, b, n) > eps) {
+        is_pass = false;
     }
 #else
-#endif*/
+    if (exgemmVsSuperacc(c, superacc, m, n, k) > eps) {
+        is_pass = false;
+    }
+#endif
+
+    exgemm('N', 'N', m, n, k, 1.0, a, k, b, n, 0.0, c, n, 4);
+#ifdef EXBLAS_VS_MPFR
+    if (exgemmVsMPFR(c, m, n, k, 1.0, a, k, b, n) > eps) {
+        is_pass = false;
+    }
+#else
+    if (exgemmVsSuperacc(c, superacc, m, n, k) > eps) {
+        is_pass = false;
+    }
+#endif
+
+    exgemm('N', 'N', m, n, k, 1.0, a, k, b, n, 0.0, c, n, 8);
+#ifdef EXBLAS_VS_MPFR
+    if (exgemmVsMPFR(c, m, n, k, 1.0, a, k, b, n) > eps) {
+        is_pass = false;
+    }
+#else
+    if (exgemmVsSuperacc(c, superacc, m, n, k) > eps) {
+        is_pass = false;
+    }
+#endif
+
+    exgemm('N', 'N', m, n, k, 1.0, a, k, b, n, 0.0, c, n, 4, true);
+#ifdef EXBLAS_VS_MPFR
+    if (exgemmVsMPFR(c, m, n, k, 1.0, a, k, b, n) > eps) {
+        is_pass = false;
+    }
+#else
+    if (exgemmVsSuperacc(c, superacc, m, n, k) > eps) {
+        is_pass = false;
+    }
+#endif
+
+    exgemm('N', 'N', m, n, k, 1.0, a, k, b, n, 0.0, c, n, 6, true);
+#ifdef EXBLAS_VS_MPFR
+    if (exgemmVsMPFR(c, m, n, k, 1.0, a, k, b, n) > eps) {
+        is_pass = false;
+    }
+#else
+    if (exgemmVsSuperacc(c, superacc, m, n, k) > eps) {
+        is_pass = false;
+    }
+#endif
+
+    exgemm('N', 'N', m, n, k, 1.0, a, k, b, n, 0.0, c, n, 8, true);
+#ifdef EXBLAS_VS_MPFR
+    if (exgemmVsMPFR(c, m, n, k, 1.0, a, k, b, n) > eps) {
+        is_pass = false;
+    }
+#else
+    if (exgemmVsSuperacc(c, superacc, m, n, k) > eps) {
+        is_pass = false;
+    }
+#endif
     fprintf(stderr, "\n");
 
     if (is_pass)
