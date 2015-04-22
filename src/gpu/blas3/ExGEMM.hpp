@@ -5,7 +5,7 @@
 
 /**
  *  \file ExGEMM.hpp
- *  \brief Provides a set of summation routines
+ *  \brief Provides a set of gemm routines
  *
  *  \authors
  *    Developers : \n

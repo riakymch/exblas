@@ -10,7 +10,8 @@ order of computations, thread scheduling, or reduction tree schemes.
 
 
 The current version of the ExBLAS library is equipped with 
-  * Reproducible parallel reduction (parallel summation);
+  * ExSUM -- Reproducible and accurate parallel reduction (parallel summation);
+  * ExGEMM -- Reproducible and accurate parallel matrix-matrix multiplication.
 These routines can be executed on a set of architectures: Intel Core i7 and 
 Sandy Bridge processors; Intel Xeon Phi co-processors; both AMD and NVIDIA 
 GPUs using the OpenCL framework.
