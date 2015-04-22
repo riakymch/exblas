@@ -21,9 +21,9 @@
 
 /**
  * \ingroup ExGEMM
- * \brief Parallel matrix-matrix multiplication (C := beta * C + alpha * op(A) * op(B), where op(X) = X or op(X) = X^T)
- *     with our multi-level reproducible and accurate algorithm that relies upon floating-point expansions in conjuction
- *     with superaccumulators
+ * \brief Executes on GPU parallel matrix-matrix multiplication (C := beta * C + alpha * op(A) * op(B), where op(X) = X or op(X) = X^T)
+ *     built on top of our multi-level reproducible and accurate algorithm that relies upon floating-point expansions in conjuction
+ *     with superaccumulators. For internal use
  *
  * \param m nb of rows of matrix C
  * \param n nb of columns of matrix C
