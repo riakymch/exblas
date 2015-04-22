@@ -51,6 +51,9 @@ extern "C" cl_int initExGEMM(
     cl_command_queue cqParamCommandQue,
     cl_device_id cdDevice,
     const char* program_file,
+    const uint mi,
+    const uint ni,
+    const uint ki,
     const uint NbFPE
 );
 
@@ -60,12 +63,17 @@ extern "C" void closeExGEMM(
 
 extern "C" size_t runExGEMM(
     cl_command_queue cqCommandQueue,
-    cl_mem d_C,
-    const cl_mem d_A,
-    const cl_mem d_B,
     const uint m,
     const uint n,
-    const int multi,
+    const uint k,
+    const double alpha,
+    const cl_mem d_a,
+    const uint lda,
+    const cl_mem d_b,
+    const uint ldb,
+    const double beta,
+    cl_mem d_c,
+    const uint ldc,
     cl_int *ciErrNumRes
 );
 

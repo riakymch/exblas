@@ -25,8 +25,6 @@
  *     with our multi-level reproducible and accurate algorithm that relies upon floating-point expansions in conjuction
  *     with superaccumulators
  *
- * \param transa 'T' or 'N' -- transpose or non-transpose matrix A
- * \param transb 'T' or 'N' -- transpose or non-transpose matrix B
  * \param m nb of rows of matrix C
  * \param n nb of columns of matrix C
  * \param k nb of rows in matrix B
@@ -42,6 +40,6 @@
  * \param program_file path to the file with kernels
  * \return matrix C contains the reproducible and accurate result of the matrix product
  */
-double runExGEMM(char transa, char transb, int m, int n, int k, double alpha, double *a, int lda, double *b, int ldb, double beta, double *c, double ldc, int fpe, const char* program_file);
+int runExGEMM(int m, int n, int k, double alpha, double *a, int lda, double *b, int ldb, double beta, double *c, double ldc, int fpe, const char* program_file);
 
 #endif // EXGEMM_HPP_

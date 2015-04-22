@@ -40,8 +40,10 @@ double min(double arr[], int size) {
  * Parallel GEMM based on our algorithm. If fpe < 2, use superaccumulators only.
  * Otherwise, use floating-point expansions of size FPE with superaccumulators when needed.
  * early_exit corresponds to the early-exit technique
+ *
+ * For now, we work non-transpose matrices
  */
-double exgemm(char transa, char transb, int m, int n, int k, double alpha, double *a, int lda, double *b, int ldb, double beta, double *c, double ldc, int fpe, bool early_exit) {
+int exgemm(char transa, char transb, int m, int n, int k, double alpha, double *a, int lda, double *b, int ldb, double beta, double *c, double ldc, int fpe, bool early_exit) {
     char path[256];
     strcpy(path, EXBLAS_BINARY_DIR);
     strcat(path, "/include/cl/");
@@ -54,35 +56,34 @@ double exgemm(char transa, char transb, int m, int n, int k, double alpha, doubl
     }
     // there is no need and no improvement at all in using the early-exit technique for FPE of size 2
     if (fpe == 2)
-        return runExGEMM(N, a, inca, 2, strcat(path, "ExGEMM.FPE.cl"));
+        return runExGEMM(m, n, k, alpha, a, lda, b, ldb, beta, c, ldc, 2, strcat(path, "ExGEMM.FPE.cl"));
 
     if (early_exit) {
         if (fpe <= 4)
-            return runExGEMM(N, a, inca, 4, strcat(path, "ExGEMM.FPE.EX.4.cl"));
+            return runExGEMM(m, n, k, alpha, a, lda, b, ldb, beta, c, ldc, 4, strcat(path, "ExGEMM.FPE.EX.4.cl"));
         if (fpe <= 6)
-            return runExGEMM(N, a, inca, 6, strcat(path, "ExGEMM.FPE.EX.6.cl"));
+            return runExGEMM(m, n, k, alpha, a, lda, b, ldb, beta, c, ldc, 6, strcat(path, "ExGEMM.FPE.EX.6.cl"));
         if (fpe <= 8)
-            return runExGEMM(N, a, inca, 8, strcat(path, "ExGEMM.FPE.EX.8.cl"));
+            return runExGEMM(m, n, k, alpha, a, lda, b, ldb, beta, c, ldc, 8, strcat(path, "ExGEMM.FPE.EX.8.cl"));
     } else { // ! early_exit
         if (fpe == 3)
-            return runExGEMM(N, a, inca, 3, strcat(path, "ExGEMM.FPE.cl"));
+            return runExGEMM(m, n, k, alpha, a, lda, b, ldb, beta, c, ldc, 3, strcat(path, "ExGEMM.FPE.cl"));
         if (fpe == 4)
-            return runExGEMM(N, a, inca, 4, strcat(path, "ExGEMM.FPE.cl"));
+            return runExGEMM(m, n, k, alpha, a, lda, b, ldb, beta, c, ldc, 4, strcat(path, "ExGEMM.FPE.cl"));
         if (fpe == 5)
-            return runExGEMM(N, a, inca, 5, strcat(path, "ExGEMM.FPE.cl"));
+            return runExGEMM(m, n, k, alpha, a, lda, b, ldb, beta, c, ldc, 5, strcat(path, "ExGEMM.FPE.cl"));
         if (fpe == 6)
-            return runExGEMM(N, a, inca, 6, strcat(path, "ExGEMM.FPE.cl"));
+            return runExGEMM(m, n, k, alpha, a, lda, b, ldb, beta, c, ldc, 6, strcat(path, "ExGEMM.FPE.cl"));
         if (fpe == 7)
-            return runExGEMM(N, a, inca, 7, strcat(path, "ExGEMM.FPE.cl"));
+            return runExGEMM(m, n, k, alpha, a, lda, b, ldb, beta, c, ldc, 7, strcat(path, "ExGEMM.FPE.cl"));
         if (fpe == 8)
-            return runExGEMM(N, a, inca, 8, strcat(path, "ExGEMM.FPE.cl"));
+            return runExGEMM(m, n, k, alpha, a, lda, b, ldb, beta, c, ldc, 8, strcat(path, "ExGEMM.FPE.cl"));
     }
 
-    return 0.0;
+    return EXIT_SUCCESS;
 }
 
-double runExGEMM(char transa, char transb, int m, int n, int k, double alpha, double *a, int lda, double *b, int ldb, double beta, double *c, double ldc, int fpe, const char* program_file) {
-    double h_Res;
+int runExGEMM(int m, int n, int k, double alpha, double *a, int lda, double *b, int ldb, double beta, double *c, double ldc, int fpe, const char* program_file) {
     cl_int ciErrNum;
 
     //printf("Initializing OpenCL...\n");
@@ -121,26 +122,31 @@ double runExGEMM(char transa, char transb, int m, int n, int k, double alpha, do
         }
 
         //Allocating OpenCL memory...
-        cl_mem d_a = clCreateBuffer(cxGPUContext, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, N * sizeof(cl_double), h_a, &ciErrNum);
+        cl_mem d_a = clCreateBuffer(cxGPUContext, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, m * k * sizeof(cl_double), h_a, &ciErrNum);
         if (ciErrNum != CL_SUCCESS) {
             printf("Error in clCreateBuffer for d_a, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
             exit(EXIT_FAILURE);
         }
-        cl_mem d_Res = clCreateBuffer(cxGPUContext, CL_MEM_READ_WRITE, sizeof(cl_double), NULL, &ciErrNum);
+        cl_mem d_b = clCreateBuffer(cxGPUContext, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, k * n * sizeof(cl_double), h_b, &ciErrNum);
         if (ciErrNum != CL_SUCCESS) {
-            printf("Error in clCreateBuffer for d_res, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
+            printf("Error in clCreateBuffer for d_b, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
+            exit(EXIT_FAILURE);
+        }
+        cl_mem d_c = clCreateBuffer(cxGPUContext, CL_MEM_READ_WRITE, m * n * sizeof(cl_double), h_c, &ciErrNum);
+        if (ciErrNum != CL_SUCCESS) {
+            printf("Error in clCreateBuffer for d_c, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
             exit(EXIT_FAILURE);
         }
 
     {
-        //Initializing OpenCL dSum...
-            ciErrNum = initExGEMM(cxGPUContext, cqCommandQueue, cdDevice, program_file, N, fpe);
+        //Initializing OpenCL ExGEMM...
+            ciErrNum = initExGEMM(cxGPUContext, cqCommandQueue, cdDevice, program_file, fpe);
             if (ciErrNum != CL_SUCCESS)
                 exit(EXIT_FAILURE);
 
-        //Running OpenCL dSum with %u elements...
+        //Running OpenCL ExGEMM...
             //Just a single launch or a warmup iteration
-            ExGEMM(NULL, d_Res, d_a, &ciErrNum);
+            runExGEMM(NULL, m, n, k, alpha, d_a, lda, d_b, ldb, beta, d_c, ldc, &ciErrNum);
             if (ciErrNum != CL_SUCCESS)
                 exit(EXIT_FAILURE);
 
@@ -156,7 +162,7 @@ double runExGEMM(char transa, char transb, int m, int n, int k, double alpha, do
                 exit(EXIT_FAILURE);
             }
 
-            ExGEMM(NULL, d_Res, d_a, &ciErrNum);
+            runExGEMM(NULL, m, n, k, alpha, d_a, lda, d_b, ldb, beta, d_c, ldc, &ciErrNum);
 
             ciErrNum  = clEnqueueMarker(cqCommandQueue, &endMark);
             ciErrNum |= clFinish(cqCommandQueue);
@@ -176,12 +182,13 @@ double runExGEMM(char transa, char transb, int m, int n, int k, double alpha, do
         }
 
         double minTime = min(gpuTime, NUM_ITER);
-        printf("NbFPE = %u \t NbElements = %u \t \t Time = %.8f s \t Throughput = %.4f GB/s\n",
-          fpe, N, minTime, ((1e-9 * N * sizeof(double)) / minTime));
+        double perf = 2.0 * m * n * k;
+        perf = (perf / minTime) * 1e-9;
+        printf("NbFPE = %u \t M = %u \t N = %u \t K = %u \t Time = %.8f s \t Performance = %.4f GFLOPS\n", fpe, m, n, k, minTime, perf);
 #endif
 
         //Retrieving results...
-            ciErrNum = clEnqueueReadBuffer(cqCommandQueue, d_Res, CL_TRUE, 0, sizeof(cl_double), &h_Res, 0, NULL, NULL);
+            ciErrNum = clEnqueueReadBuffer(cqCommandQueue, d_c, CL_TRUE, 0, m * n * sizeof(double), c, 0, NULL, NULL);
             if (ciErrNum != CL_SUCCESS) {
                 printf("Error in clEnqueueReadBuffer Line %u in file %s !!!\n\n", __LINE__, __FILE__);
                 exit(EXIT_FAILURE);
@@ -192,14 +199,16 @@ double runExGEMM(char transa, char transb, int m, int n, int k, double alpha, do
             closeExGEMM();
             if(d_a)
                 clReleaseMemObject(d_a);
-            if(d_Res)
-                clReleaseMemObject(d_Res);
+            if(d_b)
+                clReleaseMemObject(d_b);
+            if(d_c)
+                clReleaseMemObject(d_c);
             if(cqCommandQueue)
                 clReleaseCommandQueue(cqCommandQueue);
             if(cxGPUContext)
                 clReleaseContext(cxGPUContext);
     }
 
-    return h_Res;
+    return EXIT_SUCCESS;
 }
 
