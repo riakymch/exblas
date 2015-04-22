@@ -82,7 +82,7 @@ int Normalize(long *accumulator, int *imin, int *imax) {
     // Sign-extend all the way
     for (i = *imin + 1; i < BIN_COUNT; ++i) {
         accumulator[i] += carry_in;
-        long carry_out = accumulator[i] >> digits;    // Arithmetic shift
+        long carry_out = (accumulator[i] >> digits);    // Arithmetic shift
         accumulator[i] -= (carry_out << digits);
         carry_in = carry_out;
     }
@@ -91,7 +91,7 @@ int Normalize(long *accumulator, int *imin, int *imax) {
     return carry_in < 0;
 }
 
-double Round(__global long *accumulator) {
+double Round(long *accumulator) {
     int imin = 0;
     int imax = 38;
     int negative = Normalize(accumulator, &imin, &imax);
@@ -103,7 +103,7 @@ double Round(__global long *accumulator) {
     }
     if (negative) {
         //Skip ones
-        for (; (accumulator[i] & ((1l << digits) - 1)) == ((1l << digits) - 1) && i >= imin; --i) {
+        for(; (accumulator[i] & ((1l << digits) - 1)) == ((1l << digits) - 1) && i >= imin; --i) {
         }
     }
     if (i < 0)

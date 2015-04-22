@@ -10,14 +10,12 @@
 #include "common.hpp"
 
 
-double randDoubleUniform()
-{
+double randDoubleUniform() {
     // Uniform distribution for now
     return double(rand() - RAND_MAX/4) * 12345.678901234;
 }
 
-double randDouble(int emin, int emax, int neg_ratio)
-{
+double randDouble(int emin, int emax, int neg_ratio) {
     // Uniform mantissa
     double x = double(rand()) / double(RAND_MAX * .99) + 1.;
     // Uniform exponent
@@ -29,8 +27,7 @@ double randDouble(int emin, int emax, int neg_ratio)
     return ldexp(x, e);
 }
 
-void init_fpuniform(double *a, int n, int range, int emax)
-{
+void init_fpuniform(double *a, int n, int range, int emax) {
     for(int i = 0; i != n; ++i) {
         a[i] = randDouble(emax-range, emax, 1);
         //a[i] = randDoubleUniform();
@@ -38,8 +35,10 @@ void init_fpuniform(double *a, int n, int range, int emax)
     }
 }
 
-void init_lognormal(double * a, int n, double mean, double stddev)
-{
+void init_fpuniform(double *a, int m, int n, int range, int emax) {
+}
+
+void init_lognormal(double * a, int n, double mean, double stddev) {
     std::random_device rd;
     std::default_random_engine gen(rd());
     std::lognormal_distribution<> d(mean, stddev);
@@ -51,8 +50,10 @@ void init_lognormal(double * a, int n, double mean, double stddev)
     }
 }
 
-void init_ill_cond(double *a, int n, double c) 
-{
+void init_lognormal(double *a, int m, int n, double mean, double stddev) {
+}
+
+void init_ill_cond(double *a, int n, double c) {
     int n2 = round(n / 2);
 
     for(int i = 0; i != n; ++i)
@@ -64,32 +65,38 @@ void init_ill_cond(double *a, int n, double c)
     double b = log2(c);
     for(int i = 0; i != n2; ++i) {
         x = double(rand()) / double(RAND_MAX);
-	e[i] = round(x * b / 2);
+        e[i] = round(x * b / 2);
     }
     e[0] = round(b / 2) + 1.;
     e[n-1] = 0;
-   
+
     // init the first half of the vector
     for(int i = 0; i != n2; ++i) {
         double x = double(rand()) / double(RAND_MAX);
-	a[i] = (2. * x - 1.) * pow(2., e[i]);
+        a[i] = (2. * x - 1.) * pow(2., e[i]);
     }
 
     // init the second half of the vector
     double step = (b / 2) / (n - n2);
     for(int i = n2; i != n; ++i) {
         double x = double(rand()) / double(RAND_MAX);
-	e[i] = step * (i - n2);
-	a[i] = (2. * x - 1.) * pow(2., e[i]); 
+        e[i] = step * (i - n2);
+        a[i] = (2. * x - 1.) * pow(2., e[i]); 
     }
 
     free(e);
 }
 
+void init_ill_cond(double *a, int m, int n, double c) {
+}
 
-void init_naive(double *a, int n)
-{
+void init_naive(double *a, int n) {
     for(int i = 0; i != n; ++i)
         a[i] = 1.0;
 }
 
+void init_naive(double *a, int m, int n) {
+    for(int j = 0; j != n; ++j)
+        for(int i = 0; i != m; ++i)
+            a[j * m + i] = 1.0;
+}

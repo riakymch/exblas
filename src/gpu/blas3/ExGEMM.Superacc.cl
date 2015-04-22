@@ -99,7 +99,7 @@ double Round(long *accumulator) {
     }
     if (negative) {
         //Skip ones
-        for(; (accumulator[i] & (((1l << digits) - 1) - 1) == ((1l << digits) - 1) && i >= imin; --i) {
+        for(; (accumulator[i] & ((1l << digits) - 1)) == ((1l << digits) - 1) && i >= imin; --i) {
         }
     }
     if (i < 0)

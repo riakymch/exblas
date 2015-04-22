@@ -96,7 +96,7 @@ int Normalize(long *accumulator, int *imin, int *imax) {
 
 double Round(long *accumulator) {
     int imin = 0;
-    int imax = 75;
+    int imax = 38;
     int negative = Normalize(accumulator, &imin, &imax);
 
     //Find leading word

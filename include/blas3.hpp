@@ -50,9 +50,9 @@
  * \param c matrix C
  * \param ldc leading dimension of C
  * \param fpe size of floating-point expansion
- * \param program_file path to the file with kernels
+ * \param early_exit specifies the optimization technique. By default, it is disabled
  * \return matrix C contains the reproducible and accurate result of the matrix product
  */
-double runExGEMM(char transa, char transb, int m, int n, int k, double alpha, double *a, int lda, double *b, int ldb, double beta, double *c, double ldc, int fpe, const char* program_file);
+int exgemm(char transa, char transb, int m, int n, int k, double alpha, double *a, int lda, double *b, int ldb, double beta, double *c, int ldc, int fpe, bool early_exit = false);
 
 #endif // BLAS3_HPP_

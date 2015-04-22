@@ -40,7 +40,7 @@ if (EXBLAS_TIMING)
 endif (EXBLAS_TIMING)
 
 # Grab the .c and .cpp files
-file (GLOB_RECURSE EXBLAS_C_CPP_SOURCE "blas1/*.cpp" "blas3/*.hpp" "${PROJECT_SOURCE_DIR}/src/common/*.cpp")
+file (GLOB_RECURSE EXBLAS_C_CPP_SOURCE "blas1/*.cpp" "blas1/*.hpp" "blas3/*.cpp" "blas3/*.hpp" "${PROJECT_SOURCE_DIR}/src/common/*.cpp")
 # Grab the .cl files
 file (GLOB_RECURSE EXBLAS_CL_SOURCE "blas1/*.cl" "blas3/*.cl")
 # Grab the C/C++ headers
@@ -71,4 +71,5 @@ if (EXBLAS_VS_MPFR)
 endif (EXBLAS_VS_MPFR)
 
 add_subdirectory (blas1)
+add_subdirectory (blas3)
 

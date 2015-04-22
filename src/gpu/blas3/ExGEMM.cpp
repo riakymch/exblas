@@ -43,16 +43,17 @@ double min(double arr[], int size) {
  *
  * For now, we work non-transpose matrices
  */
-int exgemm(char transa, char transb, int m, int n, int k, double alpha, double *a, int lda, double *b, int ldb, double beta, double *c, double ldc, int fpe, bool early_exit) {
+//int exgemm(char transa, char transb, int m, int n, int k, double alpha, double *a, int lda, double *b, int ldb, double beta, double *c, int ldc, int fpe, bool early_exit = false) {
+int exgemm(char transa, char transb, int m, int n, int k, double alpha, double *a, int lda, double *b, int ldb, double beta, double *c, int ldc, int fpe, bool early_exit = false) {
     char path[256];
     strcpy(path, EXBLAS_BINARY_DIR);
     strcat(path, "/include/cl/");
 
     // with superaccumulators only
     if (fpe < 2) {
-    //    return runExGEMM(N, a, inca, 0, strcat(path, "ExGEMM.Superacc.cl"));
-        printf("Please use the size of FPE from this range [2, 8]\n");
-        exit(0);
+        return runExGEMM(m, n, k, alpha, a, lda, b, ldb, beta, c, ldc, 0, strcat(path, "ExGEMM.Superacc.cl"));
+        //printf("Please use the size of FPE from this range [2, 8]\n");
+        //exit(0);
     }
     // there is no need and no improvement at all in using the early-exit technique for FPE of size 2
     if (fpe == 2)
@@ -83,7 +84,7 @@ int exgemm(char transa, char transb, int m, int n, int k, double alpha, double *
     return EXIT_SUCCESS;
 }
 
-int runExGEMM(int m, int n, int k, double alpha, double *a, int lda, double *b, int ldb, double beta, double *c, double ldc, int fpe, const char* program_file) {
+int runExGEMM(int m, int n, int k, double alpha, double *h_a, int lda, double *h_b, int ldb, double beta, double *h_c, int ldc, int fpe, const char* program_file) {
     cl_int ciErrNum;
 
     //printf("Initializing OpenCL...\n");
@@ -146,7 +147,7 @@ int runExGEMM(int m, int n, int k, double alpha, double *a, int lda, double *b, 
 
         //Running OpenCL ExGEMM...
             //Just a single launch or a warmup iteration
-            runExGEMM(NULL, m, n, k, alpha, d_a, lda, d_b, ldb, beta, d_c, ldc, &ciErrNum);
+            ExGEMM(NULL, m, n, k, alpha, d_a, lda, d_b, ldb, beta, d_c, ldc, &ciErrNum);
             if (ciErrNum != CL_SUCCESS)
                 exit(EXIT_FAILURE);
 
@@ -162,7 +163,7 @@ int runExGEMM(int m, int n, int k, double alpha, double *a, int lda, double *b, 
                 exit(EXIT_FAILURE);
             }
 
-            runExGEMM(NULL, m, n, k, alpha, d_a, lda, d_b, ldb, beta, d_c, ldc, &ciErrNum);
+            ExGEMM(NULL, m, n, k, alpha, d_a, lda, d_b, ldb, beta, d_c, ldc, &ciErrNum);
 
             ciErrNum  = clEnqueueMarker(cqCommandQueue, &endMark);
             ciErrNum |= clFinish(cqCommandQueue);
@@ -188,7 +189,7 @@ int runExGEMM(int m, int n, int k, double alpha, double *a, int lda, double *b, 
 #endif
 
         //Retrieving results...
-            ciErrNum = clEnqueueReadBuffer(cqCommandQueue, d_c, CL_TRUE, 0, m * n * sizeof(double), c, 0, NULL, NULL);
+            ciErrNum = clEnqueueReadBuffer(cqCommandQueue, d_c, CL_TRUE, 0, m * n * sizeof(double), h_c, 0, NULL, NULL);
             if (ciErrNum != CL_SUCCESS) {
                 printf("Error in clEnqueueReadBuffer Line %u in file %s !!!\n\n", __LINE__, __FILE__);
                 exit(EXIT_FAILURE);

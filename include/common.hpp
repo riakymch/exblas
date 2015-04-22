@@ -76,6 +76,18 @@ void init_fpuniform(double *a, int n, int range, int emax);
 
 /**
  * \ingroup common
+ * \brief Generates a real matrix with uniform distribution of ellements
+ *
+ * \param a input/output matrix
+ * \param m nb of rows
+ * \param n nb of columns
+ * \param range dynamic range of generated elements
+ * \param emax maximum exponent (emax + range < EMAX)
+ */
+void init_fpuniform(double *a, int m, int n, int range, int emax);
+
+/**
+ * \ingroup common
  * \brief Generates a real vector with log-uniform distribution of ellements
  *
  * \param a input/output vector
@@ -84,6 +96,18 @@ void init_fpuniform(double *a, int n, int range, int emax);
  * \param stddev
  */
 void init_lognormal(double *a, int n, double mean, double stddev);
+
+/**
+ * \ingroup common
+ * \brief Generates a real matrix with log-uniform distribution of ellements
+ *
+ * \param a input/output matrix
+ * \param m nb of rows
+ * \param n nb of columns
+ * \param mean 
+ * \param stddev
+ */
+void init_lognormal(double *a, int m, int n, double mean, double stddev);
 
 /**
  * \ingroup common
@@ -100,10 +124,33 @@ void init_ill_cond(double *a, int n, double c);
 
 /**
  * \ingroup common
+ * \brief Generates a real matrix with ill-conditioned ellements using \n
+ * Algorithm 6.1. Generation of extremely ill-conditioned dot products from \n
+ * T.Ogita et al. Accurate sum and dot product, SIAM Journal on Scientific Computing, 
+ * 26(6):1955-1988, 2005.
+ *
+ * \param a input/output matrix
+ * \param m nb of rows
+ * \param n nb of columns
+ * \param c anticipated condition number
+ */
+void init_ill_cond(double *a, int m, int n, double c);
+
+/**
+ * \ingroup common
  * \brief Generates a real vector with all ellements set to 1.1
  * \param a input/output vector
  * \param n vector size
  */
 void init_naive(double *a, int n);
+
+/**
+ * \ingroup common
+ * \brief Generates a real matrix with all ellements set to 1.1
+ * \param a input/output matrix
+ * \param m nb of rows
+ * \param n nb of columns
+ */
+void init_naive(double *a, int m, int n);
 
 #endif // COMMON_H
