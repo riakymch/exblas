@@ -31,12 +31,6 @@
 
 
 /**
- * \ingroup common
- * \brief Processor's frequency
- */
-double const freq = 2.6; // GHz
-
-/**
  * \class TBBlongsum
  * \ingroup ExSUM
  * \brief This class is meant to be used in our multi-level reproducible and 

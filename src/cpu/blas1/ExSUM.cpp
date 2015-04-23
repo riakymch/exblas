@@ -129,7 +129,7 @@ double ExSUMSuperacc(int N, double *a, int inca) {
 #ifdef EXBLAS_TIMING
     uint64_t tend = rdtsc();
     double t = double(tend - tstart) / N;
-    printf("time = %f (%f Gacc)\n", t, freq / t);
+    printf("time = %f\n", t);
 #endif
 
     return dacc;
@@ -230,7 +230,7 @@ template<typename CACHE> double ExSUMFPE(int N, double *a, int inca) {
 #ifdef EXBLAS_TIMING
     uint64_t tend = rdtsc();
     double t = double(tend - tstart)/N;
-    printf("time = %f (%f Gacc)\n", t, freq/t);
+    printf("time = %f\n", t);
 #endif
 
     return dacc;

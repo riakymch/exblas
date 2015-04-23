@@ -33,8 +33,8 @@
  * \brief Parallel summation computes the sum of elements of a real vector with our 
  *     multi-level reproducible and accurate algorithm.
  *
- *     If fpe < 2, it uses superaccumulators only.
- *     Otherwise, it relies on floating-point expansions of size FPE with superaccumulators when needed
+ *     If fpe < 2, it uses superaccumulators only. Otherwise, it relies on 
+ *     floating-point expansions of size FPE with superaccumulators when needed
  *
  * \param N vector size
  * \param a vector

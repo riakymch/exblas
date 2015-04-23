@@ -3,6 +3,16 @@
  *  All rights reserved.
  */
 
+/**
+ *  \file gpu/blas3/ExGEMM.cpp
+ *  \brief Provides implementations of a set of gemm routines
+ *
+ *  \authors
+ *    Developers : \n
+ *        Roman Iakymchuk  -- roman.iakymchuk@lip6.fr \n
+ *        Sylvain Collange -- sylvain.collange@inria.fr \n
+ */
+
 #include <cassert>
 #include <cstdlib>
 #include <cstdio>
@@ -10,14 +20,14 @@
 #include <cstring>
 
 #include "config.h"
-#include "ExGEMM.hpp"
+#include "common.hpp"
 #include "blas1.hpp"
 #include "ExGEMM.Launcher.hpp"
 
-#define NUM_ITER 20
-
 #ifdef EXBLAS_TIMING
 #include <cassert>
+
+#define NUM_ITER 20
 
 double min(double arr[], int size) {
     assert(arr != NULL);
@@ -35,15 +45,52 @@ double min(double arr[], int size) {
 }
 #endif
 
-
-/*
- * Parallel GEMM based on our algorithm. If fpe < 2, use superaccumulators only.
- * Otherwise, use floating-point expansions of size FPE with superaccumulators when needed.
- * early_exit corresponds to the early-exit technique
+/**
+ * \ingroup ExGEMM
+ * \brief Executes on GPU parallel matrix-matrix multiplication (C := beta * C + alpha * op(A) * op(B), where op(X) = X or op(X) = X^T).
+ *     For internal use
  *
- * For now, we work non-transpose matrices
+ * \param m nb of rows of matrix C
+ * \param n nb of columns of matrix C
+ * \param k nb of rows in matrix B
+ * \param alpha scalar
+ * \param a matrix A
+ * \param lda leading dimension of A
+ * \param b matrix B
+ * \param ldb leading dimension of B
+ * \param beta scalar
+ * \param c matrix C
+ * \param ldc leading dimension of C
+ * \param fpe size of floating-point expansion
+ * \param program_file path to the file with kernels
+ * \return matrix C contains the reproducible and accurate result of the matrix product
  */
-//int exgemm(char transa, char transb, int m, int n, int k, double alpha, double *a, int lda, double *b, int ldb, double beta, double *c, int ldc, int fpe, bool early_exit = false) {
+static int runExGEMM(int m, int n, int k, double alpha, double *a, int lda, double *b, int ldb, double beta, double *c, int ldc, int fpe, const char* program_file);
+
+
+/**
+ * \ingroup ExGEMM
+ * \brief Parallel GEMM based on our algorithm. If fpe < 2, use superaccumulators only.
+ *     Otherwise, use floating-point expansions of size FPE with superaccumulators when needed.
+ *     early_exit corresponds to the early-exit technique. For now, it works on non-transpose matrices
+ *
+ * \param transa 'T' or 'N' -- transpose or non-transpose matrix A
+ * \param transb 'T' or 'N' -- transpose or non-transpose matrix B
+ * \param m nb of rows of matrix C
+ * \param n nb of columns of matrix C
+ * \param k nb of rows in matrix B
+ * \param alpha scalar
+ * \param a matrix A
+ * \param lda leading dimension of A
+ * \param b matrix B
+ * \param ldb leading dimension of B
+ * \param beta scalar
+ * \param c matrix C
+ * \param ldc leading dimension of C
+ * \param fpe size of FPE
+ * \param early_exit Flag to indicate the early-exit technique
+ * \return status
+ */
 int exgemm(char transa, char transb, int m, int n, int k, double alpha, double *a, int lda, double *b, int ldb, double beta, double *c, int ldc, int fpe, bool early_exit = false) {
     char path[256];
     strcpy(path, EXBLAS_BINARY_DIR);
@@ -84,7 +131,7 @@ int exgemm(char transa, char transb, int m, int n, int k, double alpha, double *
     return EXIT_SUCCESS;
 }
 
-int runExGEMM(int m, int n, int k, double alpha, double *h_a, int lda, double *h_b, int ldb, double beta, double *h_c, int ldc, int fpe, const char* program_file) {
+static int runExGEMM(int m, int n, int k, double alpha, double *h_a, int lda, double *h_b, int ldb, double beta, double *h_c, int ldc, int fpe, const char* program_file) {
     cl_int ciErrNum;
 
     //printf("Initializing OpenCL...\n");

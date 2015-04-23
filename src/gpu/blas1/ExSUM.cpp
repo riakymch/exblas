@@ -3,6 +3,16 @@
  *  All rights reserved.
  */
 
+/**
+ *  \file gpu/blas3/ExSUM.cpp
+ *  \brief Provides implementations of a set of sum routines
+ *
+ *  \authors
+ *    Developers : \n
+ *        Roman Iakymchuk  -- roman.iakymchuk@lip6.fr \n
+ *        Sylvain Collange -- sylvain.collange@inria.fr \n
+ */
+
 #include <cassert>
 #include <cstdlib>
 #include <cstdio>
@@ -10,16 +20,16 @@
 #include <cstring>
 
 #include "config.h"
-#include "ExSUM.hpp"
+#include "common.hpp"
 #include "blas1.hpp"
 #include "ExSUM.Launcher.hpp"
-
-#define NUM_ITER 20
 
 #ifdef EXBLAS_TIMING
 #include <cassert>
 
-double min(double arr[], int size) {
+#define NUM_ITER 20
+
+static double min(double arr[], int size) {
     assert(arr != NULL);
     assert(size >= 0);
 
@@ -35,11 +45,34 @@ double min(double arr[], int size) {
 }
 #endif
 
+/**
+ * \ingroup ExSUM
+ * \brief Executes on GPU parallel summation/reduction on elements of a real vector.
+ *     For internal use
+ *
+ * \param N vector size
+ * \param a vector
+ * \param inca specifies the increment for the elements of a
+ * \param fpe size of floating-point expansion
+ * \param program_file path to the file with kernels
+ * \return Contains the reproducible and accurate sum of elements of a real vector
+ */
+static double runExSUM(int N, double *a, int inca, int fpe, const char* program_file);
 
-/*
- * Parallel summation using our algorithm. If fpe < 2, use superaccumulators only.
- * Otherwise, use floating-point expansions of size FPE with superaccumulators when needed.
- * early_exit corresponds to the early-exit technique
+/**
+ * \ingroup ExSUM
+ * \brief Parallel summation computes the sum of elements of a real vector with our 
+ *     multi-level reproducible and accurate algorithm.
+ *
+ *     If fpe < 2, it uses superaccumulators only. Otherwise, it relies on 
+ *     floating-point expansions of size FPE with superaccumulators when needed
+ *
+ * \param N vector size
+ * \param a vector
+ * \param inca specifies the increment for the elements of a
+ * \param fpe stands for the floating-point expansions size (used in conjuction with superaccumulators)
+ * \param early_exit specifies the optimization technique. By default, it is disabled
+ * \return Contains the reproducible and accurate sum of elements of a real vector
  */
 double exsum(int N, double *a, int inca, int fpe, bool early_exit) {
     char path[256];
@@ -81,7 +114,7 @@ double exsum(int N, double *a, int inca, int fpe, bool early_exit) {
     return 0.0;
 }
 
-double runExSUM(int N, double *h_a, int inca, int fpe, const char* program_file){
+static double runExSUM(int N, double *h_a, int inca, int fpe, const char* program_file){
     double h_Res;
     cl_int ciErrNum;
 
