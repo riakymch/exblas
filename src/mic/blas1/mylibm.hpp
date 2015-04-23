@@ -3,6 +3,17 @@
  *  All rights reserved.
  */
 
+/**
+ *  \file mic/blas1/mylibm.hpp
+ *  \brief Provides a set of auxiliary functions to superaccumulation.
+ *         For internal use
+ *
+ *  \authors
+ *    Developers : \n
+ *        Roman Iakymchuk  -- roman.iakymchuk@lip6.fr \n
+ *        Sylvain Collange -- sylvain.collange@inria.fr \n
+ */
+
 #ifndef MYLIBM_HPP_INCLUDED
 #define MYLIBM_HPP_INCLUDED
 

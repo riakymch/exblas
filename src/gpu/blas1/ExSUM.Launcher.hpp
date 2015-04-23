@@ -3,8 +3,19 @@
  *  All rights reserved.
  */
 
-#ifndef EXSUM_LAUNCHER_H
-#define EXSUM_LAUNCHER_H
+/**
+ *  \file  ExSUM.Launcher.hpp
+ *  \brief Provides a set of routines for executing summation on GPUs.
+ *         For internal use
+ *
+ *  \authors
+ *    Developers : \n
+ *        Roman Iakymchuk  -- roman.iakymchuk@lip6.fr \n
+ *        Sylvain Collange -- sylvain.collange@inria.fr \n
+ */
+
+#ifndef EXSUM_LAUNCHER_HPP_
+#define EXSUM_LAUNCHER_HPP_
 
 #include <cmath>
 #include <cstdio>
@@ -29,14 +40,36 @@ typedef long long int bintype;
 ////////////////////////////////////////////////////////////////////////////////
 // Common functions
 ////////////////////////////////////////////////////////////////////////////////
+/**
+ * \ingroup ExSUM
+ * \brief Function to obtain platform. For internal use
+ *
+ * \param name Platform name
+ * \return Platform ID
+ */
 cl_platform_id GetOCLPlatform(
     char name[]
 );
 
+/**
+ * \ingroup ExSUM
+ * \brief Function to obtain device. For internal use
+ * 
+ * \param pPlatform Platform ID
+ * \return Device ID
+ */
 cl_device_id GetOCLDevice(
     cl_platform_id pPlatform
 );
 
+/**
+ * \ingroup ExSUM
+ * \brief Function to obtain device by name. For internal use
+ *
+ * \param pPlatform Platform ID
+ * \param name Device name
+ * \return Device ID
+ */
 cl_device_id GetOCLDevice(
     cl_platform_id pPlatform,
     char name[]
@@ -46,6 +79,19 @@ cl_device_id GetOCLDevice(
 ////////////////////////////////////////////////////////////////////////////////
 // GPU reduction related functions
 ////////////////////////////////////////////////////////////////////////////////
+/**
+ * \ingroup ExSUM
+ * \brief Function to initialize execution on GPUs by allocating kernels and 
+ *     memory space. For internal use
+ *
+ * \param cxGPUContext GPU context
+ * \param cqParamCommandQue Command queue
+ * \param cdDevice Device ID
+ * \param program_file OpenCL file to execute
+ * \param NbElements Nb of elements to sum
+ * \param NbFPE Size of FPEs
+ * \return Status
+ */
 extern "C" cl_int initExSUM(
     cl_context cxGPUContext,
     cl_command_queue cqParamCommandQue,
@@ -55,10 +101,25 @@ extern "C" cl_int initExSUM(
     const uint NbFPE
 );
 
+/**
+ * \ingroup ExSUM
+ * \brief Function to finish the execution on GPUs. It is sort of garbage collector.
+ *     For internal use
+ */
 extern "C" void closeExSUM(
     void
 );
 
+/**
+ * \ingroup ExSUM
+ * \brief Executes on GPU parallel matrix-matrix multiplication. For internal use
+ *
+ * \param cqCommandQueue Command queue
+ * \param d_Res Result of summation rounded to the nearest
+ * \param d_Data Array to sum
+ * \param ciErrNum Error number (output)
+ * \return status
+ */
 extern "C" size_t ExSUM(
     cl_command_queue cqCommandQueue,
     cl_mem d_Res,
@@ -66,4 +127,4 @@ extern "C" size_t ExSUM(
     cl_int *ciErrNum
 );
 
-#endif
+#endif // EXSUM_LAUNCHER_HPP_

@@ -4,7 +4,7 @@
  */
 
 /**
- *  \file ExSUM.FPE.hpp
+ *  \file mic/blas1/ExSUM.FPE.hpp
  *  \brief Provides a set of routines concerning floating-point expansions
  *
  *  \authors
@@ -12,8 +12,8 @@
  *        Roman Iakymchuk  -- roman.iakymchuk@lip6.fr \n
  *        Sylvain Collange -- sylvain.collange@inria.fr \n
  */
-#ifndef ExSUM_FPE_HPP_INCLUDED
-#define ExSUM_FPE_HPP_INCLUDED
+#ifndef ExSUM_FPE_HPP_
+#define ExSUM_FPE_HPP_
 
 /**
  * \struct FPExpansionVect
@@ -25,7 +25,7 @@ template<typename T, int N, bool EX=false>
 struct FPExpansionVect
 {
     typedef T limb_t;
-    
+
     /**
      * Constructor
      * \param sa superaccumulator
@@ -47,7 +47,7 @@ struct FPExpansionVect
 
     /** 
      * This function accumulates value x to 
-     * \param x1 input array of values
+     * \param x input array of values
      * \param n  number of elementes
      */
     void Accumulate(double const * x, int n);
@@ -65,7 +65,7 @@ struct FPExpansionVect
 private:
     void FlushVector(T x) const;
     void DumpVector(T x) const;
-    
+
     Superaccumulator & superacc;
 
     // Most significant digits first!

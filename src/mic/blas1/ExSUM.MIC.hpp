@@ -5,15 +5,16 @@
 
 /**
  *  \file ExSUM.MIC.hpp
- *  \brief Provides a set of routines for working with vector types on MIC
+ *  \brief Provides a set of routines for working with vector types on MIC.
+ *         For internal use
  *
  *  \authors
  *    Developers : \n
  *        Roman Iakymchuk  -- roman.iakymchuk@lip6.fr \n
  *        Sylvain Collange -- sylvain.collange@inria.fr \n
  */
-#ifndef EXSUM_MIC_HPP_INCLUDED
-#define EXSUM_MIC_HPP_INCLUDED
+#ifndef EXSUM_MIC_HPP_
+#define EXSUM_MIC_HPP_
 
 #include <algorithm>
 #include <cmath>
@@ -48,7 +49,7 @@ struct FPLargeBaseMIC
 
     /** 
      * This function accumulates an array of values to the floating-point expansion
-     * \param x1 input array of values
+     * \param x input array of values
      * \param n  size of the array
      */
     void Accumulate(double const * x, int n);

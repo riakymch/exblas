@@ -4,7 +4,7 @@
  */
 
 /**
- *  \file ExSUM.hpp
+ *  \file gpu/blas1/ExSUM.hpp
  *  \brief Provides a set of summation routines
  *
  *  \authors
@@ -22,9 +22,8 @@
 /**
  * \ingroup ExSUM
  * \brief Executes parallel summation/reduction on elements of a real vector with our 
- *     multi-level reproducible and accurate algorithm that relies upon
- *     floating-point expansions in conjuction with superaccumulators or superaccumulators
- *     only
+ *     multi-level reproducible and accurate algorithm that relies upon floating-point
+ *     expansions in conjuction with superaccumulators or superaccumulators only
  *
  * \param N vector size
  * \param a vector

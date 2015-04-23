@@ -4,7 +4,7 @@
  */
 
 /**
- *  \file fpexpansionvect.hpp
+ *  \file cpu/blas1/ExSUM.FPE.hpp
  *  \brief Provides a set of routines concerning floating-point expansions
  *
  *  \authors
@@ -12,8 +12,8 @@
  *        Roman Iakymchuk  -- roman.iakymchuk@lip6.fr \n
  *        Sylvain Collange -- sylvain.collange@inria.fr \n
  */
-#ifndef FPEXPANSIONVECT_HPP_INCLUDED
-#define FPEXPANSIONVECT_HPP_INCLUDED
+#ifndef EXSUM_FPE_HPP_
+#define EXSUM_FPE_HPP_
 
 /**
  * \struct FPExpansionTraits
@@ -438,4 +438,4 @@ void FPExpansionVect<T,N,TRAITS>::DumpVector(T x) const
     }
 }
 
-#endif
+#endif // EXSUM_FPE_HPP_

@@ -4,7 +4,7 @@
  */
 
 /**
- *  \file ExSUM.hpp
+ *  \file mic/blas1/ExSUM.hpp
  *  \brief Provides a set of summation routines
  *
  *  \authors

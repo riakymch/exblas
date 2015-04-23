@@ -3,6 +3,18 @@
 // Based on Agner Fog's Vector Class
 // (c) Copyright 2013 GNU General Public License http://www.gnu.org/licenses
 
+/**
+ *  \file vectori512.h
+ *  \brief Auxiliary file to vectorf512.h.
+ *         Provides a set of auxiliary functions to work with Vec8d -- Vector of 8 double precision floating point values.
+ *         For internal use
+ *
+ *  \authors
+ *    Developers : \n
+ *        Roman Iakymchuk  -- roman.iakymchuk@lip6.fr \n
+ *        Sylvain Collange -- sylvain.collange@inria.fr \n
+ */
+
 #ifndef VECTORI512_H
 #define VECTORI512_H
 

@@ -37,9 +37,8 @@ double min(double arr[], int size) {
 
 
 /*
- * Parallel summation using our algorithm
- * If fpe < 2, use superaccumulators only,
- * Otherwise, use floating-point expansions of size FPE with superaccumulators when needed
+ * Parallel summation using our algorithm. If fpe < 2, use superaccumulators only.
+ * Otherwise, use floating-point expansions of size FPE with superaccumulators when needed.
  * early_exit corresponds to the early-exit technique
  */
 double exsum(int N, double *a, int inca, int fpe, bool early_exit) {

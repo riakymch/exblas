@@ -4,7 +4,7 @@
  */
 
 /**
- *  \file dsum.hpp
+ *  \file cpu/blas1/ExSUM.hpp
  *  \brief Provides a set of summation routines
  *
  *  \authors
@@ -13,8 +13,8 @@
  *        Sylvain Collange -- sylvain.collange@inria.fr \n
  */
 
-#ifndef EXSUM_H_
-#define EXSUM_H_
+#ifndef EXSUM_HPP_
+#define EXSUM_HPP_
 
 #include "superaccumulator.hpp"
 #include "ExSUM.FPE.hpp"
@@ -104,4 +104,4 @@ double ExSUMSuperacc(int N, double *a, int inca);
  */
 template<typename CACHE> double ExSUMFPE(int N, double *a, int inca);
 
-#endif // EXSUM_H_
+#endif // EXSUM_HPP_

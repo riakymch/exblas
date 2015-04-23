@@ -4,7 +4,7 @@
  */
 
 /**
- *  \file ExGEMM.hpp
+ *  \file gpu/blas3/ExGEMM.hpp
  *  \brief Provides a set of gemm routines
  *
  *  \authors
@@ -40,6 +40,6 @@
  * \param program_file path to the file with kernels
  * \return matrix C contains the reproducible and accurate result of the matrix product
  */
-int runExGEMM(int m, int n, int k, double alpha, double *h_a, int lda, double *h_b, int ldb, double beta, double *h_c, int ldc, int fpe, const char* program_file);
+int runExGEMM(int m, int n, int k, double alpha, double *a, int lda, double *b, int ldb, double beta, double *c, int ldc, int fpe, const char* program_file);
 
 #endif // EXGEMM_HPP_

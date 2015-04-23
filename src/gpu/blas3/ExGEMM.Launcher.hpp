@@ -4,8 +4,9 @@
  */
 
 /**
- *  \file ExGEMM.Launcher.hpp
- *  \brief Provides a set of routines for executing gemm on GPUs
+ *  \file gpu/blas3/ExGEMM.Launcher.hpp
+ *  \brief Provides a set of routines for executing gemm on GPUs.
+ *         For internal use
  *
  *  \authors
  *    Developers : \n
@@ -13,8 +14,8 @@
  *        Sylvain Collange -- sylvain.collange@inria.fr \n
  */
 
-#ifndef ExGEMM_LAUNCHER_H
-#define ExGEMM_LAUNCHER_H
+#ifndef EXGEMM_LAUNCHER_HPP_
+#define EXGEMM_LAUNCHER_HPP_
 
 #include <cmath>
 #include <cstdio>
@@ -43,7 +44,7 @@ typedef long long int bintype;
  * \ingroup ExGEMM
  * \brief Function to obtain platform. For internal use
  *
- * \param Platform name
+ * \param name Platform name
  * \return Platform ID
  */
 cl_platform_id GetOCLPlatform(
@@ -54,7 +55,7 @@ cl_platform_id GetOCLPlatform(
  * \ingroup ExGEMM
  * \brief Function to obtain device. For internal use
  * 
- * \param Platform ID
+ * \param pPlatform Platform ID
  * \return Device ID
  */
 cl_device_id GetOCLDevice(
@@ -65,8 +66,8 @@ cl_device_id GetOCLDevice(
  * \ingroup ExGEMM
  * \brief Function to obtain device by name. For internal use
  *
- * \param Platform ID
- * \param Device name
+ * \param pPlatform Platform ID
+ * \param name Device name
  * \return Device ID
  */
 cl_device_id GetOCLDevice(
@@ -83,11 +84,11 @@ cl_device_id GetOCLDevice(
  * \brief Function to initialize execution on GPUs by allocating kernels and 
  *     memory space. For internal use
  *
- * \param GPU context
- * \param Command queue
- * \param Device ID
- * \param OpenCL file to execute
- * \param Size of FPEs
+ * \param cxGPUContext GPU context
+ * \param cqParamCommandQue Command queue
+ * \param cdDevice Device ID
+ * \param program_file OpenCL file to execute
+ * \param NbFPE Size of FPEs
  * \return Status
  */
 extern "C" cl_int initExGEMM(
@@ -112,7 +113,7 @@ extern "C" void closeExGEMM(
  * \ingroup ExGEMM
  * \brief Executes on GPU parallel matrix-matrix multiplication. For internal use
  *
- * \param Command queue
+ * \param cqCommandQueue Command queue
  * \param m nb of rows of matrix C
  * \param n nb of columns of matrix C
  * \param k nb of rows in matrix B
@@ -124,7 +125,7 @@ extern "C" void closeExGEMM(
  * \param beta scalar
  * \param c matrix C
  * \param ldc leading dimension of C
- * \param Error number (output)
+ * \param ciErrNumRes Error number (output)
  * \return status
  */
 extern "C" size_t ExGEMM(
@@ -133,14 +134,14 @@ extern "C" size_t ExGEMM(
     const uint n,
     const uint k,
     const double alpha,
-    const cl_mem d_a,
+    const cl_mem a,
     const uint lda,
-    const cl_mem d_b,
+    const cl_mem b,
     const uint ldb,
     const double beta,
-    cl_mem d_c,
+    cl_mem c,
     const uint ldc,
     cl_int *ciErrNumRes
 );
 
-#endif
+#endif //EXGEMM_LAUNCHER_HPP_

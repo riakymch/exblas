@@ -4,8 +4,9 @@
  */
 
 /**
- *  \file mylibm.hpp
- *  \brief Provides a set of auxiliary functions to superaccumulation
+ *  \file cpu/blas1/mylibm.hpp
+ *  \brief Provides a set of auxiliary functions to superaccumulation.
+ *         For internal use
  *
  *  \authors
  *    Developers : \n

@@ -4,7 +4,7 @@
  */
 
 /**
- *  \file superaccumulator.hpp
+ *  \file cpu/blas1/superaccumulator.hpp
  *  \brief Provides a class to work with superaccumulators
  *
  *  \authors
