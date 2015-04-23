@@ -45,17 +45,17 @@ if (DOXYGEN_FOUND)
     configure_file (${PROJECT_SOURCE_DIR}/doc/Doxyfile.in ${PROJECT_BINARY_DIR}/doc/Doxyfile @ONLY)
     add_custom_target (doc
         ${DOXYGEN_EXECUTABLE} ${PROJECT_BINARY_DIR}/doc/Doxyfile
-        WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/doc
+        WORKING_DIRECTORY ${PROJECT_BINARY_DIR}
         COMMENT "Generating API documentation with Doxygen" VERBATIM
     )
-
-#include(UseLATEX)
-#    ADD_LATEX_DOCUMENT(${PROJECT_BINARY_DIR}/doc/latex/refman.tex
-#            DEFAULT_PDF
-#        )
-#    add_custom_command(TARGET pdf POST_BUILD
-#        COMMAND ${CMAKE_COMMAND} -E copy
-#        ${CMAKE_CURRENT_BINARY_DIR}/refman.pdf
-#        ${PROJECT_BINARY_DIR}/refman.pdf)
+    # to build latex documentation
+    include (tests/UseLATEX)
+    SET (LATEX_OUTPUT_PATH ${PROJECT_BINARY_DIR}/doc/latex)
+    ADD_LATEX_DOCUMENT (
+        refman.tex
+        USE_INDEX
+        USE_GLOSSARY
+    )
+    add_dependencies(pdf doc)
 endif (DOXYGEN_FOUND)
 
