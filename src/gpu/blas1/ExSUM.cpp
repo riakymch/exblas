@@ -4,7 +4,7 @@
  */
 
 /**
- *  \file gpu/blas3/ExSUM.cpp
+ *  \file gpu/blas1/ExSUM.cpp
  *  \brief Provides implementations of a set of sum routines
  *
  *  \authors
@@ -67,48 +67,48 @@ static double runExSUM(int N, double *a, int inca, int fpe, const char* program_
  *     If fpe < 2, it uses superaccumulators only. Otherwise, it relies on 
  *     floating-point expansions of size FPE with superaccumulators when needed
  *
- * \param N vector size
- * \param a vector
+ * \param Ng vector size
+ * \param ag vector
  * \param inca specifies the increment for the elements of a
  * \param fpe stands for the floating-point expansions size (used in conjuction with superaccumulators)
  * \param early_exit specifies the optimization technique. By default, it is disabled
  * \return Contains the reproducible and accurate sum of elements of a real vector
  */
-double exsum(int N, double *a, int inca, int fpe, bool early_exit) {
+double exsum(int Ng, double *ag, int inca, int fpe, bool early_exit) {
     char path[256];
     strcpy(path, EXBLAS_BINARY_DIR);
     strcat(path, "/include/cl/");
 
     // with superaccumulators only
     if (fpe < 2) {
-    //    return runExSUM(N, a, inca, 0, strcat(path, "ExSUM.Superacc.cl"));
+    //    return runExSUM(Ng, ag, inca, 0, strcat(path, "ExSUM.Superacc.cl"));
         printf("Please use the size of FPE from this range [2, 8]\n");
         exit(0);
     }
     // there is no need and no improvement at all in using the early-exit technique for FPE of size 2
     if (fpe == 2)
-        return runExSUM(N, a, inca, 2, strcat(path, "ExSUM.FPE.cl"));
+        return runExSUM(Ng, ag, inca, 2, strcat(path, "ExSUM.FPE.cl"));
 
     if (early_exit) {
         if (fpe <= 4)
-            return runExSUM(N, a, inca, 4, strcat(path, "ExSUM.FPE.EX.4.cl"));
+            return runExSUM(Ng, ag, inca, 4, strcat(path, "ExSUM.FPE.EX.4.cl"));
         if (fpe <= 6)
-            return runExSUM(N, a, inca, 6, strcat(path, "ExSUM.FPE.EX.6.cl"));
+            return runExSUM(Ng, ag, inca, 6, strcat(path, "ExSUM.FPE.EX.6.cl"));
         if (fpe <= 8)
-            return runExSUM(N, a, inca, 8, strcat(path, "ExSUM.FPE.EX.8.cl"));
+            return runExSUM(Ng, ag, inca, 8, strcat(path, "ExSUM.FPE.EX.8.cl"));
     } else { // ! early_exit
         if (fpe == 3)
-            return runExSUM(N, a, inca, 3, strcat(path, "ExSUM.FPE.cl"));
+            return runExSUM(Ng, ag, inca, 3, strcat(path, "ExSUM.FPE.cl"));
         if (fpe == 4)
-            return runExSUM(N, a, inca, 4, strcat(path, "ExSUM.FPE.cl"));
+            return runExSUM(Ng, ag, inca, 4, strcat(path, "ExSUM.FPE.cl"));
         if (fpe == 5)
-            return runExSUM(N, a, inca, 5, strcat(path, "ExSUM.FPE.cl"));
+            return runExSUM(Ng, ag, inca, 5, strcat(path, "ExSUM.FPE.cl"));
         if (fpe == 6)
-            return runExSUM(N, a, inca, 6, strcat(path, "ExSUM.FPE.cl"));
+            return runExSUM(Ng, ag, inca, 6, strcat(path, "ExSUM.FPE.cl"));
         if (fpe == 7)
-            return runExSUM(N, a, inca, 7, strcat(path, "ExSUM.FPE.cl"));
+            return runExSUM(Ng, ag, inca, 7, strcat(path, "ExSUM.FPE.cl"));
         if (fpe == 8)
-            return runExSUM(N, a, inca, 8, strcat(path, "ExSUM.FPE.cl"));
+            return runExSUM(Ng, ag, inca, 8, strcat(path, "ExSUM.FPE.cl"));
     }
 
     return 0.0;
