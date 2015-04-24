@@ -74,3 +74,11 @@ Testing
                number distribution comparing the results either against the ones
                produced by superaccumulators only or by MPFR
 
+* All tests are stored in the tests dir
+
+
+Examples
+=============================================
+In the example dir you can find a simple test that shows how the ExBLAS routines 
+can be called and how the ExBLAS library can be linked from your project.
+
