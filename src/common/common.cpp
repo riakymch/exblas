@@ -81,6 +81,6 @@ void init_ill_cond(double *a, int n, double c) {
 
 void init_naive(double *a, int n) {
     for(int i = 0; i != n; ++i)
-        a[i] = 1.0;
+        a[i] = 1.1;
 }
 

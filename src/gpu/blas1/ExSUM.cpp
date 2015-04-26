@@ -81,8 +81,8 @@ double exsum(int Ng, double *ag, int inca, int fpe, bool early_exit) {
 
     // with superaccumulators only
     if (fpe < 2) {
-    //    return runExSUM(Ng, ag, inca, 0, strcat(path, "ExSUM.Superacc.cl"));
-        printf("Please use the size of FPE from this range [2, 8]\n");
+        return runExSUM(Ng, ag, inca, 0, strcat(path, "ExSUM.Superacc.old.cl"));
+        //printf("Please use the size of FPE from this range [2, 8]\n");
         exit(0);
     }
     // there is no need and no improvement at all in using the early-exit technique for FPE of size 2

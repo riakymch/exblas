@@ -42,23 +42,6 @@ long xadd(__local volatile long *sa, long x, uchar *of) {
     return y;
 }
 
-long xaddGlobal(__global volatile long *sa, long x, uchar *of) {
-    // OF and SF  -> carry=1
-    // OF and !SF -> carry=-1
-    // !OF        -> carry=0
-    long y = atom_add(sa, x);
-    long z = y + x; // since the value sa->superacc[i] can be changed by another work item
-
-    // TODO: cover also underflow
-    *of = 0;
-    if(x > 0 && y > 0 && z < 0)
-        *of = 1;
-    if(x < 0 && y < 0 && z > 0)
-        *of = 1;
-
-    return y;
-}
-
 
 ////////////////////////////////////////////////////////////////////////////////
 // Rounding functions
@@ -77,26 +60,7 @@ double OddRoundSumNonnegative(double th, double tl) {
     return thdb.d;
 }
 
-int NormalizeLocal(__local long *accumulator, int *imin, int *imax) {
-    long carry_in = (accumulator[*imin * WARP_COUNT] >> digits);
-    accumulator[*imin * WARP_COUNT] -= (carry_in << digits);
-    int i;
-    // Sign-extend all the way
-    for (i = *imin + 1; i < BIN_COUNT; ++i) {
-        accumulator[i * WARP_COUNT] += carry_in;
-        long carry_out = (accumulator[i * WARP_COUNT] >> digits);    // Arithmetic shift
-        accumulator[i * WARP_COUNT] -= (carry_out << digits);
-        carry_in = carry_out;
-    }
-    *imax = i - 1;
-
-    return carry_in < 0;
-}
-
 int Normalize(__global long *accumulator, int *imin, int *imax) {
-    if (*imin > *imax)
-        return 0;
-
     long carry_in = (accumulator[*imin] >> digits);
     accumulator[*imin] -= (carry_in << digits);
     int i;
@@ -108,11 +72,6 @@ int Normalize(__global long *accumulator, int *imin, int *imax) {
         carry_in = carry_out;
     }
     *imax = i - 1;
-
-    if ((carry_in != 0) && (carry_in != -1)) {
-        //TODO: handle overflow
-        //status = Overflow;
-    }
 
     return carry_in < 0;
 }
@@ -167,41 +126,6 @@ double Round(__global long *accumulator) {
 ////////////////////////////////////////////////////////////////////////////////
 // Main computation pass: compute partial superaccs
 ////////////////////////////////////////////////////////////////////////////////
-void AccumulateWordGlobal(__global volatile long *sa, int i, long x) {
-    // With atomic superacc updates
-    // accumulation and carry propagation can happen in any order,
-    // as long as addition is atomic
-    // only constraint is: never forget an overflow bit
-    uchar overflow;
-    long carry = x;
-    long carrybit;
-    long oldword = xaddGlobal(&sa[i], x, &overflow);
-
-    // To propagate over- or underflow
-    while (overflow) {
-        // Carry or borrow
-        // oldword has sign S
-        // x has sign S
-        // superacc[i] has sign !S (just after update)
-        // carry has sign !S
-        // carrybit has sign S
-        carry = (oldword + carry) >> digits;    // Arithmetic shift
-        bool s = oldword > 0;
-        carrybit = (s ? 1l << K : -1l << K);
-
-        // Cancel carry-save bits
-        xaddGlobal(&sa[i], (long) -(carry << digits), &overflow);
-        if (TSAFE && (s ^ overflow))
-            carrybit *= 2;
-        carry += carrybit;
-
-        ++i;
-        if (i >= BIN_COUNT)
-            return;
-        oldword = xaddGlobal(&sa[i], carry, &overflow);
-    }
-}
-
 void AccumulateWord(__local volatile long *sa, int i, long x) {
     // With atomic superacc updates
     // accumulation and carry propagation can happen in any order,
@@ -237,36 +161,6 @@ void AccumulateWord(__local volatile long *sa, int i, long x) {
     }
 }
 
-#if 1
-bool Accumulate(__local volatile long *sa, __local volatile uint *check, double x) {
-    if (x == 0)
-        return false;
-
-    int e;
-    bool is_norm = false;
-    frexp(x, &e);
-    int exp_word = e / digits;  // Word containing MSbit
-    int iup = exp_word + f_words;
-
-    double xscaled = ldexp(x, -digits * exp_word);
-
-    int i;
-    for (i = iup; xscaled != 0; --i) {
-        double xrounded = rint(xscaled);
-        long xint = (long) xrounded;
-
-        atom_add(&sa[i * WARP_COUNT], xint);
-        atomic_inc(&check[i]);
-        if (check[i] > 256 - WARP_SIZE)
-            is_norm = true;
-
-        xscaled -= xrounded;
-        xscaled *= deltaScale;
-    }
-
-    return is_norm;
-}
-#else
 void Accumulate(__local volatile long *sa, double x) {
     if (x == 0)
         return;
@@ -289,7 +183,6 @@ void Accumulate(__local volatile long *sa, double x) {
         xscaled *= deltaScale;
     }
 }
-#endif
 
 __kernel __attribute__((reqd_work_group_size(WORKGROUP_SIZE, 1, 1)))
 void ExSUM(
@@ -299,58 +192,48 @@ void ExSUM(
 ) {
     __local long l_sa[WARP_COUNT * BIN_COUNT] __attribute__((aligned(8)));
     __local long *l_workingBase = l_sa + (get_local_id(0) & (WARP_COUNT - 1));
-    __local uint l_check[BIN_COUNT];
 
     //Initialize superaccs
     for (uint i = 0; i < BIN_COUNT; i++) {
         l_workingBase[i * WARP_COUNT] = 0;
-        l_check[i] = 0;
     }
     barrier(CLK_LOCAL_MEM_FENCE);
 
     //Read data from global memory and scatter it to sub-superaccs
     for(uint pos = get_global_id(0); pos < NbElements; pos += get_global_size(0)){
         data_t x = d_Data[pos];
-#if 0
         Accumulate(l_workingBase, x.x);
         Accumulate(l_workingBase, x.y);
-#else
-        bool is_norm = Accumulate(l_workingBase, l_check, x.y);
-        if (is_norm) {
-            barrier(CLK_LOCAL_MEM_FENCE);
-            if (get_local_id(0) == 0) {
-                int imin = 0;
-                int imax = 38;
-                NormalizeLocal(l_workingBase, &imin, &imax);
-            }
-            barrier(CLK_LOCAL_MEM_FENCE);
-            if (get_local_id(0) < BIN_COUNT)
-                l_check[get_local_id(0)] = 0;
-        }
-#endif
     }
     barrier(CLK_LOCAL_MEM_FENCE);
 
     //Merge sub-superaccs into work-group partial-superacc
     uint pos = get_local_id(0);
-#if 0
-    if (pos == 0){
-        for (uint j = 0; j < BIN_COUNT; j++) {
+    /*if (pos < BIN_COUNT) {
+        long sum = 0;
+
+        for(uint i = 0; i < WARP_COUNT; i++)
+            sum += l_sa[pos * WARP_COUNT + i];
+        barrier(CLK_LOCAL_MEM_FENCE);
+
+        d_PartialSuperaccs[get_group_id(0) * BIN_COUNT + pos] = sum;
+    }*/
+    /*if (pos < BIN_COUNT){
+        //for (uint j = 0; j < BIN_COUNT; j++) {
             for (uint i = 1; i < WARP_COUNT; i++) {
-                AccumulateWord(l_sa, j, l_sa[j * WARP_COUNT + i]);
+                AccumulateWord(l_sa, pos, l_sa[pos * WARP_COUNT + i]);
             }
+            barrier(CLK_LOCAL_MEM_FENCE);
+            d_PartialSuperaccs[pos] = l_sa[pos * WARP_COUNT];
+        //}
+    }
+    barrier(CLK_LOCAL_MEM_FENCE);*/
+    if (pos == 0) {
+        for (uint j = 0; j < BIN_COUNT; j++) {
             d_PartialSuperaccs[j] = l_sa[j];
         }
     }
-#else
-    if (pos < BIN_COUNT) {
-        for(uint i = 1; i < WARP_COUNT; i++) {
-            AccumulateWord(l_sa, pos, l_sa[pos * WARP_COUNT + i]);
-        }
-        barrier(CLK_LOCAL_MEM_FENCE);
-        d_PartialSuperaccs[get_group_id(0) * BIN_COUNT + pos] = l_sa[pos * WARP_COUNT];
-    }
-#endif
+    barrier(CLK_LOCAL_MEM_FENCE);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -363,7 +246,6 @@ void ExSUMComplete(
     uint PartialSuperaccusCount
 ) {
     uint lid = get_local_id(0);
-#if 0
     __local long l_Data[MERGE_WORKGROUP_SIZE];
 
     //Reduce to one work group
@@ -384,15 +266,6 @@ void ExSUMComplete(
 
     if(lid == 0)
         d_Superacc[gid] = l_Data[0];
-#else
-
-    if (lid < BIN_COUNT) {
-        for(uint i = 1; i < PartialSuperaccusCount; i++) {
-            AccumulateWordGlobal(d_PartialSuperaccs, lid, d_PartialSuperaccs[lid + i * BIN_COUNT]);
-        }
-        d_Superacc[lid] = d_PartialSuperaccs[lid];
-    }
-#endif
 }
 
 ////////////////////////////////////////////////////////////////////////////////

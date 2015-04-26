@@ -20,7 +20,7 @@
 #include <cstddef>
 #include <mpfr.h>
 
-double exsumVsMPFR(int N, double *a) {
+double ExSUMVsMPFR(int N, double *a) {
     mpfr_t mpaccum;
     mpfr_init2(mpaccum, 2098);
     mpfr_set_zero(mpaccum, 0);
@@ -90,7 +90,7 @@ int main(int argc, char * argv[]) {
     }
 
     fprintf(stderr, "%d ", N);
-    
+
     if(lognormal) {
         fprintf(stderr, "%f ", stddev);
     } else {
@@ -115,7 +115,7 @@ int main(int argc, char * argv[]) {
     printf("  exsum with FPE8 early-exit and superacc = %.16g\n", exsum_fpe8ee);
 
 #ifdef EXBLAS_VS_MPFR
-    double exsumMPFR = exsumVsMPFR(N, a);
+    double exsumMPFR = ExSUMVsMPFR(N, a);
     printf("  exsum with MPFR = %.16g\n", exsumMPFR);
     if ((fabs(exsumMPFR - exsum_acc) != 0) || (fabs(exsumMPFR - exsum_fpe2) != 0) || (fabs(exsumMPFR - exsum_fpe4) != 0) || (fabs(exsumMPFR - exsum_fpe8ee) != 0)) {
         is_pass = false;
