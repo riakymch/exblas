@@ -24,16 +24,16 @@ static cl_command_queue cqDefaultCommandQue; //Default command queue for Superac
 static cl_mem           d_Superacc;
 static cl_mem           d_PartialSuperaccs;
 
-static const uint PARTIAL_SUPERACCS_COUNT = 512;
+static const uint PARTIAL_SUPERACCS_COUNT = 256;
 static const uint WORKGROUP_SIZE          = 256;
-static const uint MERGE_WORKGROUP_SIZE    = 64;
+static const uint MERGE_WORKGROUP_SIZE    = 256;
 static uint vector_number                 = 1;
 static uint NbElements;
 
 #ifdef AMD
-static char  compileOptions[256] = "-DWARP_COUNT=16 -DWARP_SIZE=16 -DMERGE_WORKGROUP_SIZE=64 -DUSE_KNUTH";
+static char  compileOptions[256] = "-DWARP_COUNT=16 -DWARP_SIZE=16 -DMERGE_WORKGROUP_SIZE=256 -DUSE_KNUTH";
 #else
-static char  compileOptions[256] = "-DWARP_COUNT=16 -DWARP_SIZE=16 -DMERGE_WORKGROUP_SIZE=64 -DUSE_KNUTH -DNVIDIA -cl-mad-enable -cl-fast-relaxed-math"; // -cl-nv-verbose";
+static char  compileOptions[256] = "-DWARP_COUNT=16 -DWARP_SIZE=16 -DMERGE_WORKGROUP_SIZE=256 -DUSE_KNUTH -DNVIDIA -cl-mad-enable -cl-fast-relaxed-math"; // -cl-nv-verbose";
 #endif
 
 
@@ -164,7 +164,6 @@ extern "C" size_t ExSUM(
         uint NbElems = NbElements / vector_number;
 
         cl_uint i = 0;
-        //ciErrNum  = clSetKernelArg(ckKernel, i++, sizeof(cl_mem),  (void *)&d_Superacc);
         ciErrNum  = clSetKernelArg(ckKernel, i++, sizeof(cl_mem),  (void *)&d_PartialSuperaccs);
         ciErrNum |= clSetKernelArg(ckKernel, i++, sizeof(cl_mem),  (void *)&d_Data);
         ciErrNum |= clSetKernelArg(ckKernel, i++, sizeof(cl_uint), (void *)&NbElems);
@@ -199,7 +198,7 @@ extern "C" size_t ExSUM(
 
         ciErrNum = clEnqueueNDRangeKernel(cqCommandQueue, ckComplete, 1, NULL, &TotalNbThreads, &NbThreadsPerWorkGroup, 0, NULL, NULL);
         if (ciErrNum != CL_SUCCESS) {
-	    printf("ciErrNum = %d\n", ciErrNum);
+            printf("ciErrNum = %d\n", ciErrNum);
             printf("Error in clEnqueueNDRangeKernel, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
             *ciErrNumRes = EXIT_FAILURE;
             return 0;

@@ -372,11 +372,11 @@ void ExSUM(
         d_PartialSuperaccs[get_group_id(0) * BIN_COUNT + pos] = l_sa[pos * WARP_COUNT];
     }
 #endif
-    if (pos == 0) {
+    /*if (pos == 0) {
         int imin = 0;
         int imax = 38;
-        int negative = NormalizeAuxiliary(&d_PartialSuperaccs[get_group_id(0) * BIN_COUNT], &imin, &imax);
-    }
+        NormalizeAuxiliary(&d_PartialSuperaccs[get_group_id(0) * BIN_COUNT], &imin, &imax);
+    }*/
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -389,7 +389,7 @@ void ExSUMComplete(
     uint PartialSuperaccusCount
 ) {
     uint lid = get_local_id(0);
-#if 0
+#if 1
     __local long l_Data[MERGE_WORKGROUP_SIZE];
 
     //Reduce to one work group
@@ -426,7 +426,7 @@ void ExSUMComplete(
         if (lid == 0) {
             int imin = 0;
             int imax = 38;
-            int negative = NormalizeAuxiliary(&d_PartialSuperaccs[gid * BIN_COUNT], &imin, &imax);
+            NormalizeAuxiliary(&d_PartialSuperaccs[gid * BIN_COUNT], &imin, &imax);
         }
         barrier(CLK_LOCAL_MEM_FENCE);
     }
@@ -438,7 +438,6 @@ void ExSUMComplete(
 
         d_Superacc[lid] = sum;
     }
-
 
     /*uint gid = get_group_id(0);
     for(uint i = lid; i < PartialSuperaccusCount; i += MERGE_WORKGROUP_SIZE) {
@@ -470,4 +469,5 @@ void ExSUMRound(
     if (pos == 0)
         d_Res[0] = Round(d_Superacc);
 }
+
 
