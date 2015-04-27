@@ -8,6 +8,7 @@ option (USE_EXBLAS "Use ExBLAS provided reproducible and accurate implementation
 if (USE_EXBLAS)
   include_directories ("${PROJECT_SOURCE_DIR}/include")
   include_directories ("${PROJECT_SOURCE_DIR}/src/common")
+  include_directories ("${PROJECT_SOURCE_DIR}/src/gpu")
   include_directories ("${PROJECT_BINARY_DIR}/include")
   set (EXTRA_LIBS ${EXTRA_LIBS} exblas)
 endif (USE_EXBLAS)
@@ -40,11 +41,11 @@ if (EXBLAS_TIMING)
 endif (EXBLAS_TIMING)
 
 # Grab the .c and .cpp files
-file (GLOB_RECURSE EXBLAS_C_CPP_SOURCE "blas1/*.cpp" "blas1/*.hpp" "blas3/*.cpp" "blas3/*.hpp" "${PROJECT_SOURCE_DIR}/src/common/*.cpp")
+file (GLOB_RECURSE EXBLAS_C_CPP_SOURCE "common.gpu.cpp" "blas1/*.cpp" "blas3/*.cpp" "${PROJECT_SOURCE_DIR}/src/common/*.cpp")
 # Grab the .cl files
 file (GLOB_RECURSE EXBLAS_CL_SOURCE "blas1/*.cl" "blas3/*.cl")
 # Grab the C/C++ headers
-file (GLOB_RECURSE EXBLAS_C_CPP_HEADERS "${PROJECT_SOURCE_DIR}/include/*.hpp")
+file (GLOB_RECURSE EXBLAS_C_CPP_HEADERS "common.gpu.hpp" "blas1/*.hpp" "blas3/*.hpp" "${PROJECT_SOURCE_DIR}/include/*.hpp")
 set (EXBLAS_C_CPP_FILES "${EXBLAS_C_CPP_SOURCE};${EXBLAS_C_CPP_HEADERS};${EXBLAS_CL_SOURCE}")
 
 # add the main library

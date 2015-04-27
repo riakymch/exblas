@@ -21,6 +21,7 @@
 
 #include "config.h"
 #include "common.hpp"
+#include "common.gpu.hpp"
 #include "blas1.hpp"
 #include "ExSUM.Launcher.hpp"
 

@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2013-2015 University Pierre and Marie Curie 
+ *  Copyright (c) 2013-2015 Inria and University Pierre and Marie Curie 
  *  All rights reserved.
  */
 
@@ -31,50 +31,12 @@
     #include <CL/opencl.h>
 #endif
 
+
 ////////////////////////////////////////////////////////////////////////////////
 // Common definitions
 ////////////////////////////////////////////////////////////////////////////////
 
 typedef long long int bintype;
-
-////////////////////////////////////////////////////////////////////////////////
-// Common functions
-////////////////////////////////////////////////////////////////////////////////
-/**
- * \ingroup ExGEMM
- * \brief Function to obtain platform. For internal use
- *
- * \param name Platform name
- * \return Platform ID
- */
-cl_platform_id GetOCLPlatform(
-    char name[]
-);
-
-/**
- * \ingroup ExGEMM
- * \brief Function to obtain device. For internal use
- * 
- * \param pPlatform Platform ID
- * \return Device ID
- */
-cl_device_id GetOCLDevice(
-    cl_platform_id pPlatform
-);
-
-/**
- * \ingroup ExGEMM
- * \brief Function to obtain device by name. For internal use
- *
- * \param pPlatform Platform ID
- * \param name Device name
- * \return Device ID
- */
-cl_device_id GetOCLDevice(
-    cl_platform_id pPlatform,
-    char name[]
-);
-
 
 ////////////////////////////////////////////////////////////////////////////////
 // GPU reduction related functions

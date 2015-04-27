@@ -1,3 +1,8 @@
+/*
+ *  Copyright (c) 2013-2015 Inria and University Pierre and Marie Curie
+ *  All rights reserved.
+ */
+
 #include <cstdlib>
 #include <cstdio>
 #include <iostream>

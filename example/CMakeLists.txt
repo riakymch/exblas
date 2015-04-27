@@ -1,3 +1,6 @@
+# Copyright (c) 2013-2015 Inria and University Pierre and Marie Curie
+# All rights reserved.
+
 cmake_minimum_required (VERSION 2.8.8)
 include(CheckCSourceCompiles)
 include(CheckCXXSourceCompiles)
