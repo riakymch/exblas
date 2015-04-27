@@ -97,14 +97,33 @@ double OddRoundSumNonnegative(double th, double tl) {
     return thdb.d;
 }
 
+int NormalizeLocal(__local long *accumulator, int *imin, int *imax) {
+    long carry_in = (accumulator[*imin * WARP_COUNT] >> digits);
+    accumulator[*imin * WARP_COUNT] -= carry_in << digits;
+    int i;
+    // Sign-extend all the way
+    for (i = *imin + 1; i < BIN_COUNT; ++i) {
+        accumulator[i * WARP_COUNT] += carry_in;
+        long carry_out = accumulator[i * WARP_COUNT] >> digits;    // Arithmetic shift
+        accumulator[i * WARP_COUNT] -= (carry_out << digits);
+        carry_in = carry_out;
+    }
+    *imax = i - 1;
+
+    // Do not cancel the last carry to avoid losing information
+    accumulator[*imax * WARP_COUNT] += carry_in << digits;
+
+    return carry_in < 0;
+}
+
 int NormalizeAuxiliary(__global long *accumulator, int *imin, int *imax) {
     int i;
-    long carry_in = (accumulator[*imin] >> digits);
-    accumulator[*imin] -= (carry_in << digits);
+    long carry_in = accumulator[*imin] >> digits;
+    accumulator[*imin] -= carry_in << digits;
     // Sign-extend all the way
     for (i = *imin + 1; i < BIN_COUNT; ++i) {
         accumulator[i] += carry_in;
-        long carry_out = (accumulator[i] >> digits);    // Arithmetic shift
+        long carry_out = accumulator[i] >> digits;    // Arithmetic shift
         accumulator[i] -= (carry_out << digits);
         carry_in = carry_out;
     }
@@ -117,13 +136,13 @@ int NormalizeAuxiliary(__global long *accumulator, int *imin, int *imax) {
 }
 
 int Normalize(__global long *accumulator, int *imin, int *imax) {
-    long carry_in = (accumulator[*imin] >> digits);
-    accumulator[*imin] -= (carry_in << digits);
+    long carry_in = accumulator[*imin] >> digits;
+    accumulator[*imin] -= carry_in << digits;
     int i;
     // Sign-extend all the way
     for (i = *imin + 1; i < BIN_COUNT; ++i) {
         accumulator[i] += carry_in;
-        long carry_out = (accumulator[i] >> digits);    // Arithmetic shift
+        long carry_out = accumulator[i] >> digits;    // Arithmetic shift
         accumulator[i] -= (carry_out << digits);
         carry_in = carry_out;
     }
@@ -151,7 +170,6 @@ double Round(__global long *accumulator) {
         }
     }
     if (i < 0)
-        //TODO: should we preserve sign of zero?
         return 0.0;
 
     long hiword = negative ? ((1l << digits) - 1) - accumulator[i] : accumulator[i];
@@ -165,9 +183,9 @@ double Round(__global long *accumulator) {
     //Compute sticky
     long sticky = 0;
     for (int j = imin; j != i - 1; ++j)
-        sticky |= negative ? ((1l << digits) - accumulator[j]) : accumulator[j];
+        sticky |= negative ? (1l << digits) - accumulator[j] : accumulator[j];
 
-    long loword = negative ? ((1l << digits) - accumulator[i - 1]) : accumulator[i - 1];
+    long loword = negative ? (1l << digits) - accumulator[i - 1] : accumulator[i - 1];
     loword |= !!sticky;
     double lo = ldexp((double) loword, (i - 1 - f_words) * digits);
 
@@ -329,6 +347,12 @@ void ExSUM(
 
     //Merge sub-superaccs into work-group partial-accumulator
     uint pos = get_local_id(0);
+    /*int imin = 0;
+    int imax = 38;
+    if (pos < WARP_COUNT) {
+        NormalizeLocal(l_workingBase, &imin, &imax);
+    }
+    barrier(CLK_LOCAL_MEM_FENCE);*/
 #if 1
     if (pos < BIN_COUNT) {
         long sum = 0;
@@ -365,7 +389,7 @@ void ExSUMComplete(
     uint PartialSuperaccusCount
 ) {
     uint lid = get_local_id(0);
-#if 1
+#if 0
     __local long l_Data[MERGE_WORKGROUP_SIZE];
 
     //Reduce to one work group
@@ -388,14 +412,41 @@ void ExSUMComplete(
         d_Superacc[gid] = l_Data[0];
 #else
 
-#if 0
+#if 1
+    //Reduce to one work group
     uint gid = get_group_id(0);
+
+    if ((lid < BIN_COUNT) && (gid < 32)) {
+        long sum = 0;
+        for(uint i = 0; i < PartialSuperaccusCount; i += 32)
+            sum += d_PartialSuperaccs[(gid + i) * BIN_COUNT + lid];
+
+        d_PartialSuperaccs[gid * BIN_COUNT + lid] = sum;
+        barrier(CLK_LOCAL_MEM_FENCE);
+        if (lid == 0) {
+            int imin = 0;
+            int imax = 38;
+            int negative = NormalizeAuxiliary(&d_PartialSuperaccs[gid * BIN_COUNT], &imin, &imax);
+        }
+        barrier(CLK_LOCAL_MEM_FENCE);
+    }
+
+    if ((lid < BIN_COUNT) && (gid == 0)) {
+        long sum = 0;
+        for(uint i = 0; i < 32; i++)
+            sum += d_PartialSuperaccs[i * BIN_COUNT + lid];
+
+        d_Superacc[lid] = sum;
+    }
+
+
+    /*uint gid = get_group_id(0);
     for(uint i = lid; i < PartialSuperaccusCount; i += MERGE_WORKGROUP_SIZE) {
         if ((lid == 0) && (i == 0))
             continue;
 
         AccumulateWordGlobal(d_PartialSuperaccs, gid, d_PartialSuperaccs[gid + i * BIN_COUNT]);
-    }
+    }*/
 #else
     if (lid < BIN_COUNT) {
         for(uint i = 1; i < PartialSuperaccusCount; i++) {

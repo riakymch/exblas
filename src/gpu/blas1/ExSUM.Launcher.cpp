@@ -24,16 +24,16 @@ static cl_command_queue cqDefaultCommandQue; //Default command queue for Superac
 static cl_mem           d_Superacc;
 static cl_mem           d_PartialSuperaccs;
 
-static const uint PARTIAL_SUPERACCS_COUNT = 32;
+static const uint PARTIAL_SUPERACCS_COUNT = 1024;
 static const uint WORKGROUP_SIZE          = 256;
-static const uint MERGE_WORKGROUP_SIZE    = 256;
+static const uint MERGE_WORKGROUP_SIZE    = 64;
 static uint vector_number                 = 1;
 static uint NbElements;
 
 #ifdef AMD
 static char  compileOptions[256] = "-DWARP_COUNT=16 -DWARP_SIZE=16 -DMERGE_WORKGROUP_SIZE=256 -DUSE_KNUTH";
 #else
-static char  compileOptions[256] = "-DWARP_COUNT=16 -DWARP_SIZE=16 -DMERGE_WORKGROUP_SIZE=256 -DUSE_KNUTH -DNVIDIA -cl-mad-enable -cl-fast-relaxed-math"; // -cl-nv-verbose";
+static char  compileOptions[256] = "-DWARP_COUNT=16 -DWARP_SIZE=16 -DMERGE_WORKGROUP_SIZE=64 -DUSE_KNUTH -DNVIDIA -cl-mad-enable -cl-fast-relaxed-math"; // -cl-nv-verbose";
 #endif
 
 
@@ -184,7 +184,7 @@ extern "C" size_t ExSUM(
 
     {
         NbThreadsPerWorkGroup = MERGE_WORKGROUP_SIZE;
-        TotalNbThreads = NbThreadsPerWorkGroup;
+        //TotalNbThreads = 32 * NbThreadsPerWorkGroup;
         TotalNbThreads *= bin_count;
 
         cl_uint i = 0;
