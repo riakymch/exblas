@@ -42,23 +42,6 @@ typedef double2 data_t;
     }
 #endif
 
-long xaddGlobal(__global volatile long *sa, long x, uchar *of) {
-    // OF and SF  -> carry=1
-    // OF and !SF -> carry=-1
-    // !OF        -> carry=0
-    long y = atom_add(sa, x);
-    long z = y + x; // since the value sa->superacc[i] can be changed by another work item
-
-    // TODO: cover also underflow
-    *of = 0;
-    if(x > 0 && y > 0 && z < 0)
-        *of = 1;
-    if(x < 0 && y < 0 && z > 0)
-        *of = 1;
-
-    return y;
-}
-
 // signedcarry in {-1, 0, 1}
 long xadd(__local volatile long *sa, long x, uchar *of) {
     // OF and SF  -> carry=1
@@ -96,9 +79,6 @@ double OddRoundSumNonnegative(double th, double tl) {
 }
 
 int Normalize(__global long *accumulator, int *imin, int *imax) {
-    if (*imin > *imax)
-        return 0;
-
     long carry_in = accumulator[*imin] >> digits;
     accumulator[*imin] -= carry_in << digits;
     int i;
@@ -111,10 +91,8 @@ int Normalize(__global long *accumulator, int *imin, int *imax) {
     }
     *imax = i - 1;
 
-    if ((carry_in != 0) && (carry_in != -1)) {
-        //TODO: handle overflow
-        //status = Overflow;
-    }
+    // Do not cancel the last carry to avoid losing information
+    accumulator[*imax] += carry_in << digits;
 
     return carry_in < 0;
 }
@@ -169,41 +147,6 @@ double Round(__global long *accumulator) {
 ////////////////////////////////////////////////////////////////////////////////
 // Main computation pass: compute partial superaccs
 ////////////////////////////////////////////////////////////////////////////////
-void AccumulateWordGlobal(__global volatile long *sa, int i, long x) {
-    // With atomic superacc updates
-    // accumulation and carry propagation can happen in any order,
-    // as long as addition is atomic
-    // only constraint is: never forget an overflow bit
-    uchar overflow;
-    long carry = x;
-    long carrybit;
-    long oldword = xaddGlobal(&sa[i], x, &overflow);
-
-    // To propagate over- or underflow
-    while (overflow) {
-        // Carry or borrow
-        // oldword has sign S
-        // x has sign S
-        // superacc[i] has sign !S (just after update)
-        // carry has sign !S
-        // carrybit has sign S
-        carry = (oldword + carry) >> digits;    // Arithmetic shift
-        bool s = oldword > 0;
-        carrybit = (s ? 1l << K : -1l << K);
-
-        // Cancel carry-save bits
-        xaddGlobal(&sa[i], (long) -(carry << digits), &overflow);
-        if (TSAFE && (s ^ overflow))
-            carrybit *= 2;
-        carry += carrybit;
-
-        ++i;
-        if (i >= BIN_COUNT)
-            return;
-        oldword = xaddGlobal(&sa[i], carry, &overflow);
-    }
-}
-
 void AccumulateWord(__local volatile long *sa, int i, long x) {
     // With atomic superacc updates
     // accumulation and carry propagation can happen in any order,
@@ -324,7 +267,6 @@ void ExSUM(
 
     //Merge sub-superaccs into work-group partial-accumulator
     uint pos = get_local_id(0);
-#if 1
     if (pos < BIN_COUNT) {
         long sum = 0;
 
@@ -334,15 +276,13 @@ void ExSUM(
 
         d_PartialSuperaccs[get_group_id(0) * BIN_COUNT + pos] = sum;
     }
-#else
-    if (pos < BIN_COUNT) {
-        for(uint i = 1; i < WARP_COUNT; i++) {
-            AccumulateWord(l_sa, pos, l_sa[pos * WARP_COUNT + i]);
-        }
-        barrier(CLK_LOCAL_MEM_FENCE);
-        d_PartialSuperaccs[get_group_id(0) * BIN_COUNT + pos] = l_sa[pos * WARP_COUNT];
+
+    barrier(CLK_LOCAL_MEM_FENCE);
+    if (pos == 0) {
+        int imin = 0;
+        int imax = 38;
+        Normalize(&d_PartialSuperaccs[get_group_id(0) * BIN_COUNT], &imin, &imax);
     }
-#endif
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -355,7 +295,6 @@ void ExSUMComplete(
     uint PartialSuperaccusCount
 ) {
     uint lid = get_local_id(0);
-#if 1
     __local long l_Data[MERGE_WORKGROUP_SIZE];
 
     //Reduce to one work group
@@ -376,15 +315,6 @@ void ExSUMComplete(
 
     if(lid == 0)
         d_Superacc[gid] = l_Data[0];
-#else
-
-    if (lid < BIN_COUNT) {
-        for(uint i = 1; i < PartialSuperaccusCount; i++) {
-            AccumulateWordGlobal(d_PartialSuperaccs, lid, d_PartialSuperaccs[lid + i * BIN_COUNT]);
-        }
-        d_Superacc[lid] = d_PartialSuperaccs[lid];
-    }
-#endif
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -24,7 +24,7 @@ static cl_command_queue cqDefaultCommandQue; //Default command queue for Superac
 static cl_mem           d_Superacc;
 static cl_mem           d_PartialSuperaccs;
 
-static const uint PARTIAL_SUPERACCS_COUNT = 256;
+static const uint PARTIAL_SUPERACCS_COUNT = 128;
 static const uint WORKGROUP_SIZE          = 256;
 static const uint MERGE_WORKGROUP_SIZE    = 256;
 static uint vector_number                 = 1;
