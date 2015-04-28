@@ -285,10 +285,11 @@ void ExSUMComplete(
     uint PartialSuperaccusCount
 ) {
     uint lid = get_local_id(0);
-    __local long l_Data[MERGE_WORKGROUP_SIZE];
 
     //Reduce to one work group
     uint gid = get_group_id(0);
+#if 0
+    __local long l_Data[MERGE_WORKGROUP_SIZE];
 
     long sum = 0;
     for(uint i = lid; i < PartialSuperaccusCount; i += MERGE_WORKGROUP_SIZE)
@@ -305,6 +306,25 @@ void ExSUMComplete(
 
     if(lid == 0)
         d_Superacc[gid] = l_Data[0];
+#else
+    if (lid < BIN_COUNT) {
+        long sum = 0;
+
+        d_PartialSuperaccs += gid * MERGE_WORKGROUP_SIZE * BIN_COUNT;
+        for(uint i = 0; i < MERGE_WORKGROUP_SIZE; i++)
+            sum += d_PartialSuperaccs[i * BIN_COUNT + lid];
+
+        //d_PartialSuperaccs[get_group_id(0) * BIN_COUNT + lid] = sum;
+        d_Superacc[lid] = sum;
+    }
+
+    /*barrier(CLK_LOCAL_MEM_FENCE);
+    if (pos == 0) {
+        int imin = 0;
+        int imax = 38;
+        Normalize(&d_PartialSuperaccs[get_group_id(0) * BIN_COUNT], &imin, &imax);
+    }*/
+#endif
 }
 
 ////////////////////////////////////////////////////////////////////////////////
