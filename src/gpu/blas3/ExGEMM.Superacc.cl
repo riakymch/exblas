@@ -69,20 +69,20 @@ double OddRoundSumNonnegative(double th, double tl) {
 }
 
 int Normalize(long *accumulator, int *imin, int *imax) {
-    if (*imin > *imax)
-        return 0;
-
     long carry_in = accumulator[*imin] >> digits;
     accumulator[*imin] -= carry_in << digits;
     int i;
     // Sign-extend all the way
     for (i = *imin + 1; i < BIN_COUNT; ++i) {
         accumulator[i] += carry_in;
-        long carry_out = (accumulator[i] >> digits);    // Arithmetic shift
+        long carry_out = accumulator[i] >> digits;    // Arithmetic shift
         accumulator[i] -= (carry_out << digits);
         carry_in = carry_out;
     }
     *imax = i - 1;
+
+    // Do not cancel the last carry to avoid losing information
+    accumulator[*imax] += carry_in << digits;
 
     return carry_in < 0;
 }
