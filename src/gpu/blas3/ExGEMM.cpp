@@ -181,7 +181,7 @@ static int runExGEMM(int m, int n, int k, double alpha, double *h_a, int lda, do
             printf("Error in clCreateBuffer for d_b, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
             exit(EXIT_FAILURE);
         }
-        cl_mem d_c = clCreateBuffer(cxGPUContext, CL_MEM_READ_WRITE, m * n * sizeof(cl_double), h_c, &ciErrNum);
+        cl_mem d_c = clCreateBuffer(cxGPUContext, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, m * n * sizeof(cl_double), h_c, &ciErrNum);
         if (ciErrNum != CL_SUCCESS) {
             printf("Error in clCreateBuffer for d_c, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
             exit(EXIT_FAILURE);
