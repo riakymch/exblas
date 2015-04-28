@@ -365,16 +365,3 @@ void ExSUMComplete(
 #endif
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Round the results
-////////////////////////////////////////////////////////////////////////////////
-__kernel __attribute__((reqd_work_group_size(MERGE_WORKGROUP_SIZE, 1, 1)))
-void ExSUMRound(
-    __global double *d_Res,
-    __global long *d_Superacc
-){
-    uint lid = get_local_id(0);
-    if (lid == 0)
-        d_Res[0] = Round(d_Superacc);
-}
-
