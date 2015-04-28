@@ -101,11 +101,11 @@ int main(int argc, char *argv[]) {
     }
 
     double *a, *b, *c;
-    posix_memalign((void **) &a, 64, m * k * sizeof(double));
-    posix_memalign((void **) &b, 64, k * n * sizeof(double));
-    posix_memalign((void **) &c, 64, m * n * sizeof(double));
-    if ((!a) || (!b) || (!c))
-        fprintf(stderr, "Cannot allocate memory for the main array\n");
+    int err = posix_memalign((void **) &a, 64, m * k * sizeof(double));
+    err &= posix_memalign((void **) &b, 64, k * n * sizeof(double));
+    err &= posix_memalign((void **) &c, 64, m * n * sizeof(double));
+    if ((!a) || (!b) || (!c) || (err != 0))
+        fprintf(stderr, "Cannot allocate memory with posix_memalign\n");
     if(lognormal) {
         init_lognormal(a, m * k, mean, stddev);
         init_lognormal(b, k * n, mean, stddev);
@@ -131,7 +131,9 @@ int main(int argc, char *argv[]) {
     bool is_pass = true;
     double eps = 1e-16;
     double *superacc;
-    posix_memalign((void **) &superacc, 64, m * n * sizeof(double));
+    err = posix_memalign((void **) &superacc, 64, m * n * sizeof(double));
+    if ((!superacc) || (err != 0))
+        fprintf(stderr, "Cannot allocate memory with posix_memalign\n");
 
     exgemm('N', 'N', m, n, k, 1.0, a, k, b, n, 0.0, superacc, n, 1);
 #ifdef EXBLAS_VS_MPFR

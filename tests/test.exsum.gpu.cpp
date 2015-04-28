@@ -69,9 +69,9 @@ int main(int argc, char *argv[]) {
 
     double *a; 
     //a = (double*)_mm_malloc(N * sizeof(double), 32);
-    posix_memalign((void **) &a, 64, N * sizeof(double));
-    if (!a)
-        fprintf(stderr, "Cannot allocate memory for the main array\n");
+    int err = posix_memalign((void **) &a, 64, N * sizeof(double));
+    if ((!a) || (err != 0))
+        fprintf(stderr, "Cannot allocate memory with posix_memalign\n");
     if(lognormal) {
         init_lognormal(a, N, mean, stddev);
     } else if ((argc > 4) && (argv[4][0] == 'i')) {
@@ -93,7 +93,7 @@ int main(int argc, char *argv[]) {
     }
 
     bool is_pass = true;
-    double exsum_acc, exsum_fpe2, exsum_fpe4, exsum_fpe4ee, exsum_fpe6ee, exsum_fpe8ee;
+    double exsum_fpe2, exsum_fpe4, exsum_fpe4ee, exsum_fpe6ee, exsum_fpe8ee;
     //exsum_acc = exsum(N, a, 1, 0);
     exsum_fpe2 = exsum(N, a, 1, 2);
     exsum_fpe4 = exsum(N, a, 1, 4);
