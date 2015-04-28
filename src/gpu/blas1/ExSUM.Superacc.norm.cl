@@ -106,6 +106,9 @@ int Normalize(__global long *accumulator, int *imin, int *imax) {
     }
     *imax = i - 1;
 
+    // Do not cancel the last carry to avoid losing information
+    accumulator[*imax] += carry_in << digits;
+
     return carry_in < 0;
 }
 
@@ -278,16 +281,15 @@ void ExSUM(
     barrier(CLK_LOCAL_MEM_FENCE);
 
     uint pos = get_local_id(0);
-    /*int imin = 0;
+    int imin = 0;
     int imax = 38;
-    //if (pos < WARP_COUNT) {
-    if (pos == 0) {
+    if (pos < WARP_COUNT) {
         NormalizeLocal(l_workingBase, &imin, &imax);
     }
-    barrier(CLK_LOCAL_MEM_FENCE);*/
+    barrier(CLK_LOCAL_MEM_FENCE);
 
     //Merge sub-superaccs into work-group partial-superacc
-    /*if (pos < BIN_COUNT) {
+    if (pos < BIN_COUNT) {
         long sum = 0;
 
         for(uint i = 0; i < WARP_COUNT; i++)
@@ -295,13 +297,7 @@ void ExSUM(
         barrier(CLK_LOCAL_MEM_FENCE);
 
         d_PartialSuperaccs[get_group_id(0) * BIN_COUNT + pos] = sum;
-    }*/
-    if (pos == 0) {
-        for (uint j = 0; j < BIN_COUNT; j++) {
-            d_PartialSuperaccs[j] = l_sa[j];
-        }
     }
-    barrier(CLK_LOCAL_MEM_FENCE);
     /*if (pos == 0) {
         int imin = 0;
         int imax = 38;

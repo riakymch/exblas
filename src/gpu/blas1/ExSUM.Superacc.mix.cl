@@ -90,6 +90,9 @@ int NormalizeLocal(__local long *accumulator, int *imin, int *imax) {
     }
     *imax = i - 1;
 
+    // Do not cancel the last carry to avoid losing information
+    accumulator[*imax * WARP_COUNT] += carry_in << digits;
+
     return carry_in < 0;
 }
 
@@ -105,6 +108,9 @@ int Normalize(__global long *accumulator, int *imin, int *imax) {
         carry_in = carry_out;
     }
     *imax = i - 1;
+
+    // Do not cancel the last carry to avoid losing information
+    accumulator[*imax] += carry_in << digits;
 
     return carry_in < 0;
 }

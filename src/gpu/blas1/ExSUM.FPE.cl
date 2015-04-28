@@ -148,41 +148,6 @@ double Round(__global long *accumulator) {
 ////////////////////////////////////////////////////////////////////////////////
 // Main computation pass: compute partial superaccs
 ////////////////////////////////////////////////////////////////////////////////
-void AccumulateWordGlobal(__global volatile long *sa, int i, long x) {
-    // With atomic superacc updates
-    // accumulation and carry propagation can happen in any order,
-    // as long as addition is atomic
-    // only constraint is: never forget an overflow bit
-    uchar overflow;
-    long carry = x;
-    long carrybit;
-    long oldword = xaddGlobal(&sa[i], x, &overflow);
-
-    // To propagate over- or underflow
-    while (overflow) {
-        // Carry or borrow
-        // oldword has sign S
-        // x has sign S
-        // superacc[i] has sign !S (just after update)
-        // carry has sign !S
-        // carrybit has sign S
-        carry = (oldword + carry) >> digits;    // Arithmetic shift
-        bool s = oldword > 0;
-        carrybit = (s ? 1l << K : -1l << K);
-
-        // Cancel carry-save bits
-        xaddGlobal(&sa[i], (long) -(carry << digits), &overflow);
-        if (TSAFE && (s ^ overflow))
-            carrybit *= 2;
-        carry += carrybit;
-
-        ++i;
-        if (i >= BIN_COUNT)
-            return;
-        oldword = xaddGlobal(&sa[i], carry, &overflow);
-    }
-}
-
 void AccumulateWord(__local volatile long *sa, int i, long x) {
     // With atomic superacc updates
     // accumulation and carry propagation can happen in any order,
@@ -347,5 +312,4 @@ void ExSUMRound(
     if (pos == 0)
         d_Res[0] = Round(d_Superacc);
 }
-
 

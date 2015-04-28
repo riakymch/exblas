@@ -61,17 +61,20 @@ double OddRoundSumNonnegative(double th, double tl) {
 }
 
 int Normalize(__global long *accumulator, int *imin, int *imax) {
-    long carry_in = (accumulator[*imin] >> digits);
-    accumulator[*imin] -= (carry_in << digits);
+    long carry_in = accumulator[*imin] >> digits;
+    accumulator[*imin] -= carry_in << digits;
     int i;
     // Sign-extend all the way
     for (i = *imin + 1; i < BIN_COUNT; ++i) {
         accumulator[i] += carry_in;
-        long carry_out = (accumulator[i] >> digits);    // Arithmetic shift
+        long carry_out = accumulator[i] >> digits;    // Arithmetic shift
         accumulator[i] -= (carry_out << digits);
         carry_in = carry_out;
     }
     *imax = i - 1;
+
+    // Do not cancel the last carry to avoid losing information
+    accumulator[*imax] += carry_in << digits;
 
     return carry_in < 0;
 }
@@ -92,7 +95,6 @@ double Round(__global long *accumulator) {
         }
     }
     if (i < 0)
-        //TODO: should we preserve sign of zero?
         return 0.0;
 
     long hiword = negative ? ((1l << digits) - 1) - accumulator[i] : accumulator[i];
@@ -194,9 +196,8 @@ void ExSUM(
     __local long *l_workingBase = l_sa + (get_local_id(0) & (WARP_COUNT - 1));
 
     //Initialize superaccs
-    for (uint i = 0; i < BIN_COUNT; i++) {
+    for (uint i = 0; i < BIN_COUNT; i++)
         l_workingBase[i * WARP_COUNT] = 0;
-    }
     barrier(CLK_LOCAL_MEM_FENCE);
 
     //Read data from global memory and scatter it to sub-superaccs
@@ -209,7 +210,7 @@ void ExSUM(
 
     //Merge sub-superaccs into work-group partial-superacc
     uint pos = get_local_id(0);
-    /*if (pos < BIN_COUNT) {
+    if (pos < BIN_COUNT) {
         long sum = 0;
 
         for(uint i = 0; i < WARP_COUNT; i++)
@@ -217,7 +218,7 @@ void ExSUM(
         barrier(CLK_LOCAL_MEM_FENCE);
 
         d_PartialSuperaccs[get_group_id(0) * BIN_COUNT + pos] = sum;
-    }*/
+    }
     /*if (pos < BIN_COUNT){
         //for (uint j = 0; j < BIN_COUNT; j++) {
             for (uint i = 1; i < WARP_COUNT; i++) {
@@ -228,12 +229,12 @@ void ExSUM(
         //}
     }
     barrier(CLK_LOCAL_MEM_FENCE);*/
-    if (pos == 0) {
+    /*if (pos == 0) {
         for (uint j = 0; j < BIN_COUNT; j++) {
             d_PartialSuperaccs[j] = l_sa[j];
         }
     }
-    barrier(CLK_LOCAL_MEM_FENCE);
+    barrier(CLK_LOCAL_MEM_FENCE);*/
 }
 
 ////////////////////////////////////////////////////////////////////////////////
