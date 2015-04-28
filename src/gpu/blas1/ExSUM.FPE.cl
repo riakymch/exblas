@@ -262,7 +262,6 @@ void ExSUM(
 
         for(uint i = 0; i < WARP_COUNT; i++)
             sum += l_sa[pos * WARP_COUNT + i];
-        barrier(CLK_LOCAL_MEM_FENCE);
 
         d_PartialSuperaccs[get_group_id(0) * BIN_COUNT + pos] = sum;
     }
@@ -307,17 +306,17 @@ void ExSUMComplete(
     if(lid == 0)
         d_Superacc[gid] = l_Data[0];
 #else
-    if ((lid < BIN_COUNT) && (gid < 8)) {
+    if (lid < BIN_COUNT) {
         long sum = 0;
 
-        for(uint i = 0; i < MERGE_WORKGROUP_SIZE; i++)
-            sum += d_PartialSuperaccs[(gid * MERGE_WORKGROUP_SIZE + i) * BIN_COUNT + lid];
+        for(uint i = 0; i < MERGE_SUPERACCS_SIZE; i++)
+            sum += d_PartialSuperaccs[(gid * MERGE_SUPERACCS_SIZE + i) * BIN_COUNT + lid];
 
         d_PartialSuperaccs[gid * BIN_COUNT + lid] = sum;
     }
 
     barrier(CLK_LOCAL_MEM_FENCE);
-    if ((lid == 0) && (gid < 8)) {
+    if (lid == 0) {
         int imin = 0;
         int imax = 38;
         Normalize(&d_PartialSuperaccs[gid * BIN_COUNT], &imin, &imax);
@@ -327,10 +326,14 @@ void ExSUMComplete(
     if ((lid < BIN_COUNT) && (gid == 0)) {
         long sum = 0;
 
-        for(uint i = 0; i < 8; i++)
+        for(uint i = 0; i < get_global_size(0) / get_local_size(0); i++)
             sum += d_PartialSuperaccs[i * BIN_COUNT + lid];
 
         d_Superacc[lid] = sum;
+
+	/*barrier(CLK_GLOBAL_MEM_FENCE);
+	if (lid == 0)
+            d_Res[0] = Round(d_PartialSuperaccs);*/
     }
 #endif
 }
