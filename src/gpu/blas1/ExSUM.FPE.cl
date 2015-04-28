@@ -279,7 +279,7 @@ void ExSUM(
 ////////////////////////////////////////////////////////////////////////////////
 __kernel __attribute__((reqd_work_group_size(MERGE_WORKGROUP_SIZE, 1, 1)))
 void ExSUMComplete(
-    __global long *d_Superacc,
+    __global double *d_Res,
     __global long *d_PartialSuperaccs,
     uint PartialSuperaccusCount
 ) {
@@ -329,11 +329,11 @@ void ExSUMComplete(
         for(uint i = 0; i < get_global_size(0) / get_local_size(0); i++)
             sum += d_PartialSuperaccs[i * BIN_COUNT + lid];
 
-        d_Superacc[lid] = sum;
+        d_PartialSuperaccs[lid] = sum;
 
-	/*barrier(CLK_GLOBAL_MEM_FENCE);
-	if (lid == 0)
-            d_Res[0] = Round(d_PartialSuperaccs);*/
+        barrier(CLK_LOCAL_MEM_FENCE);
+        if (lid == 0)
+            d_Res[0] = Round(d_PartialSuperaccs);
     }
 #endif
 }
