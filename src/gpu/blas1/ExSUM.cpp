@@ -183,8 +183,9 @@ static double runExSUM(int N, double *h_a, int inca, int fpe, const char* progra
         cl_event startMark, endMark;
 
         for(uint iter = 0; iter < NUM_ITER; iter++) {
-            ciErrNum = clEnqueueMarker(cqCommandQueue, &startMark);
-            ciErrNum |= clFinish(cqCommandQueue);
+            /*ciErrNum = clEnqueueMarker(cqCommandQueue, &startMark);
+            ciErrNum |= clFinish(cqCommandQueue);*/
+            ciErrNum = clEnqueueMarkerWithWaitList(cqCommandQueue, 0, NULL, &startMark);
             if (ciErrNum != CL_SUCCESS) {
                 printf("Error in clEnqueueMarker, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
                 exit(EXIT_FAILURE);
@@ -192,8 +193,9 @@ static double runExSUM(int N, double *h_a, int inca, int fpe, const char* progra
 
             ExSUM(NULL, d_Res, d_a, &ciErrNum);
 
-            ciErrNum  = clEnqueueMarker(cqCommandQueue, &endMark);
-            ciErrNum |= clFinish(cqCommandQueue);
+            /*ciErrNum  = clEnqueueMarker(cqCommandQueue, &endMark);
+            ciErrNum |= clFinish(cqCommandQueue);*/
+            ciErrNum = clEnqueueMarkerWithWaitList(cqCommandQueue, 0, NULL, &endMark);
             if (ciErrNum != CL_SUCCESS) {
                 printf("Error in clEnqueueMarker, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
                 exit(EXIT_FAILURE);
