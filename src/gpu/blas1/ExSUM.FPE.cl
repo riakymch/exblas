@@ -307,23 +307,31 @@ void ExSUMComplete(
     if(lid == 0)
         d_Superacc[gid] = l_Data[0];
 #else
-    if (lid < BIN_COUNT) {
+    if ((lid < BIN_COUNT) && (gid < 8)) {
         long sum = 0;
 
-        d_PartialSuperaccs += gid * MERGE_WORKGROUP_SIZE * BIN_COUNT;
         for(uint i = 0; i < MERGE_WORKGROUP_SIZE; i++)
-            sum += d_PartialSuperaccs[i * BIN_COUNT + lid];
+            sum += d_PartialSuperaccs[(gid * MERGE_WORKGROUP_SIZE + i) * BIN_COUNT + lid];
 
-        //d_PartialSuperaccs[get_group_id(0) * BIN_COUNT + lid] = sum;
-        d_Superacc[lid] = sum;
+        d_PartialSuperaccs[gid * BIN_COUNT + lid] = sum;
     }
 
-    /*barrier(CLK_LOCAL_MEM_FENCE);
-    if (pos == 0) {
+    barrier(CLK_LOCAL_MEM_FENCE);
+    if ((lid == 0) && (gid < 8)) {
         int imin = 0;
         int imax = 38;
-        Normalize(&d_PartialSuperaccs[get_group_id(0) * BIN_COUNT], &imin, &imax);
-    }*/
+        Normalize(&d_PartialSuperaccs[gid * BIN_COUNT], &imin, &imax);
+    }
+
+    barrier(CLK_GLOBAL_MEM_FENCE);
+    if ((lid < BIN_COUNT) && (gid == 0)) {
+        long sum = 0;
+
+        for(uint i = 0; i < 8; i++)
+            sum += d_PartialSuperaccs[i * BIN_COUNT + lid];
+
+        d_Superacc[lid] = sum;
+    }
 #endif
 }
 
@@ -335,8 +343,8 @@ void ExSUMRound(
     __global double *d_Res,
     __global long *d_Superacc
 ){
-    uint pos = get_local_id(0);
-    if (pos == 0)
+    uint lid = get_local_id(0);
+    if (lid == 0)
         d_Res[0] = Round(d_Superacc);
 }
 
