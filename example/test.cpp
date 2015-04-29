@@ -85,12 +85,10 @@ int main(int argc, char * argv[]) {
     }
 
     bool is_pass = true;
-    double exsum_acc, exsum_fpe2, exsum_fpe4, exsum_fpe8ee;
-    exsum_acc = exsum(N, a, 1, 0);
+    double exsum_fpe2, exsum_fpe4, exsum_fpe8ee;
     exsum_fpe2 = exsum(N, a, 1, 2);
     exsum_fpe4 = exsum(N, a, 1, 4);
     exsum_fpe8ee = exsum(N, a, 1, 8, true);
-    printf("  exsum with superacc = %.16g\n", exsum_acc);
     printf("  exsum with FPE2 and superacc = %.16g\n", exsum_fpe2);
     printf("  exsum with FPE4 and superacc = %.16g\n", exsum_fpe4);
     printf("  exsum with FPE8 early-exit and superacc = %.16g\n", exsum_fpe8ee);
@@ -98,14 +96,9 @@ int main(int argc, char * argv[]) {
 #ifdef EXBLAS_VS_MPFR
     double exsumMPFR = exsumVsMPFR(N, a);
     printf("  exsum with MPFR = %.16g\n", exsumMPFR);
-    if ((fabs(exsumMPFR - exsum_acc) != 0) || (fabs(exsumMPFR - exsum_fpe2) != 0) || (fabs(exsumMPFR - exsum_fpe4) != 0) || (fabs(exsumMPFR - exsum_fpe8ee) != 0)) {
+    if ((fabs(exsumMPFR - exsum_fpe2) != 0) || (fabs(exsumMPFR - exsum_fpe4) != 0) || (fabs(exsumMPFR - exsum_fpe8ee) != 0)) {
         is_pass = false;
-        printf("FAILED: %.16g \t %.16g \t %.16g \t %.16g\n", fabs(exsumMPFR - exsum_acc), fabs(exsumMPFR - exsum_fpe2), fabs(exsumMPFR - exsum_fpe4), fabs(exsumMPFR - exsum_fpe8ee));
-    }
-#else
-    if ((fabs(exsum_acc - exsum_fpe2) != 0) || (fabs(exsum_acc - exsum_fpe4) != 0) || (fabs(exsum_acc - exsum_fpe8ee) != 0)) {
-        is_pass = false;
-        printf("FAILED: %.16g \t %.16g \t %.16g\n", fabs(exsum_acc - exsum_fpe2), fabs(exsum_acc - exsum_fpe4), fabs(exsum_acc - exsum_fpe8ee));
+        printf("FAILED: %.16g \t %.16g \t %.16g\n", fabs(exsumMPFR - exsum_fpe2), fabs(exsumMPFR - exsum_fpe4), fabs(exsumMPFR - exsum_fpe8ee));
     }
 #endif
 
