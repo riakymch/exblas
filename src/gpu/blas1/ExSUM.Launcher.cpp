@@ -78,7 +78,7 @@ extern "C" cl_int initExSUM(
         sprintf(compileOptions, "%s -DNBFPE=%d", compileOptions, NbFPE);
         ciErrNum = clBuildProgram(cpProgram, 0, NULL, compileOptions, NULL, NULL);
         if (ciErrNum != CL_SUCCESS) {
-            //printf("Error in clBuildProgram, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
+            printf("Error in clBuildProgram, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
 
             // Determine the reason for the error
             char buildLog[16384];
