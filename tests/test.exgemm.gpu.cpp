@@ -46,11 +46,22 @@ double exgemmVsMPFR(double *exgemm, uint m, uint n, uint k, double alpha, double
     }
 
     //Compare the GPU and MPFR results
+#if 0
     //Frobenius Norm
     double norm = 0.0;
     for (uint i = 0; i < m * n; i++)
         norm += pow((exgemm[i] - exgemm_mpfr[i]) / exgemm_mpfr[i], 2);
     norm = ::sqrt(norm);
+#else
+    //Inf norm -- maximum absolute row sum norm
+    double norm = 0.0;
+    for(uint i = 0; i < m; i++) {
+	double rowsum = 0.0;
+        for(uint j = 0; j < n; j++)
+	   rowsum += fabs((exgemm[i * n + j] - exgemm_mpfr[i * n + j]) / exgemm_mpfr[i * n + j]);
+	norm = std::max(norm, rowsum);
+    }
+#endif
 
     free(exgemm_mpfr);
     mpfr_free_cache();
@@ -99,7 +110,7 @@ int main(int argc, char *argv[]) {
         }
     }
 
-    double eps = 1e-14;
+    double eps = 1e-13;
     double *a, *b, *c;
     int err = posix_memalign((void **) &a, 64, m * k * sizeof(double));
     err &= posix_memalign((void **) &b, 64, k * n * sizeof(double));
@@ -114,7 +125,6 @@ int main(int argc, char *argv[]) {
         init_ill_cond(a, m * k, range);
         init_ill_cond(b, k * n, range);
         init_ill_cond(c, m * n, range);
-        eps = 1e-11;
     } else {
         if(range == 1){
             init_naive(a, m * k);
