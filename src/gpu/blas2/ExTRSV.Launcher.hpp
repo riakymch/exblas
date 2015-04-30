@@ -4,8 +4,8 @@
  */
 
 /**
- *  \file  ExSUM.Launcher.hpp
- *  \brief Provides a set of routines for executing summation on GPUs.
+ *  \file  ExTRSV.Launcher.hpp
+ *  \brief Provides a set of routines for executing trsv on GPUs.
  *         For internal use
  *
  *  \authors
@@ -14,8 +14,8 @@
  *        Sylvain Collange -- sylvain.collange@inria.fr \n
  */
 
-#ifndef EXSUM_LAUNCHER_HPP_
-#define EXSUM_LAUNCHER_HPP_
+#ifndef EXTRSV_LAUNCHER_HPP_
+#define EXTRSV_LAUNCHER_HPP_
 
 #include <cmath>
 #include <cstdio>
@@ -42,7 +42,7 @@ typedef long long int bintype;
 // GPU reduction related functions
 ////////////////////////////////////////////////////////////////////////////////
 /**
- * \ingroup ExSUM
+ * \ingroup ExTRSV
  * \brief Function to initialize execution on GPUs by allocating kernels and 
  *     memory space. For internal use
  *
@@ -50,43 +50,50 @@ typedef long long int bintype;
  * \param cqParamCommandQue Command queue
  * \param cdDevice Device ID
  * \param program_file OpenCL file to execute
- * \param NbElements Nb of elements to sum
+ * \param n size of matrix A
  * \param NbFPE Size of FPEs
  * \return Status
  */
-extern "C" cl_int initExSUM(
+extern "C" cl_int initExTRSV(
     cl_context cxGPUContext,
     cl_command_queue cqParamCommandQue,
     cl_device_id cdDevice,
     const char* program_file,
-    const uint NbElements,
+    const uint n,
     const uint NbFPE
 );
 
 /**
- * \ingroup ExSUM
+ * \ingroup ExTRSV
  * \brief Function to finish the execution on GPUs. It is sort of garbage collector.
  *     For internal use
  */
-extern "C" void closeExSUM(
+extern "C" void closeExTRSV(
     void
 );
 
 /**
- * \ingroup ExSUM
- * \brief Executes parallel reduction on GPUs. For internal use
+ * \ingroup ExTRSV
+ * \brief Executes parallel triangular solver on GPU. For internal use
  *
  * \param cqCommandQueue Command queue
- * \param d_Res Result of summation rounded to the nearest
- * \param d_Data Array to sum
+ * \param n size of matrix A
+ * \param a matrix A
+ * \param lda leading dimension of A
+ * \param x vector
+ * \param incx the increment for the elements of a
  * \param ciErrNum Error number (output)
  * \return status
  */
-extern "C" size_t ExSUM(
+extern "C" size_t ExTRSV(
     cl_command_queue cqCommandQueue,
-    cl_mem d_Res,
-    cl_mem d_Data,
+    const uint n,
+    const cl_mem d_a,
+    const uint lda,
+    const cl_mem d_x,
+    const uint incx,
     cl_int *ciErrNum
 );
 
-#endif // EXSUM_LAUNCHER_HPP_
+#endif // EXTRSV_LAUNCHER_HPP_
+

@@ -5,7 +5,7 @@
 
 /**
  *  \file blas1.hpp
- *  \brief Provides a set of Basic Linear Algera Subprograms level-1 to work with scalar-vectors
+ *  \brief Provides a set of Basic Linear Algera Subprograms level-1 to handle scalar-vector operations
  *
  *  \authors
  *    Developers : \n
@@ -13,8 +13,8 @@
  *        Sylvain Collange -- sylvain.collange@inria.fr \n
  */
 
-#ifndef BLAS1_H_
-#define BLAS1_H_
+#ifndef BLAS1_HPP_
+#define BLAS1_HPP_
 
 // config from cmake
 #include "config.h"
@@ -45,4 +45,5 @@
  */
 double exsum(int Ng, double *ag, int inca, int fpe, bool early_exit = false);
 
-#endif // BLAS1_H_
+#endif // BLAS1_HPP_
+

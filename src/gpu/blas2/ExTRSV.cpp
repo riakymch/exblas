@@ -4,8 +4,8 @@
  */
 
 /**
- *  \file gpu/blas3/ExGEMM.cpp
- *  \brief Provides implementations of a set of gemm routines
+ *  \file gpu/blas2/ExTRSV.cpp
+ *  \brief Provides implementations of a set of trsv routines
  *
  *  \authors
  *    Developers : \n
@@ -22,15 +22,15 @@
 #include "config.h"
 #include "common.hpp"
 #include "common.gpu.hpp"
-#include "blas3.hpp"
-#include "ExGEMM.Launcher.hpp"
+#include "blas2.hpp"
+#include "ExTRSV.Launcher.hpp"
 
 #ifdef EXBLAS_TIMING
 #include <cassert>
 
 #define NUM_ITER 20
 
-double min(double arr[], int size) {
+static double min(double arr[], int size) {
     assert(arr != NULL);
     assert(size >= 0);
 
@@ -47,77 +47,62 @@ double min(double arr[], int size) {
 #endif
 
 /**
- * \ingroup ExGEMM
- * \brief Executes on GPU parallel matrix-matrix multiplication (C := beta * C + alpha * op(A) * op(B), where op(X) = X or op(X) = X^T).
- *  For internal use
+ * \ingroup ExTRSV
+ * \brief Executes on GPU parallel triangular solver A*x = b or A**T*x = b.
+ *     For internal use
  *
- * \param m nb of rows of matrix C
- * \param n nb of columns of matrix C
- * \param k nb of rows in matrix B
- * \param alpha scalar
+ * \param n size of matrix A
  * \param a matrix A
  * \param lda leading dimension of A
- * \param b matrix B
- * \param ldb leading dimension of B
- * \param beta scalar
- * \param c matrix C
- * \param ldc leading dimension of C
+ * \param x vector
+ * \param incx the increment for the elements of a
  * \param fpe size of floating-point expansion
  * \param program_file path to the file with kernels
- * \return matrix C contains the reproducible and accurate result of the matrix product
+ * \return Contains the reproducible and accurate result of solving triangular system
  */
-static int runExGEMM(int m, int n, int k, double alpha, double *a, int lda, double *b, int ldb, double beta, double *c, int ldc, int fpe, const char* program_file);
-
+int runExTRSV(int n, double *a, int lda, double *x, int incx, int fpe, const char* program_file);
 
 /**
- * \ingroup ExGEMM
- * \brief Parallel GEMM based on our algorithm. If fpe < 3, use superaccumulators only.
+ * \ingroup ExTRSV
+ * \brief Parallel TRSV based on our algorithm. If fpe < 3, use superaccumulators only.
  *  Otherwise, use floating-point expansions of size FPE with superaccumulators when needed.
- *  early_exit corresponds to the early-exit technique. For now, it works on non-transpose matrices
+ *  early_exit corresponds to the early-exit technique. For now, it works with non-transpose matrices
  *
+ * \param uplo 'U' or 'L' an upper or a lower triangular matrix A
  * \param transa 'T' or 'N' a transpose or a non-transpose matrix A
- * \param transb 'T' or 'N' a transpose or a non-transpose matrix B
- * \param m nb of rows of matrix C
- * \param n nb of columns of matrix C
- * \param k nb of rows in matrix B
- * \param alpha scalar
+ * \param diag 'U' or 'N' a unit or non-unit triangular matrix A
+ * \param n size of matrix A
  * \param a matrix A
  * \param lda leading dimension of A
- * \param b matrix B
- * \param ldb leading dimension of B
- * \param beta scalar
- * \param c matrix C
- * \param ldc leading dimension of C
- * \param fpe size of FPE
- * \param early_exit Flag to indicate the early-exit technique
- * \return status
+ * \param x vector
+ * \param incx the increment for the elements of a
+ * \param fpe stands for the floating-point expansions size (used in conjuction with superaccumulators)
+ * \param early_exit specifies the optimization technique. By default, it is disabled
+ * \return Contains the reproducible and accurate sum of elements of a real vector
  */
-int exgemm(char transa, char transb, int m, int n, int k, double alpha, double *a, int lda, double *b, int ldb, double beta, double *c, int ldc, int fpe, bool early_exit) {
+int extrsv(char uplo, char transa, char diag, int n, double *a, int lda, double *x, int incx, int fpe, bool early_exit) {
     char path[256];
     strcpy(path, EXBLAS_BINARY_DIR);
     strcat(path, "/include/cl/");
 
     // with superaccumulators only
-    if (fpe < 3) {
-        return runExGEMM(m, n, k, alpha, a, lda, b, ldb, beta, c, ldc, 0, strcat(path, "ExGEMM.Superacc.cl"));
-        //printf("Please use the size of FPE from this range [2, 8]\n");
-        //exit(0);
-    }
+    if (fpe < 3)
+        return runExTRSV(n, a, lda, x, incx, 0, strcat(path, "ExTRSV.Superacc.cl"));
 
     if (early_exit) {
         if (fpe <= 4)
-            return runExGEMM(m, n, k, alpha, a, lda, b, ldb, beta, c, ldc, 4, strcat(path, "ExGEMM.FPE.EX.4.cl"));
+            return runExTRSV(n, a, lda, x, incx, 4, strcat(path, "ExTRSV.FPE.EX.4.cl"));
         if (fpe <= 6)
-            return runExGEMM(m, n, k, alpha, a, lda, b, ldb, beta, c, ldc, 6, strcat(path, "ExGEMM.FPE.EX.6.cl"));
+            return runExTRSV(n, a, lda, x, incx, 6, strcat(path, "ExTRSV.FPE.EX.6.cl"));
         if (fpe <= 8)
-            return runExGEMM(m, n, k, alpha, a, lda, b, ldb, beta, c, ldc, 8, strcat(path, "ExGEMM.FPE.EX.8.cl"));
+            return runExTRSV(n, a, lda, x, incx, 8, strcat(path, "ExTRSV.FPE.EX.8.cl"));
     } else // ! early_exit
-        return runExGEMM(m, n, k, alpha, a, lda, b, ldb, beta, c, ldc, fpe, strcat(path, "ExGEMM.FPE.cl"));
+        return runExTRSV(n, a, lda, x, incx, fpe, strcat(path, "ExTRSV.FPE.cl"));
 
-    return EXIT_SUCCESS;
+    return 0.0;
 }
 
-static int runExGEMM(int m, int n, int k, double alpha, double *h_a, int lda, double *h_b, int ldb, double beta, double *h_c, int ldc, int fpe, const char* program_file) {
+int runExTRSV(int n, double *a, int lda, double *x, int incx, int fpe, const char* program_file){
     cl_int ciErrNum;
 
     //printf("Initializing OpenCL...\n");
@@ -155,31 +140,26 @@ static int runExGEMM(int m, int n, int k, double alpha, double *h_a, int lda, do
         }
 
         //Allocating OpenCL memory...
-        cl_mem d_a = clCreateBuffer(cxGPUContext, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, m * k * sizeof(cl_double), h_a, &ciErrNum);
+        cl_mem d_a = clCreateBuffer(cxGPUContext, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, n * n * sizeof(cl_double), a, &ciErrNum);
         if (ciErrNum != CL_SUCCESS) {
             printf("Error in clCreateBuffer for d_a, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
             exit(EXIT_FAILURE);
         }
-        cl_mem d_b = clCreateBuffer(cxGPUContext, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, k * n * sizeof(cl_double), h_b, &ciErrNum);
+        cl_mem d_x = clCreateBuffer(cxGPUContext, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, n * sizeof(cl_double), x, &ciErrNum);
         if (ciErrNum != CL_SUCCESS) {
-            printf("Error in clCreateBuffer for d_b, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
-            exit(EXIT_FAILURE);
-        }
-        cl_mem d_c = clCreateBuffer(cxGPUContext, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, m * n * sizeof(cl_double), h_c, &ciErrNum);
-        if (ciErrNum != CL_SUCCESS) {
-            printf("Error in clCreateBuffer for d_c, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
+            printf("Error in clCreateBuffer for d_res, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
             exit(EXIT_FAILURE);
         }
 
     {
-        //Initializing OpenCL ExGEMM...
-            ciErrNum = initExGEMM(cxGPUContext, cqCommandQueue, cdDevice, program_file, fpe);
+        //Initializing OpenCL dSum...
+            ciErrNum = initExTRSV(cxGPUContext, cqCommandQueue, cdDevice, program_file, n, fpe);
             if (ciErrNum != CL_SUCCESS)
                 exit(EXIT_FAILURE);
 
-        //Running OpenCL ExGEMM...
+        //Running OpenCL dSum with %u elements...
             //Just a single launch or a warmup iteration
-            ExGEMM(NULL, m, n, k, alpha, d_a, lda, d_b, ldb, beta, d_c, ldc, &ciErrNum);
+            ExTRSV(NULL, n, d_a, lda, d_x, incx, &ciErrNum);
             if (ciErrNum != CL_SUCCESS)
                 exit(EXIT_FAILURE);
 
@@ -195,7 +175,7 @@ static int runExGEMM(int m, int n, int k, double alpha, double *h_a, int lda, do
                 exit(EXIT_FAILURE);
             }
 
-            ExGEMM(NULL, m, n, k, alpha, d_a, lda, d_b, ldb, beta, d_c, ldc, &ciErrNum);
+            ExTRSV(NULL, n, d_a, lda, d_x, incx, &ciErrNum);
 
             ciErrNum  = clEnqueueMarker(cqCommandQueue, &endMark);
             ciErrNum |= clFinish(cqCommandQueue);
@@ -215,13 +195,13 @@ static int runExGEMM(int m, int n, int k, double alpha, double *h_a, int lda, do
         }
 
         double minTime = min(gpuTime, NUM_ITER);
-        double perf = 2.0 * m * n * k;
+        double perf = n * n;
         perf = (perf / minTime) * 1e-9;
-        printf("NbFPE = %u \t M = %u \t N = %u \t K = %u \t Time = %.8f s \t Performance = %.4f GFLOPS\n", fpe, m, n, k, minTime, perf);
+        printf("NbFPE = %u \t N = %u \t \t Time = %.8f s \t Performance = %.4f GFLOPS\n", fpe, n, minTime, perf);
 #endif
 
         //Retrieving results...
-            ciErrNum = clEnqueueReadBuffer(cqCommandQueue, d_c, CL_TRUE, 0, m * n * sizeof(double), h_c, 0, NULL, NULL);
+            ciErrNum = clEnqueueReadBuffer(cqCommandQueue, d_x, CL_TRUE, 0, n * sizeof(cl_double), x, 0, NULL, NULL);
             if (ciErrNum != CL_SUCCESS) {
                 printf("Error in clEnqueueReadBuffer Line %u in file %s !!!\n\n", __LINE__, __FILE__);
                 exit(EXIT_FAILURE);
@@ -229,13 +209,11 @@ static int runExGEMM(int m, int n, int k, double alpha, double *h_a, int lda, do
 
          //Release kernels and program
          //Shutting down and freeing memory...
-            closeExGEMM();
+            closeExTRSV();
             if(d_a)
                 clReleaseMemObject(d_a);
-            if(d_b)
-                clReleaseMemObject(d_b);
-            if(d_c)
-                clReleaseMemObject(d_c);
+            if(d_x)
+                clReleaseMemObject(d_x);
             if(cqCommandQueue)
                 clReleaseCommandQueue(cqCommandQueue);
             if(cxGPUContext)

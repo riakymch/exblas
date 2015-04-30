@@ -73,7 +73,7 @@ extern "C" void closeExGEMM(
 
 /**
  * \ingroup ExGEMM
- * \brief Executes on GPU parallel matrix-matrix multiplication. For internal use
+ * \brief Executes parallel matrix-matrix multiplication on GPU. For internal use
  *
  * \param cqCommandQueue Command queue
  * \param m nb of rows of matrix C
@@ -107,3 +107,4 @@ extern "C" size_t ExGEMM(
 );
 
 #endif //EXGEMM_LAUNCHER_HPP_
+

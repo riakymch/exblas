@@ -86,9 +86,6 @@ double exsum(int Ng, double *ag, int inca, int fpe, bool early_exit) {
         printf("Please use the size of FPE from this range [2, 8]\n");
         exit(0);
     }
-    // there is no need and no improvement at all in using the early-exit technique for FPE of size 2
-    if (fpe == 2)
-        return runExSUM(Ng, ag, inca, 2, strcat(path, "ExSUM.FPE.cl"));
 
     if (early_exit) {
         if (fpe <= 4)
@@ -97,20 +94,8 @@ double exsum(int Ng, double *ag, int inca, int fpe, bool early_exit) {
             return runExSUM(Ng, ag, inca, 6, strcat(path, "ExSUM.FPE.EX.6.cl"));
         if (fpe <= 8)
             return runExSUM(Ng, ag, inca, 8, strcat(path, "ExSUM.FPE.EX.8.cl"));
-    } else { // ! early_exit
-        if (fpe == 3)
-            return runExSUM(Ng, ag, inca, 3, strcat(path, "ExSUM.FPE.cl"));
-        if (fpe == 4)
-            return runExSUM(Ng, ag, inca, 4, strcat(path, "ExSUM.FPE.cl"));
-        if (fpe == 5)
-            return runExSUM(Ng, ag, inca, 5, strcat(path, "ExSUM.FPE.cl"));
-        if (fpe == 6)
-            return runExSUM(Ng, ag, inca, 6, strcat(path, "ExSUM.FPE.cl"));
-        if (fpe == 7)
-            return runExSUM(Ng, ag, inca, 7, strcat(path, "ExSUM.FPE.cl"));
-        if (fpe == 8)
-            return runExSUM(Ng, ag, inca, 8, strcat(path, "ExSUM.FPE.cl"));
-    }
+    } else // ! early_exit
+        return runExSUM(Ng, ag, inca, fpe, strcat(path, "ExSUM.FPE.cl"));
 
     return 0.0;
 }
