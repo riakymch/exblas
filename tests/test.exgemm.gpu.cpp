@@ -46,20 +46,25 @@ double exgemmVsMPFR(double *exgemm, uint m, uint n, uint k, double alpha, double
     }
 
     //Compare the GPU and MPFR results
-#if 0
+#if 1
     //Frobenius Norm
-    double norm = 0.0;
-    for (uint i = 0; i < m * n; i++)
-        norm += pow((exgemm[i] - exgemm_mpfr[i]) / exgemm_mpfr[i], 2);
-    norm = ::sqrt(norm);
+    double norm = 0.0, val = 0.0;
+    for (uint i = 0; i < m * n; i++) {
+        norm += pow(exgemm[i] - exgemm_mpfr[i], 2);
+        val += pow(exgemm_mpfr[i], 2);
+    }
+    norm = ::sqrt(norm) / ::sqrt(val);
 #else
     //Inf norm -- maximum absolute row sum norm
-    double norm = 0.0;
+    double norm = 0.0, val = 0.0;
     for(uint i = 0; i < m; i++) {
-	double rowsum = 0.0;
-        for(uint j = 0; j < n; j++)
-	   rowsum += fabs((exgemm[i * n + j] - exgemm_mpfr[i * n + j]) / exgemm_mpfr[i * n + j]);
-	norm = std::max(norm, rowsum);
+        double rowsum = 0.0, valrowsum = 0.0;
+        for(uint j = 0; j < n; j++) {
+            rowsum += fabs(exgemm[i * n + j] - exgemm_mpfr[i * n + j]);
+            valrowsum += fabs(exgemm_mpfr[i * n + j]);
+        }
+        val = std::max(val, valrowsum);
+        norm = std::max(norm, rowsum / val);
     }
 #endif
 
@@ -110,7 +115,7 @@ int main(int argc, char *argv[]) {
         }
     }
 
-    double eps = 1e-13;
+    double eps = 1e-15;
     double *a, *b, *c;
     int err = posix_memalign((void **) &a, 64, m * k * sizeof(double));
     err &= posix_memalign((void **) &b, 64, k * n * sizeof(double));
@@ -149,7 +154,7 @@ int main(int argc, char *argv[]) {
     exgemm('N', 'N', m, n, k, 1.0, a, k, b, n, 0.0, superacc, n, 1);
 #ifdef EXBLAS_VS_MPFR
     norm = exgemmVsMPFR(superacc, m, n, k, 1.0, a, k, b, n);
-    printf("Superacc norm = %.16g\n", norm);
+    printf("Superacc error = %.16g\n", norm);
     if (norm > eps) {
         is_pass = false;
     }
@@ -158,7 +163,7 @@ int main(int argc, char *argv[]) {
     exgemm('N', 'N', m, n, k, 1.0, a, k, b, n, 0.0, c, n, 3);
 #ifdef EXBLAS_VS_MPFR
     norm = exgemmVsMPFR(c, m, n, k, 1.0, a, k, b, n);
-    printf("FPE3 norm = %.16g\n", norm);
+    printf("FPE3 error = %.16g\n", norm);
     if (norm > eps) {
         is_pass = false;
     }
@@ -171,7 +176,7 @@ int main(int argc, char *argv[]) {
     exgemm('N', 'N', m, n, k, 1.0, a, k, b, n, 0.0, c, n, 4);
 #ifdef EXBLAS_VS_MPFR
     norm = exgemmVsMPFR(c, m, n, k, 1.0, a, k, b, n);
-    printf("FPE4 norm = %.16g\n", norm);
+    printf("FPE4 error = %.16g\n", norm);
     if (norm > eps) {
         is_pass = false;
     }
@@ -184,7 +189,7 @@ int main(int argc, char *argv[]) {
     exgemm('N', 'N', m, n, k, 1.0, a, k, b, n, 0.0, c, n, 8);
 #ifdef EXBLAS_VS_MPFR
     norm = exgemmVsMPFR(c, m, n, k, 1.0, a, k, b, n);
-    printf("FPE8 norm = %.16g\n", norm);
+    printf("FPE8 error = %.16g\n", norm);
     if (norm > eps) {
         is_pass = false;
     }
@@ -197,7 +202,7 @@ int main(int argc, char *argv[]) {
     exgemm('N', 'N', m, n, k, 1.0, a, k, b, n, 0.0, c, n, 4, true);
 #ifdef EXBLAS_VS_MPFR
     norm = exgemmVsMPFR(c, m, n, k, 1.0, a, k, b, n);
-    printf("FPE4EE norm = %.16g\n", norm);
+    printf("FPE4EE error = %.16g\n", norm);
     if (norm > eps) {
         is_pass = false;
     }
@@ -210,7 +215,7 @@ int main(int argc, char *argv[]) {
     exgemm('N', 'N', m, n, k, 1.0, a, k, b, n, 0.0, c, n, 6, true);
 #ifdef EXBLAS_VS_MPFR
     norm = exgemmVsMPFR(c, m, n, k, 1.0, a, k, b, n);
-    printf("FPE6EE norm = %.16g\n", norm);
+    printf("FPE6EE error = %.16g\n", norm);
     if (norm > eps) {
         is_pass = false;
     }
@@ -223,7 +228,7 @@ int main(int argc, char *argv[]) {
     exgemm('N', 'N', m, n, k, 1.0, a, k, b, n, 0.0, c, n, 8, true);
 #ifdef EXBLAS_VS_MPFR
     norm = exgemmVsMPFR(c, m, n, k, 1.0, a, k, b, n);
-    printf("FPE8EE norm = %.16g\n", norm);
+    printf("FPE8EE error = %.16g\n", norm);
     if (norm > eps) {
         is_pass = false;
     }

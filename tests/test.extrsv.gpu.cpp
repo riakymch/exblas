@@ -143,7 +143,7 @@ int main(int argc, char *argv[]) {
     extrsv('L', 'N', 'N', n, a, n, superacc, 1, 0);
 #ifdef EXBLAS_VS_MPFR
     norm = extrsvVsMPFR(superacc, n, a, n, xorig, 1);
-    printf("Superacc norm = %.16g\n", norm);
+    printf("Superacc error = %.16g\n", norm);
     if (norm > eps) {
         is_pass = false;
     }
@@ -152,7 +152,7 @@ int main(int argc, char *argv[]) {
     extrsv('L', 'N', 'N', n, a, n, x, 1, 3);
 #ifdef EXBLAS_VS_MPFR
     norm = extrsvVsMPFR(x, n, a, n, xorig, 1);
-    printf("FPE3 norm = %.16g\n", norm);
+    printf("FPE3 error = %.16g\n", norm);
     if (norm > eps) {
         is_pass = false;
     }
@@ -166,7 +166,7 @@ int main(int argc, char *argv[]) {
     extrsv('L', 'N', 'N', n, a, n, x, 1, 4);
 #ifdef EXBLAS_VS_MPFR
     norm = extrsvVsMPFR(x, n, a, n, xorig, 1);
-    printf("FPE4 norm = %.16g\n", norm);
+    printf("FPE4 error = %.16g\n", norm);
     if (norm > eps) {
         is_pass = false;
     }
@@ -180,7 +180,7 @@ int main(int argc, char *argv[]) {
     extrsv('L', 'N', 'N', n, a, n, x, 1, 8);
 #ifdef EXBLAS_VS_MPFR
     norm = extrsvVsMPFR(x, n, a, n, xorig, 1);
-    printf("FPE8 norm = %.16g\n", norm);
+    printf("FPE8 error = %.16g\n", norm);
     if (norm > eps) {
         is_pass = false;
     }
@@ -194,7 +194,7 @@ int main(int argc, char *argv[]) {
     extrsv('L', 'N', 'N', n, a, n, x, 1, 4, true);
 #ifdef EXBLAS_VS_MPFR
     norm = extrsvVsMPFR(x, n, a, n, xorig, 1);
-    printf("FPE4EE norm = %.16g\n", norm);
+    printf("FPE4EE error = %.16g\n", norm);
     if (norm > eps) {
         is_pass = false;
     }
@@ -208,7 +208,7 @@ int main(int argc, char *argv[]) {
     extrsv('L', 'N', 'N', n, a, n, x, 1, 6, true);
 #ifdef EXBLAS_VS_MPFR
     norm = extrsvVsMPFR(x, n, a, n, xorig, 1);
-    printf("FPE6EE norm = %.16g\n", norm);
+    printf("FPE6EE error = %.16g\n", norm);
     if (norm > eps) {
         is_pass = false;
     }
@@ -222,7 +222,7 @@ int main(int argc, char *argv[]) {
     extrsv('L', 'N', 'N', n, a, n, x, 1, 8, true);
 #ifdef EXBLAS_VS_MPFR
     norm = extrsvVsMPFR(x, n, a, n, xorig, 1);
-    printf("FPE8EE norm = %.16g\n", norm);
+    printf("FPE8EE error = %.16g\n", norm);
     if (norm > eps) {
         is_pass = false;
     }
