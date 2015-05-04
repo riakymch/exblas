@@ -52,6 +52,7 @@ static double extrsvVsMPFR(double *extrsv, uint n, double *a, uint lda, double *
     }
 
     //Compare the GPU and MPFR results
+#if 0
     //L2 norm
     double norm = 0.0, val = 0.0;
     for(uint i = 0; i < n; i++) {
@@ -59,8 +60,17 @@ static double extrsvVsMPFR(double *extrsv, uint n, double *a, uint lda, double *
         val += pow(fabs(extrsv_mpfr[i]), 2);
     }
     norm = ::sqrt(norm) / ::sqrt(val);
+#else
+    //Inf norm
+    double norm = 0.0, val = 0.0;
+    for(uint i = 0; i < n; i++) {
+        norm += std::max(norm, fabs(extrsv[i] - extrsv_mpfr[i]));
+        val += std::max(val, fabs(extrsv_mpfr[i]));
+    }
+    norm = norm / val;
+#endif
 
-    //free(extrsv_mpfr);
+    free(extrsv_mpfr);
     mpfr_free_cache();
 
     return norm;

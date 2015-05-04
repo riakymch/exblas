@@ -46,7 +46,7 @@ double exgemmVsMPFR(double *exgemm, uint m, uint n, uint k, double alpha, double
     }
 
     //Compare the GPU and MPFR results
-#if 1
+#if 0
     //Frobenius Norm
     double norm = 0.0, val = 0.0;
     for (uint i = 0; i < m * n; i++) {
@@ -64,8 +64,9 @@ double exgemmVsMPFR(double *exgemm, uint m, uint n, uint k, double alpha, double
             valrowsum += fabs(exgemm_mpfr[i * n + j]);
         }
         val = std::max(val, valrowsum);
-        norm = std::max(norm, rowsum / val);
+        norm = std::max(norm, rowsum);
     }
+    norm = norm / val;
 #endif
 
     free(exgemm_mpfr);
