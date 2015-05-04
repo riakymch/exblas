@@ -7,11 +7,11 @@
 #endif
 
 #define BIN_COUNT  76
-#define K          8                    //High-radix carry-save bits
+#define K           8                   //High-radix carry-save bits
 #define digits     56
 #define deltaScale 72057594037927936.0  //Assumes K > 0
-#define f_words    39 
-#define TSAFE      0
+#define f_words    20
+#define TSAFE       0
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -79,31 +79,27 @@ double OddRoundSumNonnegative(double th, double tl) {
 }
 
 int Normalize(__global long *accumulator, int lda, int *imin, int *imax) {
-    if (*imin > *imax)
-        return 0;
-
     long carry_in = accumulator[*imin * lda] >> digits;
     accumulator[*imin * lda] -= carry_in << digits;
     int i;
     // Sign-extend all the way
     for (i = *imin + 1; i < BIN_COUNT; ++i) {
+        accumulator[i * lda] += carry_in;
         long carry_out = accumulator[i * lda] >> digits;    // Arithmetic shift
-        accumulator[i * lda] += carry_in - (carry_out << digits);
+        accumulator[i * lda] -= (carry_out << digits);
         carry_in = carry_out;
     }
     *imax = i - 1;
 
-    if ((carry_in != 0) && (carry_in != -1)) {
-        //TODO: handle overflow
-        //status = Overflow;
-    }
+    // Do not cancel the last carry to avoid losing information
+    accumulator[*imax * lda] += carry_in << digits;
 
     return carry_in < 0;
 }
 
 double Round(__global long *accumulator, int lda) {
     int imin = 0;
-    int imax = 75;
+    int imax = 38;
     int negative = Normalize(accumulator, lda, &imin, &imax);
 
     //Find leading word
@@ -113,14 +109,14 @@ double Round(__global long *accumulator, int lda) {
     }
     if (negative) {
         //Skip ones
-        for (; accumulator[i * lda] == ((1l << digits) - 1) && i >= imin; --i) {
+        for (; (accumulator[i * lda] & ((1l << digits) - 1)) == ((1l << digits) - 1) && i >= imin; --i) {
         }
     }
     if (i < 0)
         //TODO: should we preserve sign of zero?
         return 0.0;
 
-    long hiword = negative ? (1l << digits) - accumulator[i * lda] : accumulator[i * lda];
+    long hiword = negative ? ((1l << digits) - 1) - accumulator[i * lda] : accumulator[i * lda];
     double rounded = (double) hiword;
     double hi = ldexp(rounded, (i - f_words) * digits);
     if (i == 0)
@@ -219,7 +215,7 @@ void wait_until_ge(
     int *col_done
 ){
     if(tid == 0) {
-        /* Only read global memory when necessary */
+        // Only read global memory when necessary
         if (*col_done < col_to_wait) {
             while(*sync < col_to_wait) {}
             *col_done = *sync;

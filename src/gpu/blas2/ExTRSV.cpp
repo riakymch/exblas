@@ -203,6 +203,7 @@ int runExTRSV(int n, double *a, int lda, double *x, int incx, int fpe, const cha
         //Retrieving results...
             ciErrNum = clEnqueueReadBuffer(cqCommandQueue, d_x, CL_TRUE, 0, n * sizeof(cl_double), x, 0, NULL, NULL);
             if (ciErrNum != CL_SUCCESS) {
+                printf("ciErrNum = %d\n", ciErrNum);
                 printf("Error in clEnqueueReadBuffer Line %u in file %s !!!\n\n", __LINE__, __FILE__);
                 exit(EXIT_FAILURE);
             }

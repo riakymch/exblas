@@ -28,9 +28,8 @@ double randDouble(int emin, int emax, int neg_ratio) {
 }
 
 void init_fpuniform(double *a, int n, int range, int emax) {
-    for(int i = 0; i != n; ++i) {
+    for(int i = 0; i != n; ++i)
         a[i] = randDouble(emax-range, emax, 1);
-    }
 }
 
 void init_lognormal(double * a, int n, double mean, double stddev) {
@@ -40,9 +39,8 @@ void init_lognormal(double * a, int n, double mean, double stddev) {
 
     //printf("min=%a, max=%a\n", d.min(), d.max());
 
-    for(int i = 0; i != n; ++i) {
+    for(int i = 0; i != n; ++i)
         a[i] = d(gen);
-    }
 }
 
 void init_ill_cond(double *a, int n, double c) {
