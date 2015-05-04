@@ -78,9 +78,9 @@ extern "C" void closeExTRSV(
  *
  * \param cqCommandQueue Command queue
  * \param n size of matrix A
- * \param a matrix A
+ * \param d_a matrix A
  * \param lda leading dimension of A
- * \param x vector
+ * \param d_x vector
  * \param incx the increment for the elements of a
  * \param ciErrNum Error number (output)
  * \return status
