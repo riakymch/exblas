@@ -8,9 +8,9 @@ processors, Intel Xeon Phi co-processors, and GPU accelerators. We construct
 our approach in such a way that it is independent from data partitioning, 
 order of computations, thread scheduling, or reduction tree schemes.
 
-
 The current version of the ExBLAS library is equipped with 
   * ExSUM -- Reproducible and accurate parallel reduction (parallel summation);
+  * ExTRSV -- Reproducible and accurate parallel triangular solver;
   * ExGEMM -- Reproducible and accurate parallel matrix-matrix multiplication.
 These routines can be executed on a set of architectures: Intel Core i7 and 
 Sandy Bridge processors; Intel Xeon Phi co-processors; both AMD and NVIDIA 
