@@ -225,6 +225,17 @@ void wait_until_ge(
 }
 
 /* Returns next block row index that requires processing */
+#if 1
+void nextRow(
+   __local volatile int *old,
+   __global volatile int *address
+){
+   if(get_local_id(0)==0 && get_local_id(1)==0)
+      *old = atomic_add(address, 1);
+
+   barrier(CLK_GLOBAL_MEM_FENCE);
+}
+#else
 int nextRow(
    __global volatile int *address
 ){
@@ -235,6 +246,7 @@ int nextRow(
    barrier(CLK_GLOBAL_MEM_FENCE);
    return old;
 }
+#endif
 
 /* Sets sync values correctly prior to call to trsv_ln_exec */
 __kernel void trsv_init(
@@ -291,7 +303,13 @@ __kernel void trsv_lnn(
     __global long *l_working = d_Superaccs + get_group_id(0) * threadsy * threadsx * BIN_COUNT + tid;
 
     // Get row handled by this block
+#if 1
+    __local int row;
+    row = 0.0;
+    nextRow(&row, &sync[1]);
+#else
     int row = nextRow(&sync[1]);
+#endif
 
     // Copy diagonal block to shared memory
     tocache(&d_a[row * BLOCK_SIZE * n + row * BLOCK_SIZE], cache, BLOCK_SIZE, threadsx * threadsy, 0, isunit, tid, n);
