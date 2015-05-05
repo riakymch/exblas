@@ -130,13 +130,8 @@ int main(int argc, char *argv[]) {
         init_ill_cond(a, n * n, range);
         init_ill_cond(x, n, range);
     } else {
-        if(range == 1){
-            init_naive(a, n * n);
-            init_naive(x, n);
-        } else {
-            init_fpuniform(a, n * n, range, emax);
-            init_fpuniform(x, n, range, emax);
-        }
+        init_fpuniform(a, n * n, 1, emax);
+        init_fpuniform(x, n, 1, emax);
     }
     copyVector(n, xorig, x);
 
