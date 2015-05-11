@@ -32,15 +32,53 @@ void init_fpuniform(double *a, int n, int range, int emax) {
         a[i] = randDouble(emax-range, emax, 1);
 }
 
+void init_fpuniform_matrix(char uplo, char diag, double *a, int n, int range, int emax) {
+    if (uplo == 'U') {
+        for(int i = 0; i != n; ++i)
+            for(int j = 0; j >= i; ++j)
+                if ((diag == 'U') && (j == i))
+                    a[j * n + i] = 1.0;
+                else
+                    a[j * n + i] = randDouble(emax-range, emax, 1);
+    } else {
+        for(int i = 0; i != n; ++i)
+            for(int j = 0; j <= i; ++j)
+                if ((diag == 'U') && (j == i))
+                    a[j * n + i] = 1.0;
+                else
+                    a[j * n + i] = randDouble(emax-range, emax, 1);
+    }
+}
+
 void init_lognormal(double * a, int n, double mean, double stddev) {
     std::random_device rd;
     std::default_random_engine gen(rd());
     std::lognormal_distribution<> d(mean, stddev);
 
-    //printf("min=%a, max=%a\n", d.min(), d.max());
-
     for(int i = 0; i != n; ++i)
         a[i] = d(gen);
+}
+
+void init_lognormal_matrix(char uplo, char diag, double * a, int n, double mean, double stddev) {
+    std::random_device rd;
+    std::default_random_engine gen(rd());
+    std::lognormal_distribution<> d(mean, stddev);
+
+    if (uplo == 'U') {
+        for(int i = 0; i != n; ++i)
+            for(int j = 0; j >= i; ++j)
+                if ((diag == 'U') && (j == i))
+                    a[i * n + j] = 1.0;
+                else
+                    a[i * n + j] = d(gen);
+    } else {
+        for(int i = 0; i != n; ++i)
+            for(int j = 0; j <= i; ++j)
+                if ((diag == 'U') && (j == i))
+                    a[i * n + j] = 1.0;
+                else
+                    a[i * n + j] = d(gen);
+    }
 }
 
 void init_ill_cond(double *a, int n, double c) {

@@ -76,6 +76,17 @@ void init_fpuniform(double *a, int n, int range, int emax);
 
 /**
  * \ingroup common
+ * \brief Generates a real lower/upper unit/non-unit matrix with uniform distribution of ellements
+ *
+ * \param a input/output matrix
+ * \param n matrix size
+ * \param range dynamic range of generated elements
+ * \param emax maximum exponent (emax + range < EMAX)
+ */
+void init_fpuniform_matrix(char uplo, char diag, double *a, int n, int range, int emax);
+
+/**
+ * \ingroup common
  * \brief Generates a real vector with log-uniform distribution of ellements
  *
  * \param a input/output vector
@@ -84,6 +95,17 @@ void init_fpuniform(double *a, int n, int range, int emax);
  * \param stddev
  */
 void init_lognormal(double *a, int n, double mean, double stddev);
+
+/**
+ * \ingroup common
+ * \brief Generates a real lower/upper unit/non-unit matrux with log-uniform distribution of ellements
+ *
+ * \param a input/output matrix
+ * \param n matrix size
+ * \param mean
+ * \param stddev
+ */
+void init_lognormal_matrix(char uplo, char diag, double *a, int n, double mean, double stddev);
 
 /**
  * \ingroup common

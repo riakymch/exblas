@@ -328,7 +328,7 @@ __kernel void trsv_lnn(
     int isunit = 0;
     int lda = threadsx * threadsy;
 
-    __global long *l_working = d_Superaccs + get_group_id(0) * threadsy * threadsx * BIN_COUNT + tid;
+    //__global long *l_working = d_Superaccs + get_group_id(0) * threadsy * threadsx * BIN_COUNT + tid;
 
     // Get row handled by this block
 #if 1
@@ -345,8 +345,8 @@ __kernel void trsv_lnn(
 
     // Loop over blocks as they become available
     // Initialize accumulators
-    for (uint i = 0; i < BIN_COUNT; i++)
-        l_working[i * lda] = 0;
+    /*for (uint i = 0; i < BIN_COUNT; i++)
+        l_working[i * lda] = 0;*/
     // FPEs
     double fpe[3] = {0.0};
     double x, s, r;
