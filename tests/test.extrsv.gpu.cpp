@@ -58,6 +58,9 @@ static double extrsvVsMPFR(double *extrsv, uint n, double *a, uint lda, double *
         mpfr_div(div, sum, op1, MPFR_RNDN);
         extrsv_mpfr[i] = mpfr_get_d(div, MPFR_RNDN);
     }
+    for(uint i = 0; i < n; i++)
+        printf("%.16g\t", extrsv[i]);
+    printf("\n");
 
     //naive trsv
     double *trsvn;
@@ -190,17 +193,43 @@ int main(int argc, char *argv[]) {
     err &= posix_memalign((void **) &xorig, 64, n * sizeof(double));
     if ((!a) || (!x) || (!xorig) || (err != 0))
         fprintf(stderr, "Cannot allocate memory with posix_memalign\n");
+
+#if 1
+    //Reading matrix A and vector b from files
+    FILE *pFileA, *pFileb;
+    size_t resA, resb;
+    pFileA = fopen("matrices/A_lnn_64_3.83e+08.bin", "rb");
+    pFileb = fopen("matrices/b_lnn_64_3.83e+08.bin", "rb");
+    if ((pFileA == NULL) || (pFileb == NULL)) {
+        fprintf(stderr, "Cannot open files to read matrix and vector\n");
+        exit(1);
+    }
+
+    resA = fread(a, sizeof(double), n * n, pFileA);
+    resb = fread(x, sizeof(double), n, pFileb);
+    if ((resA != n * n) || (resb != n)) {
+        fprintf(stderr, "Cannot read matrix and vector from files\n");
+        exit(1);
+    }
+
+    fclose(pFileA);
+    fclose(pFileb);
+#else
     if(lognormal) {
         init_lognormal_matrix('L', 'N', a, n, mean, stddev);
-        init_lognormal(x, n, mean, stddev);
+        init_lognormal(xorig, n, mean, stddev);
     } else if ((argc > 6) && (argv[6][0] == 'i')) {
         init_ill_cond(a, n * n, range);
-        init_ill_cond(x, n, range);
+        init_ill_cond(xorig, n, range);
     } else {
         init_fpuniform_matrix('L', 'N', a, n, range, emax);
-        init_fpuniform(x, n, range, emax);
+        init_fpuniform(xorig, n, range, emax);
     }
-    copyVector(n, xorig, x);
+#endif
+    for(uint i = 0; i < n; i++)
+        printf("%.16g\t", a[i * n]);
+    printf("\n");
+    copyVector(n, x, xorig);
 
     /*for(uint i = 0; i < n; i++)
         printf("%.16g\t", x[i]);
