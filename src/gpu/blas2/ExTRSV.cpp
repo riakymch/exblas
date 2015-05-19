@@ -86,9 +86,13 @@ int extrsv(char uplo, char transa, char diag, int n, double *a, int lda, double 
     strcat(path, "/include/cl/");
 
     // with superaccumulators only
-    if (fpe < 3) {
-        //return runExTRSV(n, a, lda, x, incx, 0, strcat(path, "ExTRSV.Superacc.cl"));
-        return runExTRSV(n, a, lda, x, incx, fpe, strcat(path, "ExTRSV.FPE.IR.cl"));
+    if (fpe == 0) {
+        return runExTRSV(n, a, lda, x, incx, 0, strcat(path, "ExTRSV.Superacc.cl"));
+    }
+
+    // FPE with IR
+    if (fpe == 1) {
+        return runExTRSV(n, a, lda, x, incx, 3, strcat(path, "ExTRSV.FPE.IR.cl"));
     }
 
     if (early_exit) {
@@ -98,8 +102,9 @@ int extrsv(char uplo, char transa, char diag, int n, double *a, int lda, double 
             return runExTRSV(n, a, lda, x, incx, 6, strcat(path, "ExTRSV.FPE.EX.6.cl"));
         if (fpe <= 8)
             return runExTRSV(n, a, lda, x, incx, 8, strcat(path, "ExTRSV.FPE.EX.8.cl"));
-    } else // ! early_exit
+    } else { // ! early_exit
         return runExTRSV(n, a, lda, x, incx, fpe, strcat(path, "ExTRSV.FPE.cl"));
+    }
 
     return 0.0;
 }

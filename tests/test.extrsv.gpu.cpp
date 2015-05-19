@@ -58,7 +58,7 @@ static double extrsvVsMPFR(double *extrsv, uint n, double *a, uint lda, double *
         printf("%.16g\t", extrsv_mpfr[i]);
     printf("\n\n");*/
 
-    /*//naive trsv
+    //naive trsv
     double *trsvn = (double *) malloc(n * sizeof(double));
     copyVector(n, trsvn, x);
     for (uint i = 0; i < n; i++) {
@@ -66,28 +66,25 @@ static double extrsvVsMPFR(double *extrsv, uint n, double *a, uint lda, double *
         for(uint j = 0; j < i; j++)
             sum -= a[j * n + i] * trsvn[j];
         trsvn[i] = (sum + trsvn[i]) / a[i * (n + 1)];
-    }*/
+    }
 
     //compare the GPU and MPFR results
 #if 0
     //L2 norm
-    double norm = 0.0, val = 0.0;
+    double nrm = 0.0, val = 0.0;
     for(uint i = 0; i < n; i++) {
-        norm += pow(fabs(extrsv[i] - extrsv_mpfr[i]), 2);
+        nrm += pow(fabs(extrsv[i] - extrsv_mpfr[i]), 2);
         val += pow(fabs(extrsv_mpfr[i]), 2);
     }
-    printf("val = %.16g\n", val);
-    printf("norm = %.16g\n", norm);
-    printf("\n\n");
-    norm = ::sqrt(norm) / ::sqrt(val);
+    nrm = ::sqrt(nrm) / ::sqrt(val);
 #else
     //Inf norm
-    double norm = 0.0, val = 0.0;
+    double nrm = 0.0, val = 0.0;
     for(uint i = 0; i < n; i++) {
         val = std::max(val, fabs(extrsv_mpfr[i]));
-        norm = std::max(norm, fabs(extrsv[i] - extrsv_mpfr[i]));
+        nrm = std::max(nrm, fabs(extrsv[i] - extrsv_mpfr[i]));
     }
-    norm = norm / val;
+    nrm = nrm / val;
 #endif
 
     // test ||b - A * extrsv||
@@ -123,18 +120,18 @@ static double extrsvVsMPFR(double *extrsv, uint n, double *a, uint lda, double *
     free(extrsv_mpfr);
     mpfr_free_cache();
 
-    return norm;
+    return nrm;
 }
 #else
 static double extrsvVsSuperacc(uint n, double *extrsv, double *superacc) {
-    double norm = 0.0, val = 0.0;
+    double nrm = 0.0, val = 0.0;
     for (uint i = 0; i < n; i++) {
-        norm += pow(fabs(extrsv[i] - superacc[i]), 2);
+        nrm += pow(fabs(extrsv[i] - superacc[i]), 2);
         val += pow(fabs(superacc[i]), 2);
     }
-    norm = ::sqrt(norm) / ::sqrt(val);
+    nrm = ::sqrt(nrm) / ::sqrt(val);
 
-    return norm;
+    return nrm;
 }
 #endif
 
@@ -183,7 +180,9 @@ int main(int argc, char *argv[]) {
     //pFileA = fopen("matrices/A_lnn_64_9.30e+13.bin", "rb");
     //pFileb = fopen("matrices/b_lnn_64_9.30e+13.bin", "rb");
     //pFileA = fopen("matrices/A_lnn_64_9.53e+21.bin", "rb");
-    //pFileb = fopen("matrices/A_lnn_64_9.53e+21.bin", "rb");
+    //pFileb = fopen("matrices/b_lnn_64_9.53e+21.bin", "rb");
+    //pFileA = fopen("matrices/A_lnn_64_7.58e+40.bin", "rb");
+    //pFileb = fopen("matrices/b_lnn_64_7.58e+40.bin", "rb");
     if ((pFileA == NULL) || (pFileb == NULL)) {
         fprintf(stderr, "Cannot open files to read matrix and vector\n");
         exit(1);
@@ -221,8 +220,8 @@ int main(int argc, char *argv[]) {
     if ((!superacc) || (err != 0))
         fprintf(stderr, "Cannot allocate memory with posix_memalign\n");
 
-    copyVector(n, superacc, x);
-    extrsv('L', 'N', 'N', n, a, n, superacc, 1, 3);
+    copyVector(n, superacc, xorig);
+    extrsv('L', 'N', 'N', n, a, n, superacc, 1, 0);
 #ifdef EXBLAS_VS_MPFR
     norm = extrsvVsMPFR(superacc, n, a, n, xorig, 1);
     printf("Superacc error = %.16g\n", norm);
@@ -231,6 +230,17 @@ int main(int argc, char *argv[]) {
     }
 #endif
 
+    copyVector(n, x, xorig);
+    extrsv('L', 'N', 'N', n, a, n, x, 1, 1);
+#ifdef EXBLAS_VS_MPFR
+    norm = extrsvVsMPFR(x, n, a, n, xorig, 1);
+    printf("FPE IR error = %.16g\n", norm);
+    if (norm > eps) {
+        is_pass = false;
+    }
+#endif
+
+    copyVector(n, x, xorig);
     extrsv('L', 'N', 'N', n, a, n, x, 1, 3);
 #ifdef EXBLAS_VS_MPFR
     norm = extrsvVsMPFR(x, n, a, n, xorig, 1);

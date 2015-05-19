@@ -328,7 +328,7 @@ __kernel void trsv_lnn(
     int isunit = 0;
     int lda = threadsx * threadsy;
 
-    //__global long *l_working = d_Superaccs + get_group_id(0) * threadsy * threadsx * BIN_COUNT + tid;
+    __global long *l_working = d_Superaccs + get_group_id(0) * threadsy * threadsx * BIN_COUNT + tid;
 
     // Get row handled by this block
 #if 1
@@ -345,8 +345,8 @@ __kernel void trsv_lnn(
 
     // Loop over blocks as they become available
     // Initialize accumulators
-    /*for (uint i = 0; i < BIN_COUNT; i++)
-        l_working[i * lda] = 0;*/
+    for (uint i = 0; i < BIN_COUNT; i++)
+        l_working[i * lda] = 0;
     // FPEs
     double fpe[3] = {0.0};
     double x, s, r;
@@ -385,6 +385,16 @@ __kernel void trsv_lnn(
                     x = s;
                 }
             }
+            if(x != 0.0) {
+                Accumulate(l_working, lda, x);
+                //So, there is not space in FPEs -- need to flush to the accumulator
+                Accumulate(l_working, lda, fpe[0]);
+                Accumulate(l_working, lda, fpe[1]);
+                Accumulate(l_working, lda, fpe[2]);
+                fpe[0] = 0.0;
+                fpe[1] = 0.0;
+                fpe[2] = 0.0;
+            }
 
             fpe[0] = KnuthTwoSum(fpe[0], r, &s);
             r = s;
@@ -396,6 +406,8 @@ __kernel void trsv_lnn(
                     r = s;
                 }
             }
+            if(r != 0.0)
+                Accumulate(l_working, lda, r);
         }
     }
     barrier(CLK_LOCAL_MEM_FENCE);
@@ -409,13 +421,14 @@ __kernel void trsv_lnn(
         #endif
         for (uint i = 0; i < BLOCK_SIZE; i++) {
             if (lidx == i) {
-                /*//Flush to the accumulator
+#if 1
+                //Flush to the accumulator
                 Accumulate(l_working, lda, fpe[0]);
                 Accumulate(l_working, lda, fpe[1]);
                 Accumulate(l_working, lda, fpe[2]);
                 //Rounding
-                val = Round(l_working, lda);*/
-
+                val = Round(l_working, lda);
+#else
 #if 1
                 val = OddRoundSum(fpe);
 #else
@@ -425,6 +438,7 @@ __kernel void trsv_lnn(
                     fpe[0] = OddRoundSumNonnegative(fpe[1], fpe[0]);
                 //Final rounding
                 val = fpe[2] + fpe[0];
+#endif
 #endif
 
                 //Set FPE to zero
@@ -449,6 +463,16 @@ __kernel void trsv_lnn(
                         x = s;
                     }
                 }
+                if(x != 0.0) {
+                    Accumulate(l_working, lda, x);
+                    //So, there is not space in FPEs -- need to flush to the accumulator
+                    Accumulate(l_working, lda, fpe[0]);
+                    Accumulate(l_working, lda, fpe[1]);
+                    Accumulate(l_working, lda, fpe[2]);
+                    fpe[0] = 0.0;
+                    fpe[1] = 0.0;
+                    fpe[2] = 0.0;
+                }
 
                 fpe[0] = KnuthTwoSum(fpe[0], r, &s);
                 r = s;
@@ -460,6 +484,8 @@ __kernel void trsv_lnn(
                         r = s;
                     }
                 }
+                if(r != 0.0)
+                    Accumulate(l_working, lda, r);
             }
         }
         d_x[row * BLOCK_SIZE + tid] = val;

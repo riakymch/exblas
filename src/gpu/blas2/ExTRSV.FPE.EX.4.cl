@@ -368,13 +368,14 @@ __kernel void trsv_lnn(
             if(x != 0.0) {
                 Accumulate(l_working, lda, x);
                 //So, there is not space in FPEs -- need to flush to the accumulator
-                #ifdef NVIDIA
-                    #pragma unroll
-                #endif
-                for(uint i = 0; i != NBFPE; ++i) {
-                    Accumulate(l_working, lda, fpe[i]);
-                    fpe[i] = 0.0;
-                }
+                Accumulate(l_working, lda, fpe[0]);
+                Accumulate(l_working, lda, fpe[1]);
+                Accumulate(l_working, lda, fpe[2]);
+                Accumulate(l_working, lda, fpe[3]);
+                fpe[0] = 0.0;
+                fpe[1] = 0.0;
+                fpe[2] = 0.0;
+                fpe[3] = 0.0;
             }
 
             fpe[0] = KnuthTwoSum(fpe[0], r, &s);
@@ -397,12 +398,14 @@ __kernel void trsv_lnn(
     }
     barrier(CLK_LOCAL_MEM_FENCE);
 
-    /*//merge fpes
+#if 0
+    //merge fpes
     if (lidy != 0) {
         for(uint i = 0; i != NBFPE; ++i)
             Accumulate(l_working, lda, fpe[i]);
     }
-    barrier(CLK_LOCAL_MEM_FENCE);*/
+    barrier(CLK_LOCAL_MEM_FENCE);
+#endif
 
     // Apply update from diagonal block (row, row)
     if (lidy == 0) {
@@ -424,13 +427,15 @@ __kernel void trsv_lnn(
             if (lidx == i) {
                 //TODO: round only fpes when accumulator was not used
                 //Flush to the accumulator
-                #ifdef NVIDIA
-                    #pragma unroll
-                #endif
-                for(uint i = 0; i != NBFPE; ++i) {
-                    Accumulate(l_working, lda, fpe[i]);
-                    fpe[i] = 0.0;
-                }
+                Accumulate(l_working, lda, fpe[0]);
+                Accumulate(l_working, lda, fpe[1]);
+                Accumulate(l_working, lda, fpe[2]);
+                Accumulate(l_working, lda, fpe[3]);
+                //Set FPE to zero
+                fpe[0] = 0.0;
+                fpe[1] = 0.0;
+                fpe[2] = 0.0;
+                fpe[3] = 0.0;
 
                 val = Round(l_working, lda);
                 if (!isunit)
@@ -457,13 +462,14 @@ __kernel void trsv_lnn(
                 if(x != 0.0) {
                     Accumulate(l_working, lda, x);
                     //So, there is not space in FPEs -- need to flush to the accumulator
-                    #ifdef NVIDIA
-                        #pragma unroll
-                    #endif
-                    for(uint i = 0; i != NBFPE; ++i) {
-                        Accumulate(l_working, lda, fpe[i]);
-                        fpe[i] = 0.0;
-                    }
+                    Accumulate(l_working, lda, fpe[0]);
+                    Accumulate(l_working, lda, fpe[1]);
+                    Accumulate(l_working, lda, fpe[2]);
+                    Accumulate(l_working, lda, fpe[3]);
+                    fpe[0] = 0.0;
+                    fpe[1] = 0.0;
+                    fpe[2] = 0.0;
+                    fpe[3] = 0.0;
                 }
 
                 fpe[0] = KnuthTwoSum(fpe[0], r, &s);
