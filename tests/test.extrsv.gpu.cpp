@@ -28,50 +28,45 @@ static void copyVector(uint n, double *x, double *y) {
 #include <mpfr.h>
 
 static double extrsvVsMPFR(double *extrsv, uint n, double *a, uint lda, double *x, uint incx) {
-    double *extrsv_mpfr;
     mpfr_t sum, dot, div, op1, op2;
 
-    extrsv_mpfr = (double *) malloc(n * sizeof(double));
+    double *extrsv_mpfr = (double *) malloc(n * sizeof(double));
     copyVector(n, extrsv_mpfr, x);
 
-    mpfr_init2(op1, 64);
-    mpfr_init2(op2, 64);
-    mpfr_init2(dot, 128);
-    mpfr_init2(div, 196);
+    mpfr_init2(op1, 53);
+    mpfr_init2(op2, 53);
+    mpfr_init2(dot, 106);
+    mpfr_init2(div, 2098);
     mpfr_init2(sum, 2098);
 
     //Produce a result matrix of TRSV using MPFR
     for(uint i = 0; i < n; i++) {
         // sum += a[i,j] * x[j], j < i
-        mpfr_set_d(sum, 0.0, MPFR_RNDN);
+        mpfr_set_d(sum, extrsv_mpfr[i], MPFR_RNDN);
         for(uint j = 0; j < i; j++) {
             mpfr_set_d(op1, a[j * n + i], MPFR_RNDN);
             mpfr_set_d(op2, extrsv_mpfr[j], MPFR_RNDN);
             mpfr_mul(dot, op1, op2, MPFR_RNDN);
             mpfr_sub(sum, sum, dot, MPFR_RNDN);
         }
-        // sum = b[i] - sum
-        mpfr_set_d(op1, extrsv_mpfr[i], MPFR_RNDN);
-        mpfr_add(sum, op1, sum, MPFR_RNDN);
         // x[i] = sum / a[i,i]
         mpfr_set_d(op1, a[i * (n + 1)], MPFR_RNDN);
         mpfr_div(div, sum, op1, MPFR_RNDN);
         extrsv_mpfr[i] = mpfr_get_d(div, MPFR_RNDN);
     }
-    for(uint i = 0; i < n; i++)
-        printf("%.16g\t", extrsv[i]);
-    printf("\n");
+    /*for(uint i = 0; i < n; i++)
+        printf("%.16g\t", extrsv_mpfr[i]);
+    printf("\n\n");*/
 
-    //naive trsv
-    double *trsvn;
-    trsvn = (double *) malloc(n * sizeof(double));
+    /*//naive trsv
+    double *trsvn = (double *) malloc(n * sizeof(double));
     copyVector(n, trsvn, x);
     for (uint i = 0; i < n; i++) {
         double sum = 0.0;
         for(uint j = 0; j < i; j++)
             sum -= a[j * n + i] * trsvn[j];
         trsvn[i] = (sum + trsvn[i]) / a[i * (n + 1)];
-    }
+    }*/
 
     //compare the GPU and MPFR results
 #if 0
@@ -87,27 +82,19 @@ static double extrsvVsMPFR(double *extrsv, uint n, double *a, uint lda, double *
     norm = ::sqrt(norm) / ::sqrt(val);
 #else
     //Inf norm
-    double norm = 0.0, val = 0.0, norm1 = 0.0;
+    double norm = 0.0, val = 0.0;
     for(uint i = 0; i < n; i++) {
         val = std::max(val, fabs(extrsv_mpfr[i]));
         norm = std::max(norm, fabs(extrsv[i] - extrsv_mpfr[i]));
-        norm1 = std::max(norm1, fabs(trsvn[i] - extrsv_mpfr[i]));
     }
-    /*printf("val = %.16g\n", val);
-    printf("norm = %.16g\n", norm);
-    printf("norm1 = %.16g\n", norm1);
-    printf("\n\n");*/
     norm = norm / val;
-    norm1 = norm1 / val;
 #endif
 
     // test ||b - A * extrsv||
-    double *extrsv_mpfr1 = (double *) malloc(n * sizeof(double));
+    /*double *extrsv_mpfr1 = (double *) malloc(n * sizeof(double));
     double *extrsv1 = (double *) malloc(n * sizeof(double));
-    double *trsvn1 = (double *) malloc(n * sizeof(double));
     for(uint i = 0; i < n; i++) {
         double sum1 = 0.0;
-        double sum2 = 0.0;
         mpfr_set_d(sum, 0.0, MPFR_RNDN);
         for(uint j = 0; j < n; j++) {
             mpfr_set_d(op1, a[j * n + i], MPFR_RNDN);
@@ -115,32 +102,25 @@ static double extrsvVsMPFR(double *extrsv, uint n, double *a, uint lda, double *
             mpfr_mul(dot, op1, op2, MPFR_RNDN);
             mpfr_add(sum, sum, dot, MPFR_RNDN);
             sum1 += a[j * n + i] * extrsv[j];
-            sum2 += a[j * n + i] * trsvn[j];
         }
         extrsv_mpfr1[i] = mpfr_get_d(sum, MPFR_RNDN);
         extrsv1[i] = sum1;
-        trsvn1[i] = sum2;
     }
-
     double norm02 = 0.0, val0 = 0.0, val2 = 0.0, norm12 = 0.0;
     for(uint i = 0; i < n; i++) {
         val0 = std::max(val0, fabs(x[i]));
         val2 = std::max(val2, fabs(x[i] - extrsv_mpfr1[i]));
         norm02 = std::max(norm02, fabs(x[i] - extrsv1[i]));
-        norm12 = std::max(norm12, fabs(x[i] - trsvn1[i]));
     }
-    /*printf("val0 = %.16g\n", val0);
+    printf("val0 = %.16g\n", val0);
     printf("val_res_mpfr = %.16g\n", val2 / val0);
     printf("val_res_extrsv = %.16g\n", norm02 / val0);
-    printf("val_res_trsvn = %.16g\n", norm12 / val0);
-    printf("\n\n");*/
-
-    /*free(extrsv_mpfr);
+    printf("\n\n");
     free(extrsv_mpfr1);
-    free(extrsv);
     free(extrsv1);
-    free(trsvn);
-    free(trsvn1);*/
+    */
+
+    free(extrsv_mpfr);
     mpfr_free_cache();
 
     return norm;
@@ -198,15 +178,19 @@ int main(int argc, char *argv[]) {
     //Reading matrix A and vector b from files
     FILE *pFileA, *pFileb;
     size_t resA, resb;
-    pFileA = fopen("matrices/A_lnn_64_3.83e+08.bin", "rb");
-    pFileb = fopen("matrices/b_lnn_64_3.83e+08.bin", "rb");
+    pFileA = fopen("matrices/A_lnn_64_9.76e+08.bin", "rb");
+    pFileb = fopen("matrices/b_lnn_64_9.76e+08.bin", "rb");
+    //pFileA = fopen("matrices/A_lnn_64_9.30e+13.bin", "rb");
+    //pFileb = fopen("matrices/b_lnn_64_9.30e+13.bin", "rb");
+    //pFileA = fopen("matrices/A_lnn_64_9.53e+21.bin", "rb");
+    //pFileb = fopen("matrices/A_lnn_64_9.53e+21.bin", "rb");
     if ((pFileA == NULL) || (pFileb == NULL)) {
         fprintf(stderr, "Cannot open files to read matrix and vector\n");
         exit(1);
     }
 
     resA = fread(a, sizeof(double), n * n, pFileA);
-    resb = fread(x, sizeof(double), n, pFileb);
+    resb = fread(xorig, sizeof(double), n, pFileb);
     if ((resA != n * n) || (resb != n)) {
         fprintf(stderr, "Cannot read matrix and vector from files\n");
         exit(1);
@@ -226,14 +210,7 @@ int main(int argc, char *argv[]) {
         init_fpuniform(xorig, n, range, emax);
     }
 #endif
-    for(uint i = 0; i < n; i++)
-        printf("%.16g\t", a[i * n]);
-    printf("\n");
     copyVector(n, x, xorig);
-
-    /*for(uint i = 0; i < n; i++)
-        printf("%.16g\t", x[i]);
-    printf("\n\n");*/
 
     fprintf(stderr, "%d x %d\n", n, n);
 
