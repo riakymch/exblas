@@ -92,7 +92,7 @@ int extrsv(char uplo, char transa, char diag, int n, double *a, int lda, double 
 
     // FPE with IR
     if (fpe == 1) {
-        return runExTRSV(n, a, lda, x, incx, 3, strcat(path, "ExTRSV.FPE.IR.cl"));
+        return runExTRSV(n, a, lda, x, incx, fpe, strcat(path, "ExTRSV.FPE.IR.cl"));
     }
 
     if (early_exit) {
@@ -154,21 +154,34 @@ int runExTRSV(int n, double *a, int lda, double *x, int incx, int fpe, const cha
         }
         cl_mem d_x = clCreateBuffer(cxGPUContext, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, n * sizeof(cl_double), x, &ciErrNum);
         if (ciErrNum != CL_SUCCESS) {
-            printf("Error in clCreateBuffer for d_res, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
+            printf("Error in clCreateBuffer for d_x, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
             exit(EXIT_FAILURE);
+        }
+        cl_mem d_b;
+        if (fpe == 1) {
+            // for IR case
+            d_b = clCreateBuffer(cxGPUContext, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, n * sizeof(cl_double), x, &ciErrNum);
+            if (ciErrNum != CL_SUCCESS) {
+                printf("Error in clCreateBuffer for d_b, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
+                exit(EXIT_FAILURE);
+            }
         }
 
     {
         //Initializing OpenCL dSum...
-            ciErrNum = initExTRSV(cxGPUContext, cqCommandQueue, cdDevice, program_file, n, fpe);
-            if (ciErrNum != CL_SUCCESS)
-                exit(EXIT_FAILURE);
+        ciErrNum = initExTRSV(cxGPUContext, cqCommandQueue, cdDevice, program_file, n, fpe);
+        if (ciErrNum != CL_SUCCESS)
+            exit(EXIT_FAILURE);
 
         //Running OpenCL dSum with %u elements...
-            //Just a single launch or a warmup iteration
+        if (fpe == 1) {
+            // for IR case
+            ExTRSVIR(NULL, n, d_a, lda, d_x, incx, d_b, &ciErrNum);
+        } else {
             ExTRSV(NULL, n, d_a, lda, d_x, incx, &ciErrNum);
-            if (ciErrNum != CL_SUCCESS)
-                exit(EXIT_FAILURE);
+        }
+        if (ciErrNum != CL_SUCCESS)
+            exit(EXIT_FAILURE);
 
 #ifdef EXBLAS_TIMING
         double gpuTime[NUM_ITER];
@@ -182,7 +195,12 @@ int runExTRSV(int n, double *a, int lda, double *x, int incx, int fpe, const cha
                 exit(EXIT_FAILURE);
             }
 
-            ExTRSV(NULL, n, d_a, lda, d_x, incx, &ciErrNum);
+            if (fpe == 1) {
+                // for IR case
+                ExTRSVIR(NULL, n, d_a, lda, d_x, incx, d_b, &ciErrNum);
+            } else {
+                ExTRSV(NULL, n, d_a, lda, d_x, incx, &ciErrNum);
+            }
 
             ciErrNum  = clEnqueueMarker(cqCommandQueue, &endMark);
             ciErrNum |= clFinish(cqCommandQueue);

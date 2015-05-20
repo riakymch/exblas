@@ -498,20 +498,124 @@ void __trsv_lnn(
     barrier(CLK_GLOBAL_MEM_FENCE); // Flush sync[0] asap
 }
 
+void __gemv(
+    const uint m,
+    const uint n,
+    const double alpha,
+    __global double *d_a,
+    const int lda,
+    __global double *d_x,
+    const int incx,
+    const double beta,
+    __global double *d_y,
+    const int incy,
+    __global long *d_Superaccs
+){
+    int lidx = get_local_id(0);
+    int lidy = get_local_id(1);
+    int tid  = threadsx * lidy + lidx;
+
+    __global long *l_working = d_Superaccs + get_group_id(0) * threadsy * threadsx * BIN_COUNT + tid;
+    __local double xlocal[threadsx];
+
+    // Initialize accumulators
+    for (uint i = 0; i < BIN_COUNT; i++)
+        l_working[i * threadsx * threadsy] = 0;
+    // FPEs
+    double fpe[3] = {0.0};
+    double x, s, r;
+    for (int j = 0; j < n; j += BLOCK_SIZE) {
+        // cache part of x
+        xlocal[lidx] = d_x[j * BLOCK_SIZE + lidx];
+        for (int i = 0; i < BLOCK_SIZE; i++) {
+            // d = a[i,j] * x[j]
+            x = TwoProductFMA(d_a[(j + i) * n + get_group_id(0) * threadsx + lidx], xlocal[i], &r);
+
+            fpe[0] = KnuthTwoSum(fpe[0], x, &s);
+            x = s;
+            if(x != 0.0) {
+                fpe[1] = KnuthTwoSum(fpe[1], x, &s);
+                x = s;
+                if(x != 0.0) {
+                    fpe[2] = KnuthTwoSum(fpe[2], x, &s);
+                    x = s;
+                }
+            }
+            if(x != 0.0) {
+                Accumulate(l_working, threadsx * threadsy, x);
+                Accumulate(l_working, threadsx * threadsy, fpe[0]);
+                Accumulate(l_working, threadsx * threadsy, fpe[1]);
+                Accumulate(l_working, threadsx * threadsy, fpe[2]);
+                fpe[0] = 0.0;
+                fpe[1] = 0.0;
+                fpe[2] = 0.0;
+            }
+
+            fpe[0] = KnuthTwoSum(fpe[0], r, &s);
+            r = s;
+            if(r != 0.0) {
+                fpe[1] = KnuthTwoSum(fpe[1], r, &s);
+                r = s;
+                if(r != 0.0) {
+                    fpe[2] = KnuthTwoSum(fpe[2], r, &s);
+                    r = s;
+                }
+            }
+            if(r != 0.0)
+                Accumulate(l_working, threadsx * threadsy, r);
+        }
+    }
+    Accumulate(l_working, threadsx * threadsy, fpe[0]);
+    Accumulate(l_working, threadsx * threadsy, fpe[1]);
+    Accumulate(l_working, threadsx * threadsy, fpe[2]);
+    Accumulate(l_working, threadsx * threadsy, -d_y[get_group_id(0) * threadsx + lidx]);
+
+    // Merging the results
+    d_y[get_group_id(0) * threadsx + lidx] = Round(l_working, threadsx * threadsy);
+}
+
+void __axpy(
+    const uint n,
+    const double alpha,
+    __global double *d_x,
+    const int incx,
+    __global double *d_y,
+    const int incy,
+    __global long *d_Superaccs
+){
+    int lidx = get_local_id(0);
+
+    __global long *l_working = d_Superaccs + get_group_id(0) * threadsx * BIN_COUNT + lidx;
+
+    // Initialize accumulators
+    for (uint i = 0; i < BIN_COUNT; i++)
+        l_working[i * threadsx] = 0.0;
+    Accumulate(l_working, threadsx * threadsy, d_x[get_group_id(0) * threadsx + lidx]);
+    Accumulate(l_working, threadsx * threadsy, d_y[get_group_id(0) * threadsx + lidx]);
+
+    d_x[get_group_id(0) * threadsx + lidx] = Round(l_working, threadsx * threadsy);
+}
+
 __kernel void trsv_lnn(
     __global double *d_x,
     __global double *d_a,
+    __global double *d_b,
     __global int *sync,
     __global long *d_Superaccs,
     const uint n
 ){
-    // At first we call ExTRSV
+    // At first we call ExTRSV. d_x holds the result
     __trsv_lnn(d_x, d_a, sync, d_Superaccs, n);
 
     // One step of iterative refinement
-    // ExGEMV: rm = A x - b 
+    // ExGEMV: rm = A x - b. d_b holds the result
+    __gemv(n, n, 1.0, d_a, n, d_x, 1, -1.0, d_b, 1, d_Superaccs);
 
-    // ExTRSV: A rm = xm
+    // ExTRSV: A rm = xm. d_b contains the result
+    trsv_init(sync);
+    __trsv_lnn(d_b, d_a, sync, d_Superaccs, n);
 
-    // ExAXPY: x = x + xm
+    // ExAXPY: x = x + xm. d_x contains the final result
+    __axpy(n, 1.0, d_x, 1, d_b, 1, d_Superaccs);
 }
+
