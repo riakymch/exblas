@@ -313,7 +313,7 @@ void tocache(
     }
 }
 
-__kernel void trsv_lnn(
+void __trsv_lnn(
     __global double *d_x,
     __global double *d_a,
     __global int *sync,
@@ -498,3 +498,20 @@ __kernel void trsv_lnn(
     barrier(CLK_GLOBAL_MEM_FENCE); // Flush sync[0] asap
 }
 
+__kernel void trsv_lnn(
+    __global double *d_x,
+    __global double *d_a,
+    __global int *sync,
+    __global long *d_Superaccs,
+    const uint n
+){
+    // At first we call ExTRSV
+    __trsv_lnn(d_x, d_a, sync, d_Superaccs, n);
+
+    // One step of iterative refinement
+    // ExGEMV: rm = A x - b 
+
+    // ExTRSV: A rm = xm
+
+    // ExAXPY: x = x + xm
+}
