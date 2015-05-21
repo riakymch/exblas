@@ -328,7 +328,7 @@ void __trsv_lnn(
     int isunit = 0;
     int lda = threadsx * threadsy;
 
-    __global long *l_working = d_Superaccs + get_group_id(0) * threadsy * threadsx * BIN_COUNT + tid;
+    __global long *l_working = d_Superaccs + get_group_id(0) * lda * BIN_COUNT + tid;
 
     // Get row handled by this block
 #if 1
@@ -340,7 +340,7 @@ void __trsv_lnn(
 #endif
 
     // Copy diagonal block to shared memory
-    tocache(&d_a[row * BLOCK_SIZE * n + row * BLOCK_SIZE], cache, BLOCK_SIZE, threadsx * threadsy, 0, isunit, tid, n);
+    tocache(&d_a[row * BLOCK_SIZE * n + row * BLOCK_SIZE], cache, BLOCK_SIZE, lda, 0, isunit, tid, n);
     barrier(CLK_LOCAL_MEM_FENCE);
 
     // Loop over blocks as they become available
@@ -573,7 +573,8 @@ void __trsv_ir(
     Accumulate(l_working, lda, fpe[1]);
     Accumulate(l_working, lda, fpe[2]);
     Accumulate(l_working, lda, -d_b[get_group_id(0) * threadsx + lidx]);
-    d_x[get_group_id(0) * threadsx + lidx] = Round(l_working, lda);
+    // TODO: remove this line
+    d_b[get_group_id(0) * threadsx + lidx] = Round(l_working, lda);
     fpe[0] = 0.0;
     fpe[1] = 0.0;
     fpe[2] = 0.0;
@@ -595,6 +596,25 @@ void __trsv_ir(
     barrier(CLK_LOCAL_MEM_FENCE);
 
     // Loop over blocks as they become available
+    // TODO: remove below
+    // Initialize accumulators
+    for (uint i = 0; i < BIN_COUNT; i++)
+        l_working[i * lda] = 0;
+    if(lidy == 0) {
+        x = d_b[row * threadsx + lidx];
+        fpe[0] = KnuthTwoSum(fpe[0], x, &s);
+        x = s;
+        if(x != 0.0) {
+            fpe[1] = KnuthTwoSum(fpe[1], x, &s);
+            x = s;
+            if(x != 0.0) {
+                fpe[2] = KnuthTwoSum(fpe[2], x, &s);
+                x = s;
+            }
+        }
+    }
+    barrier(CLK_LOCAL_MEM_FENCE);
+    // TODO: until here
     int col_done = -1;
 
     for (int col = 0; col < row; col++) {
@@ -718,6 +738,7 @@ void __trsv_ir(
 
     // ExAXPY: x = x + xm. d_x contains the final result
     d_x[get_group_id(0) * threadsx + lidx] += d_b[get_group_id(0) * threadsx + lidx];
+    //d_x[get_group_id(0) * threadsx + lidx] = d_b[get_group_id(0) * threadsx + lidx];
 }
 
 __kernel void trsv_lnn(
