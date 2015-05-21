@@ -54,9 +54,9 @@ static double extrsvVsMPFR(double *extrsv, uint n, double *a, uint lda, double *
         mpfr_div(div, sum, op1, MPFR_RNDN);
         extrsv_mpfr[i] = mpfr_get_d(div, MPFR_RNDN);
     }
-    /*for(uint i = 0; i < n; i++)
-        printf("%.16g\t", extrsv_mpfr[i]);
-    printf("\n\n");*/
+    for(uint i = 0; i < n; i++)
+        printf("%.16g\t", extrsv[i]);
+    printf("\n\n");
 
     //naive trsv
     double *trsvn = (double *) malloc(n * sizeof(double));

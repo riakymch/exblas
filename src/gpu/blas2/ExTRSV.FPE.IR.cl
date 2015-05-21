@@ -498,38 +498,42 @@ void __trsv_lnn(
     barrier(CLK_GLOBAL_MEM_FENCE); // Flush sync[0] asap
 }
 
-void __gemv(
-    const uint m,
-    const uint n,
-    const double alpha,
-    __global double *d_a,
-    const int lda,
+void __trsv_ir(
     __global double *d_x,
-    const int incx,
-    const double beta,
-    __global double *d_y,
-    const int incy,
-    __global long *d_Superaccs
+    __global double *d_a,
+    __global double *d_b,
+    __global int *sync,
+    __global long *d_Superaccs,
+    const uint n
 ){
     int lidx = get_local_id(0);
     int lidy = get_local_id(1);
     int tid  = threadsx * lidy + lidx;
+    int isunit = 0;
+    int lda = threadsx * threadsy;
 
-    __global long *l_working = d_Superaccs + get_group_id(0) * threadsy * threadsx * BIN_COUNT + tid;
-    __local double xlocal[threadsx];
-
+    __global long *l_working = d_Superaccs + get_group_id(0) * lda * BIN_COUNT + tid;
     // Initialize accumulators
     for (uint i = 0; i < BIN_COUNT; i++)
-        l_working[i * threadsx * threadsy] = 0;
-    // FPEs
+        l_working[i * lda] = 0;
+    // Initialize FPEs
     double fpe[3] = {0.0};
     double x, s, r;
+
+    __local double cache[BLOCK_SIZE * BLOCK_SIZE];
+
+
+    // ExGEMV: rm = A x - b. d_b holds the result
     for (int j = 0; j < n; j += BLOCK_SIZE) {
+        // multiply only lower triangular part
+        if (get_group_id(0) * BLOCK_SIZE < j)
+            break;
+
         // cache part of x
-        xlocal[lidx] = d_x[j * BLOCK_SIZE + lidx];
+        cache[lidx] = d_x[j + lidx];
         for (int i = 0; i < BLOCK_SIZE; i++) {
             // d = a[i,j] * x[j]
-            x = TwoProductFMA(d_a[(j + i) * n + get_group_id(0) * threadsx + lidx], xlocal[i], &r);
+            x = TwoProductFMA(d_a[(j + i) * n + get_group_id(0) * BLOCK_SIZE + lidx], cache[i], &r);
 
             fpe[0] = KnuthTwoSum(fpe[0], x, &s);
             x = s;
@@ -542,10 +546,10 @@ void __gemv(
                 }
             }
             if(x != 0.0) {
-                Accumulate(l_working, threadsx * threadsy, x);
-                Accumulate(l_working, threadsx * threadsy, fpe[0]);
-                Accumulate(l_working, threadsx * threadsy, fpe[1]);
-                Accumulate(l_working, threadsx * threadsy, fpe[2]);
+                Accumulate(l_working, lda, x);
+                Accumulate(l_working, lda, fpe[0]);
+                Accumulate(l_working, lda, fpe[1]);
+                Accumulate(l_working, lda, fpe[2]);
                 fpe[0] = 0.0;
                 fpe[1] = 0.0;
                 fpe[2] = 0.0;
@@ -562,38 +566,158 @@ void __gemv(
                 }
             }
             if(r != 0.0)
-                Accumulate(l_working, threadsx * threadsy, r);
+                Accumulate(l_working, lda, r);
         }
     }
-    Accumulate(l_working, threadsx * threadsy, fpe[0]);
-    Accumulate(l_working, threadsx * threadsy, fpe[1]);
-    Accumulate(l_working, threadsx * threadsy, fpe[2]);
-    Accumulate(l_working, threadsx * threadsy, -d_y[get_group_id(0) * threadsx + lidx]);
+    Accumulate(l_working, lda, fpe[0]);
+    Accumulate(l_working, lda, fpe[1]);
+    Accumulate(l_working, lda, fpe[2]);
+    Accumulate(l_working, lda, -d_b[get_group_id(0) * threadsx + lidx]);
+    d_x[get_group_id(0) * threadsx + lidx] = Round(l_working, lda);
+    fpe[0] = 0.0;
+    fpe[1] = 0.0;
+    fpe[2] = 0.0;
+    barrier(CLK_GLOBAL_MEM_FENCE); // Wait for d_b/superaccumulators to be visible to other blocks
 
-    // Merging the results
-    d_y[get_group_id(0) * threadsx + lidx] = Round(l_working, threadsx * threadsy);
-}
 
-void __axpy(
-    const uint n,
-    const double alpha,
-    __global double *d_x,
-    const int incx,
-    __global double *d_y,
-    const int incy,
-    __global long *d_Superaccs
-){
-    int lidx = get_local_id(0);
+    // ExTRSV: A rm = xm. d_b contains the result
+    // Get row handled by this block
+#if 1
+    __local int row;
+    row = 0.0;
+    nextRow(&row, &sync[1]);
+#else
+    int row = nextRow(&sync[1]);
+#endif
 
-    __global long *l_working = d_Superaccs + get_group_id(0) * threadsx * BIN_COUNT + lidx;
+    // Copy diagonal block to shared memory
+    tocache(&d_a[row * BLOCK_SIZE * n + row * BLOCK_SIZE], cache, BLOCK_SIZE, lda, 0, isunit, tid, n);
+    barrier(CLK_LOCAL_MEM_FENCE);
 
-    // Initialize accumulators
-    for (uint i = 0; i < BIN_COUNT; i++)
-        l_working[i * threadsx] = 0.0;
-    Accumulate(l_working, threadsx * threadsy, d_x[get_group_id(0) * threadsx + lidx]);
-    Accumulate(l_working, threadsx * threadsy, d_y[get_group_id(0) * threadsx + lidx]);
+    // Loop over blocks as they become available
+    int col_done = -1;
 
-    d_x[get_group_id(0) * threadsx + lidx] = Round(l_working, threadsx * threadsy);
+    for (int col = 0; col < row; col++) {
+        wait_until_ge(tid, &sync[0], col, &col_done); // Wait for diagonal block to be done
+        #ifdef NVIDIA
+            #pragma unroll
+        #endif
+        for (int j = 0; j < threadsx; j+=threadsy) {
+            double xp = -d_b[col * threadsx + lidy + j];
+            x = TwoProductFMA(d_a[(col * threadsx + lidy) * n + row * BLOCK_SIZE + lidx + j * n], xp, &r);
+
+            fpe[0] = KnuthTwoSum(fpe[0], x, &s);
+            x = s;
+            if(x != 0.0) {
+                fpe[1] = KnuthTwoSum(fpe[1], x, &s);
+                x = s;
+                if(x != 0.0) {
+                    fpe[2] = KnuthTwoSum(fpe[2], x, &s);
+                    x = s;
+                }
+            }
+            if(x != 0.0) {
+                Accumulate(l_working, lda, x);
+                //So, there is not space in FPEs -- need to flush to the accumulator
+                Accumulate(l_working, lda, fpe[0]);
+                Accumulate(l_working, lda, fpe[1]);
+                Accumulate(l_working, lda, fpe[2]);
+                fpe[0] = 0.0;
+                fpe[1] = 0.0;
+                fpe[2] = 0.0;
+            }
+
+            fpe[0] = KnuthTwoSum(fpe[0], r, &s);
+            r = s;
+            if(r != 0.0) {
+                fpe[1] = KnuthTwoSum(fpe[1], r, &s);
+                r = s;
+                if(r != 0.0) {
+                    fpe[2] = KnuthTwoSum(fpe[2], r, &s);
+                    r = s;
+                }
+            }
+            if(r != 0.0)
+                Accumulate(l_working, lda, r);
+        }
+    }
+    barrier(CLK_LOCAL_MEM_FENCE);
+
+    // Apply update from diagonal block (row, row)
+    if (lidy == 0) {
+        double val = 0.0;
+        __local volatile double xs;
+        #ifdef NVIDIA
+            #pragma unroll
+        #endif
+        for (uint i = 0; i < BLOCK_SIZE; i++) {
+            if (lidx == i) {
+                //Flush to the accumulator
+                Accumulate(l_working, lda, fpe[0]);
+                Accumulate(l_working, lda, fpe[1]);
+                Accumulate(l_working, lda, fpe[2]);
+
+                //Rounding
+                val = Round(l_working, lda);
+
+                //Set FPE to zero
+                fpe[0] = 0.0;
+                fpe[1] = 0.0;
+                fpe[2] = 0.0;
+
+                if (!isunit)
+                    val *= cache[i * (BLOCK_SIZE + 1)];
+                xs = val;
+            }
+            if (lidx > i) {
+                x = TwoProductFMA(cache[i * BLOCK_SIZE + lidx], xs, &r);
+
+                fpe[0] = KnuthTwoSum(fpe[0], x, &s);
+                x = s;
+                if(x != 0.0) {
+                    fpe[1] = KnuthTwoSum(fpe[1], x, &s);
+                    x = s;
+                    if(x != 0.0) {
+                        fpe[2] = KnuthTwoSum(fpe[2], x, &s);
+                        x = s;
+                    }
+                }
+                if(x != 0.0) {
+                    Accumulate(l_working, lda, x);
+                    Accumulate(l_working, lda, fpe[0]);
+                    Accumulate(l_working, lda, fpe[1]);
+                    Accumulate(l_working, lda, fpe[2]);
+                    fpe[0] = 0.0;
+                    fpe[1] = 0.0;
+                    fpe[2] = 0.0;
+                }
+
+                fpe[0] = KnuthTwoSum(fpe[0], r, &s);
+                r = s;
+                if(r != 0.0) {
+                    fpe[1] = KnuthTwoSum(fpe[1], r, &s);
+                    r = s;
+                    if(r != 0.0) {
+                        fpe[2] = KnuthTwoSum(fpe[2], r, &s);
+                        r = s;
+                    }
+                }
+                if(r != 0.0)
+                    Accumulate(l_working, lda, r);
+            }
+        }
+        d_b[row * BLOCK_SIZE + tid] = val;
+    }
+
+    // Notify other blocks that soln is ready for this row
+    barrier(CLK_GLOBAL_MEM_FENCE); // Wait for d_b to be visible to other blocks
+    if(tid == 0)
+        atomic_add(&sync[0], 1);   // Use atomicAdd to bypass L1 miss
+    barrier(CLK_GLOBAL_MEM_FENCE); // Flush sync[0] asap
+
+
+    // ExAXPY: x = x + xm. d_x contains the final result
+    d_x[get_group_id(0) * threadsx + lidx] += d_b[get_group_id(0) * threadsx + lidx];
 }
 
 __kernel void trsv_lnn(
@@ -608,14 +732,10 @@ __kernel void trsv_lnn(
     __trsv_lnn(d_x, d_a, sync, d_Superaccs, n);
 
     // One step of iterative refinement
-    // ExGEMV: rm = A x - b. d_b holds the result
-    __gemv(n, n, 1.0, d_a, n, d_x, 1, -1.0, d_b, 1, d_Superaccs);
-
-    // ExTRSV: A rm = xm. d_b contains the result
+    /* ExGEMV: rm = A x - b. d_b holds the result
+       ExTRSV: A rm = xm. d_b contains the result
+       ExAXPY: x = x + xm. d_x contains the final result */
     trsv_init(sync);
-    __trsv_lnn(d_b, d_a, sync, d_Superaccs, n);
-
-    // ExAXPY: x = x + xm. d_x contains the final result
-    __axpy(n, 1.0, d_x, 1, d_b, 1, d_Superaccs);
+    __trsv_ir(d_x, d_a, d_b, sync, d_Superaccs, n);
 }
 
