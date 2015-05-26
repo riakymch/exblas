@@ -261,7 +261,7 @@ void tocache(
             else if ((i + y) < nbi)
                 cache[(i + y) * nbi + x] = 0.0;
             if (!isunit && (x == (i + y)))
-                cache[x * (nbi + 1)] = 1.0 / a[x * (lda + 1)];
+                cache[x * (nbi + 1)] = a[x * (lda + 1)];
         }
     }
 }
@@ -297,12 +297,9 @@ __kernel void trsv_lnn(
     barrier(CLK_LOCAL_MEM_FENCE);
 
     // Loop over blocks as they become available
-    //Initialize accumulators
+    // Initialize accumulators
     for (uint i = 0; i < BIN_COUNT; i++)
-        l_working[i * lda] = 0;
-    if(lidy == 0)
-        Accumulate(l_working, lda, d_x[row * threadsx + lidx]);
-    barrier(CLK_LOCAL_MEM_FENCE);
+        l_working[i * lda] = 0.0;
     int col_done = -1;
 
     double x, r;
@@ -333,16 +330,18 @@ __kernel void trsv_lnn(
         }
         barrier(CLK_LOCAL_MEM_FENCE);*/
 
-        double val;
+        double val = 0.0;
         __local volatile double xs;
         #ifdef NVIDIA
             #pragma unroll
         #endif
         for (uint i = 0; i < BLOCK_SIZE; i++) {
             if (lidx == i) {
+                Accumulate(l_working, lda, d_x[row * threadsx + lidx]);
+
                 val = Round(l_working, lda);
                 if (!isunit)
-                    val *= cache[i * (BLOCK_SIZE + 1)];
+                    val = val / cache[i * (BLOCK_SIZE + 1)];
                 xs = val;
             }
             if (lidx > i) {

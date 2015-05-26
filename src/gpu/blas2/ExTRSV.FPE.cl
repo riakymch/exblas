@@ -280,7 +280,7 @@ void tocache(
             else if ((i + y) < nbi)
                 cache[(i + y) * nbi + x] = 0.0;
             if (!isunit && (x == (i + y)))
-                cache[x * (nbi + 1)] = 1.0 / a[x * (lda + 1)];
+                cache[x * (nbi + 1)] = a[x * (lda + 1)];
         }
     }
 }
@@ -318,21 +318,10 @@ __kernel void trsv_lnn(
     // Loop over blocks as they become available
     // Initialize accumulators
     for (uint i = 0; i < BIN_COUNT; i++)
-        l_working[i * lda] = 0;
+        l_working[i * lda] = 0.0;
     // FPEs
     double fpe[NBFPE] = {0.0};
     double x, s, r;
-    if(lidy == 0) {
-        x = d_x[row * threadsx + lidx];
-        #ifdef NVIDIA
-          #pragma unroll
-        #endif
-        for(uint i = 0; i != NBFPE; ++i) {
-            fpe[i] = KnuthTwoSum(fpe[i], x, &s);
-            x = s;
-        }
-    }
-    barrier(CLK_LOCAL_MEM_FENCE);
     int col_done = -1;
 
     for (int col = 0; col < row; col++) {
@@ -340,20 +329,20 @@ __kernel void trsv_lnn(
         #ifdef NVIDIA
             #pragma unroll
         #endif
-        for (int j = 0; j < threadsx; j+=threadsy) {
-            double xp = -d_x[col * threadsx + lidy + j];
-            x = TwoProductFMA(d_a[(col * threadsx + lidy) * n + row * BLOCK_SIZE + lidx + j * n], xp, &r);
+        for (int j = 0; j < BLOCK_SIZE; j+=threadsy) {
+            double xp = -d_x[col * BLOCK_SIZE + lidy + j];
+            x = TwoProductFMA(d_a[(col * BLOCK_SIZE + lidy) * n + row * BLOCK_SIZE + lidx + j * n], xp, &r);
 
-            #ifdef NVIDIA
+            /*#ifdef NVIDIA
                 #pragma unroll
             #endif
             for(uint i = 0; i != NBFPE; ++i) {
                 fpe[i] = KnuthTwoSum(fpe[i], x, &s);
                 x = s;
             }
-            if(x != 0.0) {
+            if(x != 0.0) {*/
                 Accumulate(l_working, lda, x);
-                //So, there is not space in FPEs, meaning we need to flush to the accumulator
+                /*//So, there is not space in FPEs, meaning we need to flush to the accumulator
                 #ifdef NVIDIA
                     #pragma unroll
                 #endif
@@ -361,27 +350,29 @@ __kernel void trsv_lnn(
                     Accumulate(l_working, lda, fpe[i]);
                     fpe[i] = 0.0;
                 }
-            }
+            }*/
 
-            #ifdef NVIDIA
+            /*#ifdef NVIDIA
                 #pragma unroll
             #endif
             for(uint i = 0; i != NBFPE; ++i) {
                 fpe[i] = KnuthTwoSum(fpe[i], r, &s);
                 r = s;
-            }
-            if(r != 0.0)
+            }*/
+            if(r != 0.0) {
                 Accumulate(l_working, lda, r);
+                /*//So, there is not space in FPEs, meaning we need to flush to the accumulator
+                #ifdef NVIDIA
+                    #pragma unroll
+                #endif
+                for(uint i = 0; i != NBFPE; ++i) {
+                    Accumulate(l_working, lda, fpe[i]);
+                    fpe[i] = 0.0;
+                }*/
+            }
         }
     }
     barrier(CLK_LOCAL_MEM_FENCE);
-
-    /*//merge fpes
-    if (lidy != 0) {
-        for(uint i = 0; i != NBFPE; ++i)
-            Accumulate(l_working, lda, fpe[i]);
-    }
-    barrier(CLK_LOCAL_MEM_FENCE);*/
 
     // Apply update from diagonal block (row, row)
     if (lidy == 0) {
@@ -401,6 +392,17 @@ __kernel void trsv_lnn(
         #endif
         for (uint i = 0; i < BLOCK_SIZE; i++) {
             if (lidx == i) {
+                x = d_x[row * threadsx + lidx];
+                /*#ifdef NVIDIA
+                  #pragma unroll
+                #endif
+                for(uint i = 0; i != NBFPE; ++i) {
+                    fpe[i] = KnuthTwoSum(fpe[i], x, &s);
+                    x = s;
+                }
+                if (x != 0.0)*/
+                    Accumulate(l_working, lda, x);
+
                 //TODO: round only fpes when accumulator was not used
                 //Flush to the accumulator
                 #ifdef NVIDIA
@@ -413,15 +415,12 @@ __kernel void trsv_lnn(
 
                 val = Round(l_working, lda);
                 if (!isunit)
-                    val *= cache[i * (BLOCK_SIZE + 1)];
+                    val = val / cache[i * (BLOCK_SIZE + 1)];
                 xs = val;
             }
             if (lidx > i) {
                 x = TwoProductFMA(cache[i * BLOCK_SIZE + lidx], xs, &r);
 
-                #ifdef NVIDIA
-                    #pragma unroll
-                #endif
                 for(uint i = 0; i != NBFPE; ++i) {
                     fpe[i] = KnuthTwoSum(fpe[i], x, &s);
                     x = s;
@@ -429,24 +428,26 @@ __kernel void trsv_lnn(
                 if(x != 0.0) {
                     Accumulate(l_working, lda, x);
                     //So, there is not space in FPEs -- need to flush to the accumulator
-                    #ifdef NVIDIA
-                        #pragma unroll
-                    #endif
                     for(uint i = 0; i != NBFPE; ++i) {
                         Accumulate(l_working, lda, fpe[i]);
                         fpe[i] = 0.0;
                     }
                 }
 
-                #ifdef NVIDIA
-                    #pragma unroll
-                #endif
-                for(uint i = 0; i != NBFPE; ++i) {
-                    fpe[i] = KnuthTwoSum(fpe[i], r, &s);
-                    r = s;
+                if (r != 0.0) {
+                    for(uint i = 0; i != NBFPE; ++i) {
+                        fpe[i] = KnuthTwoSum(fpe[i], r, &s);
+                        r = s;
+                    }
+                    if(r != 0.0) {
+                        Accumulate(l_working, lda, r);
+                        //So, there is not space in FPEs -- need to flush to the accumulator
+                        for(uint i = 0; i != NBFPE; ++i) {
+                            Accumulate(l_working, lda, fpe[i]);
+                            fpe[i] = 0.0;
+                        }
+                    }
                 }
-                if(r != 0.0)
-                    Accumulate(l_working, lda, r);
             }
         }
         d_x[row * BLOCK_SIZE + tid] = val;

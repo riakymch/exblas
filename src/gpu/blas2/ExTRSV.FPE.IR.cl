@@ -308,7 +308,8 @@ void tocache(
             else if ((i + y) < nbi)
                 cache[(i + y) * nbi + x] = 0.0;
             if (!isunit && (x == (i + y)))
-                cache[x * (nbi + 1)] = 1.0 / a[x * (lda + 1)];
+                cache[x * (nbi + 1)] = a[x * (lda + 1)];
+            //    cache[x * (nbi + 1)] = 1.0 / a[x * (lda + 1)];
         }
     }
 }
@@ -442,7 +443,8 @@ void __trsv_lnn(
                 fpe[2] = 0.0;
 
                 if (!isunit)
-                    val *= cache[i * (BLOCK_SIZE + 1)];
+                    //val = val / d_a[row * threadsx * n + row * BLOCK_SIZE + i * n + i];
+                    val = val / cache[i * (BLOCK_SIZE + 1)];
                 xs = val;
             }
             if (lidx > i) {
@@ -754,6 +756,7 @@ __kernel void trsv_lnn(
     __global long *d_Superaccs,
     const uint n
 ){
+
     // At first we call ExTRSV. d_x holds the result
     __trsv_lnn(d_x, d_a, sync, d_Superaccs, n);
     return;

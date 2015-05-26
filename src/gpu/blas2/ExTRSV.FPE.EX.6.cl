@@ -280,7 +280,7 @@ void tocache(
             else if ((i + y) < nbi)
                 cache[(i + y) * nbi + x] = 0.0;
             if (!isunit && (x == (i + y)))
-                cache[x * (nbi + 1)] = 1.0 / a[x * (lda + 1)];
+                cache[x * (nbi + 1)] = a[x * (lda + 1)];
         }
     }
 }
@@ -458,7 +458,7 @@ __kernel void trsv_lnn(
 
                 val = Round(l_working, lda);
                 if (!isunit)
-                    val *= cache[i * (BLOCK_SIZE + 1)];
+                    val = val / cache[i * (BLOCK_SIZE + 1)];
                 xs = val;
             }
             if (lidx > i) {
