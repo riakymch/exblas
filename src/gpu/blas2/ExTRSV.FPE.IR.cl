@@ -450,6 +450,14 @@ void __trsv_lnn(
             if (lidx > i) {
                 x = TwoProductFMA(cache[i * BLOCK_SIZE + lidx], xs, &r);
 
+                // TODO: remove this flush
+                Accumulate(l_working, lda, fpe[0]);
+                Accumulate(l_working, lda, fpe[1]);
+                Accumulate(l_working, lda, fpe[2]);
+                fpe[0] = 0.0;
+                fpe[1] = 0.0;
+                fpe[2] = 0.0;
+
                 fpe[0] = KnuthTwoSum(fpe[0], x, &s);
                 x = s;
                 if(x != 0.0) {
@@ -584,12 +592,12 @@ void __trsv_ir(
     Accumulate(l_working, lda, fpe[2]);
     Accumulate(l_working, lda, d_b[get_group_id(0) * threadsx + lidx]);
     // TODO: remove this line
-    //d_x[get_group_id(0) * threadsx + lidx] = Round(l_working, lda);
+    d_x[get_group_id(0) * threadsx + lidx] = Round(l_working, lda);
     fpe[0] = 0.0;
     fpe[1] = 0.0;
     fpe[2] = 0.0;
-    d_b[get_group_id(0) * threadsx + lidx] = 0.0;
-    barrier(CLK_GLOBAL_MEM_FENCE); // Wait for d_b/superaccumulators to be visible to other blocks
+    // Wait for d_b/superaccumulators to be visible to other blocks
+    barrier(CLK_GLOBAL_MEM_FENCE);
 
 
     // ExTRSV: A rm = xm. d_b contains the result
@@ -671,11 +679,12 @@ void __trsv_ir(
         #endif
         for (uint i = 0; i < BLOCK_SIZE; i++) {
             if (lidx == i) {
+                // Add the right-hand side
+                Accumulate(l_working, lda, d_b[row * threadsx + lidx]);
                 //Flush to the accumulator
                 Accumulate(l_working, lda, fpe[0]);
                 Accumulate(l_working, lda, fpe[1]);
                 Accumulate(l_working, lda, fpe[2]);
-                //Accumulate(l_working, lda, d_b[row * threadsx + lidx]);
 
                 //Rounding
                 val = Round(l_working, lda);
@@ -686,11 +695,19 @@ void __trsv_ir(
                 fpe[2] = 0.0;
 
                 if (!isunit)
-                    val *= cache[i * (BLOCK_SIZE + 1)];
+                    val = val / cache[i * (BLOCK_SIZE + 1)];
                 xs = val;
             }
             if (lidx > i) {
                 x = TwoProductFMA(cache[i * BLOCK_SIZE + lidx], xs, &r);
+
+                // TODO: remove this flush
+                Accumulate(l_working, lda, fpe[0]);
+                Accumulate(l_working, lda, fpe[1]);
+                Accumulate(l_working, lda, fpe[2]);
+                fpe[0] = 0.0;
+                fpe[1] = 0.0;
+                fpe[2] = 0.0;
 
                 fpe[0] = KnuthTwoSum(fpe[0], x, &s);
                 x = s;

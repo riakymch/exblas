@@ -333,42 +333,42 @@ __kernel void trsv_lnn(
             double xp = -d_x[col * BLOCK_SIZE + lidy + j];
             x = TwoProductFMA(d_a[(col * BLOCK_SIZE + lidy) * n + row * BLOCK_SIZE + lidx + j * n], xp, &r);
 
-            /*#ifdef NVIDIA
+            #ifdef NVIDIA
                 #pragma unroll
             #endif
-            for(uint i = 0; i != NBFPE; ++i) {
-                fpe[i] = KnuthTwoSum(fpe[i], x, &s);
+            for(uint it = 0; it != NBFPE; ++it) {
+                fpe[it] = KnuthTwoSum(fpe[it], x, &s);
                 x = s;
             }
-            if(x != 0.0) {*/
+            if(x != 0.0) {
                 Accumulate(l_working, lda, x);
-                /*//So, there is not space in FPEs, meaning we need to flush to the accumulator
+                //So, there is not space in FPEs, meaning we need to flush to the accumulator
                 #ifdef NVIDIA
                     #pragma unroll
                 #endif
-                for(uint i = 0; i != NBFPE; ++i) {
-                    Accumulate(l_working, lda, fpe[i]);
-                    fpe[i] = 0.0;
+                for(uint it = 0; it != NBFPE; ++it) {
+                    Accumulate(l_working, lda, fpe[it]);
+                    fpe[it] = 0.0;
                 }
-            }*/
+            }
 
-            /*#ifdef NVIDIA
+            #ifdef NVIDIA
                 #pragma unroll
             #endif
-            for(uint i = 0; i != NBFPE; ++i) {
-                fpe[i] = KnuthTwoSum(fpe[i], r, &s);
+            for(uint it = 0; it != NBFPE; ++it) {
+                fpe[it] = KnuthTwoSum(fpe[it], r, &s);
                 r = s;
-            }*/
+            }
             if(r != 0.0) {
                 Accumulate(l_working, lda, r);
-                /*//So, there is not space in FPEs, meaning we need to flush to the accumulator
+                //So, there is not space in FPEs, meaning we need to flush to the accumulator
                 #ifdef NVIDIA
                     #pragma unroll
                 #endif
-                for(uint i = 0; i != NBFPE; ++i) {
-                    Accumulate(l_working, lda, fpe[i]);
-                    fpe[i] = 0.0;
-                }*/
+                for(uint it = 0; it != NBFPE; ++it) {
+                    Accumulate(l_working, lda, fpe[it]);
+                    fpe[it] = 0.0;
+                }
             }
         }
     }
@@ -393,24 +393,24 @@ __kernel void trsv_lnn(
         for (uint i = 0; i < BLOCK_SIZE; i++) {
             if (lidx == i) {
                 x = d_x[row * threadsx + lidx];
-                /*#ifdef NVIDIA
+                #ifdef NVIDIA
                   #pragma unroll
                 #endif
-                for(uint i = 0; i != NBFPE; ++i) {
-                    fpe[i] = KnuthTwoSum(fpe[i], x, &s);
+                for(uint it = 0; it != NBFPE; ++it) {
+                    fpe[it] = KnuthTwoSum(fpe[it], x, &s);
                     x = s;
                 }
-                if (x != 0.0)*/
+                if (x != 0.0)
                     Accumulate(l_working, lda, x);
 
                 //TODO: round only fpes when accumulator was not used
-                //Flush to the accumulator
+                // Flush FPE to the accumulator
                 #ifdef NVIDIA
                     #pragma unroll
                 #endif
-                for(uint i = 0; i != NBFPE; ++i) {
-                    Accumulate(l_working, lda, fpe[i]);
-                    fpe[i] = 0.0;
+                for(uint it = 0; it != NBFPE; ++it) {
+                    Accumulate(l_working, lda, fpe[it]);
+                    fpe[it] = 0.0;
                 }
 
                 val = Round(l_working, lda);
@@ -421,30 +421,51 @@ __kernel void trsv_lnn(
             if (lidx > i) {
                 x = TwoProductFMA(cache[i * BLOCK_SIZE + lidx], xs, &r);
 
-                for(uint i = 0; i != NBFPE; ++i) {
-                    fpe[i] = KnuthTwoSum(fpe[i], x, &s);
+                // TODO: remove this flush
+                #ifdef NVIDIA
+                    #pragma unroll
+                #endif
+                for(uint it = 0; it != NBFPE; ++it) {
+                    Accumulate(l_working, lda, fpe[it]);
+                    fpe[it] = 0.0;
+                }
+
+                #ifdef NVIDIA
+                    #pragma unroll
+                #endif
+                for(uint it = 0; it != NBFPE; ++it) {
+                    fpe[it] = KnuthTwoSum(fpe[it], x, &s);
                     x = s;
                 }
                 if(x != 0.0) {
                     Accumulate(l_working, lda, x);
-                    //So, there is not space in FPEs -- need to flush to the accumulator
-                    for(uint i = 0; i != NBFPE; ++i) {
-                        Accumulate(l_working, lda, fpe[i]);
-                        fpe[i] = 0.0;
+                    //So, there is not space in FPEs, meaning we need to flush to the accumulator
+                    #ifdef NVIDIA
+                        #pragma unroll
+                    #endif
+                    for(uint it = 0; it != NBFPE; ++it) {
+                        Accumulate(l_working, lda, fpe[it]);
+                        fpe[it] = 0.0;
                     }
                 }
 
-                if (r != 0.0) {
-                    for(uint i = 0; i != NBFPE; ++i) {
-                        fpe[i] = KnuthTwoSum(fpe[i], r, &s);
+                if(r != 0.0) {
+                    #ifdef NVIDIA
+                        #pragma unroll
+                    #endif
+                    for(uint it = 0; it != NBFPE; ++it) {
+                        fpe[it] = KnuthTwoSum(fpe[it], r, &s);
                         r = s;
                     }
                     if(r != 0.0) {
                         Accumulate(l_working, lda, r);
                         //So, there is not space in FPEs -- need to flush to the accumulator
-                        for(uint i = 0; i != NBFPE; ++i) {
-                            Accumulate(l_working, lda, fpe[i]);
-                            fpe[i] = 0.0;
+                        #ifdef NVIDIA
+                            #pragma unroll
+                        #endif
+                        for(uint it = 0; it != NBFPE; ++it) {
+                            Accumulate(l_working, lda, fpe[it]);
+                            fpe[it] = 0.0;
                         }
                     }
                 }

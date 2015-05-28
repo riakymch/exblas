@@ -72,8 +72,9 @@ extern "C" cl_int initExTRSV(
         }
 
     //printf("...building ExTRSV program\n");
-        sprintf(compileOptions, "%s -DNBFPE=%d", compileOptions, NbFPE);
-        ciErrNum = clBuildProgram(cpProgram, 0, NULL, compileOptions, NULL, NULL);
+        char compileOptionsBak[256];
+        sprintf(compileOptionsBak, "%s -DNBFPE=%d", compileOptions, NbFPE);
+        ciErrNum = clBuildProgram(cpProgram, 0, NULL, compileOptionsBak, NULL, NULL);
         if (ciErrNum != CL_SUCCESS) {
             printf("Error in clBuildProgram, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
 

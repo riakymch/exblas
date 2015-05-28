@@ -28,7 +28,7 @@ static void copyVector(uint n, double *x, double *y) {
 #include <mpfr.h>
 
 static double extrsvVsMPFR(double *extrsv, uint n, double *a, uint lda, double *x, uint incx) {
-    // Compare to the results from Matlab
+    /*// Compare to the results from Matlab
     FILE *pFilex;
     size_t resx;
     //pFilex = fopen("x_test_gemv_64.bin", "rb");
@@ -48,13 +48,13 @@ static double extrsvVsMPFR(double *extrsv, uint n, double *a, uint lda, double *
 
     for(uint i = 0; i < n; i++)
         printf("%.16g\t", xmatlab[i]);
-    printf("\n\n");
+    printf("\n\n");*/
 
     for(uint i = 0; i < n; i++)
         printf("%.16g\t", extrsv[i]);
     printf("\n\n");
 
-    //Inf norm
+    /*//Inf norm
     double nrm2 = 0.0, val2 = 0.0;
     for(uint i = 0; i < n; i++) {
         val2 = std::max(val2, fabs(xmatlab[i]));
@@ -63,7 +63,7 @@ static double extrsvVsMPFR(double *extrsv, uint n, double *a, uint lda, double *
     nrm2 = nrm2 / val2;
     printf("ExTRSV vs Matlab = %.16g\n", nrm2);
 
-    return nrm2;
+    return nrm2;*/
 
     mpfr_t sum, dot, div, op1, op2;
 
@@ -77,7 +77,7 @@ static double extrsvVsMPFR(double *extrsv, uint n, double *a, uint lda, double *
     mpfr_init2(sum, 2098);
 
     //Produce a result matrix of TRSV using MPFR
-    /*for(uint i = 0; i < n; i++) {
+    for(uint i = 0; i < n; i++) {
         // sum += a[i,j] * x[j], j < i
         mpfr_set_d(sum, extrsv_mpfr[i], MPFR_RNDN);
         for(uint j = 0; j < i; j++) {
@@ -90,10 +90,9 @@ static double extrsvVsMPFR(double *extrsv, uint n, double *a, uint lda, double *
         mpfr_set_d(op1, a[i * (n + 1)], MPFR_RNDN);
         mpfr_div(div, sum, op1, MPFR_RNDN);
         extrsv_mpfr[i] = mpfr_get_d(div, MPFR_RNDN);
-    }*/
+    }
     for(uint i = 0; i < n; i++) {
-        extrsv_mpfr[i] = 1.0;
-        printf("%.16g\t", extrsv[i]);
+        printf("%.16g\t", extrsv_mpfr[i]);
     }
     printf("\n\n");
 
@@ -297,7 +296,7 @@ int main(int argc, char *argv[]) {
 #endif
 
     copyVector(n, x, xorig);
-    extrsv('L', 'N', 'N', n, a, n, x, 1, 4);
+    extrsv('L', 'N', 'N', n, a, n, x, 1, 8);
 #ifdef EXBLAS_VS_MPFR
     norm = extrsvVsMPFR(x, n, a, n, xorig, 1);
     printf("FPE4 error = %.16g\n", norm);
