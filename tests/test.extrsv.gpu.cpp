@@ -28,11 +28,12 @@ static void copyVector(uint n, double *x, double *y) {
 #include <mpfr.h>
 
 static double extrsvVsMPFR(double *extrsv, uint n, double *a, uint lda, double *x, uint incx) {
-    /*// Compare to the results from Matlab
+    // Compare to the results from Matlab
     FILE *pFilex;
     size_t resx;
-    //pFilex = fopen("x_test_gemv_64.bin", "rb");
     pFilex = fopen("x_test_trsv_64.bin", "rb");
+    //pFilex = fopen("x_test_trsv_64_final.bin", "rb");
+    //pFilex = fopen("x_test_gemv_64.bin", "rb");
     if (pFilex == NULL) {
         fprintf(stderr, "Cannot open files to read matrix and vector\n");
         exit(1);
@@ -48,22 +49,25 @@ static double extrsvVsMPFR(double *extrsv, uint n, double *a, uint lda, double *
 
     for(uint i = 0; i < n; i++)
         printf("%.16g\t", xmatlab[i]);
-    printf("\n\n");*/
+    printf("\n\n");
 
     for(uint i = 0; i < n; i++)
         printf("%.16g\t", extrsv[i]);
     printf("\n\n");
 
-    /*//Inf norm
+    //Inf norm
     double nrm2 = 0.0, val2 = 0.0;
     for(uint i = 0; i < n; i++) {
         val2 = std::max(val2, fabs(xmatlab[i]));
         nrm2 = std::max(nrm2, fabs(extrsv[i] - xmatlab[i]));
+        printf("%.16g\t", fabs(extrsv[i] - xmatlab[i]));
     }
+    printf("\n\n");
+    printf("ExTRSV vs Matlab = %.16g \t %.16g\n", nrm2, val2);
     nrm2 = nrm2 / val2;
     printf("ExTRSV vs Matlab = %.16g\n", nrm2);
 
-    return nrm2;*/
+    return nrm2;
 
     mpfr_t sum, dot, div, op1, op2;
 
@@ -93,6 +97,10 @@ static double extrsvVsMPFR(double *extrsv, uint n, double *a, uint lda, double *
     }
     for(uint i = 0; i < n; i++) {
         printf("%.16g\t", extrsv_mpfr[i]);
+    }
+    printf("\n\n");
+    for(uint i = 0; i < n; i++) {
+        printf("%.16g\t", extrsv[i]);
     }
     printf("\n\n");
 
@@ -280,6 +288,7 @@ int main(int argc, char *argv[]) {
         is_pass = false;
     }
 #endif
+    exit(0);
 
     copyVector(n, x, xorig);
     extrsv('L', 'N', 'N', n, a, n, x, 1, 3);
@@ -296,7 +305,7 @@ int main(int argc, char *argv[]) {
 #endif
 
     copyVector(n, x, xorig);
-    extrsv('L', 'N', 'N', n, a, n, x, 1, 8);
+    extrsv('L', 'N', 'N', n, a, n, x, 1, 4);
 #ifdef EXBLAS_VS_MPFR
     norm = extrsvVsMPFR(x, n, a, n, xorig, 1);
     printf("FPE4 error = %.16g\n", norm);
@@ -308,7 +317,6 @@ int main(int argc, char *argv[]) {
         is_pass = false;
     }
 #endif
-    exit(0);
 
     copyVector(n, x, xorig);
     extrsv('L', 'N', 'N', n, a, n, x, 1, 8);

@@ -17,11 +17,30 @@
 ////////////////////////////////////////////////////////////////////////////////
 // Auxiliary functions
 ////////////////////////////////////////////////////////////////////////////////
+#if 1
 double TwoProductFMA(double a, double b, double *d) {
     double p = a * b;
     *d = fma(a, b, -p);
     return p;
 }
+#else
+double split(double a, double *a2){
+    double factor = 134217729.0;
+    double c = factor * a;
+    double a1 = c - (c - a);
+    *a2 = a - a1;
+    return a1;
+}
+
+double TwoProductFMA(double a, double b, double *d) {
+    double a2, b2;
+    double x = a * b;
+    double a1 = split(a, &a2);
+    double b1 = split(a, &b2);
+    *d = a2 * b2 - (((x - a1 * b1) - a2 * b1) - a1 * b2);
+    return x;
+}
+#endif
 
 // signedcarry in {-1, 0, 1}
 long xadd(__global volatile long *sa, long x, uchar *of) {
@@ -281,7 +300,7 @@ __kernel void trsv_lnn(
     int isunit = 0;
     int lda = threadsx * threadsy;
 
-    __global long *l_working = d_Superaccs + get_group_id(0) * threadsy * threadsx * BIN_COUNT + tid;
+    __global long *l_working = d_Superaccs + get_group_id(0) * lda * BIN_COUNT + tid;
 
     // Get row handled by this block
 #if 1
@@ -293,7 +312,7 @@ __kernel void trsv_lnn(
 #endif
 
     // Copy diagonal block to shared memory
-    tocache(&d_a[row * BLOCK_SIZE * n + row * BLOCK_SIZE], cache, BLOCK_SIZE, threadsx * threadsy, 0, isunit, tid, n);
+    tocache(&d_a[row * BLOCK_SIZE * n + row * BLOCK_SIZE], cache, BLOCK_SIZE, lda, 0, isunit, tid, n);
     barrier(CLK_LOCAL_MEM_FENCE);
 
     // Loop over blocks as they become available
