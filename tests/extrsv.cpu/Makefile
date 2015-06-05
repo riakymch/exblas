@@ -8,7 +8,7 @@ OBJECTS := ${OBJECTS:.cpp=.o}
 
 HEADERS = 
 INCLUDE = -I$(PATH_TO_AMD_INC) -I$(PATH_TO_NVIDIA_INC) 
-COMPILERFLAGS = -Wall -W -O2 -march=native -fabi-version=0 -DGPU_PROFILING=1
+COMPILERFLAGS = -Wall -W -O2 -march=native -fabi-version=0 -std=c99 -DGPU_PROFILING=1
 CXX = g++
 
 is_64 = $(shell s=`uname -m`; if (echo $$s | grep x86_64 > /dev/null); then echo 1; fi)

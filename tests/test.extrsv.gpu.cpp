@@ -31,7 +31,7 @@ static double extrsvVsMPFR(double *extrsv, uint n, double *a, uint lda, double *
     // Compare to the results from Matlab
     FILE *pFilex;
     size_t resx;
-    pFilex = fopen("x_test_trsv_64.bin", "rb");
+    pFilex = fopen("matrices/x_test_trsv_64.bin", "rb");
     //pFilex = fopen("x_test_trsv_64_final.bin", "rb");
     //pFilex = fopen("x_test_gemv_64.bin", "rb");
     if (pFilex == NULL) {
@@ -51,8 +51,17 @@ static double extrsvVsMPFR(double *extrsv, uint n, double *a, uint lda, double *
         printf("%.16g\t", xmatlab[i]);
     printf("\n\n");
 
-    for(uint i = 0; i < n; i++)
+    /*for(uint i = 0; i < n; i++)
         printf("%.16g\t", extrsv[i]);
+    printf("\n\n");*/
+
+    printf("err = [");
+    for(uint i = 0; i < 63; i++) {
+        printf("%.16g,\t", extrsv[i]);
+        //if ((i+1) % 2 == 0)
+        //    printf(";");
+    }
+    printf("];");
     printf("\n\n");
 
     //Inf norm
@@ -60,6 +69,8 @@ static double extrsvVsMPFR(double *extrsv, uint n, double *a, uint lda, double *
     for(uint i = 0; i < n; i++) {
         val2 = std::max(val2, fabs(xmatlab[i]));
         nrm2 = std::max(nrm2, fabs(extrsv[i] - xmatlab[i]));
+        if (fabs(extrsv[i] - xmatlab[i]) != 0.0)
+            printf("\n %d \t", i);
         printf("%.16g\t", fabs(extrsv[i] - xmatlab[i]));
     }
     printf("\n\n");
@@ -97,10 +108,6 @@ static double extrsvVsMPFR(double *extrsv, uint n, double *a, uint lda, double *
     }
     for(uint i = 0; i < n; i++) {
         printf("%.16g\t", extrsv_mpfr[i]);
-    }
-    printf("\n\n");
-    for(uint i = 0; i < n; i++) {
-        printf("%.16g\t", extrsv[i]);
     }
     printf("\n\n");
 

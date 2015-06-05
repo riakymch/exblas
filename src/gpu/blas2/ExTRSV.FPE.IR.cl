@@ -49,7 +49,7 @@ double TwoProductFMA(double a, double b, double *d) {
         *s = (a - (r - z)) + (b - z);
         return r;
     }
-#else
+/*#else
     //twosum
     double KnuthTwoSum(double a, double b, double *s) {
         double r = a + b;
@@ -58,7 +58,7 @@ double TwoProductFMA(double a, double b, double *d) {
         double b2 = doswap ? a : b;
         *s = (a2 - r) + b2;
         return r;
-    }
+    }*/
 #endif
 
 // signedcarry in {-1, 0, 1}
@@ -335,6 +335,7 @@ void tocache(
 
 void __trsv_lnn(
     __global double *d_x,
+    __global double *d_b,
     __global double *d_a,
     __global int *sync,
     __global long *d_Superaccs,
@@ -395,9 +396,9 @@ void __trsv_lnn(
             if(x != 0.0) {
                 Accumulate(l_working, lda, x);
                 //So, there is not space in FPEs -- need to flush to the accumulator
-                Accumulate(l_working, lda, fpe[2]);
-                Accumulate(l_working, lda, fpe[1]);
                 Accumulate(l_working, lda, fpe[0]);
+                Accumulate(l_working, lda, fpe[1]);
+                Accumulate(l_working, lda, fpe[2]);
                 fpe[2] = 0.0;
                 fpe[1] = 0.0;
                 fpe[0] = 0.0;
@@ -416,9 +417,9 @@ void __trsv_lnn(
                 }
                 if(r != 0.0) {
                     Accumulate(l_working, lda, r);
-                    Accumulate(l_working, lda, fpe[2]);
-                    Accumulate(l_working, lda, fpe[1]);
                     Accumulate(l_working, lda, fpe[0]);
+                    Accumulate(l_working, lda, fpe[1]);
+                    Accumulate(l_working, lda, fpe[2]);
                     fpe[2] = 0.0;
                     fpe[1] = 0.0;
                     fpe[0] = 0.0;
@@ -438,6 +439,10 @@ void __trsv_lnn(
         for (uint i = 0; i < BLOCK_SIZE; i++) {
             if (lidx == i) {
 #if 1
+                // TODO: remove this if
+                //if ((lidx == 22) && (get_group_id(0) == 0))
+                //    return;
+
                 // Add the right-hand side
                 x = d_x[row * threadsx + lidx];
                 fpe[2] = KnuthTwoSum(fpe[2], x, &s);
@@ -450,13 +455,14 @@ void __trsv_lnn(
                         x = s;
                     }
                 }
+
                 if(x != 0.0)
                     Accumulate(l_working, lda, x);
 
                 // Flush FPE to the accumulator
-                Accumulate(l_working, lda, fpe[2]);
-                Accumulate(l_working, lda, fpe[1]);
                 Accumulate(l_working, lda, fpe[0]);
+                Accumulate(l_working, lda, fpe[1]);
+                Accumulate(l_working, lda, fpe[2]);
 
                 // Rounding
                 val = Round(l_working, lda);
@@ -484,57 +490,76 @@ void __trsv_lnn(
             }
             if (lidx > i) {
                 x = TwoProductFMA(cache[i * BLOCK_SIZE + lidx], xs, &r);
-
-                /*// TODO: remove this flush
-                Accumulate(l_working, lda, fpe[2]);
-                Accumulate(l_working, lda, fpe[1]);
-                Accumulate(l_working, lda, fpe[0]);
-                fpe[2] = 0.0;
-                fpe[1] = 0.0;
-                fpe[0] = 0.0;*/
-
-                fpe[2] = KnuthTwoSum(fpe[2], x, &s);
-                x = s;
-                if(x != 0.0) {
-                    fpe[1] = KnuthTwoSum(fpe[1], x, &s);
-                    x = s;
-                    if(x != 0.0) {
-                        fpe[0] = KnuthTwoSum(fpe[0], x, &s);
-                        x = s;
-                    }
+#if 0
+                int index = 2 * i;
+                if ((lidx == 22) && (get_group_id(0) == 0)) {
+                    d_b[index] = x; //fpe[2];
+                    d_b[index + 1] = r; //fpe[1];
+                    //d_b[index + 2] = fpe[0];
                 }
-                if(x != 0.0) {
-                    Accumulate(l_working, lda, x);
-                    //So, there is not space in FPEs -- need to flush to the accumulator
+#endif
+
+                // TODO: remove this flush
+                /*if (i == 25) {
                     Accumulate(l_working, lda, fpe[2]);
                     Accumulate(l_working, lda, fpe[1]);
                     Accumulate(l_working, lda, fpe[0]);
                     fpe[2] = 0.0;
                     fpe[1] = 0.0;
                     fpe[0] = 0.0;
+                }*/
+                fpe[2] = KnuthTwoSum(fpe[2], x, &s);
+                x = s;
+                if(fabs(x) > 0.0) {
+                    fpe[1] = KnuthTwoSum(fpe[1], x, &s);
+                    x = s;
+                    if(fabs(x) > 0.0) {
+                        fpe[0] = KnuthTwoSum(fpe[0], x, &s);
+                        x = s;
+                    }
+                }
+                if(fabs(x) > 0.0) {
+                    Accumulate(l_working, lda, x);
+                    //So, there is not space in FPEs -- need to flush to the accumulator
+                    Accumulate(l_working, lda, fpe[0]);
+                    Accumulate(l_working, lda, fpe[1]);
+                    Accumulate(l_working, lda, fpe[2]);
+                    fpe[2] = 0.0;
+                    fpe[1] = 0.0;
+                    fpe[0] = 0.0;
                 }
 
-                if(r != 0.0) {
+                if(fabs(r) > 0.0) {
                     fpe[2] = KnuthTwoSum(fpe[2], r, &s);
                     r = s;
-                    if(r != 0.0) {
+                    if(fabs(r) > 0.0) {
                         fpe[1] = KnuthTwoSum(fpe[1], r, &s);
                         r = s;
-                        if(r != 0.0) {
+                        if(fabs(r) > 0.0) {
                             fpe[0] = KnuthTwoSum(fpe[0], r, &s);
                             r = s;
                         }
                     }
-                    if(r != 0.0) {
+                    if(fabs(r) > 0.0) {
                         Accumulate(l_working, lda, r);
-                        Accumulate(l_working, lda, fpe[2]);
-                        Accumulate(l_working, lda, fpe[1]);
                         Accumulate(l_working, lda, fpe[0]);
+                        Accumulate(l_working, lda, fpe[1]);
+                        Accumulate(l_working, lda, fpe[2]);
                         fpe[2] = 0.0;
                         fpe[1] = 0.0;
                         fpe[0] = 0.0;
                     }
                 }
+#if 0
+                if (i > 0) {
+                    int index = 3 * (i - 1);
+                    if ((lidx == 22) && (get_group_id(0) == 0)) {
+                        d_b[index] = fpe[0];
+                        d_b[index + 1] = fpe[1];
+                        d_b[index + 2] = fpe[2];
+                    }
+                }
+#endif
             }
         }
         d_x[row * BLOCK_SIZE + tid] = val;
@@ -607,9 +632,9 @@ void __gemv(
             }
             if(x != 0.0) {
                 Accumulate(l_working, lda, x);
-                Accumulate(l_working, lda, fpe[2]);
-                Accumulate(l_working, lda, fpe[1]);
                 Accumulate(l_working, lda, fpe[0]);
+                Accumulate(l_working, lda, fpe[1]);
+                Accumulate(l_working, lda, fpe[2]);
                 fpe[2] = 0.0;
                 fpe[1] = 0.0;
                 fpe[0] = 0.0;
@@ -672,7 +697,11 @@ __kernel void trsv_lnn(
 ){
 
     // At first we call ExTRSV. d_x holds the result
-    __trsv_lnn(d_x, d_a, sync, d_Superaccs, n);
+    __trsv_lnn(d_x, d_b, d_a, sync, d_Superaccs, n);
+
+    //int lidx = get_local_id(0);
+    //d_x[get_group_id(0) * threadsx + lidx] = d_b[get_group_id(0) * threadsx + lidx];
+
     return;
 
     // One step of iterative refinement
@@ -683,7 +712,7 @@ __kernel void trsv_lnn(
     __gemv(d_b, d_a, d_x, d_Superaccs, n);
 
     trsv_init(sync);
-    __trsv_lnn(d_b, d_a, sync, d_Superaccs, n);
+    //__trsv_lnn(d_b, d_a, sync, d_Superaccs, n);
 
     __axpy(d_x, d_b, n);
 
