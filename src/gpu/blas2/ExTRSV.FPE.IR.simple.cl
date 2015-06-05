@@ -13,8 +13,6 @@
 #define f_words    20
 #define TSAFE       0
 
-typedef double real2_t;
-
 
 ////////////////////////////////////////////////////////////////////////////////
 // Auxiliary functions
@@ -45,9 +43,9 @@ double TwoProd(double a, double b, double *d) {
 #endif
 
 #ifdef USE_KNUTH
-    real2_t TwoSum(real2_t a, real2_t b, real2_t *s) {
-        real2_t r = a + b;
-        real2_t z = r - a;
+    double TwoSum(double a, double b, double *s) {
+        double r = a + b;
+        double z = r - a;
         *s = (a - (r - z)) + (b - z);
         return r;
     }
@@ -335,7 +333,7 @@ void tocache(
     }
 }
 
-void __trsv_lnn(
+/*void __trsv_lnn(
     __global double *d_x,
     __global double *d_b,
     __global double *d_a,
@@ -502,14 +500,14 @@ void __trsv_lnn(
 #endif
 
                 // TODO: remove this flush
-                /*if (i == 25) {
+                /if (i == 25) {
                     Accumulate(l_working, lda, fpe[2]);
                     Accumulate(l_working, lda, fpe[1]);
                     Accumulate(l_working, lda, fpe[0]);
                     fpe[2] = 0.0;
                     fpe[1] = 0.0;
                     fpe[0] = 0.0;
-                }*/
+                }/
                 fpe[2] = TwoSum(fpe[2], x, &s);
                 x = s;
                 if(fabs(x) > 0.0) {
@@ -573,53 +571,8 @@ void __trsv_lnn(
         atomic_add(&sync[0], 1);   // Use atomicAdd to bypass L1 miss
     barrier(CLK_GLOBAL_MEM_FENCE); // Flush sync[0] asap
 }
+*/
 
-void __trsv_lnn_simple_0(
-    __global double *d_x,
-    __global double *d_b,
-    __global double *d_a,
-    __global int *sync,
-    __global long *d_Superaccs,
-    const uint n
-){
-    real2_t r, s, z;
-    for (uint i = 0; i < n; i++) {
-        real2_t fpe[3] = {0.0};
-
-        for(uint j = 0; j < i; j++) {
-            r = TwoProd(d_a[j * n + i], -d_x[j], &s);
-
-            fpe[2] = TwoSum(fpe[2], r, &z);
-            if (z != 0.0) {
-                fpe[1] = TwoSum(fpe[1], z, &z);
-                if (z != 0.0) {
-                    fpe[0] = TwoSum(fpe[0], z, &z);
-                }
-            }
-
-            if (s != 0.0) {
-                fpe[2] = TwoSum(fpe[2], s, &z);
-                if (z != 0.0) {
-                    fpe[1] = TwoSum(fpe[1], z, &z);
-                    if (z != 0.0) {
-                        fpe[0] = TwoSum(fpe[0], z, &z);
-                    }
-                }
-            }
-        }
-
-        fpe[2] = TwoSum(fpe[2], d_x[i], &z);
-        if (z != 0.0) {
-            fpe[1] = TwoSum(fpe[1], z, &z);
-            if (z != 0.0) {
-                fpe[0] = TwoSum(fpe[0], z, &z);
-            }
-        }
-
-        real2_t sum = OddRoundSum(fpe);
-        d_x[i] = sum / d_a[i * (n + 1)];
-    }
-}
 
 void __trsv_lnn_simple(
     __global double *d_x,
@@ -630,24 +583,18 @@ void __trsv_lnn_simple(
     const uint n
 ){
     double r, s, z;
-    double *fpe;
     int lda = 1;
 
     __global long *l_working = d_Superaccs;
 
     for (uint i = 0; i < n; i++) {
-        double fpep[3] = {0.0};
-        double fpen[3] = {0.0};
+        double fpe[3] = {0.0};
 
         for (uint j = 0; j < BIN_COUNT; j++)
             l_working[j] = 0.0;
 
         for(uint j = 0; j < i; j++) {
             r = TwoProd(d_a[j * n + i], -d_x[j], &s);
-            //Accumulate(l_working, lda, s);
-            //Accumulate(l_working, lda, r);
-
-            fpe = r > 0.0 ? fpep : fpen;
 
             fpe[2] = TwoSum(fpe[2], r, &z);
             r = z;
@@ -663,7 +610,6 @@ void __trsv_lnn_simple(
                 Accumulate(l_working, lda, r);
 
             if (s != 0.0) {
-                fpe = s > 0.0 ? fpep : fpen;
                 fpe[2] = TwoSum(fpe[2], s, &z);
                 s = z;
                 if (s != 0.0) {
@@ -681,7 +627,6 @@ void __trsv_lnn_simple(
 
         //Accumulate(l_working, lda, d_x[i]);
         r = d_x[i];
-        fpe = r > 0 ? fpep : fpen;
         fpe[2] = TwoSum(fpe[2], r, &z);
         r = z;
         if (r != 0.0) {
@@ -695,27 +640,9 @@ void __trsv_lnn_simple(
         if (r != 0.0)
             Accumulate(l_working, lda, r);
 
-        /*fpe = fpep;
-        fpe[2] = TwoSum(fpe[2], fpen[2], &z);
-        if (z != 0.0) {
-            fpe[1] = TwoSum(fpe[1], z, &z);
-            if (z != 0.0) {
-                fpe[0] = TwoSum(fpe[0], z, &z);
-            }
-        }
-        fpe[1] = TwoSum(fpe[1], fpen[1], &z);
-        if (z != 0.0) {
-            fpe[0] = TwoSum(fpe[0], z, &z);
-        }
-        fpe[0] = TwoSum(fpe[0], fpen[0], &z);
-        double sum = OddRoundSum(fpe);*/
-
-        Accumulate(l_working, lda, fpen[2]);
-        Accumulate(l_working, lda, fpen[1]);
-        Accumulate(l_working, lda, fpen[0]);
-        Accumulate(l_working, lda, fpep[2]);
-        Accumulate(l_working, lda, fpep[1]);
-        Accumulate(l_working, lda, fpep[0]);
+        Accumulate(l_working, lda, fpe[2]);
+        Accumulate(l_working, lda, fpe[1]);
+        Accumulate(l_working, lda, fpe[0]);
         double sum = Round(l_working, lda);
 
         d_x[i] = sum / d_a[i * (n + 1)];
@@ -733,7 +660,13 @@ __kernel void trsv_lnn(
 ){
 
     // At first we call ExTRSV. d_x holds the result
-    __trsv_lnn_simple_0(d_x, d_b, d_a, sync, d_Superaccs, n);
+    __trsv_lnn_simple(d_x, d_b, d_a, sync, d_Superaccs, n);
+    //__trsv_lnn(d_x, d_b, d_a, sync, d_Superaccs, n);
+
+    //int lidx = get_local_id(0);
+    //d_x[get_group_id(0) * threadsx + lidx] = d_b[get_group_id(0) * threadsx + lidx];
+
+    return;
 
     //int lidx = get_local_id(0);
     //d_x[get_group_id(0) * threadsx + lidx] = d_b[get_group_id(0) * threadsx + lidx];
@@ -745,12 +678,12 @@ __kernel void trsv_lnn(
        ExTRSV: A rm = xm. d_b contains the result
        ExAXPY: x = x + xm. d_x contains the final result */
 
-    __gemv(d_b, d_a, d_x, d_Superaccs, n);
+    //__gemv(d_b, d_a, d_x, d_Superaccs, n);
 
-    trsv_init(sync);
+    //trsv_init(sync);
     //__trsv_lnn(d_b, d_a, sync, d_Superaccs, n);
 
-    __axpy(d_x, d_b, n);
+    //__axpy(d_x, d_b, n);
 
     //trsv_init(sync);
     //__trsv_ir(d_x, d_a, d_b, sync, d_Superaccs, n);
