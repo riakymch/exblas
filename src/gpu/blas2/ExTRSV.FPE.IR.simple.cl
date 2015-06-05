@@ -333,7 +333,7 @@ void tocache(
     }
 }
 
-/*void __trsv_lnn(
+void __trsv_lnn(
     __global double *d_x,
     __global double *d_b,
     __global double *d_a,
@@ -440,8 +440,8 @@ void tocache(
             if (lidx == i) {
 #if 1
                 // TODO: remove this if
-                if ((lidx == 22) && (get_group_id(0) == 0))
-                    return;
+                //if ((lidx == 22) && (get_group_id(0) == 0))
+                //    return;
 
                 // Add the right-hand side
                 x = d_x[row * threadsx + lidx];
@@ -500,14 +500,14 @@ void tocache(
 #endif
 
                 // TODO: remove this flush
-                /if (i == 25) {
+                /*if (i == 25) {
                     Accumulate(l_working, lda, fpe[2]);
                     Accumulate(l_working, lda, fpe[1]);
                     Accumulate(l_working, lda, fpe[0]);
                     fpe[2] = 0.0;
                     fpe[1] = 0.0;
                     fpe[0] = 0.0;
-                }/
+                }*/
                 fpe[2] = TwoSum(fpe[2], x, &s);
                 x = s;
                 if(fabs(x) > 0.0) {
@@ -550,7 +550,7 @@ void tocache(
                         fpe[0] = 0.0;
                     }
                 }
-#if 1
+#if 0
                 if (i > 0) {
                     int index = 3 * (i - 1);
                     if ((lidx == 22) && (get_group_id(0) == 0)) {
@@ -571,7 +571,6 @@ void tocache(
         atomic_add(&sync[0], 1);   // Use atomicAdd to bypass L1 miss
     barrier(CLK_GLOBAL_MEM_FENCE); // Flush sync[0] asap
 }
-*/
 
 
 void __trsv_lnn_simple(
@@ -660,13 +659,8 @@ __kernel void trsv_lnn(
 ){
 
     // At first we call ExTRSV. d_x holds the result
-    __trsv_lnn_simple(d_x, d_b, d_a, sync, d_Superaccs, n);
-    //__trsv_lnn(d_x, d_b, d_a, sync, d_Superaccs, n);
-
-    //int lidx = get_local_id(0);
-    //d_x[get_group_id(0) * threadsx + lidx] = d_b[get_group_id(0) * threadsx + lidx];
-
-    return;
+    //__trsv_lnn_simple(d_x, d_b, d_a, sync, d_Superaccs, n);
+    __trsv_lnn(d_x, d_b, d_a, sync, d_Superaccs, n);
 
     //int lidx = get_local_id(0);
     //d_x[get_group_id(0) * threadsx + lidx] = d_b[get_group_id(0) * threadsx + lidx];

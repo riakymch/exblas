@@ -170,10 +170,10 @@ extern "C" size_t ExTRSV(
         }
     }
     {
-        //size_t NbThreadsPerWorkGroup[] = {THREADSX, THREADSY};
-        //size_t TotalNbThreads[] = {n, THREADSY};
-        size_t NbThreadsPerWorkGroup[] = {1, 1};
-        size_t TotalNbThreads[] = {1, 1};
+        size_t NbThreadsPerWorkGroup[] = {THREADSX, THREADSY};
+        size_t TotalNbThreads[] = {n, THREADSY};
+        //size_t NbThreadsPerWorkGroup[] = {1, 1};
+        //size_t TotalNbThreads[] = {1, 1};
 
         uint i = 0;
         ciErrNum  = clSetKernelArg(ckKernel, i++, sizeof(cl_mem),  (void *)&d_x);
