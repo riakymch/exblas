@@ -18,6 +18,7 @@
 #else
   #define THREADSX   32
   #define THREADSY    1
+  #define BLOCK_SIZE 32
 #endif
 
 static size_t szKernelLength;                // Byte size of kernel code
@@ -183,7 +184,7 @@ extern "C" size_t ExTRSV(
         ciErrNum &= clSetKernelArg(ckKernel, i++, sizeof(cl_mem),  (void *)&d_sync);
         ciErrNum &= clSetKernelArg(ckKernel, i++, sizeof(cl_mem),  (void *)&d_Superaccs);
         ciErrNum &= clSetKernelArg(ckKernel, i++, BLOCK_SIZE * BLOCK_SIZE * sizeof(cl_double),  NULL);
-        ciErrNum &= clSetKernelArg(ckKernel, i++, sizeof(cl_double),  NULL);
+        //ciErrNum &= clSetKernelArg(ckKernel, i++, sizeof(cl_double),  NULL);
         ciErrNum &= clSetKernelArg(ckKernel, i++, sizeof(cl_uint), (void *)&n);
         if (ciErrNum != CL_SUCCESS) {
             printf("Error in clSetKernelArg, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
