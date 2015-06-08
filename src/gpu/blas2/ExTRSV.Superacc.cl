@@ -225,7 +225,7 @@ void wait_until_ge(
 }
 
 /* Returns next block row index that requires processing */
-#if 1
+#if 0
 void nextRow(
    __local volatile int *old,
    __global volatile int *address
@@ -239,7 +239,8 @@ void nextRow(
 int nextRow(
    __global volatile int *address
 ){
-   __local volatile int old;
+   //__local volatile int old;
+   int old;
    if(get_local_id(0)==0 && get_local_id(1)==0)
       old = atomic_add(address, 1);
 
@@ -290,9 +291,11 @@ __kernel void trsv_lnn(
     __global double *d_a,
     __global int *sync,
     __global long *d_Superaccs,
+    __local double *cache,
+    __local volatile double *xs,
     const uint n
 ){
-    __local double cache[BLOCK_SIZE * BLOCK_SIZE];
+    //__local double cache[BLOCK_SIZE * BLOCK_SIZE];
 
     int lidx = get_local_id(0);
     int lidy = get_local_id(1);
@@ -303,7 +306,7 @@ __kernel void trsv_lnn(
     __global long *l_working = d_Superaccs + get_group_id(0) * lda * BIN_COUNT + tid;
 
     // Get row handled by this block
-#if 1
+#if 0
     __local int row;
     row = 0.0;
     nextRow(&row, &sync[1]);
@@ -350,7 +353,7 @@ __kernel void trsv_lnn(
         barrier(CLK_LOCAL_MEM_FENCE);*/
 
         double val = 0.0;
-        __local volatile double xs;
+        //__local volatile double xs;
         #ifdef NVIDIA
             #pragma unroll
         #endif
@@ -361,10 +364,10 @@ __kernel void trsv_lnn(
                 val = Round(l_working, lda);
                 if (!isunit)
                     val = val / cache[i * (BLOCK_SIZE + 1)];
-                xs = val;
+                *xs = val;
             }
             if (lidx > i) {
-                x = TwoProductFMA(cache[i * BLOCK_SIZE + lidx], xs, &r);
+                x = TwoProductFMA(cache[i * BLOCK_SIZE + lidx], *xs, &r);
 
                 Accumulate(l_working, lda, x);
                 if (r != 0.0)

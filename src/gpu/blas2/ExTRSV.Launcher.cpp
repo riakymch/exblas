@@ -12,11 +12,12 @@
 #define TRSV_INIT "trsv_init"
 #define TRSV_KERNEL "trsv_lnn"
 #ifdef AMD
-  #define THREADSX 32
-  #define THREADSY  4
+  #define THREADSX   32
+  #define THREADSY    1
+  #define BLOCK_SIZE 32
 #else
-  #define THREADSX 32
-  #define THREADSY  1
+  #define THREADSX   32
+  #define THREADSY    1
 #endif
 
 static size_t szKernelLength;                // Byte size of kernel code
@@ -178,9 +179,11 @@ extern "C" size_t ExTRSV(
         uint i = 0;
         ciErrNum  = clSetKernelArg(ckKernel, i++, sizeof(cl_mem),  (void *)&d_x);
         ciErrNum &= clSetKernelArg(ckKernel, i++, sizeof(cl_mem),  (void *)&d_a);
-        ciErrNum &= clSetKernelArg(ckKernel, i++, sizeof(cl_mem),  (void *)&d_x);
+        //ciErrNum &= clSetKernelArg(ckKernel, i++, sizeof(cl_mem),  (void *)&d_x);
         ciErrNum &= clSetKernelArg(ckKernel, i++, sizeof(cl_mem),  (void *)&d_sync);
         ciErrNum &= clSetKernelArg(ckKernel, i++, sizeof(cl_mem),  (void *)&d_Superaccs);
+        ciErrNum &= clSetKernelArg(ckKernel, i++, BLOCK_SIZE * BLOCK_SIZE * sizeof(cl_double),  NULL);
+        ciErrNum &= clSetKernelArg(ckKernel, i++, sizeof(cl_double),  NULL);
         ciErrNum &= clSetKernelArg(ckKernel, i++, sizeof(cl_uint), (void *)&n);
         if (ciErrNum != CL_SUCCESS) {
             printf("Error in clSetKernelArg, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
@@ -190,6 +193,7 @@ extern "C" size_t ExTRSV(
 
         ciErrNum = clEnqueueNDRangeKernel(cqCommandQueue, ckKernel, 2, NULL, TotalNbThreads, NbThreadsPerWorkGroup, 0, NULL, NULL);
         if (ciErrNum != CL_SUCCESS) {
+            printf("ciErrNum = %d\n", ciErrNum);
             printf("Error in clEnqueueNDRangeKernel, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
             *ciErrNumRes = EXIT_FAILURE;
             return 0;
@@ -242,6 +246,7 @@ extern "C" size_t ExTRSVIR(
         ciErrNum &= clSetKernelArg(ckKernel, i++, sizeof(cl_mem),  (void *)&d_b);
         ciErrNum &= clSetKernelArg(ckKernel, i++, sizeof(cl_mem),  (void *)&d_sync);
         ciErrNum &= clSetKernelArg(ckKernel, i++, sizeof(cl_mem),  (void *)&d_Superaccs);
+        ciErrNum &= clSetKernelArg(ckKernel, i++, BLOCK_SIZE * BLOCK_SIZE * sizeof(cl_double),  NULL);
         ciErrNum &= clSetKernelArg(ckKernel, i++, sizeof(cl_uint), (void *)&n);
         if (ciErrNum != CL_SUCCESS) {
             printf("Error in clSetKernelArg, Line %u in file %s !!!\n\n", __LINE__, __FILE__);

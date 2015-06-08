@@ -272,7 +272,7 @@ void wait_until_ge(
 }
 
 /* Returns next block row index that requires processing */
-#if 1
+#if 0
 void nextRow(
    __local volatile int *old,
    __global volatile int *address
@@ -286,7 +286,8 @@ void nextRow(
 int nextRow(
    __global volatile int *address
 ){
-   __local volatile int old;
+   //__local volatile int old;
+   int old;
    if(get_local_id(0)==0 && get_local_id(1)==0)
       old = atomic_add(address, 1);
 
@@ -339,9 +340,10 @@ void __trsv_lnn(
     __global double *d_a,
     __global int *sync,
     __global long *d_Superaccs,
-    const uint n
+    __local double *cache,
+    const uint n,
 ){
-    __local double cache[BLOCK_SIZE * BLOCK_SIZE];
+    //__local double cache[BLOCK_SIZE * BLOCK_SIZE];
 
     int lidx = get_local_id(0);
     int lidy = get_local_id(1);
@@ -352,7 +354,7 @@ void __trsv_lnn(
     __global long *l_working = d_Superaccs + get_group_id(0) * lda * BIN_COUNT + tid;
 
     // Get row handled by this block
-#if 1
+#if 0
     __local int row;
     row = 0;
     nextRow(&row, &sync[1]);
