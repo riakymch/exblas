@@ -12,9 +12,9 @@
 #define TRSV_INIT "trsv_init"
 #define TRSV_KERNEL "trsv_lnn"
 #ifdef AMD
-  #define THREADSX   64
+  #define THREADSX   32
   #define THREADSY    1
-  #define BLOCK_SIZE 64
+  #define BLOCK_SIZE 32
 #else
   #define THREADSX   32
   #define THREADSY    1
@@ -31,7 +31,7 @@ static cl_mem           d_sync;
 static cl_mem           d_Superaccs;
 
 #ifdef AMD
-static char  compileOptions[256] = "-DUSE_KNUTH -DBLOCK_SIZE=64 -Dthreadsx=64 -Dthreadsy=1";
+static char  compileOptions[256] = "-DUSE_KNUTH -DBLOCK_SIZE=32 -Dthreadsx=32 -Dthreadsy=1";
 #else
 //static char  compileOptions[256] = "-DNVIDIA -DUSE_KNUTH -DBLOCK_SIZE=32 -Dthreadsx=32 -Dthreadsy=1 -cl-mad-enable -cl-fast-relaxed-math"; // -cl-nv-verbose";
 static char  compileOptions[256] = "-DNVIDIA -DUSE_KNUTH -DBLOCK_SIZE=32 -Dthreadsx=32 -Dthreadsy=1 -cl-mad-enable";

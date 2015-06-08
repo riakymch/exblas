@@ -214,13 +214,13 @@ void wait_until_ge(
     int col_to_wait,
     int *col_done
 ){
-    if(tid == 0) {
+    //if(tid == 0) {
         // Only read global memory when necessary
         if (*col_done < col_to_wait) {
             while(*sync < col_to_wait) {}
-            *col_done = *sync;
+            	*col_done = *sync;
         }
-    }
+    //}
     barrier(CLK_GLOBAL_MEM_FENCE);
 }
 
@@ -233,14 +233,6 @@ void nextRow(
       *old = atomic_add(address, 1);
 
    barrier(CLK_GLOBAL_MEM_FENCE);
-}
-
-/* Sets sync values correctly prior to call to trsv_ln_exec */
-__kernel void trsv_init(
-    __global int *sync
-){
-   sync[0] = -1; // Last ready column
-   sync[1] = 0;  // Next row to assign
 }
 
 /* Copies a nbi x nbi block of a to provided cache.
@@ -272,10 +264,22 @@ void tocache(
     }
 }
 
+
+/* 
+ * Sets sync values correctly prior to call to trsv_ln_exec
+ */
+__kernel void trsv_init(
+    __global int *sync
+){
+   sync[0] = -1; // Last ready column
+   sync[1] = 0;  // Next row to assign
+}
+
+
 __kernel void trsv_lnn(
     __global double *d_x,
     __global double *d_a,
-    __global int *sync,
+    __global volatile int *sync,
     __global long *d_Superaccs,
     __local double *cache,
     __local int *row,
@@ -306,9 +310,6 @@ __kernel void trsv_lnn(
     for (uint i = 0; i < BIN_COUNT; i++)
         l_working[i * lda] = 0.0;
     int col_done = -1;
-
-    d_x[lidx] = 1.0;
-    return;
 
     double x, r;
     for (int col = 0; col < *row; col++) {
