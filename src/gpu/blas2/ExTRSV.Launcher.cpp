@@ -12,9 +12,9 @@
 #define TRSV_INIT "trsv_init"
 #define TRSV_KERNEL "trsv_lnn"
 #ifdef AMD
-  #define THREADSX   32
+  #define THREADSX   64
   #define THREADSY    1
-  #define BLOCK_SIZE 32
+  #define BLOCK_SIZE 64
 #else
   #define THREADSX   32
   #define THREADSY    1
@@ -31,10 +31,10 @@ static cl_mem           d_sync;
 static cl_mem           d_Superaccs;
 
 #ifdef AMD
-static char  compileOptions[256] = "-DUSE_KNUTH -DBLOCK_SIZE=32 -Dthreadsx=32 -Dthreadsy=1";
+static char  compileOptions[256] = "-DUSE_KNUTH -DBLOCK_SIZE=64 -Dthreadsx=64 -Dthreadsy=1";
 #else
 //static char  compileOptions[256] = "-DNVIDIA -DUSE_KNUTH -DBLOCK_SIZE=32 -Dthreadsx=32 -Dthreadsy=1 -cl-mad-enable -cl-fast-relaxed-math"; // -cl-nv-verbose";
-static char  compileOptions[256] = "-DNVIDIA -DUSE_KNUTH -DBLOCK_SIZE=32 -Dthreadsx=32 -Dthreadsy=1";
+static char  compileOptions[256] = "-DNVIDIA -DUSE_KNUTH -DBLOCK_SIZE=32 -Dthreadsx=32 -Dthreadsy=1 -cl-mad-enable";
 #endif
 
 
@@ -180,7 +180,6 @@ extern "C" size_t ExTRSV(
         uint i = 0;
         ciErrNum  = clSetKernelArg(ckKernel, i++, sizeof(cl_mem),  (void *)&d_x);
         ciErrNum &= clSetKernelArg(ckKernel, i++, sizeof(cl_mem),  (void *)&d_a);
-        //ciErrNum &= clSetKernelArg(ckKernel, i++, sizeof(cl_mem),  (void *)&d_x);
         ciErrNum &= clSetKernelArg(ckKernel, i++, sizeof(cl_mem),  (void *)&d_sync);
         ciErrNum &= clSetKernelArg(ckKernel, i++, sizeof(cl_mem),  (void *)&d_Superaccs);
         ciErrNum &= clSetKernelArg(ckKernel, i++, BLOCK_SIZE * BLOCK_SIZE * sizeof(cl_double),  NULL);
