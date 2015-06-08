@@ -657,12 +657,15 @@ __kernel void trsv_lnn(
     __global double *d_b,
     __global int *sync,
     __global long *d_Superaccs,
+    __local double *cache,
+    __local int *row,
+    __local volatile double *xs,
     const uint n
 ){
 
     // At first we call ExTRSV. d_x holds the result
-    //__trsv_lnn_simple(d_x, d_b, d_a, sync, d_Superaccs, n);
-    __trsv_lnn(d_x, d_b, d_a, sync, d_Superaccs, n);
+    __trsv_lnn_simple(d_x, d_b, d_a, sync, d_Superaccs, n);
+    //__trsv_lnn(d_x, d_b, d_a, sync, d_Superaccs, n);
 
     //int lidx = get_local_id(0);
     //d_x[get_group_id(0) * threadsx + lidx] = d_b[get_group_id(0) * threadsx + lidx];
