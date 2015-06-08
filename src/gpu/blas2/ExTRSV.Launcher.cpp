@@ -77,6 +77,10 @@ extern "C" cl_int initExTRSV(
         char compileOptionsBak[256];
         sprintf(compileOptionsBak, "%s -DNBFPE=%d", compileOptions, NbFPE);
         ciErrNum = clBuildProgram(cpProgram, 0, NULL, compileOptionsBak, NULL, NULL);
+            char buildLog[8192];
+            clGetDeviceInfo(cdDevice, CL_DEVICE_VERSION, sizeof(buildLog), &buildLog, NULL);
+            printf("%s\n", buildLog);
+            exit(0);
         if (ciErrNum != CL_SUCCESS) {
             printf("Error in clBuildProgram, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
 
