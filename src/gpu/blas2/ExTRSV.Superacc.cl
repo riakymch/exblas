@@ -214,13 +214,13 @@ void wait_until_ge(
     int col_to_wait,
     int *col_done
 ){
-    //if(tid == 0) {
+    if(tid == 0) {
         // Only read global memory when necessary
         if (*col_done < col_to_wait) {
             while(*sync < col_to_wait) {}
             	*col_done = *sync;
         }
-    //}
+    }
     barrier(CLK_GLOBAL_MEM_FENCE);
 }
 
@@ -366,7 +366,7 @@ __kernel void trsv_lnn(
 
     // Notify other blocks that soln is ready for this row
     barrier(CLK_GLOBAL_MEM_FENCE); // Wait for d_x to be visible to other blocks
-    //if(tid == 0)
+    if(tid == 0)
         atomic_add(&sync[0], 1);   // Use atomicAdd to bypass L1 miss
     barrier(CLK_GLOBAL_MEM_FENCE); // Flush sync[0] asap
 }
