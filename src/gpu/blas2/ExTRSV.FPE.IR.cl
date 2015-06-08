@@ -272,7 +272,6 @@ void wait_until_ge(
 }
 
 /* Returns next block row index that requires processing */
-#if 0
 void nextRow(
    __local volatile int *old,
    __global volatile int *address
@@ -282,19 +281,6 @@ void nextRow(
 
    barrier(CLK_GLOBAL_MEM_FENCE);
 }
-#else
-int nextRow(
-   __global volatile int *address
-){
-   //__local volatile int old;
-   int old;
-   if(get_local_id(0)==0 && get_local_id(1)==0)
-      old = atomic_add(address, 1);
-
-   barrier(CLK_GLOBAL_MEM_FENCE);
-   return old;
-}
-#endif
 
 /* Sets sync values correctly prior to call to trsv_ln_exec */
 __kernel void trsv_init(
@@ -341,7 +327,7 @@ void __trsv_lnn(
     __global int *sync,
     __global long *d_Superaccs,
     __local double *cache,
-    const uint n,
+    const uint n
 ){
     //__local double cache[BLOCK_SIZE * BLOCK_SIZE];
 
@@ -354,13 +340,9 @@ void __trsv_lnn(
     __global long *l_working = d_Superaccs + get_group_id(0) * lda * BIN_COUNT + tid;
 
     // Get row handled by this block
-#if 0
     __local int row;
     row = 0;
     nextRow(&row, &sync[1]);
-#else
-    int row = nextRow(&sync[1]);
-#endif
 
     // Copy diagonal block to shared memory
     tocache(&d_a[row * BLOCK_SIZE * n + row * BLOCK_SIZE], cache, BLOCK_SIZE, lda, 0, isunit, tid, n);
@@ -695,11 +677,12 @@ __kernel void trsv_lnn(
     __global double *d_b,
     __global int *sync,
     __global long *d_Superaccs,
+    __local double *cache,
     const uint n
 ){
 
     // At first we call ExTRSV. d_x holds the result
-    __trsv_lnn(d_x, d_b, d_a, sync, d_Superaccs, n);
+    __trsv_lnn(d_x, d_b, d_a, sync, d_Superaccs, cache, n);
 
     //int lidx = get_local_id(0);
     //d_x[get_group_id(0) * threadsx + lidx] = d_b[get_group_id(0) * threadsx + lidx];
