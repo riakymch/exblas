@@ -293,6 +293,7 @@ __kernel void trsv_lnn(
     __global long *d_Superaccs,
     __local double *cache,
     //__local volatile double *xs,
+    __local int *row,
     const uint n
 ){
     //__local double cache[BLOCK_SIZE * BLOCK_SIZE];
@@ -307,15 +308,16 @@ __kernel void trsv_lnn(
 
     // Get row handled by this block
 #if 1
-    __local int row;
-    row = 0.0;
-    nextRow(&row, &sync[1]);
+    //__local int row;
+    *row = 0.0;
+    nextRow(row, &sync[1]);
+    //nextRow(&row, &sync[1]);
 #else
     int row = nextRow(&sync[1]);
 #endif
 
     // Copy diagonal block to shared memory
-    tocache(&d_a[row * BLOCK_SIZE * n + row * BLOCK_SIZE], cache, BLOCK_SIZE, lda, 0, isunit, tid, n);
+    tocache(&d_a[*row * BLOCK_SIZE * n + *row * BLOCK_SIZE], cache, BLOCK_SIZE, lda, 0, isunit, tid, n);
     barrier(CLK_LOCAL_MEM_FENCE);
 
     // Loop over blocks as they become available
@@ -325,14 +327,14 @@ __kernel void trsv_lnn(
     int col_done = -1;
 
     double x, r;
-    for (int col = 0; col < row; col++) {
+    for (int col = 0; col < *row; col++) {
         wait_until_ge(tid, &sync[0], col, &col_done); // Wait for diagonal block to be done
         #ifdef NVIDIA
             #pragma unroll
         #endif
         for (int j = 0; j < BLOCK_SIZE; j+=threadsy) {
             double xp = -d_x[col * BLOCK_SIZE + lidy + j];
-            x = TwoProductFMA(d_a[(col * BLOCK_SIZE + lidy) * n + row * BLOCK_SIZE + lidx + j * n], xp, &r);
+            x = TwoProductFMA(d_a[(col * BLOCK_SIZE + lidy) * n + *row * BLOCK_SIZE + lidx + j * n], xp, &r);
 
             Accumulate(l_working, lda, x);
             if (r != 0.0)
@@ -359,7 +361,7 @@ __kernel void trsv_lnn(
         #endif
         for (uint i = 0; i < BLOCK_SIZE; i++) {
             if (lidx == i) {
-                Accumulate(l_working, lda, d_x[row * threadsx + lidx]);
+                Accumulate(l_working, lda, d_x[*row * threadsx + lidx]);
 
                 val = Round(l_working, lda);
                 if (!isunit)
@@ -374,7 +376,7 @@ __kernel void trsv_lnn(
                     Accumulate(l_working, lda, r);
             }
         }
-        d_x[row * BLOCK_SIZE + tid] = val;
+        d_x[*row * BLOCK_SIZE + tid] = val;
     }
 
     // Notify other blocks that soln is ready for this row
