@@ -4,8 +4,8 @@
  */
 
 /**
- *  \file  ExSUM.Launcher.hpp
- *  \brief Provides a set of routines for executing summation on GPUs.
+ *  \file  ExDOT.Launcher.hpp
+ *  \brief Provides a set of routines for executing dot product on GPUs.
  *         For internal use
  *
  *  \authors
@@ -14,8 +14,8 @@
  *        Sylvain Collange -- sylvain.collange@inria.fr \n
  */
 
-#ifndef EXSUM_LAUNCHER_HPP_
-#define EXSUM_LAUNCHER_HPP_
+#ifndef EXDOT_LAUNCHER_HPP_
+#define EXDOT_LAUNCHER_HPP_
 
 #include <cmath>
 #include <cstdio>
@@ -42,7 +42,7 @@ typedef long long int bintype;
 // GPU reduction related functions
 ////////////////////////////////////////////////////////////////////////////////
 /**
- * \ingroup ExSUM
+ * \ingroup ExDOT
  * \brief Function to initialize execution on GPUs by allocating kernels and 
  *     memory space. For internal use
  *
@@ -50,11 +50,11 @@ typedef long long int bintype;
  * \param cqParamCommandQue Command queue
  * \param cdDevice Device ID
  * \param program_file OpenCL file to execute
- * \param NbElements Nb of elements to sum
+ * \param NbElements Nb of elements of two vectors
  * \param NbFPE Size of FPEs
  * \return Status
  */
-extern "C" cl_int initExSUM(
+extern "C" cl_int initExDOT(
     cl_context cxGPUContext,
     cl_command_queue cqParamCommandQue,
     cl_device_id cdDevice,
@@ -64,31 +64,35 @@ extern "C" cl_int initExSUM(
 );
 
 /**
- * \ingroup ExSUM
+ * \ingroup ExDOT
  * \brief Function to finish the execution on GPUs. It is sort of garbage collector.
  *     For internal use
  */
-extern "C" void closeExSUM(
+extern "C" void closeExDOT(
     void
 );
 
 /**
- * \ingroup ExSUM
- * \brief Executes parallel reduction on GPUs. For internal use
+ * \ingroup ExDOT
+ * \brief Executes parallel dot product on GPUs. For internal use
  *
  * \param cqCommandQueue Command queue
  * \param d_Res Result of summation rounded to the nearest
- * \param d_a vector to sum up
- * \param inca incremenet of vector a
+ * \param d_a vector a
+ * \param inca increment of vector a
+ * \param d_b vector b
+ * \param incb increment of vector b
  * \param ciErrNum Error number (output)
  * \return status
  */
-extern "C" size_t ExSUM(
+extern "C" size_t ExDOT(
     cl_command_queue cqCommandQueue,
     cl_mem d_Res,
     cl_mem d_a,
     cl_uint inca,
+    cl_mem d_b,
+    cl_uint incb,
     cl_int *ciErrNum
 );
 
-#endif // EXSUM_LAUNCHER_HPP_
+#endif // EXDOT_LAUNCHER_HPP_
