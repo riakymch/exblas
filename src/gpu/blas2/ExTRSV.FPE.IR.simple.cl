@@ -580,7 +580,7 @@ void __trsv_lnn_simple(
         for(uint j = 0; j < i; j++) {
             r = TwoProd(d_a[j * n + i], -d_x[j], &s);
 
-            /*fpe[2] = TwoSum(fpe[2], r, &z);
+            fpe[2] = TwoSum(fpe[2], r, &z);
             r = z;
             if (r != 0.0) {
                 fpe[1] = TwoSum(fpe[1], r, &z);
@@ -589,11 +589,11 @@ void __trsv_lnn_simple(
                     fpe[0] = TwoSum(fpe[0], r, &z);
                     r = z;
                 }
-            }*/
+            }
             if (r != 0.0)
                 Accumulate(l_working, lda, r);
 
-            /*if (s != 0.0) {
+            if (s != 0.0) {
                 fpe[2] = TwoSum(fpe[2], s, &z);
                 s = z;
                 if (s != 0.0) {
@@ -604,14 +604,14 @@ void __trsv_lnn_simple(
                         s = z;
                     }
                 }
-            }*/
-            if (s != 0.0)
-                Accumulate(l_working, lda, s);
+            	if (s != 0.0)
+                    Accumulate(l_working, lda, s);
+            }
         }
 
         //Accumulate(l_working, lda, d_x[i]);
         r = d_x[i];
-        /*fpe[2] = TwoSum(fpe[2], r, &z);
+        fpe[2] = TwoSum(fpe[2], r, &z);
         r = z;
         if (r != 0.0) {
             fpe[1] = TwoSum(fpe[1], r, &z);
@@ -620,13 +620,13 @@ void __trsv_lnn_simple(
                 fpe[0] = TwoSum(fpe[0], r, &z);
                 r = z;
             }
-        }*/
+        }
         if (r != 0.0)
             Accumulate(l_working, lda, r);
 
-        /*Accumulate(l_working, lda, fpe[2]);
+        Accumulate(l_working, lda, fpe[2]);
         Accumulate(l_working, lda, fpe[1]);
-        Accumulate(l_working, lda, fpe[0]);*/
+        Accumulate(l_working, lda, fpe[0]);
         double sum = Round(l_working, lda);
 
         d_x[i] = sum; // / d_a[i * (n + 1)];

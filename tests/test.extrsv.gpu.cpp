@@ -51,17 +51,8 @@ static double extrsvVsMPFR(double *extrsv, uint n, double *a, uint lda, double *
         printf("%.16g\t", xmatlab[i]);
     printf("\n\n");
 
-    /*for(uint i = 0; i < n; i++)
+    for(uint i = 0; i < n; i++)
         printf("%.16g\t", extrsv[i]);
-    printf("\n\n");*/
-
-    printf("err = [");
-    for(uint i = 0; i < 63; i++) {
-        printf("%.16g,\t", extrsv[i]);
-        //if ((i+1) % 2 == 0)
-        //    printf(";");
-    }
-    printf("];");
     printf("\n\n");
 
     //Inf norm
