@@ -272,7 +272,6 @@ void wait_until_ge(
 }
 
 /* Returns next block row index that requires processing */
-#if 0
 void nextRow(
    __local volatile int *old,
    __global volatile int *address
@@ -282,19 +281,6 @@ void nextRow(
 
    barrier(CLK_GLOBAL_MEM_FENCE);
 }
-#else
-int nextRow(
-   __global volatile int *address
-){
-   //__local volatile int old;
-   int old;
-   if(get_local_id(0)==0 && get_local_id(1)==0)
-      old = atomic_add(address, 1);
-
-   barrier(CLK_GLOBAL_MEM_FENCE);
-   return old;
-}
-#endif
 
 /* Sets sync values correctly prior to call to trsv_ln_exec */
 __kernel void trsv_init(
@@ -341,6 +327,8 @@ void __trsv_lnn(
     __global int *sync,
     __global long *d_Superaccs,
     __local double* cache,
+    __local int *row,
+    __local volatile double *xs,
     const uint n
 ){
     //__local double cache[BLOCK_SIZE * BLOCK_SIZE];
@@ -354,16 +342,12 @@ void __trsv_lnn(
     __global long *l_working = d_Superaccs + get_group_id(0) * lda * BIN_COUNT + tid;
 
     // Get row handled by this block
-#if 0
-    __local int row;
-    row = 0;
-    nextRow(&row, &sync[1]);
-#else
-    int row = nextRow(&sync[1]);
-#endif
+    //__local int row;
+    *row = 0;
+    nextRow(row, &sync[1]);
 
     // Copy diagonal block to shared memory
-    tocache(&d_a[row * BLOCK_SIZE * n + row * BLOCK_SIZE], cache, BLOCK_SIZE, lda, 0, isunit, tid, n);
+    tocache(&d_a[*row * BLOCK_SIZE * n + *row * BLOCK_SIZE], cache, BLOCK_SIZE, lda, 0, isunit, tid, n);
     barrier(CLK_LOCAL_MEM_FENCE);
 
     // Loop over blocks as they become available
@@ -376,14 +360,14 @@ void __trsv_lnn(
     double x, s, r;
     int col_done = -1;
 
-    for (int col = 0; col < row; col++) {
+    for (int col = 0; col < *row; col++) {
         wait_until_ge(tid, &sync[0], col, &col_done); // Wait for diagonal block to be done
         #ifdef NVIDIA
             #pragma unroll
         #endif
         for (int j = 0; j < BLOCK_SIZE; j+=threadsy) {
             double xp = -d_x[col * BLOCK_SIZE + lidy + j];
-            x = TwoProd(d_a[(col * BLOCK_SIZE + lidy) * n + row * BLOCK_SIZE + lidx + j * n], xp, &r);
+            x = TwoProd(d_a[(col * BLOCK_SIZE + lidy) * n + *row * BLOCK_SIZE + lidx + j * n], xp, &r);
 
             fpe[2] = TwoSum(fpe[2], x, &s);
             x = s;
@@ -434,7 +418,7 @@ void __trsv_lnn(
     // Apply update from diagonal block (row, row)
     if (lidy == 0) {
         double val = 0.0;
-        __local volatile double xs;
+        //__local volatile double xs;
         #ifdef NVIDIA
             #pragma unroll
         #endif
@@ -446,7 +430,7 @@ void __trsv_lnn(
                 //    return;
 
                 // Add the right-hand side
-                x = d_x[row * threadsx + lidx];
+                x = d_x[*row * threadsx + lidx];
                 fpe[2] = TwoSum(fpe[2], x, &s);
                 x = s;
                 if(x != 0.0) {
@@ -488,10 +472,10 @@ void __trsv_lnn(
                 if (!isunit)
                     //val = val / d_a[row * threadsx * n + row * BLOCK_SIZE + i * n + i];
                     val = val / cache[i * (BLOCK_SIZE + 1)];
-                xs = val;
+                *xs = val;
             }
             if (lidx > i) {
-                x = TwoProd(cache[i * BLOCK_SIZE + lidx], xs, &r);
+                x = TwoProd(cache[i * BLOCK_SIZE + lidx], *xs, &r);
 #if 0
                 int index = 2 * i;
                 if ((lidx == 22) && (get_group_id(0) == 0)) {
@@ -564,7 +548,7 @@ void __trsv_lnn(
 #endif
             }
         }
-        d_x[row * BLOCK_SIZE + tid] = val;
+        d_x[*row * BLOCK_SIZE + tid] = val;
     }
 
     // Notify other blocks that soln is ready for this row
@@ -577,7 +561,6 @@ void __trsv_lnn(
 
 void __trsv_lnn_simple(
     __global double *d_x,
-    __global double *d_b,
     __global double *d_a,
     __global int *sync,
     __global long *d_Superaccs,
@@ -597,7 +580,7 @@ void __trsv_lnn_simple(
         for(uint j = 0; j < i; j++) {
             r = TwoProd(d_a[j * n + i], -d_x[j], &s);
 
-            fpe[2] = TwoSum(fpe[2], r, &z);
+            /*fpe[2] = TwoSum(fpe[2], r, &z);
             r = z;
             if (r != 0.0) {
                 fpe[1] = TwoSum(fpe[1], r, &z);
@@ -606,11 +589,11 @@ void __trsv_lnn_simple(
                     fpe[0] = TwoSum(fpe[0], r, &z);
                     r = z;
                 }
-            }
+            }*/
             if (r != 0.0)
                 Accumulate(l_working, lda, r);
 
-            if (s != 0.0) {
+            /*if (s != 0.0) {
                 fpe[2] = TwoSum(fpe[2], s, &z);
                 s = z;
                 if (s != 0.0) {
@@ -621,14 +604,14 @@ void __trsv_lnn_simple(
                         s = z;
                     }
                 }
-            }
+            }*/
             if (s != 0.0)
                 Accumulate(l_working, lda, s);
         }
 
         //Accumulate(l_working, lda, d_x[i]);
         r = d_x[i];
-        fpe[2] = TwoSum(fpe[2], r, &z);
+        /*fpe[2] = TwoSum(fpe[2], r, &z);
         r = z;
         if (r != 0.0) {
             fpe[1] = TwoSum(fpe[1], r, &z);
@@ -637,16 +620,16 @@ void __trsv_lnn_simple(
                 fpe[0] = TwoSum(fpe[0], r, &z);
                 r = z;
             }
-        }
+        }*/
         if (r != 0.0)
             Accumulate(l_working, lda, r);
 
-        Accumulate(l_working, lda, fpe[2]);
+        /*Accumulate(l_working, lda, fpe[2]);
         Accumulate(l_working, lda, fpe[1]);
-        Accumulate(l_working, lda, fpe[0]);
+        Accumulate(l_working, lda, fpe[0]);*/
         double sum = Round(l_working, lda);
 
-        d_x[i] = sum / d_a[i * (n + 1)];
+        d_x[i] = sum; // / d_a[i * (n + 1)];
     }
 }
 
@@ -654,7 +637,6 @@ void __trsv_lnn_simple(
 __kernel void trsv_lnn(
     __global double *d_x,
     __global double *d_a,
-    __global double *d_b,
     __global int *sync,
     __global long *d_Superaccs,
     __local double *cache,
@@ -664,8 +646,8 @@ __kernel void trsv_lnn(
 ){
 
     // At first we call ExTRSV. d_x holds the result
-    __trsv_lnn_simple(d_x, d_b, d_a, sync, d_Superaccs, n);
-    //__trsv_lnn(d_x, d_b, d_a, sync, d_Superaccs, n);
+    __trsv_lnn_simple(d_x, d_a, sync, d_Superaccs, n);
+    //__trsv_lnn(d_x, d_b, d_a, sync, d_Superaccs, cache, row, xs, n);
 
     //int lidx = get_local_id(0);
     //d_x[get_group_id(0) * threadsx + lidx] = d_b[get_group_id(0) * threadsx + lidx];
