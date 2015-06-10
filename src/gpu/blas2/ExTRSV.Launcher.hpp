@@ -95,31 +95,5 @@ extern "C" size_t ExTRSV(
     cl_int *ciErrNum
 );
 
-/**
- * \ingroup ExTRSV
- * \brief Executes parallel triangular solver on GPU in case of iterative refinement.
- *   For internal use
- *
- * \param cqCommandQueue Command queue
- * \param n size of matrix A
- * \param d_a matrix A
- * \param lda leading dimension of A
- * \param d_x vector
- * \param incx the increment for the elements of a
- * \param d_b vector
- * \param ciErrNum Error number (output)
- * \return status
- */
-extern "C" size_t ExTRSVIR(
-    cl_command_queue cqCommandQueue,
-    const uint n,
-    const cl_mem d_a,
-    const uint lda,
-    const cl_mem d_x,
-    const uint incx,
-    const cl_mem d_b,
-    cl_int *ciErrNum
-);
-
 #endif // EXTRSV_LAUNCHER_HPP_
 

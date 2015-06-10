@@ -58,7 +58,7 @@ static double min(double arr[], int size) {
  * \param incb specifies the increment for the elements of b
  * \param fpe size of floating-point expansion
  * \param program_file path to the file with kernels
- * \return Contains the reproducible and accurate sum of elements of a real vector
+ * \return Contains the reproducible and accurate dot product of two real vectors
  */
 static double runExDOT(int N, double *a, int inca, double *b, int incb, int fpe, const char* program_file);
 
