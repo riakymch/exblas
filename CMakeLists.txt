@@ -40,23 +40,27 @@ set (CPACK_PACKAGE_VERSION_MAJOR "${EXBLAS_VERSION_MAJOR}")
 set (CPACK_PACKAGE_VERSION_MINOR "${EXBLAS_VERSION_MINOR}")
 include (CPack)
 
+# Generate documentation
 # add a target to generate API documentation with Doxygen
-find_package (Doxygen)
-if (DOXYGEN_FOUND)
-    configure_file (${PROJECT_SOURCE_DIR}/doc/Doxyfile.in ${PROJECT_BINARY_DIR}/doc/Doxyfile @ONLY)
-    add_custom_target (doc
-        ${DOXYGEN_EXECUTABLE} ${PROJECT_BINARY_DIR}/doc/Doxyfile
-        WORKING_DIRECTORY ${PROJECT_BINARY_DIR}
-        COMMENT "Generating API documentation with Doxygen" VERBATIM
-    )
-    # to build latex documentation
-    include (tests/UseLATEX)
-    SET (LATEX_OUTPUT_PATH ${PROJECT_BINARY_DIR}/doc/latex)
-    ADD_LATEX_DOCUMENT (
-        refman.tex
-        USE_INDEX
-        USE_GLOSSARY
-    )
-    add_dependencies(pdf doc)
-endif (DOXYGEN_FOUND)
+option (EXBLAS_DOC "Generate the ExBLAS documentation using Doxygen and LaTeX" OFF)
+if (EXBLAS_DOC)
+    find_package (Doxygen)
+    if (DOXYGEN_FOUND)
+        configure_file (${PROJECT_SOURCE_DIR}/doc/Doxyfile.in ${PROJECT_BINARY_DIR}/doc/Doxyfile @ONLY)
+        add_custom_target (doc
+            ${DOXYGEN_EXECUTABLE} ${PROJECT_BINARY_DIR}/doc/Doxyfile
+            WORKING_DIRECTORY ${PROJECT_BINARY_DIR}
+            COMMENT "Generating API documentation with Doxygen" VERBATIM
+        )
+        # to build latex documentation
+        include (tests/UseLATEX)
+        SET (LATEX_OUTPUT_PATH ${PROJECT_BINARY_DIR}/doc/latex)
+        ADD_LATEX_DOCUMENT (
+            refman.tex
+            USE_INDEX
+            USE_GLOSSARY
+        )
+        add_dependencies(pdf doc)
+    endif (DOXYGEN_FOUND)
+endif (EXBLAS_DOC)
 

@@ -78,6 +78,16 @@ Testing
 
 * All tests are stored in the tests dir
 
+Documentation
+---------------------------------------------
+* [Required] Doxygen of version 1.8.0;
+
+* [Optional] LaTeX in case you want to generate documentation in PDF format;
+
+* -DEXBLAS_DOC=ON -- enables generationg of the ExBLAS documentation using Doxygen and LaTeX
+
+* make doc -- command to generate the ExBLAS documentation
+
 
 Examples
 =============================================
