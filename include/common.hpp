@@ -22,7 +22,6 @@
 
 /**
  * \defgroup common Common Definitions and Functions
- * \ingroup blas1
  */
 
 /**
