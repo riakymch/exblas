@@ -276,8 +276,8 @@ int main(int argc, char *argv[]) {
         is_pass = false;
     }
 #endif
-    exit(0);
 
+    exit(0);
     copyVector(n, x, xorig);
     extrsv('L', 'N', 'N', n, a, n, x, 1, 1);
 #ifdef EXBLAS_VS_MPFR
