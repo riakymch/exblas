@@ -4,13 +4,13 @@
  */
 
 #include "common.hpp"
-#include "ExSUM.Launcher.hpp"
+#include "ExDOT.Launcher.hpp"
 
 ////////////////////////////////////////////////////////////////////////////////
 // OpenCL launcher for bitonic sort kernel
 ////////////////////////////////////////////////////////////////////////////////
-#define EXSUM_KERNEL          "ExSUM"
-#define EXSUM_COMPLETE_KERNEL "ExSUMComplete"
+#define EXDOT_KERNEL          "ExDOT"
+#define EXDOT_COMPLETE_KERNEL "ExDOTComplete"
 
 static size_t szKernelLength;                // Byte size of kernel code
 static char* cSources = NULL;                // Buffer to hold source for compilation
@@ -19,27 +19,26 @@ static cl_program       cpProgram;           //OpenCL Superaccumulator program
 static cl_kernel        ckKernel;            //OpenCL Superaccumulator kernels
 static cl_kernel        ckComplete;
 static cl_command_queue cqDefaultCommandQue; //Default command queue for Superaccumulator
-static cl_mem           d_Superacc;
 static cl_mem           d_PartialSuperaccs;
 
-static const uint PARTIAL_SUPERACCS_COUNT = 512;
+static const uint PARTIAL_SUPERACCS_COUNT = 512; //1024
 static const uint WORKGROUP_SIZE          = 256;
-static const uint MERGE_WORKGROUP_SIZE    = 64;
-static const uint MERGE_SUPERACCS_SIZE    = 128;
+static const uint MERGE_WORKGROUP_SIZE    = 64;  //256
+static const uint MERGE_SUPERACCS_SIZE    = 128; //--
 static uint vector_number                 = 1;
 static uint NbElements;
 
 #ifdef AMD
 static char  compileOptions[256] = "-DWARP_COUNT=16 -DWARP_SIZE=16 -DMERGE_WORKGROUP_SIZE=64 -DMERGE_SUPERACCS_SIZE=128 -DUSE_KNUTH";
 #else
-static char  compileOptions[256] = "-DWARP_COUNT=16 -DWARP_SIZE=16 -DMERGE_WORKGROUP_SIZE=64 -DMERGE_SUPERACCS_SIZE=128 -DUSE_KNUTH -DNVIDIA -cl-mad-enable -cl-fast-relaxed-math"; // -cl-nv-verbose";
+static char  compileOptions[256] = "-DWARP_COUNT=16 -DWARP_SIZE=16 -DMERGE_WORKGROUP_SIZE=64 -DMERGE_SUPERACCS_SIZE=128 -DUSE_KNUTH -DNVIDIA -cl-mad-enable -cl-fast-relaxed-math";
 #endif
 
 
 ////////////////////////////////////////////////////////////////////////////////
 // GPU reduction related functions
 ////////////////////////////////////////////////////////////////////////////////
-extern "C" cl_int initExSUM(
+extern "C" cl_int initExDOT(
     cl_context cxGPUContext,
     cl_command_queue cqParamCommandQue,
     cl_device_id cdDevice,
@@ -49,11 +48,9 @@ extern "C" cl_int initExSUM(
 ){
     cl_int ciErrNum;
     NbElements = NbElems;
-    vector_number = 2;
 
     // Read the OpenCL kernel in from source file
     FILE *program_handle;
-    //printf("Load the program sources (%s)...\n", program_file);
     program_handle = fopen(program_file, "r");
     if (!program_handle) {
         fprintf(stderr, "Failed to load kernel.\n");
@@ -67,52 +64,43 @@ extern "C" cl_int initExSUM(
     ciErrNum = fread(cSources, sizeof(char), szKernelLength, program_handle);
     fclose(program_handle);
 
-    //printf("clCreateProgramWithSource...\n"); 
-        cpProgram = clCreateProgramWithSource(cxGPUContext, 1, (const char **)&cSources, &szKernelLength, &ciErrNum);
-        if (ciErrNum != CL_SUCCESS) {
-            printf("Error in clCreateProgramWithSource, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
-            return EXIT_FAILURE;
-        }
+    cpProgram = clCreateProgramWithSource(cxGPUContext, 1, (const char **)&cSources, &szKernelLength, &ciErrNum);
+    if (ciErrNum != CL_SUCCESS) {
+        printf("Error in clCreateProgramWithSource, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
+        return EXIT_FAILURE;
+    }
 
-    //printf("...building ExSUM program\n");
-        sprintf(compileOptions, "%s -DNBFPE=%d", compileOptions, NbFPE);
-        ciErrNum = clBuildProgram(cpProgram, 0, NULL, compileOptions, NULL, NULL);
-        if (ciErrNum != CL_SUCCESS) {
-            printf("Error in clBuildProgram, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
+    sprintf(compileOptions, "%s -DNBFPE=%d", compileOptions, NbFPE);
+    ciErrNum = clBuildProgram(cpProgram, 0, NULL, compileOptions, NULL, NULL);
+    if (ciErrNum != CL_SUCCESS) {
+        printf("Error in clBuildProgram, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
 
-            // Determine the reason for the error
-            char buildLog[16384];
-            clGetProgramBuildInfo(cpProgram, cdDevice, CL_PROGRAM_BUILD_LOG, sizeof(buildLog), &buildLog, NULL);
-            printf("%s\n", buildLog);
+        // Determine the reason for the error
+        char buildLog[16384];
+        clGetProgramBuildInfo(cpProgram, cdDevice, CL_PROGRAM_BUILD_LOG, sizeof(buildLog), &buildLog, NULL);
+        printf("%s\n", buildLog);
 
-            return EXIT_FAILURE;
-        }
+        return EXIT_FAILURE;
+    }
 
-    //printf("...creating ExSUM kernels:\n");
-        ckKernel = clCreateKernel(cpProgram, EXSUM_KERNEL, &ciErrNum);
-        if (ciErrNum != CL_SUCCESS) {
-            printf("Error in clCreateKernel: ExSUM, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
-            return EXIT_FAILURE;
-        }
-        ckComplete = clCreateKernel(cpProgram, EXSUM_COMPLETE_KERNEL, &ciErrNum);
-        if (ciErrNum != CL_SUCCESS) {
-            printf("Error in clCreateKernel: ExSUMComplete, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
-            return EXIT_FAILURE;
-        }
+    ckKernel = clCreateKernel(cpProgram, EXDOT_KERNEL, &ciErrNum);
+    if (ciErrNum != CL_SUCCESS) {
+        printf("Error in clCreateKernel: ExDOT, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
+        return EXIT_FAILURE;
+    }
+    ckComplete = clCreateKernel(cpProgram, EXDOT_COMPLETE_KERNEL, &ciErrNum);
+    if (ciErrNum != CL_SUCCESS) {
+        printf("Error in clCreateKernel: ExDOTComplete, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
+        return EXIT_FAILURE;
+    }
 
-    //printf("...allocating internal buffer\n");
-        uint size = PARTIAL_SUPERACCS_COUNT;
-        size = size * bin_count * sizeof(cl_long);
-        d_PartialSuperaccs = clCreateBuffer(cxGPUContext, CL_MEM_READ_WRITE, size, NULL, &ciErrNum);
-        if (ciErrNum != CL_SUCCESS) {
-            printf("Error in clCreateBuffer for d_PartialSuperaccs, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
-            return EXIT_FAILURE;
-        }
-        d_Superacc = clCreateBuffer(cxGPUContext, CL_MEM_READ_WRITE, bin_count * sizeof(bintype), NULL, &ciErrNum);
-        if (ciErrNum != CL_SUCCESS) {
-            printf("Error in clCreateBuffer for d_Superacc, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
-            return EXIT_FAILURE;
-        }
+    uint size = PARTIAL_SUPERACCS_COUNT;
+    size = size * bin_count * sizeof(cl_long);
+    d_PartialSuperaccs = clCreateBuffer(cxGPUContext, CL_MEM_READ_WRITE, size, NULL, &ciErrNum);
+    if (ciErrNum != CL_SUCCESS) {
+        printf("Error in clCreateBuffer for d_PartialSuperaccs, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
+        return EXIT_FAILURE;
+    }
 
     //Save default command queue
     cqDefaultCommandQue = cqParamCommandQue;
@@ -123,27 +111,28 @@ extern "C" cl_int initExSUM(
     return EXIT_SUCCESS;
 }
 
-extern "C" void closeExSUM(void){
+extern "C" void closeExDOT(void){
     cl_int ciErrNum;
 
     ciErrNum = clReleaseMemObject(d_PartialSuperaccs);
-    ciErrNum |= clReleaseMemObject(d_Superacc);
     ciErrNum |= clReleaseKernel(ckKernel);
     ciErrNum |= clReleaseKernel(ckComplete);
     ciErrNum |= clReleaseProgram(cpProgram);
     if (ciErrNum != CL_SUCCESS) {
-        printf("Error in closeExSUM(), Line %u in file %s !!!\n\n", __LINE__, __FILE__);
+        printf("Error in closeExDOT(), Line %u in file %s !!!\n\n", __LINE__, __FILE__);
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// OpenCL launchers for Superaccumulator / mergeSuperaccumulators kernels
+// OpenCL launchers
 ////////////////////////////////////////////////////////////////////////////////
-extern "C" size_t ExSUM(
+extern "C" size_t ExDOT(
     cl_command_queue cqCommandQueue,
     cl_mem d_Res,
     cl_mem d_a,
     cl_uint inca,
+    cl_mem d_b,
+    cl_uint incb,
     cl_int *ciErrNumRes
 ){
     cl_int ciErrNum;
@@ -161,6 +150,8 @@ extern "C" size_t ExSUM(
         ciErrNum  = clSetKernelArg(ckKernel, i++, sizeof(cl_mem),  (void *)&d_PartialSuperaccs);
         ciErrNum |= clSetKernelArg(ckKernel, i++, sizeof(cl_mem),  (void *)&d_a);
         ciErrNum |= clSetKernelArg(ckKernel, i++, sizeof(cl_uint),  (void *)&inca);
+        ciErrNum |= clSetKernelArg(ckKernel, i++, sizeof(cl_mem),  (void *)&d_b);
+        ciErrNum |= clSetKernelArg(ckKernel, i++, sizeof(cl_uint),  (void *)&incb);
         ciErrNum |= clSetKernelArg(ckKernel, i++, sizeof(cl_uint), (void *)&NbElems);
         if (ciErrNum != CL_SUCCESS) {
             printf("Error in clSetKernelArg, Line %u in file %s !!!\n\n", __LINE__, __FILE__);

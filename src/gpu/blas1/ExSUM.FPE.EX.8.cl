@@ -208,6 +208,7 @@ __kernel __attribute__((reqd_work_group_size(WORKGROUP_SIZE, 1, 1)))
 void ExSUM(
     __global long *d_PartialSuperaccs,
     __global data_t *d_Data,
+    const uint inca,
     const uint NbElements
 ){
     __local long l_sa[WARP_COUNT * BIN_COUNT] __attribute__((aligned(8)));

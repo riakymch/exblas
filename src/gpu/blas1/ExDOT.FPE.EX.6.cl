@@ -8,39 +8,33 @@
 #pragma OPENCL EXTENSION cl_khr_byte_addressable_store : enable
 
 //Data type used for input data fetches
-typedef double2 data_t;
+typedef double data_t;
 
 #define BIN_COUNT      39
-#define K              8                    // High-radix carry-save bits
+#define K               8                   // High-radix carry-save bits
 #define digits         56
 #define deltaScale     72057594037927936.0  // Assumes K>0
 #define f_words        20
-#define TSAFE          0
-#define EARLY_EXIT     1
+#define TSAFE           0
+#define EARLY_EXIT      1
 #define WORKGROUP_SIZE (WARP_COUNT * WARP_SIZE)
 
 
 ////////////////////////////////////////////////////////////////////////////////
 // Auxiliary functions
 ////////////////////////////////////////////////////////////////////////////////
-#ifdef USE_KNUTH
-    double KnuthTwoSum(double a, double b, double *s) {
-        double r = a + b;
-        double z = r - a;
-        *s = (a - (r - z)) + (b - z);
-        return r;
-    }
-#else
-    //twosum
-    double KnuthTwoSum(double a, double b, double *s) {
-        double r = a + b;
-        int doswap = fabs(b) > fabs(a);
-        double a2 = doswap ? b : a;
-        double b2 = doswap ? a : b;
-        *s = (a2 - r) + b2;
-        return r;
-    }
-#endif
+double TwoProductFMA(double a, double b, double *d) {
+    double p = a * b;
+    *d = fma(a, b, -p);
+    return p;
+}
+
+double KnuthTwoSum(double a, double b, double *s) {
+    double r = a + b;
+    double z = r - a;
+    *s = (a - (r - z)) + (b - z);
+    return r;
+}
 
 // signedcarry in {-1, 0, 1}
 long xadd(__local volatile long *sa, long x, uchar *of) {
@@ -206,10 +200,12 @@ void Accumulate(__local volatile long *sa, double x) {
 }
 
 __kernel __attribute__((reqd_work_group_size(WORKGROUP_SIZE, 1, 1)))
-void ExSUM(
+void ExDOT(
     __global long *d_PartialSuperaccs,
-    __global data_t *d_Data,
+    __global data_t *d_a,
     const uint inca,
+    __global data_t *d_b,
+    const uint incb,
     const uint NbElements
 ) {
     __local long l_sa[WARP_COUNT * BIN_COUNT] __attribute__((aligned(8)));
@@ -221,49 +217,71 @@ void ExSUM(
     barrier(CLK_LOCAL_MEM_FENCE);
 
     //Read data from global memory and scatter it to sub-superaccs
-    double a[4] = {0.0};
+    double a[6] = {0.0};
     for(uint pos = get_global_id(0); pos < NbElements; pos += get_global_size(0)){
-        data_t x = d_Data[pos];
-        double s;
-        a[0] = KnuthTwoSum(a[0], x.x, &s);
-        x.x = s;
-        if (x.x != 0.0) {
-            a[1] = KnuthTwoSum(a[1], x.x, &s);
-            x.x = s;
-            if (x.x != 0.0) {
-                a[2] = KnuthTwoSum(a[2], x.x, &s);
-                x.x = s;
-                if (x.x != 0.0) {
-                    a[3] = KnuthTwoSum(a[3], x.x, &s);
-                    x.x = s;
-                }
-            }
-        }
-        if(x.x != 0.0)
-            Accumulate(l_workingBase, x.x);
+        double r = 0.0;
+        data_t x = TwoProductFMA(d_a[pos], d_b[pos], &r);
 
-        a[0] = KnuthTwoSum(a[0], x.y, &s);
-        x.y = s;
-        if (x.y != 0.0) {
-            a[1] = KnuthTwoSum(a[1], x.y, &s);
-            x.y = s;
-            if (x.y != 0.0) {
-                a[2] = KnuthTwoSum(a[2], x.y, &s);
-                x.y = s;
-                if (x.y != 0.0) {
-                    a[3] = KnuthTwoSum(a[3], x.y, &s);
-                    x.y = s;
+        double s;
+        a[0] = KnuthTwoSum(a[0], x, &s);
+        x = s;
+        if (x != 0.0) {
+            a[1] = KnuthTwoSum(a[1], x, &s);
+            x = s;
+            if (x != 0.0) {
+                a[2] = KnuthTwoSum(a[2], x, &s);
+                x = s;
+                if (x != 0.0) {
+                    a[3] = KnuthTwoSum(a[3], x, &s);
+                    x = s;
+                    if (x != 0.0) {
+                        a[4] = KnuthTwoSum(a[4], x, &s);
+                        x = s;
+                        if (x != 0.0) {
+                            a[5] = KnuthTwoSum(a[5], x, &s);
+                            x = s;
+                        }
+                    }
                 }
             }
         }
-        if(x.y != 0.0)
-            Accumulate(l_workingBase, x.y);
+        if(x != 0.0)
+            Accumulate(l_workingBase, x);
+
+        if(r != 0.0) {
+            a[0] = KnuthTwoSum(a[0], r, &s);
+            r = s;
+            if (r != 0.0) {
+                a[1] = KnuthTwoSum(a[1], r, &s);
+                r = s;
+                if (r != 0.0) {
+                    a[2] = KnuthTwoSum(a[2], r, &s);
+                    r = s;
+                    if (r != 0.0) {
+                        a[3] = KnuthTwoSum(a[3], r, &s);
+                        r = s;
+                        if (r != 0.0) {
+                            a[4] = KnuthTwoSum(a[4], r, &s);
+                            r = s;
+                            if (r != 0.0) {
+                                a[5] = KnuthTwoSum(a[5], r, &s);
+                                r = s;
+                            }
+                        }
+                    }
+                }
+            }
+            if(r != 0.0)
+                Accumulate(l_workingBase, r);
+        }
     }
     //Flush to the superacc
     Accumulate(l_workingBase, a[0]);
     Accumulate(l_workingBase, a[1]);
     Accumulate(l_workingBase, a[2]);
     Accumulate(l_workingBase, a[3]);
+    Accumulate(l_workingBase, a[4]);
+    Accumulate(l_workingBase, a[5]);
     barrier(CLK_LOCAL_MEM_FENCE);
 
     //Merge sub-superaccs into work-group partial-accumulator
@@ -289,7 +307,7 @@ void ExSUM(
 // Merging
 ////////////////////////////////////////////////////////////////////////////////
 __kernel __attribute__((reqd_work_group_size(MERGE_WORKGROUP_SIZE, 1, 1)))
-void ExSUMComplete(
+void ExDOTComplete(
     __global double *d_Res,
     __global long *d_PartialSuperaccs,
     uint PartialSuperaccusCount
@@ -298,25 +316,7 @@ void ExSUMComplete(
 
     //Reduce to one work group
     uint gid = get_group_id(0);
-#if 0
-    __local long l_Data[MERGE_WORKGROUP_SIZE];
 
-    long sum = 0;
-    for(uint i = lid; i < PartialSuperaccusCount; i += MERGE_WORKGROUP_SIZE)
-        sum += d_PartialSuperaccs[gid + i * BIN_COUNT];
-    l_Data[lid] = sum;
-    barrier(CLK_LOCAL_MEM_FENCE);
-
-    //Reduce within the work group
-    for(uint stride = MERGE_WORKGROUP_SIZE / 2; stride > 0; stride >>= 1){
-        barrier(CLK_LOCAL_MEM_FENCE);
-        if(lid < stride)
-            l_Data[lid] += l_Data[lid + stride];
-    }
-
-    if(lid == 0)
-        d_Superacc[gid] = l_Data[0];
-#else
     if (lid < BIN_COUNT) {
         long sum = 0;
 
@@ -346,6 +346,5 @@ void ExSUMComplete(
         if (lid == 0)
             d_Res[0] = Round(d_PartialSuperaccs);
     }
-#endif
 }
 

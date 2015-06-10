@@ -4,8 +4,8 @@
  */
 
 /**
- *  \file gpu/blas1/ExSUM.cpp
- *  \brief Provides implementations of a set of sum routines
+ *  \file gpu/blas1/ExDOT.cpp
+ *  \brief Provides implementations of a set of dot routines
  *
  *  \authors
  *    Developers : \n
@@ -23,7 +23,7 @@
 #include "common.hpp"
 #include "common.gpu.hpp"
 #include "blas1.hpp"
-#include "ExSUM.Launcher.hpp"
+#include "ExDOT.Launcher.hpp"
 
 #ifdef EXBLAS_TIMING
 #include <cassert>
@@ -47,64 +47,68 @@ static double min(double arr[], int size) {
 #endif
 
 /**
- * \ingroup ExSUM
- * \brief Executes on GPU parallel summation/reduction on elements of a real vector.
+ * \ingroup ExDOT
+ * \brief Executes on GPU parallel dot product of two real vectors.
  *     For internal use
  *
  * \param N vector size
  * \param a vector
  * \param inca specifies the increment for the elements of a
+ * \param b vector
+ * \param incb specifies the increment for the elements of b
  * \param fpe size of floating-point expansion
  * \param program_file path to the file with kernels
  * \return Contains the reproducible and accurate sum of elements of a real vector
  */
-static double runExSUM(int N, double *a, int inca, int fpe, const char* program_file);
+static double runExDOT(int N, double *a, int inca, double *b, int incb, int fpe, const char* program_file);
 
 /**
- * \ingroup ExSUM
- * \brief Parallel summation computes the sum of elements of a real vector with our 
+ * \ingroup ExDOT
+ * \brief Parallel dot forms the dot product of two vectors with our
  *     multi-level reproducible and accurate algorithm.
  *
- *     If fpe < 2, it uses superaccumulators only. Otherwise, it relies on 
+ *     If fpe < 3, it uses superaccumulators only. Otherwise, it relies on 
  *     floating-point expansions of size FPE with superaccumulators when needed
  *
  * \param Ng vector size
  * \param ag vector
  * \param inca specifies the increment for the elements of a
+ * \param bg vector
+ * \param incb specifies the increment for the elements of b
  * \param fpe stands for the floating-point expansions size (used in conjuction with superaccumulators)
  * \param early_exit specifies the optimization technique. By default, it is disabled
- * \return Contains the reproducible and accurate sum of elements of a real vector
+ * \return Contains the reproducible and accurate result of the dot product of two real vectors
  */
-double exsum(int Ng, double *ag, int inca, int fpe, bool early_exit) {
+double exdot(int Ng, double *ag, int inca, double *bg, int incb, int fpe, bool early_exit) {
     char path[256];
     strcpy(path, EXBLAS_BINARY_DIR);
     strcat(path, "/include/cl/");
 
     // with superaccumulators only
-    if (fpe < 2) {
-        //return runExSUM(Ng, ag, inca, 0, strcat(path, "ExSUM.Superacc.old.cl"));
-        printf("Please use the size of FPE from this range [2, 8]\n");
+    if (fpe < 3) {
+        //return runExDOT(Ng, ag, inca, bg, incb, 0, strcat(path, "ExDOT.Superacc.cl"));
+        printf("Please use the size of FPE from this range [3, 8]\n");
         exit(0);
     }
 
     if (early_exit) {
         if (fpe <= 4)
-            return runExSUM(Ng, ag, inca, 4, strcat(path, "ExSUM.FPE.EX.4.cl"));
+            return runExDOT(Ng, ag, inca, bg, incb, 4, strcat(path, "ExDOT.FPE.EX.4.cl"));
         if (fpe <= 6)
-            return runExSUM(Ng, ag, inca, 6, strcat(path, "ExSUM.FPE.EX.6.cl"));
+            return runExDOT(Ng, ag, inca, bg, incb, 6, strcat(path, "ExDOT.FPE.EX.6.cl"));
         if (fpe <= 8)
-            return runExSUM(Ng, ag, inca, 8, strcat(path, "ExSUM.FPE.EX.8.cl"));
+            return runExDOT(Ng, ag, inca, bg, incb, 8, strcat(path, "ExDOT.FPE.EX.8.cl"));
     } else // ! early_exit
-        return runExSUM(Ng, ag, inca, fpe, strcat(path, "ExSUM.FPE.cl"));
+        return runExDOT(Ng, ag, inca, bg, incb, fpe, strcat(path, "ExDOT.FPE.cl"));
 
     return 0.0;
 }
 
-static double runExSUM(int N, double *h_a, int inca, int fpe, const char* program_file){
+static double runExDOT(int N, double *h_a, int inca, double *h_b, int incb, int fpe, const char* program_file){
     double h_Res;
     cl_int ciErrNum;
 
-    //printf("Initializing OpenCL...\n");
+    // Initializing OpenCL
         char platform_name[64];
 #ifdef AMD
         strcpy(platform_name, "AMD Accelerated Parallel Processing");
@@ -145,6 +149,11 @@ static double runExSUM(int N, double *h_a, int inca, int fpe, const char* progra
             printf("Error in clCreateBuffer for d_a, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
             exit(EXIT_FAILURE);
         }
+        cl_mem d_b = clCreateBuffer(cxGPUContext, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, N * sizeof(cl_double), h_b, &ciErrNum);
+        if (ciErrNum != CL_SUCCESS) {
+            printf("Error in clCreateBuffer for d_b, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
+            exit(EXIT_FAILURE);
+        }
         cl_mem d_Res = clCreateBuffer(cxGPUContext, CL_MEM_READ_WRITE, sizeof(cl_double), NULL, &ciErrNum);
         if (ciErrNum != CL_SUCCESS) {
             printf("Error in clCreateBuffer for d_res, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
@@ -152,14 +161,14 @@ static double runExSUM(int N, double *h_a, int inca, int fpe, const char* progra
         }
 
     {
-        //Initializing OpenCL dSum...
-            ciErrNum = initExSUM(cxGPUContext, cqCommandQueue, cdDevice, program_file, N, fpe);
+        //Initializing OpenCL ExDOT
+            ciErrNum = initExDOT(cxGPUContext, cqCommandQueue, cdDevice, program_file, N, fpe);
             if (ciErrNum != CL_SUCCESS)
                 exit(EXIT_FAILURE);
 
-        //Running OpenCL dSum with %u elements...
+        //Running OpenCL ExDOT
             //Just a single launch or a warmup iteration
-            ExSUM(NULL, d_Res, d_a, inca, &ciErrNum);
+            ExDOT(NULL, d_Res, d_a, inca, d_b, incb, &ciErrNum);
             if (ciErrNum != CL_SUCCESS)
                 exit(EXIT_FAILURE);
 
@@ -175,7 +184,7 @@ static double runExSUM(int N, double *h_a, int inca, int fpe, const char* progra
                 exit(EXIT_FAILURE);
             }
 
-            ExSUM(NULL, d_Res, d_a, inca, &ciErrNum);
+            ExDOT(NULL, d_Res, d_a, inca, d_b, incb, &ciErrNum);
 
             ciErrNum  = clEnqueueMarker(cqCommandQueue, &endMark);
             ciErrNum |= clFinish(cqCommandQueue);
@@ -199,7 +208,7 @@ static double runExSUM(int N, double *h_a, int inca, int fpe, const char* progra
           fpe, N, minTime, ((1e-9 * N * sizeof(double)) / minTime));
 #endif
 
-        //Retrieving results...
+        //Retrieving results
             ciErrNum = clEnqueueReadBuffer(cqCommandQueue, d_Res, CL_TRUE, 0, sizeof(cl_double), &h_Res, 0, NULL, NULL);
             if (ciErrNum != CL_SUCCESS) {
                 printf("Error in clEnqueueReadBuffer Line %u in file %s !!!\n\n", __LINE__, __FILE__);
@@ -207,10 +216,12 @@ static double runExSUM(int N, double *h_a, int inca, int fpe, const char* progra
             }
 
          //Release kernels and program
-         //Shutting down and freeing memory...
-            closeExSUM();
+         //Shutting down and freeing memory
+            closeExDOT();
             if(d_a)
                 clReleaseMemObject(d_a);
+            if(d_b)
+                clReleaseMemObject(d_b);
             if(d_Res)
                 clReleaseMemObject(d_Res);
             if(cqCommandQueue)
