@@ -218,7 +218,7 @@ void wait_until_ge(
         // Only read global memory when necessary
         if (*col_done < col_to_wait) {
             while(*sync < col_to_wait) {}
-            	*col_done = *sync;
+            *col_done = *sync;
         }
     }
     barrier(CLK_GLOBAL_MEM_FENCE);

@@ -31,7 +31,7 @@ static double extrsvVsMPFR(double *extrsv, uint n, double *a, uint lda, double *
     // Compare to the results from Matlab
     FILE *pFilex;
     size_t resx;
-    pFilex = fopen("matrices/x_test_trsv_64_simple.bin", "rb");
+    pFilex = fopen("matrices/x_test_trsv_64.bin", "rb");
     //pFilex = fopen("x_test_trsv_64_final.bin", "rb");
     //pFilex = fopen("x_test_gemv_64.bin", "rb");
     if (pFilex == NULL) {
@@ -276,8 +276,8 @@ int main(int argc, char *argv[]) {
         is_pass = false;
     }
 #endif
-    exit(0);
 
+    exit(0);
     copyVector(n, x, xorig);
     extrsv('L', 'N', 'N', n, a, n, x, 1, 1);
 #ifdef EXBLAS_VS_MPFR

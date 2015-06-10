@@ -629,7 +629,7 @@ void __trsv_lnn_simple(
         Accumulate(l_working, lda, fpe[0]);
         double sum = Round(l_working, lda);
 
-        d_x[i] = sum; // / d_a[i * (n + 1)];
+        d_x[i] = sum / d_a[i * (n + 1)];
     }
 }
 
