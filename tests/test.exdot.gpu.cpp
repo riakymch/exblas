@@ -48,6 +48,7 @@ double ExDOTVsMPFR(int N, double *a, int inca, double *b, int incb) {
 
 
 int main(int argc, char *argv[]) {
+    double eps = 1e-15;
     int N = 1 << 20;
     bool lognormal = false;
     if(argc > 1) {
@@ -120,25 +121,28 @@ int main(int argc, char *argv[]) {
     printf("  exdot with FPE6 early-exit and superacc = %.16g\n", exdot_fpe6ee);
     printf("  exdot with FPE8 early-exit and superacc = %.16g\n", exdot_fpe8ee);
 
-    /*double dacc = 0.;
-    for(int i = 0; i != N; ++i) {
-        dacc += a[i];
-    }
-    printf("  fpsum=%.16g\n", dacc);*/
 
 #ifdef EXBLAS_VS_MPFR
     double exdotMPFR = ExDOTVsMPFR(N, a, 1, b, 1);
     printf("  exdot with MPFR = %.16g\n", exdotMPFR);
-    //if ((fabs(exdotMPFR - exdot_acc) != 0) || (fabs(exdotMPFR - exdot_fpe2) != 0) || (fabs(exdotMPFR - exdot_fpe4) != 0) || (fabs(exdotMPFR - exdot_fpe8ee) != 0) || (fabs(exdotMPFR - exdot_fpe4ee) != 0) || (fabs(exdotMPFR - exdot_fpe6ee) != 0)) {
-    if ((fabs(exdotMPFR - exdot_fpe2) != 0) || (fabs(exdotMPFR - exdot_fpe4) != 0) || (fabs(exdotMPFR - exdot_fpe8ee) != 0) || (fabs(exdotMPFR - exdot_fpe4ee) != 0) || (fabs(exdotMPFR - exdot_fpe6ee) != 0)) {
+    exdot_fpe2 = fabs(exdotMPFR - exdot_fpe2) / fabs(exdotMPFR);
+    exdot_fpe4 = fabs(exdotMPFR - exdot_fpe4) / fabs(exdotMPFR);
+    exdot_fpe4ee = fabs(exdotMPFR - exdot_fpe4ee) / fabs(exdotMPFR);
+    exdot_fpe6ee = fabs(exdotMPFR - exdot_fpe6ee) / fabs(exdotMPFR);
+    exdot_fpe8ee = fabs(exdotMPFR - exdot_fpe8ee) / fabs(exdotMPFR);
+    if ((exdot_fpe2 > eps) || (exdot_fpe4 > eps) || (exdot_fpe4ee > eps) || (exdot_fpe6ee > eps) || (exdot_fpe8ee > eps)) {
         is_pass = false;
-        //printf("FAILED: %.16g \t %.16g \t %.16g \t %.16g\n", fabs(exdotMPFR - exdot_acc), fabs(exdotMPFR - exdot_fpe2), fabs(exdotMPFR - exdot_fpe4), fabs(exdotMPFR - exdot_fpe8ee));
-        printf("FAILED: %.16g \t %.16g \t %.16g \t %.16g \t %.16g\n", fabs(exdotMPFR - exdot_fpe2), fabs(exdotMPFR - exdot_fpe4), fabs(exdotMPFR - exdot_fpe4ee), fabs(exdotMPFR - exdot_fpe6ee), fabs(exdotMPFR - exdot_fpe8ee));
+        printf("FAILED: %.16g \t %.16g \t %.16g \t %.16g \t %.16g\n", exdot_fpe2, exdot_fpe4, exdot_fpe4ee, exdot_fpe6ee, exdot_fpe8ee);
     }
 #else
-    if ((fabs(exdot_acc - exdot_fpe2) != 0) || (fabs(exdot_acc - exdot_fpe4) != 0) || (fabs(exdot_acc - exdot_fpe8ee) != 0)) {
+    exdot_fpe2 = fabs(exdot_acc - exdot_fpe2) / fabs(exdot_acc);
+    exdot_fpe4 = fabs(exdot_acc - exdot_fpe4) / fabs(exdot_acc);
+    exdot_fpe4ee = fabs(exdot_acc - exdot_fpe4ee) / fabs(exdot_acc);
+    exdot_fpe6ee = fabs(exdot_acc - exdot_fpe6ee) / fabs(exdot_acc);
+    exdot_fpe8ee = fabs(exdot_acc - exdot_fpe8ee) / fabs(exdot_acc);
+    if ((exdot_fpe2 > eps) || (exdot_fpe4 > eps) || (exdot_fpe4ee > eps) || (exdot_fpe6ee > eps) || (exdot_fpe8ee > eps)) {
         is_pass = false;
-        printf("FAILED: %.16g \t %.16g \t %.16g\n", fabs(exdot_acc - exdot_fpe2), fabs(exdot_acc - exdot_fpe4), fabs(exdot_acc - exdot_fpe8ee));
+        printf("FAILED: %.16g \t %.16g \t %.16g \t %.16g \t %.16g\n", exdot_fpe2, exdot_fpe4, exdot_fpe4ee, exdot_fpe6ee, exdot_fpe8ee);
     }
 #endif
     fprintf(stderr, "\n");
