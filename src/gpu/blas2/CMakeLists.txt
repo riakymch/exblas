@@ -1,9 +1,6 @@
 # Copyright (c) 2013-2015 Inria and University Pierre and Marie Curie
 # All rights reserved.
 
-# Install files with data (matrices and vectors) into the binary dir
-install (DIRECTORY "${PROJECT_SOURCE_DIR}/tests/matrices" DESTINATION "${PROJECT_BINARY_DIR}")
-
 # Testing
 add_executable (test.extrsv ${PROJECT_SOURCE_DIR}/tests/test.extrsv.gpu.cpp)
 target_link_libraries (test.extrsv ${EXTRA_LIBS})
