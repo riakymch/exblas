@@ -48,8 +48,8 @@ Compilation Options
    parallelism is activated
 * -DEXBLAS_MIC=ON -- enables compilation for Intel MIC architectures
 * -DEXBLAS_GPU=ON -- enables compilation for GPUs
-   -DEXBLAS_AMD_GPU=ON -- for AMD GPUs
-   -DEXBLAS_NVIDIA_GPU=ON -- for NVIDIA GPUs
+   -DEXBLAS_GPU_AMD=ON -- for AMD GPUs
+   -DEXBLAS_GPU_NVIDIA=ON -- for NVIDIA GPUs
 * -DEXBLAS_VS_MPFR=ON -- compares the results against the ones produced by MPFR
 
 Compilation

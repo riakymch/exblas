@@ -70,7 +70,7 @@ static double extrsvVsMPFR(double *extrsv, uint n, double *a, uint lda, double *
     nrm = ::sqrt(nrm) / ::sqrt(val);
 #else
     //Inf norm
-    double nrm = 0.0, val = 0.0, nrm1 = 0.0;
+    double nrm = 0.0, val = 0.0;
     for(uint i = 0; i < n; i++) {
         val = std::max(val, fabs(extrsv_mpfr[i]));
         nrm = std::max(nrm, fabs(extrsv[i] - extrsv_mpfr[i]));
