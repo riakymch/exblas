@@ -201,7 +201,7 @@ void Accumulate(__local volatile long *sa, __local bool *res, double x) {
 
         //AccumulateWord(sa, i, xint);
         atom_add(&sa[i * WARP_COUNT], xint);
-        if ((sa[i * WARP_COUNT] & 0x0000FFFFFFFFFFFF) > 0)
+        if ((sa[i * WARP_COUNT] & 0x000000000000001F) > 0)
             *res = true;
 
         xscaled -= xrounded;
@@ -222,9 +222,8 @@ void ExSUM(
     __local bool *l_workingBase_check = l_sa_check + (get_local_id(0) & (WARP_COUNT - 1));
 
     //Initialize superaccs
-    for (uint i = 0; i < BIN_COUNT; i++) {
+    for (uint i = 0; i < BIN_COUNT; i++)
         l_workingBase[i * WARP_COUNT] = 0;
-    }
     *l_workingBase_check = false;
     barrier(CLK_LOCAL_MEM_FENCE);
 
@@ -232,9 +231,10 @@ void ExSUM(
     for(uint pos = get_global_id(0); pos < NbElements; pos += get_global_size(0)) {
         double x = d_Data[pos];
         Accumulate(l_workingBase, l_workingBase_check, x);
-        if (l_workingBase_check) {
+        if (*l_workingBase_check) {
             barrier(CLK_LOCAL_MEM_FENCE);
-            if (get_local_id(0) == 0) {
+            // TODO: check the performance, because here all threads from the first warp (half of it) and involved. So, it may cause some memory contention.
+            if (get_local_id(0) < WARP_COUNT){
                 int imin = 0;
                 int imax = 38;
                 Normalize_local(l_workingBase, &imin, &imax);
@@ -246,7 +246,7 @@ void ExSUM(
     barrier(CLK_LOCAL_MEM_FENCE);
 
     //Merge sub-superaccs into work-group partial-accumulator
-#if 0
+#if 1
     uint pos = get_local_id(0);
     if (pos < BIN_COUNT) {
         long sum = 0;
@@ -257,7 +257,7 @@ void ExSUM(
         d_PartialSuperaccs[get_group_id(0) * BIN_COUNT + pos] = sum;
     }
 #else
-    uint pos = get_local_id(0);
+    uint pos = get_global_id(0);
     if (pos == 0) {
         for(uint j = 0; j < BIN_COUNT; j++) {
             //d_PartialSuperaccs[j] = l_sa[j];
