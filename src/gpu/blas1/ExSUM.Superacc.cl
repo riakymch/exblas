@@ -10,8 +10,6 @@
     #pragma OPENCL EXTENSION cl_nv_pragma_unroll       : enable
 #endif
 
-//Data type used for input data fetches
-typedef double data_t;
 
 #define BIN_COUNT      39
 #define K               8                   // High-radix carry-save bits

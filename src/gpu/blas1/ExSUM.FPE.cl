@@ -10,8 +10,6 @@
     #pragma OPENCL EXTENSION cl_nv_pragma_unroll       : enable
 #endif
 
-//Data type used for input data fetches
-typedef double2 data_t;
 
 #define BIN_COUNT      39
 #define K               8                   // High-radix carry-save bits
@@ -209,7 +207,7 @@ void Accumulate(__local volatile long *sa, double x) {
 __kernel __attribute__((reqd_work_group_size(WORKGROUP_SIZE, 1, 1)))
 void ExSUM(
     __global long *d_PartialSuperaccs,
-    __global data_t *d_Data,
+    __global double *d_Data,
     const uint inca,
     const uint NbElements
 ) {
@@ -224,29 +222,18 @@ void ExSUM(
     //Read data from global memory and scatter it to sub-superaccs
     double a[NBFPE] = {0.0};
     for(uint pos = get_global_id(0); pos < NbElements; pos += get_global_size(0)) {
-        data_t x = d_Data[pos];
+        double x = d_Data[pos];
 #ifdef NVIDIA
         #pragma unroll
 #endif
         for(uint i = 0; i != NBFPE; ++i) {
             double s;
-            a[i] = KnuthTwoSum(a[i], x.x, &s);
-            x.x = s;
+            a[i] = KnuthTwoSum(a[i], x, &s);
+            x = s;
         }
-        if(x.x != 0.0)
+        if(x != 0.0)
             //TODO: do NOT propagate NaNs
-            Accumulate(l_workingBase, x.x);
-#ifdef NVIDIA
-        #pragma unroll
-#endif
-        for(uint i = 0; i != NBFPE; ++i) {
-            double s;
-            a[i] = KnuthTwoSum(a[i], x.y, &s);
-            x.y = s;
-        }
-        if(x.y != 0.0)
-            //TODO: do NOT propagate NaNs
-            Accumulate(l_workingBase, x.y);
+            Accumulate(l_workingBase, x);
     }
     //Flush FPEs to the superacc
 #ifdef NVIDIA

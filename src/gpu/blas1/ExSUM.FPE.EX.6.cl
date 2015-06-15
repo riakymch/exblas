@@ -7,8 +7,6 @@
 #pragma OPENCL EXTENSION cl_khr_int64_base_atomics     : enable  // For 64 atomic operations
 #pragma OPENCL EXTENSION cl_khr_byte_addressable_store : enable
 
-//Data type used for input data fetches
-typedef double2 data_t;
 
 #define BIN_COUNT      39
 #define K               8                   // High-radix carry-save bits
@@ -207,7 +205,7 @@ void Accumulate(__local volatile long *sa, double x) {
 __kernel __attribute__((reqd_work_group_size(WORKGROUP_SIZE, 1, 1)))
 void ExSUM(
     __global long *d_PartialSuperaccs,
-    __global data_t *d_Data,
+    __global double *d_Data,
     const uint inca,
     const uint NbElements
 ) {
@@ -222,57 +220,32 @@ void ExSUM(
     //Read data from global memory and scatter it to sub-superaccs
     double a[6] = {0.0};
     for(uint pos = get_global_id(0); pos < NbElements; pos += get_global_size(0)){
-        data_t x = d_Data[pos];
+        double x = d_Data[pos];
         double s;
-        a[0] = KnuthTwoSum(a[0], x.x, &s);
-        x.x = s;
-        if (x.x != 0.0) {
-            a[1] = KnuthTwoSum(a[1], x.x, &s);
-            x.x = s;
-            if (x.x != 0.0) {
-                a[2] = KnuthTwoSum(a[2], x.x, &s);
-                x.x = s;
-                if (x.x != 0.0) {
-                    a[3] = KnuthTwoSum(a[3], x.x, &s);
-                    x.x = s;
-                    if (x.x != 0.0) {
-                        a[4] = KnuthTwoSum(a[4], x.x, &s);
-                        x.x = s;
-                        if (x.x != 0.0) {
-                            a[5] = KnuthTwoSum(a[5], x.x, &s);
-                            x.x = s;
+        a[0] = KnuthTwoSum(a[0], x, &s);
+        x = s;
+        if (x != 0.0) {
+            a[1] = KnuthTwoSum(a[1], x, &s);
+            x = s;
+            if (x != 0.0) {
+                a[2] = KnuthTwoSum(a[2], x, &s);
+                x = s;
+                if (x != 0.0) {
+                    a[3] = KnuthTwoSum(a[3], x, &s);
+                    x = s;
+                    if (x != 0.0) {
+                        a[4] = KnuthTwoSum(a[4], x, &s);
+                        x = s;
+                        if (x != 0.0) {
+                            a[5] = KnuthTwoSum(a[5], x, &s);
+                            x = s;
                         }
                     }
                 }
             }
         }
-        if(x.x != 0.0)
-            Accumulate(l_workingBase, x.x);
-
-        a[0] = KnuthTwoSum(a[0], x.y, &s);
-        x.y = s;
-        if (x.y != 0.0) {
-            a[1] = KnuthTwoSum(a[1], x.y, &s);
-            x.y = s;
-            if (x.y != 0.0) {
-                a[2] = KnuthTwoSum(a[2], x.y, &s);
-                x.y = s;
-                if (x.y != 0.0) {
-                    a[3] = KnuthTwoSum(a[3], x.y, &s);
-                    x.y = s;
-                    if (x.y != 0.0) {
-                        a[4] = KnuthTwoSum(a[4], x.y, &s);
-                        x.y = s;
-                        if (x.y != 0.0) {
-                            a[5] = KnuthTwoSum(a[5], x.y, &s);
-                            x.y = s;
-                        }
-                    }
-                }
-            }
-        }
-        if(x.y != 0.0)
-            Accumulate(l_workingBase, x.y);
+        if(x != 0.0)
+            Accumulate(l_workingBase, x);
     }
     //Flush to the superacc
     Accumulate(l_workingBase, a[0]);
