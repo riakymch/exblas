@@ -74,6 +74,25 @@ double OddRoundSumNonnegative(double th, double tl) {
     return thdb.d;
 }
 
+int Normalize_local(__local long *accumulator, int *imin, int *imax) {
+    long carry_in = accumulator[*imin * WARP_COUNT] >> digits;
+    accumulator[*imin * WARP_COUNT] -= carry_in << digits;
+    int i;
+    // Sign-extend all the way
+    for (i = *imin + 1; i < BIN_COUNT; ++i) {
+        accumulator[i * WARP_COUNT] += carry_in;
+        long carry_out = accumulator[i * WARP_COUNT] >> digits;    // Arithmetic shift
+        accumulator[i * WARP_COUNT] -= (carry_out << digits);
+        carry_in = carry_out;
+    }
+    *imax = i - 1;
+
+    // Do not cancel the last carry to avoid losing information
+    accumulator[*imax * WARP_COUNT] += carry_in << digits;
+
+    return carry_in < 0;
+}
+
 int Normalize(__global long *accumulator, int *imin, int *imax) {
     long carry_in = accumulator[*imin] >> digits;
     accumulator[*imin] -= carry_in << digits;
@@ -177,6 +196,7 @@ void AccumulateWord(__local volatile long *sa, int i, long x) {
     }
 }
 
+#if 0
 void Accumulate(__local volatile long *sa, double x) {
     if (x == 0)
         return;
@@ -199,6 +219,33 @@ void Accumulate(__local volatile long *sa, double x) {
         xscaled *= deltaScale;
     }
 }
+#else
+void Accumulate(__local volatile long *sa, __local bool *res, double x) {
+    if (x == 0)
+        return;
+
+    int e;
+    frexp(x, &e);
+    int exp_word = e / digits;  // Word containing MSbit
+    int iup = exp_word + f_words;
+
+    double xscaled = ldexp(x, -digits * exp_word);
+
+    int i;
+    for (i = iup; xscaled != 0; --i) {
+        double xrounded = rint(xscaled);
+        long xint = (long) xrounded;
+
+        //AccumulateWord(sa, i, xint);
+        atom_add(&sa[i * WARP_COUNT], xint);
+        if ((sa[i * WARP_COUNT] & 0x000000000000002F) > 0)
+            *res = true;
+
+        xscaled -= xrounded;
+        xscaled *= deltaScale;
+    }
+}
+#endif
 
 __kernel __attribute__((reqd_work_group_size(WORKGROUP_SIZE, 1, 1)))
 void ExDOT(
@@ -211,10 +258,13 @@ void ExDOT(
 ) {
     __local long l_sa[WARP_COUNT * BIN_COUNT] __attribute__((aligned(8)));
     __local long *l_workingBase = l_sa + (get_local_id(0) & (WARP_COUNT - 1));
+    __local bool l_sa_check[WARP_COUNT];
+    __local bool *l_workingBase_check = l_sa_check + (get_local_id(0) & (WARP_COUNT - 1));
 
     //Initialize superaccs
     for (uint i = 0; i < BIN_COUNT; i++)
         l_workingBase[i * WARP_COUNT] = 0;
+    *l_workingBase_check = false;
     barrier(CLK_LOCAL_MEM_FENCE);
 
     //Read data from global memory and scatter it to sub-superaccs
@@ -231,8 +281,21 @@ void ExDOT(
             a[i] = KnuthTwoSum(a[i], x, &s);
             x = s;
         }
-        if (x != 0.0)
-            Accumulate(l_workingBase, x);
+        if (x != 0.0) {
+            Accumulate(l_workingBase, l_workingBase_check, x);
+
+            if (*l_workingBase_check) {
+                barrier(CLK_LOCAL_MEM_FENCE);
+                // TODO: check the performance, because here all threads from the first warp (half of it) and involved. So, it may cause some memory contention.
+                if (get_local_id(0) < WARP_COUNT){
+                    int imin = 0;
+                    int imax = 38;
+                    Normalize_local(l_workingBase, &imin, &imax);
+                }
+                *l_workingBase_check = false;
+                barrier(CLK_LOCAL_MEM_FENCE);
+            }
+        }
 
         if (r != 0.0) {
             #ifdef NVIDIA
@@ -243,16 +306,42 @@ void ExDOT(
                 a[i] = KnuthTwoSum(a[i], r, &s);
                 r = s;
             }
-            if (r != 0.0)
-                Accumulate(l_workingBase, r);
+            if (r != 0.0) {
+                Accumulate(l_workingBase, l_workingBase_check, r);
+
+                if (*l_workingBase_check) {
+                    barrier(CLK_LOCAL_MEM_FENCE);
+                    // TODO: check the performance, because here all threads from the first warp (half of it) and involved. So, it may cause some memory contention.
+                    if (get_local_id(0) < WARP_COUNT){
+                        int imin = 0;
+                        int imax = 38;
+                        Normalize_local(l_workingBase, &imin, &imax);
+                    }
+                    *l_workingBase_check = false;
+                    barrier(CLK_LOCAL_MEM_FENCE);
+                }
+            }
         }
     }
     //Flush FPEs to the superacc
     #ifdef NVIDIA
         #pragma unroll
     #endif
-    for(uint i = 0; i != NBFPE; ++i)
-        Accumulate(l_workingBase, a[i]);
+    for(uint i = 0; i != NBFPE; ++i) {
+        Accumulate(l_workingBase, l_workingBase_check, a[i]);
+
+        if (*l_workingBase_check) {
+            barrier(CLK_LOCAL_MEM_FENCE);
+            // TODO: check the performance, because here all threads from the first warp (half of it) and involved. So, it may cause some memory contention.
+            if (get_local_id(0) < WARP_COUNT){
+                int imin = 0;
+                int imax = 38;
+                Normalize_local(l_workingBase, &imin, &imax);
+            }
+            *l_workingBase_check = false;
+            barrier(CLK_LOCAL_MEM_FENCE);
+        }
+    }
     barrier(CLK_LOCAL_MEM_FENCE);
 
     //Merge sub-superaccs into work-group partial-accumulator
