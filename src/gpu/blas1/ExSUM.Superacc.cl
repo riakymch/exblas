@@ -199,7 +199,7 @@ void Accumulate(__local volatile long *sa, __local bool *res, double x) {
 
         //AccumulateWord(sa, i, xint);
         atom_add(&sa[i * WARP_COUNT], xint);
-        if ((sa[i * WARP_COUNT] & 0x000000000000001F) > 0)
+        if ((sa[i * WARP_COUNT] & 0x000000000000003F) > 0)
             *res = true;
 
         xscaled -= xrounded;

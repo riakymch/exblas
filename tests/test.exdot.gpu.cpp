@@ -48,7 +48,7 @@ double ExDOTVsMPFR(int N, double *a, int inca, double *b, int incb) {
 
 
 int main(int argc, char *argv[]) {
-    double eps = 1e-15;
+    double eps = 1e-16;
     int N = 1 << 20;
     bool lognormal = false;
     if(argc > 1) {
