@@ -85,11 +85,8 @@ double exdot(int Ng, double *ag, int inca, double *bg, int incb, int fpe, bool e
     strcat(path, "/include/cl/");
 
     // with superaccumulators only
-    if (fpe < 3) {
-        //return runExDOT(Ng, ag, inca, bg, incb, 0, strcat(path, "ExDOT.Superacc.cl"));
-        printf("Please use the size of FPE from this range [3, 8]\n");
-        exit(0);
-    }
+    if (fpe < 3)
+        return runExDOT(Ng, ag, inca, bg, incb, 0, strcat(path, "ExDOT.Superacc.cl"));
 
     if (early_exit) {
         if (fpe <= 4)

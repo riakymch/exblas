@@ -107,14 +107,14 @@ int main(int argc, char *argv[]) {
     }
 
     bool is_pass = true;
-    double exdot_fpe2, exdot_fpe4, exdot_fpe4ee, exdot_fpe6ee, exdot_fpe8ee;
-    //double exdot_acc = exdot(N, a, 1, b, 1, 1);
+    double exdot_acc, exdot_fpe2, exdot_fpe4, exdot_fpe4ee, exdot_fpe6ee, exdot_fpe8ee;
+    exdot_acc = exdot(N, a, 1, b, 1, 0);
     exdot_fpe2 = exdot(N, a, 1, b, 1, 3);
     exdot_fpe4 = exdot(N, a, 1, b, 1, 4);
     exdot_fpe4ee = exdot(N, a, 1, b, 1, 4, true);
     exdot_fpe6ee = exdot(N, a, 1, b, 1, 6, true);
     exdot_fpe8ee = exdot(N, a, 1, b, 1, 8, true);
-    //printf("  exdot with superacc = %.16g\n", exdot_acc);
+    printf("  exdot with superacc = %.16g\n", exdot_acc);
     printf("  exdot with FPE2 and superacc = %.16g\n", exdot_fpe2);
     printf("  exdot with FPE4 and superacc = %.16g\n", exdot_fpe4);
     printf("  exdot with FPE4 early-exit and superacc = %.16g\n", exdot_fpe4ee);
@@ -125,14 +125,15 @@ int main(int argc, char *argv[]) {
 #ifdef EXBLAS_VS_MPFR
     double exdotMPFR = ExDOTVsMPFR(N, a, 1, b, 1);
     printf("  exdot with MPFR = %.16g\n", exdotMPFR);
+    exdot_acc = fabs(exdotMPFR - exdot_acc) / fabs(exdotMPFR);
     exdot_fpe2 = fabs(exdotMPFR - exdot_fpe2) / fabs(exdotMPFR);
     exdot_fpe4 = fabs(exdotMPFR - exdot_fpe4) / fabs(exdotMPFR);
     exdot_fpe4ee = fabs(exdotMPFR - exdot_fpe4ee) / fabs(exdotMPFR);
     exdot_fpe6ee = fabs(exdotMPFR - exdot_fpe6ee) / fabs(exdotMPFR);
     exdot_fpe8ee = fabs(exdotMPFR - exdot_fpe8ee) / fabs(exdotMPFR);
-    if ((exdot_fpe2 > eps) || (exdot_fpe4 > eps) || (exdot_fpe4ee > eps) || (exdot_fpe6ee > eps) || (exdot_fpe8ee > eps)) {
+    if ((exdot_acc > eps) || (exdot_fpe2 > eps) || (exdot_fpe4 > eps) || (exdot_fpe4ee > eps) || (exdot_fpe6ee > eps) || (exdot_fpe8ee > eps)) {
         is_pass = false;
-        printf("FAILED: %.16g \t %.16g \t %.16g \t %.16g \t %.16g\n", exdot_fpe2, exdot_fpe4, exdot_fpe4ee, exdot_fpe6ee, exdot_fpe8ee);
+        printf("FAILED: %.16g \t %.16g \t %.16g \t %.16g \t %.16g \t %.16g\n", exdot_acc, exdot_fpe2, exdot_fpe4, exdot_fpe4ee, exdot_fpe6ee, exdot_fpe8ee);
     }
 #else
     exdot_fpe2 = fabs(exdot_acc - exdot_fpe2) / fabs(exdot_acc);

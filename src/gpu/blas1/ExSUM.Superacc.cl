@@ -228,6 +228,7 @@ void ExSUM(
     //Read data from global memory and scatter it to sub-superaccs
     for(uint pos = get_global_id(0); pos < NbElements; pos += get_global_size(0)) {
         double x = d_Data[pos];
+
         Accumulate(l_workingBase, l_workingBase_check, x);
         if (*l_workingBase_check) {
             barrier(CLK_LOCAL_MEM_FENCE);
@@ -244,7 +245,6 @@ void ExSUM(
     barrier(CLK_LOCAL_MEM_FENCE);
 
     //Merge sub-superaccs into work-group partial-accumulator
-#if 1
     uint pos = get_local_id(0);
     if (pos < BIN_COUNT) {
         long sum = 0;
@@ -254,20 +254,6 @@ void ExSUM(
 
         d_PartialSuperaccs[get_group_id(0) * BIN_COUNT + pos] = sum;
     }
-#else
-    uint pos = get_global_id(0);
-    if (pos == 0) {
-        for(uint j = 0; j < BIN_COUNT; j++) {
-            //d_PartialSuperaccs[j] = l_sa[j];
-            long sum = 0;
-
-            for(uint i = 0; i < WARP_COUNT; i++)
-                sum += l_sa[j * WARP_COUNT + i];
-
-            d_PartialSuperaccs[get_group_id(0) * BIN_COUNT + j] = sum;
-        }
-    }
-#endif
 
     barrier(CLK_LOCAL_MEM_FENCE);
     if (pos == 0) {

@@ -81,11 +81,8 @@ double exsum(int Ng, double *ag, int inca, int fpe, bool early_exit) {
     strcat(path, "/include/cl/");
 
     // with superaccumulators only
-    if (fpe < 2) {
+    if (fpe < 2)
         return runExSUM(Ng, ag, inca, 0, strcat(path, "ExSUM.Superacc.cl"));
-        printf("Please use the size of FPE from this range [2, 8]\n");
-        exit(0);
-    }
 
     if (early_exit) {
         if (fpe <= 4)
