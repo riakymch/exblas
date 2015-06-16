@@ -202,7 +202,7 @@ void wait_until_ge(
             *col_done = *sync;
         }
     }
-    barrier(CLK_GLOBAL_MEM_FENCE);
+    barrier(CLK_LOCAL_MEM_FENCE);
 }
 
 /* Returns next block row index that requires processing */
