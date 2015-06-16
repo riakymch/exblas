@@ -202,7 +202,7 @@ void wait_until_ge(
             *col_done = *sync;
         }
     }
-    barrier(CLK_LOCAL_MEM_FENCE);
+    barrier(CLK_GLOBAL_MEM_FENCE);
 }
 
 /* Returns next block row index that requires processing */
@@ -267,7 +267,6 @@ __kernel void trsv_lnn(
     __local volatile double *xs,
     const uint n
 ){
-    //__local double cache[BLOCK_SIZE * BLOCK_SIZE];
     int lidx = get_local_id(0);
     int lidy = get_local_id(1);
     int tid  = threadsx * lidy + lidx;
@@ -277,10 +276,8 @@ __kernel void trsv_lnn(
     __global long *l_working = d_Superaccs + get_group_id(0) * lda * BIN_COUNT + tid;
 
     // Get row handled by this block
-    //__local int row;
     *row = 0.0;
     nextRow(row, &sync[1]);
-    //nextRow(&row, &sync[1]);
 
     // Copy diagonal block to shared memory
     tocache(&d_a[*row * BLOCK_SIZE * n + *row * BLOCK_SIZE], cache, BLOCK_SIZE, lda, 0, isunit, tid, n);
@@ -321,7 +318,6 @@ __kernel void trsv_lnn(
         barrier(CLK_LOCAL_MEM_FENCE);*/
 
         double val = 0.0;
-        //__local volatile double xs;
         #ifdef NVIDIA
             #pragma unroll
         #endif

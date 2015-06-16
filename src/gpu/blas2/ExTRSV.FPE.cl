@@ -225,7 +225,6 @@ void wait_until_ge(
 }
 
 /* Returns next block row index that requires processing */
-#if 1
 void nextRow(
    __local volatile int *old,
    __global volatile int *address
@@ -234,26 +233,6 @@ void nextRow(
       *old = atomic_add(address, 1);
 
    barrier(CLK_GLOBAL_MEM_FENCE);
-}
-#else
-int nextRow(
-   __global volatile int *address
-){
-   __local volatile int old;
-   if(get_local_id(0)==0 && get_local_id(1)==0)
-      old = atomic_add(address, 1);
-
-   barrier(CLK_GLOBAL_MEM_FENCE);
-   return old;
-}
-#endif
-
-/* Sets sync values correctly prior to call to trsv_ln_exec */
-__kernel void trsv_init(
-    __global int *sync
-){
-   sync[0] = -1; // Last ready column
-   sync[1] = 0;  // Next row to assign
 }
 
 /* Copies a nbi x nbi block of a to provided cache.
@@ -285,15 +264,26 @@ void tocache(
     }
 }
 
+
+/* Sets sync values correctly prior to call to trsv_ln_exec */
+__kernel void trsv_init(
+    __global int *sync
+){
+   sync[0] = -1; // Last ready column
+   sync[1] = 0;  // Next row to assign
+}
+
+
 __kernel void trsv_lnn(
     __global double *d_x,
     __global double *d_a,
     __global int *sync,
     __global long *d_Superaccs,
+    __local double *cache,
+    __local int *row,
+    __local volatile double *xs,
     const uint n
 ){
-    __local double cache[BLOCK_SIZE * BLOCK_SIZE];
-
     int lidx = get_local_id(0);
     int lidy = get_local_id(1);
     int tid  = threadsx * lidy + lidx;
@@ -303,16 +293,11 @@ __kernel void trsv_lnn(
     __global long *l_working = d_Superaccs + get_group_id(0) * threadsy * threadsx * BIN_COUNT + tid;
 
     // Get row handled by this block
-#if 1
-    __local int row;
-    row = 0.0;
-    nextRow(&row, &sync[1]);
-#else
-    int row = nextRow(&sync[1]);
-#endif
+    *row = 0.0;
+    nextRow(row, &sync[1]);
 
     // Copy diagonal block to shared memory
-    tocache(&d_a[row * BLOCK_SIZE * n + row * BLOCK_SIZE], cache, BLOCK_SIZE, threadsx * threadsy, 0, isunit, tid, n);
+    tocache(&d_a[*row * BLOCK_SIZE * n + *row * BLOCK_SIZE], cache, BLOCK_SIZE, threadsx * threadsy, 0, isunit, tid, n);
     barrier(CLK_LOCAL_MEM_FENCE);
 
     // Loop over blocks as they become available
@@ -324,14 +309,14 @@ __kernel void trsv_lnn(
     double x, s, r;
     int col_done = -1;
 
-    for (int col = 0; col < row; col++) {
+    for (int col = 0; col < *row; col++) {
         wait_until_ge(tid, &sync[0], col, &col_done); // Wait for diagonal block to be done
         #ifdef NVIDIA
             #pragma unroll
         #endif
         for (int j = 0; j < BLOCK_SIZE; j+=threadsy) {
             double xp = -d_x[col * BLOCK_SIZE + lidy + j];
-            x = TwoProductFMA(d_a[(col * BLOCK_SIZE + lidy) * n + row * BLOCK_SIZE + lidx + j * n], xp, &r);
+            x = TwoProductFMA(d_a[(col * BLOCK_SIZE + lidy) * n + *row * BLOCK_SIZE + lidx + j * n], xp, &r);
 
             #ifdef NVIDIA
                 #pragma unroll
@@ -352,22 +337,24 @@ __kernel void trsv_lnn(
                 }
             }
 
-            #ifdef NVIDIA
-                #pragma unroll
-            #endif
-            for(uint it = 0; it != NBFPE; ++it) {
-                fpe[it] = KnuthTwoSum(fpe[it], r, &s);
-                r = s;
-            }
             if(r != 0.0) {
-                Accumulate(l_working, lda, r);
-                //So, there is not space in FPEs, meaning we need to flush to the accumulator
                 #ifdef NVIDIA
                     #pragma unroll
                 #endif
                 for(uint it = 0; it != NBFPE; ++it) {
-                    Accumulate(l_working, lda, fpe[it]);
-                    fpe[it] = 0.0;
+                    fpe[it] = KnuthTwoSum(fpe[it], r, &s);
+                    r = s;
+                }
+                if(r != 0.0) {
+                    Accumulate(l_working, lda, r);
+                    //So, there is not space in FPEs, meaning we need to flush to the accumulator
+                    #ifdef NVIDIA
+                        #pragma unroll
+                    #endif
+                    for(uint it = 0; it != NBFPE; ++it) {
+                        Accumulate(l_working, lda, fpe[it]);
+                        fpe[it] = 0.0;
+                    }
                 }
             }
         }
@@ -376,23 +363,13 @@ __kernel void trsv_lnn(
 
     // Apply update from diagonal block (row, row)
     if (lidy == 0) {
-        /*//merge superaccs
-        for (int i = 0; i < BIN_COUNT; i++) {
-            long sum = 0.0;
-            for(int j = 0; j < threadsy; j++)
-                sum += l_working[i * lda + j * threadsx];
-            l_working[i * lda] = sum;
-        }
-        barrier(CLK_LOCAL_MEM_FENCE);*/
-
         double val = 0.0;
-        __local volatile double xs;
         #ifdef NVIDIA
             #pragma unroll
         #endif
         for (uint i = 0; i < BLOCK_SIZE; i++) {
             if (lidx == i) {
-                x = d_x[row * threadsx + lidx];
+                x = d_x[*row * threadsx + lidx];
                 #ifdef NVIDIA
                   #pragma unroll
                 #endif
@@ -416,19 +393,10 @@ __kernel void trsv_lnn(
                 val = Round(l_working, lda);
                 if (!isunit)
                     val = val / cache[i * (BLOCK_SIZE + 1)];
-                xs = val;
+                *xs = val;
             }
             if (lidx > i) {
-                x = TwoProductFMA(cache[i * BLOCK_SIZE + lidx], xs, &r);
-
-                // TODO: remove this flush
-                #ifdef NVIDIA
-                    #pragma unroll
-                #endif
-                for(uint it = 0; it != NBFPE; ++it) {
-                    Accumulate(l_working, lda, fpe[it]);
-                    fpe[it] = 0.0;
-                }
+                x = TwoProductFMA(cache[i * BLOCK_SIZE + lidx], *xs, &r);
 
                 #ifdef NVIDIA
                     #pragma unroll
@@ -471,7 +439,7 @@ __kernel void trsv_lnn(
                 }
             }
         }
-        d_x[row * BLOCK_SIZE + tid] = val;
+        d_x[*row * BLOCK_SIZE + tid] = val;
     }
 
     // Notify other blocks that soln is ready for this row
