@@ -17,30 +17,11 @@
 ////////////////////////////////////////////////////////////////////////////////
 // Auxiliary functions
 ////////////////////////////////////////////////////////////////////////////////
-#if 1
 double TwoProductFMA(double a, double b, double *d) {
     double p = a * b;
     *d = fma(a, b, -p);
     return p;
 }
-#else
-double split(double a, double *a2){
-    double factor = 134217729.0;
-    double c = factor * a;
-    double a1 = c - (c - a);
-    *a2 = a - a1;
-    return a1;
-}
-
-double TwoProductFMA(double a, double b, double *d) {
-    double a2, b2;
-    double x = a * b;
-    double a1 = split(a, &a2);
-    double b1 = split(a, &b2);
-    *d = a2 * b2 - (((x - a1 * b1) - a2 * b1) - a1 * b2);
-    return x;
-}
-#endif
 
 // signedcarry in {-1, 0, 1}
 long xadd(__global volatile long *sa, long x, uchar *of) {

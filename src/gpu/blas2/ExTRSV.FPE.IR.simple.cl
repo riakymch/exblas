@@ -17,30 +17,11 @@
 ////////////////////////////////////////////////////////////////////////////////
 // Auxiliary functions
 ////////////////////////////////////////////////////////////////////////////////
-#if 1
 double TwoProd(double a, double b, double *d) {
     double p = a * b;
     *d = fma(a, b, -p);
     return p;
 }
-#else
-double split(double a, double *a2){
-    double factor = 134217729.0;
-    double c = factor * a;
-    double a1 = c - (c - a);
-    *a2 = a - a1;
-    return a1;
-}
-
-double TwoProd(double a, double b, double *d) {
-    double a2, b2;
-    double x = a * b;
-    double a1 = split(a, &a2);
-    double b1 = split(a, &b2);
-    *d = a2 * b2 - (((x - a1 * b1) - a2 * b1) - a1 * b2);
-    return x;
-}
-#endif
 
 #ifdef USE_KNUTH
     double TwoSum(double a, double b, double *s) {
@@ -49,7 +30,7 @@ double TwoProd(double a, double b, double *d) {
         *s = (a - (r - z)) + (b - z);
         return r;
     }
-/*#else
+#else
     //twosum
     double TwoSum(double a, double b, double *s) {
         double r = a + b;
@@ -58,7 +39,7 @@ double TwoProd(double a, double b, double *d) {
         double b2 = doswap ? a : b;
         *s = (a2 - r) + b2;
         return r;
-    }*/
+    }
 #endif
 
 // signedcarry in {-1, 0, 1}
