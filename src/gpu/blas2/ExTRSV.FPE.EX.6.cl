@@ -225,7 +225,6 @@ void wait_until_ge(
 }
 
 /* Returns next block row index that requires processing */
-#if 1
 void nextRow(
    __local volatile int *old,
    __global volatile int *address
@@ -234,26 +233,6 @@ void nextRow(
       *old = atomic_add(address, 1);
 
    barrier(CLK_GLOBAL_MEM_FENCE);
-}
-#else
-int nextRow(
-   __global volatile int *address
-){
-   __local volatile int old;
-   if(get_local_id(0)==0 && get_local_id(1)==0)
-      old = atomic_add(address, 1);
-
-   barrier(CLK_GLOBAL_MEM_FENCE);
-   return old;
-}
-#endif
-
-/* Sets sync values correctly prior to call to trsv_ln_exec */
-__kernel void trsv_init(
-    __global int *sync
-){
-   sync[0] = -1; // Last ready column
-   sync[1] = 0;  // Next row to assign
 }
 
 /* Copies a nbi x nbi block of a to provided cache.
@@ -285,34 +264,40 @@ void tocache(
     }
 }
 
+
+/* Sets sync values correctly prior to call to trsv_ln_exec */
+__kernel void trsv_init(
+    __global int *sync
+){
+   sync[0] = -1; // Last ready column
+   sync[1] = 0;  // Next row to assign
+}
+
+
 __kernel void trsv_lnn(
     __global double *d_x,
     __global double *d_a,
     __global int *sync,
     __global long *d_Superaccs,
+    __local double *cache,
+    __local int *row,
+    __local volatile double *xs,
     const uint n
 ){
-    __local double cache[BLOCK_SIZE * BLOCK_SIZE];
-
     int lidx = get_local_id(0);
     int lidy = get_local_id(1);
     int tid  = threadsx * lidy + lidx;
     int isunit = 0;
     int lda = threadsx * threadsy;
 
-    __global long *l_working = d_Superaccs + get_group_id(0) * threadsy * threadsx * BIN_COUNT + tid;
+    __global long *l_working = d_Superaccs + get_group_id(0) * lda * BIN_COUNT + tid;
 
     // Get row handled by this block
-#if 1
-    __local int row;
-    row = 0.0;
-    nextRow(&row, &sync[1]);
-#else
-    int row = nextRow(&sync[1]);
-#endif
+    *row = 0.0;
+    nextRow(row, &sync[1]);
 
     // Copy diagonal block to shared memory
-    tocache(&d_a[row * BLOCK_SIZE * n + row * BLOCK_SIZE], cache, BLOCK_SIZE, threadsx * threadsy, 0, isunit, tid, n);
+    tocache(&d_a[*row * BLOCK_SIZE * n + *row * BLOCK_SIZE], cache, BLOCK_SIZE, lda, 0, isunit, tid, n);
     barrier(CLK_LOCAL_MEM_FENCE);
 
     // Loop over blocks as they become available
@@ -320,44 +305,18 @@ __kernel void trsv_lnn(
     for (uint i = 0; i < BIN_COUNT; i++)
         l_working[i * lda] = 0;
     // FPEs
-    double fpe[NBFPE] = {0.0};
+    double fpe[6] = {0.0};
     double x, s, r;
-    if(lidy == 0) {
-        x = d_x[row * threadsx + lidx];
-        fpe[0] = KnuthTwoSum(fpe[0], x, &s);
-        x = s;
-        if(x != 0.0) {
-            fpe[1] = KnuthTwoSum(fpe[1], x, &s);
-            x = s;
-            if(x != 0.0) {
-                fpe[2] = KnuthTwoSum(fpe[2], x, &s);
-                x = s;
-                if(x != 0.0) {
-                    fpe[3] = KnuthTwoSum(fpe[3], x, &s);
-                    x = s;
-                    if(x != 0.0) {
-                        fpe[4] = KnuthTwoSum(fpe[4], x, &s);
-                        x = s;
-                        if(x != 0.0) {
-                            fpe[5] = KnuthTwoSum(fpe[5], x, &s);
-                            x = s;
-                        }
-                    }
-                }
-            }
-        }
-    }
-    barrier(CLK_LOCAL_MEM_FENCE);
     int col_done = -1;
 
-    for (int col = 0; col < row; col++) {
+    for (int col = 0; col < *row; col++) {
         wait_until_ge(tid, &sync[0], col, &col_done); // Wait for diagonal block to be done
         #ifdef NVIDIA
             #pragma unroll
         #endif
-        for (int j = 0; j < threadsx; j+=threadsy) {
-            double xp = -d_x[col * threadsx + lidy + j];
-            x = TwoProductFMA(d_a[(col * threadsx + lidy) * n + row * BLOCK_SIZE + lidx + j * n], xp, &r);
+        for (int j = 0; j < BLOCK_SIZE; j+=threadsy) {
+            double xp = -d_x[col * BLOCK_SIZE + lidy + j];
+            x = TwoProductFMA(d_a[(col * BLOCK_SIZE + lidy) * n + *row * BLOCK_SIZE + lidx + j * n], xp, &r);
 
             fpe[0] = KnuthTwoSum(fpe[0], x, &s);
             x = s;
@@ -384,85 +343,121 @@ __kernel void trsv_lnn(
             if(x != 0.0) {
                 Accumulate(l_working, lda, x);
                 //So, there is not space in FPEs -- need to flush to the accumulator
-                #ifdef NVIDIA
-                    #pragma unroll
-                #endif
-                for(uint i = 0; i != NBFPE; ++i) {
-                    Accumulate(l_working, lda, fpe[i]);
-                    fpe[i] = 0.0;
-                }
+                Accumulate(l_working, lda, fpe[0]);
+                Accumulate(l_working, lda, fpe[1]);
+                Accumulate(l_working, lda, fpe[2]);
+                Accumulate(l_working, lda, fpe[3]);
+                Accumulate(l_working, lda, fpe[4]);
+                Accumulate(l_working, lda, fpe[5]);
+                fpe[0] = 0.0;
+                fpe[1] = 0.0;
+                fpe[2] = 0.0;
+                fpe[3] = 0.0;
+                fpe[4] = 0.0;
+                fpe[5] = 0.0;
             }
 
-            fpe[0] = KnuthTwoSum(fpe[0], r, &s);
-            r = s;
             if(r != 0.0) {
-                fpe[1] = KnuthTwoSum(fpe[1], r, &s);
+                fpe[0] = KnuthTwoSum(fpe[0], r, &s);
                 r = s;
                 if(r != 0.0) {
-                    fpe[2] = KnuthTwoSum(fpe[2], r, &s);
+                    fpe[1] = KnuthTwoSum(fpe[1], r, &s);
                     r = s;
                     if(r != 0.0) {
-                        fpe[3] = KnuthTwoSum(fpe[3], r, &s);
+                        fpe[2] = KnuthTwoSum(fpe[2], r, &s);
                         r = s;
                         if(r != 0.0) {
-                            fpe[4] = KnuthTwoSum(fpe[4], r, &s);
+                            fpe[3] = KnuthTwoSum(fpe[3], r, &s);
                             r = s;
                             if(r != 0.0) {
-                                fpe[5] = KnuthTwoSum(fpe[5], r, &s);
+                                fpe[4] = KnuthTwoSum(fpe[4], r, &s);
                                 r = s;
+                                if(r != 0.0) {
+                                    fpe[5] = KnuthTwoSum(fpe[5], r, &s);
+                                    r = s;
+                                }
                             }
                         }
                     }
                 }
+                if(r != 0.0) {
+                    Accumulate(l_working, lda, r);
+                    //So, there is not space in FPEs -- need to flush to the accumulator
+                    Accumulate(l_working, lda, fpe[0]);
+                    Accumulate(l_working, lda, fpe[1]);
+                    Accumulate(l_working, lda, fpe[2]);
+                    Accumulate(l_working, lda, fpe[3]);
+                    Accumulate(l_working, lda, fpe[4]);
+                    Accumulate(l_working, lda, fpe[5]);
+                    fpe[0] = 0.0;
+                    fpe[1] = 0.0;
+                    fpe[2] = 0.0;
+                    fpe[3] = 0.0;
+                    fpe[4] = 0.0;
+                    fpe[5] = 0.0;
+                }
             }
-            if(r != 0.0)
-                Accumulate(l_working, lda, r);
         }
     }
     barrier(CLK_LOCAL_MEM_FENCE);
 
-    /*//merge fpes
-    if (lidy != 0) {
-        for(uint i = 0; i != NBFPE; ++i)
-            Accumulate(l_working, lda, fpe[i]);
-    }
-    barrier(CLK_LOCAL_MEM_FENCE);*/
-
     // Apply update from diagonal block (row, row)
     if (lidy == 0) {
-        /*//merge superaccs
-        for (int i = 0; i < BIN_COUNT; i++) {
-            long sum = 0.0;
-            for(int j = 0; j < threadsy; j++)
-                sum += l_working[i * lda + j * threadsx];
-            l_working[i * lda] = sum;
-        }
-        barrier(CLK_LOCAL_MEM_FENCE);*/
-
         double val = 0.0;
-        __local volatile double xs;
         #ifdef NVIDIA
             #pragma unroll
         #endif
         for (uint i = 0; i < BLOCK_SIZE; i++) {
             if (lidx == i) {
+                x = d_x[*row * threadsx + lidx];
+                fpe[0] = KnuthTwoSum(fpe[0], x, &s);
+                x = s;
+                if(x != 0.0) {
+                    fpe[1] = KnuthTwoSum(fpe[1], x, &s);
+                    x = s;
+                    if(x != 0.0) {
+                        fpe[2] = KnuthTwoSum(fpe[2], x, &s);
+                        x = s;
+                        if(x != 0.0) {
+                            fpe[3] = KnuthTwoSum(fpe[3], x, &s);
+                            x = s;
+                            if(x != 0.0) {
+                                fpe[4] = KnuthTwoSum(fpe[4], x, &s);
+                                x = s;
+                                if(x != 0.0) {
+                                    fpe[5] = KnuthTwoSum(fpe[5], x, &s);
+                                    x = s;
+                                }
+                            }
+                        }
+                    }
+                }
+                if(x != 0.0)
+                    Accumulate(l_working, lda, x);
+
                 //TODO: round only fpes when accumulator was not used
                 //Flush to the accumulator
-                #ifdef NVIDIA
-                    #pragma unroll
-                #endif
-                for(uint i = 0; i != NBFPE; ++i) {
-                    Accumulate(l_working, lda, fpe[i]);
-                    fpe[i] = 0.0;
-                }
+                Accumulate(l_working, lda, fpe[0]);
+                Accumulate(l_working, lda, fpe[1]);
+                Accumulate(l_working, lda, fpe[2]);
+                Accumulate(l_working, lda, fpe[3]);
+                Accumulate(l_working, lda, fpe[4]);
+                Accumulate(l_working, lda, fpe[5]);
+                //Set FPE to zero
+                fpe[0] = 0.0;
+                fpe[1] = 0.0;
+                fpe[2] = 0.0;
+                fpe[3] = 0.0;
+                fpe[4] = 0.0;
+                fpe[5] = 0.0;
 
                 val = Round(l_working, lda);
                 if (!isunit)
                     val = val / cache[i * (BLOCK_SIZE + 1)];
-                xs = val;
+                *xs = val;
             }
             if (lidx > i) {
-                x = TwoProductFMA(cache[i * BLOCK_SIZE + lidx], xs, &r);
+                x = TwoProductFMA(cache[i * BLOCK_SIZE + lidx], *xs, &r);
 
                 fpe[0] = KnuthTwoSum(fpe[0], x, &s);
                 x = s;
@@ -489,42 +484,63 @@ __kernel void trsv_lnn(
                 if(x != 0.0) {
                     Accumulate(l_working, lda, x);
                     //So, there is not space in FPEs -- need to flush to the accumulator
-                    #ifdef NVIDIA
-                        #pragma unroll
-                    #endif
-                    for(uint i = 0; i != NBFPE; ++i) {
-                        Accumulate(l_working, lda, fpe[i]);
-                        fpe[i] = 0.0;
-                    }
+                    Accumulate(l_working, lda, fpe[0]);
+                    Accumulate(l_working, lda, fpe[1]);
+                    Accumulate(l_working, lda, fpe[2]);
+                    Accumulate(l_working, lda, fpe[3]);
+                    Accumulate(l_working, lda, fpe[4]);
+                    Accumulate(l_working, lda, fpe[5]);
+                    fpe[0] = 0.0;
+                    fpe[1] = 0.0;
+                    fpe[2] = 0.0;
+                    fpe[3] = 0.0;
+                    fpe[4] = 0.0;
+                    fpe[5] = 0.0;
                 }
 
-                fpe[0] = KnuthTwoSum(fpe[0], r, &s);
-                r = s;
                 if(r != 0.0) {
-                    fpe[1] = KnuthTwoSum(fpe[1], r, &s);
+                    fpe[0] = KnuthTwoSum(fpe[0], r, &s);
                     r = s;
                     if(r != 0.0) {
-                        fpe[2] = KnuthTwoSum(fpe[2], r, &s);
+                        fpe[1] = KnuthTwoSum(fpe[1], r, &s);
                         r = s;
                         if(r != 0.0) {
-                            fpe[3] = KnuthTwoSum(fpe[3], r, &s);
+                            fpe[2] = KnuthTwoSum(fpe[2], r, &s);
                             r = s;
                             if(r != 0.0) {
-                                fpe[4] = KnuthTwoSum(fpe[4], r, &s);
+                                fpe[3] = KnuthTwoSum(fpe[3], r, &s);
                                 r = s;
                                 if(r != 0.0) {
-                                    fpe[5] = KnuthTwoSum(fpe[5], r, &s);
+                                    fpe[4] = KnuthTwoSum(fpe[4], r, &s);
                                     r = s;
+                                    if(r != 0.0) {
+                                        fpe[5] = KnuthTwoSum(fpe[5], r, &s);
+                                        r = s;
+                                    }
                                 }
                             }
                         }
                     }
+                    if(r != 0.0) {
+                        Accumulate(l_working, lda, r);
+                        //So, there is not space in FPEs -- need to flush to the accumulator
+                        Accumulate(l_working, lda, fpe[0]);
+                        Accumulate(l_working, lda, fpe[1]);
+                        Accumulate(l_working, lda, fpe[2]);
+                        Accumulate(l_working, lda, fpe[3]);
+                        Accumulate(l_working, lda, fpe[4]);
+                        Accumulate(l_working, lda, fpe[5]);
+                        fpe[0] = 0.0;
+                        fpe[1] = 0.0;
+                        fpe[2] = 0.0;
+                        fpe[3] = 0.0;
+                        fpe[4] = 0.0;
+                        fpe[5] = 0.0;
+                    }
                 }
-                if(r != 0.0)
-                    Accumulate(l_working, lda, r);
             }
         }
-        d_x[row * BLOCK_SIZE + tid] = val;
+        d_x[*row * BLOCK_SIZE + tid] = val;
     }
 
     // Notify other blocks that soln is ready for this row
