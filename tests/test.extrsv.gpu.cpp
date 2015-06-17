@@ -31,9 +31,9 @@ static double extrsvVsMPFR(double *extrsv, uint n, double *a, uint lda, double *
     // Compare to the results from Matlab
     FILE *pFilex;
     size_t resx;
+    //pFilex = fopen("matrices/x_test_trsv_gemv_64.bin", "rb");
+    //pFilex = fopen("matrices/x_test_trsv_final_64.bin", "rb");
     pFilex = fopen("matrices/x_test_trsv_64.bin", "rb");
-    //pFilex = fopen("x_test_trsv_64_final.bin", "rb");
-    //pFilex = fopen("x_test_gemv_64.bin", "rb");
     if (pFilex == NULL) {
         fprintf(stderr, "Cannot open files to read matrix and vector\n");
         exit(1);
@@ -286,6 +286,7 @@ int main(int argc, char *argv[]) {
         is_pass = false;
     }
 #endif
+    //exit(0);
 
     copyVector(n, x, xorig);
     extrsv('L', 'N', 'N', n, a, n, x, 1, 3);

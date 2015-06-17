@@ -106,45 +106,45 @@ double OddRoundSumNonnegative(double th, double tl) {
     return thdb.d;
 }
 
-int Normalize(__global long *accumulator, int lda, int *imin, int *imax) {
-    long carry_in = accumulator[*imin * lda] >> digits;
-    accumulator[*imin * lda] -= carry_in << digits;
+int Normalize(__global long *accumulator, int *imin, int *imax) {
+    long carry_in = accumulator[*imin] >> digits;
+    accumulator[*imin] -= carry_in << digits;
     int i;
     // Sign-extend all the way
     for (i = *imin + 1; i < BIN_COUNT; ++i) {
-        accumulator[i * lda] += carry_in;
-        long carry_out = accumulator[i * lda] >> digits;    // Arithmetic shift
-        accumulator[i * lda] -= (carry_out << digits);
+        accumulator[i] += carry_in;
+        long carry_out = accumulator[i] >> digits;    // Arithmetic shift
+        accumulator[i] -= (carry_out << digits);
         carry_in = carry_out;
     }
     *imax = i - 1;
 
     // Do not cancel the last carry to avoid losing information
-    accumulator[*imax * lda] += carry_in << digits;
+    accumulator[*imax] += carry_in << digits;
 
     return carry_in < 0;
 }
 
-double Round(__global long *accumulator, int lda) {
+double Round(__global long *accumulator) {
     int imin = 0;
     int imax = 38;
-    int negative = Normalize(accumulator, lda, &imin, &imax);
+    int negative = Normalize(accumulator, &imin, &imax);
 
     //Find leading word
     int i;
     //Skip zeroes
-    for (i = imax; accumulator[i * lda] == 0 && i >= imin; --i) {
+    for (i = imax; accumulator[i] == 0 && i >= imin; --i) {
     }
     if (negative) {
         //Skip ones
-        for (; (accumulator[i * lda] & ((1l << digits) - 1)) == ((1l << digits) - 1) && i >= imin; --i) {
+        for (; (accumulator[i] & ((1l << digits) - 1)) == ((1l << digits) - 1) && i >= imin; --i) {
         }
     }
     if (i < 0)
         //TODO: should we preserve sign of zero?
         return 0.0;
 
-    long hiword = negative ? ((1l << digits) - 1) - accumulator[i * lda] : accumulator[i * lda];
+    long hiword = negative ? ((1l << digits) - 1) - accumulator[i] : accumulator[i];
     double rounded = (double) hiword;
     double hi = ldexp(rounded, (i - f_words) * digits);
     if (i == 0)
@@ -155,9 +155,9 @@ double Round(__global long *accumulator, int lda) {
     //Compute sticky
     long sticky = 0;
     for (int j = imin; j != i - 1; ++j)
-        sticky |= negative ? (1l << digits) - accumulator[j * lda] : accumulator[j * lda];
+        sticky |= negative ? (1l << digits) - accumulator[j] : accumulator[j];
 
-    long loword = negative ? (1l << digits) - accumulator[(i - 1) * lda] : accumulator[(i - 1) * lda];
+    long loword = negative ? (1l << digits) - accumulator[(i - 1)] : accumulator[(i - 1)];
     loword |= !!sticky;
     double lo = ldexp((double) loword, (i - 1 - f_words) * digits);
 
@@ -171,7 +171,7 @@ double Round(__global long *accumulator, int lda) {
     return negative ? -hi : hi;
 }
 
-void AccumulateWord(__global volatile long *sa, int lda, int i, long x) {
+void AccumulateWord(__global volatile long *sa, int i, long x) {
     // With atomic accumulator updates
     // accumulation and carry propagation can happen in any order,
     // as long as addition is atomic
@@ -179,7 +179,7 @@ void AccumulateWord(__global volatile long *sa, int lda, int i, long x) {
     uchar overflow;
     long carry = x;
     long carrybit;
-    long oldword = xadd(&sa[i * lda], x, &overflow);
+    long oldword = xadd(&sa[i], x, &overflow);
 
     // To propagate over- or underflow
     while (overflow) {
@@ -194,7 +194,7 @@ void AccumulateWord(__global volatile long *sa, int lda, int i, long x) {
         carrybit = (s ? 1l << K : -1l << K);
 
         // Cancel carry-save bits
-        xadd(&sa[i * lda], (long) -(carry << digits), &overflow);
+        xadd(&sa[i], (long) -(carry << digits), &overflow);
         if (TSAFE && (s ^ overflow))
             carrybit *= 2;
         carry += carrybit;
@@ -202,11 +202,11 @@ void AccumulateWord(__global volatile long *sa, int lda, int i, long x) {
         ++i;
         if (i >= BIN_COUNT)
             return;
-        oldword = xadd(&sa[i * lda], carry, &overflow);
+        oldword = xadd(&sa[i], carry, &overflow);
     }
 }
 
-void Accumulate(__global volatile long *sa, int lda, double x) {
+void Accumulate(__global volatile long *sa, double x) {
     if (x == 0)
         return;
 
@@ -222,7 +222,7 @@ void Accumulate(__global volatile long *sa, int lda, double x) {
         double xrounded = rint(xscaled);
         long xint = (long) xrounded;
 
-        AccumulateWord(sa, lda, i, xint);
+        AccumulateWord(sa, i, xint);
 
         xscaled -= xrounded;
         xscaled *= deltaScale;
@@ -304,7 +304,6 @@ __kernel void trsv_init(
 
 void __trsv_lnn(
     __global double *d_x,
-    __global double *d_b,
     __global double *d_a,
     __global int *sync,
     __global long *d_Superaccs,
@@ -319,7 +318,7 @@ void __trsv_lnn(
     int isunit = 0;
     int lda = threadsx * threadsy;
 
-    __global long *l_working = d_Superaccs + get_group_id(0) * lda * BIN_COUNT + tid;
+    __global long *l_working = d_Superaccs + (get_group_id(0) * lda + lidx) * BIN_COUNT;
 
     // Get row handled by this block
     *row = 0;
@@ -332,7 +331,7 @@ void __trsv_lnn(
     // Loop over blocks as they become available
     // Initialize accumulators
     for (uint i = 0; i < BIN_COUNT; i++)
-        l_working[i * lda] = 0;
+        l_working[i] = 0;
     // FPEs
     double fpe[3] = {0.0};
 
@@ -359,11 +358,11 @@ void __trsv_lnn(
                 }
             }
             if(x != 0.0) {
-                Accumulate(l_working, lda, x);
+                Accumulate(l_working, x);
                 //So, there is not space in FPEs -- need to flush to the accumulator
-                Accumulate(l_working, lda, fpe[0]);
-                Accumulate(l_working, lda, fpe[1]);
-                Accumulate(l_working, lda, fpe[2]);
+                Accumulate(l_working, fpe[0]);
+                Accumulate(l_working, fpe[1]);
+                Accumulate(l_working, fpe[2]);
                 fpe[0] = 0.0;
                 fpe[1] = 0.0;
                 fpe[2] = 0.0;
@@ -381,10 +380,10 @@ void __trsv_lnn(
                     }
                 }
                 if(r != 0.0) {
-                    Accumulate(l_working, lda, r);
-                    Accumulate(l_working, lda, fpe[0]);
-                    Accumulate(l_working, lda, fpe[1]);
-                    Accumulate(l_working, lda, fpe[2]);
+                    Accumulate(l_working, r);
+                    Accumulate(l_working, fpe[0]);
+                    Accumulate(l_working, fpe[1]);
+                    Accumulate(l_working, fpe[2]);
                     fpe[0] = 0.0;
                     fpe[1] = 0.0;
                     fpe[2] = 0.0;
@@ -416,15 +415,15 @@ void __trsv_lnn(
                     }
                 }
                 if(x != 0.0)
-                    Accumulate(l_working, lda, x);
+                    Accumulate(l_working, x);
 
                 // Flush FPE to the accumulator
-                Accumulate(l_working, lda, fpe[0]);
-                Accumulate(l_working, lda, fpe[1]);
-                Accumulate(l_working, lda, fpe[2]);
+                Accumulate(l_working, fpe[0]);
+                Accumulate(l_working, fpe[1]);
+                Accumulate(l_working, fpe[2]);
 
                 // Rounding
-                val = Round(l_working, lda);
+                val = Round(l_working);
 #else
 #if 1
                 val = OddRoundSum(fpe);
@@ -460,11 +459,11 @@ void __trsv_lnn(
                     }
                 }
                 if(x != 0.0) {
-                    Accumulate(l_working, lda, x);
+                    Accumulate(l_working, x);
                     //So, there is not space in FPEs -- need to flush to the accumulator
-                    Accumulate(l_working, lda, fpe[0]);
-                    Accumulate(l_working, lda, fpe[1]);
-                    Accumulate(l_working, lda, fpe[2]);
+                    Accumulate(l_working, fpe[0]);
+                    Accumulate(l_working, fpe[1]);
+                    Accumulate(l_working, fpe[2]);
                     fpe[0] = 0.0;
                     fpe[1] = 0.0;
                     fpe[2] = 0.0;
@@ -482,10 +481,10 @@ void __trsv_lnn(
                         }
                     }
                     if(r != 0.0) {
-                        Accumulate(l_working, lda, r);
-                        Accumulate(l_working, lda, fpe[0]);
-                        Accumulate(l_working, lda, fpe[1]);
-                        Accumulate(l_working, lda, fpe[2]);
+                        Accumulate(l_working, r);
+                        Accumulate(l_working, fpe[0]);
+                        Accumulate(l_working, fpe[1]);
+                        Accumulate(l_working, fpe[2]);
                         fpe[0] = 0.0;
                         fpe[1] = 0.0;
                         fpe[2] = 0.0;
@@ -503,11 +502,13 @@ void __trsv_lnn(
     barrier(CLK_GLOBAL_MEM_FENCE); // Flush sync[0] asap
 }
 
+
 void __gemv(
     __global double *d_b,
     __global double *d_a,
     __global double *d_x,
     __global long *d_Superaccs,
+    __local double *cache,
     const uint n
 ){
     int lidx = get_local_id(0);
@@ -516,28 +517,45 @@ void __gemv(
     int isunit = 0;
     int lda = threadsx * threadsy;
 
-    __global long *l_working = d_Superaccs + get_group_id(0) * lda * BIN_COUNT + tid;
+    __global long *l_working = d_Superaccs + (get_group_id(0) * BLOCK_SIZE + lidx) * BIN_COUNT;
     // Initialize accumulators
     for (uint i = 0; i < BIN_COUNT; i++)
-        l_working[i * lda] = 0;
+        l_working[i] = 0;
     // Initialize FPEs
     double fpe[3] = {0.0};
     double x, s, r;
 
-    __local double cache[BLOCK_SIZE * BLOCK_SIZE];
-
     // ExGEMV: rm = b - A x. d_b holds the result
-    //Accumulate(l_working, lda, d_b[get_group_id(0) * threadsx + lidx]);
-    fpe[2] = KnuthTwoSum(fpe[2], d_b[get_group_id(0) * threadsx + lidx], &s);
-#if 0
+#if 1
+ #if 1
     int pos = get_group_id(0) * BLOCK_SIZE + lidx;
     for (int j = 0; j <= pos; j++) {
-        // d = a[i,j] * x[j]
-        x = TwoProductFMA(d_a[j * n + pos], d_x[j], &r);
+        x = TwoProductFMA(d_a[j * n + pos], -d_x[j], &r);
 
-        Accumulate(l_working, lda, x);
-        Accumulate(l_working, lda, r);
+        Accumulate(l_working, x);
+        if (r != 0.0)
+            Accumulate(l_working, r);
     }
+    Accumulate(l_working, d_b[pos]);
+    d_b[pos] = Round(l_working);
+
+ #else
+    if (get_global_id(0) == 0) {
+        for (int i = 0; i < n; i++) {
+            for (uint it = 0; it < BIN_COUNT; it++)
+                l_working[it] = 0;
+
+            for (int j = 0; j <= i; j++) {
+                x = TwoProductFMA(d_a[j * n + i], -d_x[j], &r);
+                Accumulate(l_working, x);
+                if(r != 0.0)
+                    Accumulate(l_working, r);
+            }
+            Accumulate(l_working, d_b[i]);
+            d_b[i] = Round(l_working);
+        }
+    }
+ #endif
 #else
     for (int j = 0; j < n; j += BLOCK_SIZE) {
         // multiply only lower triangular part
@@ -551,56 +569,71 @@ void __gemv(
             x = TwoProductFMA(d_a[(j + i) * n + get_group_id(0) * BLOCK_SIZE + lidx], -cache[i], &r);
 
             // accumulate the result of multiplication
-            fpe[2] = KnuthTwoSum(fpe[2], x, &s);
+            fpe[0] = KnuthTwoSum(fpe[0], x, &s);
             x = s;
             if(x != 0.0) {
                 fpe[1] = KnuthTwoSum(fpe[1], x, &s);
                 x = s;
                 if(x != 0.0) {
-                    fpe[0] = KnuthTwoSum(fpe[0], x, &s);
+                    fpe[2] = KnuthTwoSum(fpe[2], x, &s);
                     x = s;
                 }
             }
             if(x != 0.0) {
-                Accumulate(l_working, lda, x);
-                Accumulate(l_working, lda, fpe[0]);
-                Accumulate(l_working, lda, fpe[1]);
-                Accumulate(l_working, lda, fpe[2]);
-                fpe[2] = 0.0;
-                fpe[1] = 0.0;
+                Accumulate(l_working, x);
+                Accumulate(l_working, fpe[0]);
+                Accumulate(l_working, fpe[1]);
+                Accumulate(l_working, fpe[2]);
                 fpe[0] = 0.0;
+                fpe[1] = 0.0;
+                fpe[2] = 0.0;
             }
 
             // accumulate the error of multiplication
             if(r != 0.0) {
-                fpe[2] = KnuthTwoSum(fpe[2], r, &s);
+                fpe[0] = KnuthTwoSum(fpe[0], r, &s);
                 r = s;
                 if(r != 0.0) {
                     fpe[1] = KnuthTwoSum(fpe[1], r, &s);
                     r = s;
                     if(r != 0.0) {
-                        fpe[0] = KnuthTwoSum(fpe[0], r, &s);
+                        fpe[2] = KnuthTwoSum(fpe[2], r, &s);
                         r = s;
                     }
                 }
                 // if r is still not zero
                 if (r != 0.0) {
-                    Accumulate(l_working, lda, r);
-                    Accumulate(l_working, lda, fpe[2]);
-                    Accumulate(l_working, lda, fpe[1]);
-                    Accumulate(l_working, lda, fpe[0]);
-                    fpe[2] = 0.0;
-                    fpe[1] = 0.0;
+                    Accumulate(l_working, r);
+                    Accumulate(l_working, fpe[0]);
+                    Accumulate(l_working, fpe[1]);
+                    Accumulate(l_working, fpe[2]);
                     fpe[0] = 0.0;
+                    fpe[1] = 0.0;
+                    fpe[2] = 0.0;
                 }
             }
         }
     }
-    Accumulate(l_working, lda, fpe[2]);
-    Accumulate(l_working, lda, fpe[1]);
-    Accumulate(l_working, lda, fpe[0]);
+    //Accumulate(l_working, d_b[get_group_id(0) * threadsx + lidx]);
+    x = d_b[get_group_id(0) * threadsx + lidx];
+    fpe[0] = KnuthTwoSum(fpe[0], x, &s);
+    x = s;
+    if(x != 0.0) {
+        fpe[1] = KnuthTwoSum(fpe[1], x, &s);
+        x = s;
+        if(x != 0.0) {
+            fpe[2] = KnuthTwoSum(fpe[2], x, &s);
+            x = s;
+        }
+    }
+    if(x != 0.0)
+        Accumulate(l_working, x);
+
+    Accumulate(l_working, fpe[0]);
+    Accumulate(l_working, fpe[1]);
+    Accumulate(l_working, fpe[2]);
+    d_b[get_group_id(0) * threadsx + lidx] = Round(l_working);
 #endif
-    d_x[get_group_id(0) * threadsx + lidx] = Round(l_working, lda);
 
     // Wait for d_b/superaccumulators to be visible to other blocks
     barrier(CLK_GLOBAL_MEM_FENCE);
@@ -631,8 +664,7 @@ __kernel void trsv_lnn(
 ){
 
     // At first we call ExTRSV. d_x holds the result
-    __trsv_lnn(d_x, d_b, d_a, sync, d_Superaccs, cache, row, xs, n);
-
+    __trsv_lnn(d_x, d_a, sync, d_Superaccs, cache, row, xs, n);
     return;
 
     // One step of iterative refinement
@@ -640,10 +672,17 @@ __kernel void trsv_lnn(
        ExTRSV: A rm = xm. d_b contains the result
        ExAXPY: x = x + xm. d_x contains the final result */
 
-    __gemv(d_b, d_a, d_x, d_Superaccs, n);
+    __gemv(d_b, d_a, d_x, d_Superaccs, cache, n);
+    d_x[get_global_id(0)] = d_b[get_global_id(0)];
+    /*if (get_global_id(0) == 0) {
+        for(uint i = 0; i < n; i++)
+            d_x[i] = d_b[i];
+    }*/
+    return;
 
     trsv_init(sync);
-    //__trsv_lnn(d_b, d_a, sync, d_Superaccs, n);
+    barrier(CLK_GLOBAL_MEM_FENCE);
+    __trsv_lnn(d_b, d_a, sync, d_Superaccs, cache, row, xs, n);
 
     __axpy(d_x, d_b, n);
 }
