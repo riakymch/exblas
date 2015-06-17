@@ -517,7 +517,7 @@ void __gemv(
     int isunit = 0;
     int lda = threadsx * threadsy;
 
-    __global long *l_working = d_Superaccs + (get_group_id(0) * BLOCK_SIZE + lidx) * BIN_COUNT;
+    __global long *l_working = d_Superaccs + (get_group_id(0) * lda + lidx) * BIN_COUNT;
     // Initialize accumulators
     for (uint i = 0; i < BIN_COUNT; i++)
         l_working[i] = 0;
@@ -528,7 +528,7 @@ void __gemv(
     // ExGEMV: rm = b - A x. d_b holds the result
 #if 1
  #if 1
-    int pos = get_group_id(0) * BLOCK_SIZE + lidx;
+    int pos = get_global_id(0);
     for (int j = 0; j <= pos; j++) {
         x = TwoProductFMA(d_a[j * n + pos], -d_x[j], &r);
 
@@ -665,7 +665,6 @@ __kernel void trsv_lnn(
 
     // At first we call ExTRSV. d_x holds the result
     __trsv_lnn(d_x, d_a, sync, d_Superaccs, cache, row, xs, n);
-    return;
 
     // One step of iterative refinement
     /* ExGEMV: rm = A x - b. d_b holds the result

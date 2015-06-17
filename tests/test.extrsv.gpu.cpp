@@ -31,9 +31,9 @@ static double extrsvVsMPFR(double *extrsv, uint n, double *a, uint lda, double *
     // Compare to the results from Matlab
     FILE *pFilex;
     size_t resx;
-    //pFilex = fopen("matrices/x_test_trsv_gemv_64.bin", "rb");
+    pFilex = fopen("matrices/x_test_trsv_gemv_64.bin", "rb");
     //pFilex = fopen("matrices/x_test_trsv_final_64.bin", "rb");
-    pFilex = fopen("matrices/x_test_trsv_64.bin", "rb");
+    //pFilex = fopen("matrices/x_test_trsv_64.bin", "rb");
     if (pFilex == NULL) {
         fprintf(stderr, "Cannot open files to read matrix and vector\n");
         exit(1);
@@ -267,7 +267,7 @@ int main(int argc, char *argv[]) {
     if ((!superacc) || (err != 0))
         fprintf(stderr, "Cannot allocate memory with posix_memalign\n");
 
-    copyVector(n, superacc, xorig);
+    /*copyVector(n, superacc, xorig);
     extrsv('L', 'N', 'N', n, a, n, superacc, 1, 0);
 #ifdef EXBLAS_VS_MPFR
     norm = extrsvVsMPFR(superacc, n, a, n, xorig, 1);
@@ -275,7 +275,7 @@ int main(int argc, char *argv[]) {
     if (norm > eps) {
         is_pass = false;
     }
-#endif
+#endif*/
 
     copyVector(n, x, xorig);
     extrsv('L', 'N', 'N', n, a, n, x, 1, 1);
@@ -286,7 +286,7 @@ int main(int argc, char *argv[]) {
         is_pass = false;
     }
 #endif
-    //exit(0);
+    exit(0);
 
     copyVector(n, x, xorig);
     extrsv('L', 'N', 'N', n, a, n, x, 1, 3);
