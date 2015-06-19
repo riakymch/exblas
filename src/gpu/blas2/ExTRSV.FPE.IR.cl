@@ -305,7 +305,7 @@ __kernel void trsv_init(
 void __trsv_lnn(
     __global double *d_x,
     __global double *d_a,
-    __global int *sync,
+    __global volatile int *sync,
     __global long *d_Superaccs,
     __local double *cache,
     __local int *row,
@@ -511,13 +511,9 @@ void __gemv(
     __local double *cache,
     const uint n
 ){
-    int lidx = get_local_id(0);
-    int lidy = get_local_id(1);
-    int tid  = threadsx * lidy + lidx;
-    int isunit = 0;
-    int lda = threadsx * threadsy;
+    int pos = get_global_id(0);
 
-    __global long *l_working = d_Superaccs + (get_group_id(0) * lda + lidx) * BIN_COUNT;
+    __global long *l_working = d_Superaccs + pos * BIN_COUNT;
     // Initialize accumulators
     for (uint i = 0; i < BIN_COUNT; i++)
         l_working[i] = 0;
@@ -526,61 +522,43 @@ void __gemv(
     double x, s, r;
 
     // ExGEMV: rm = b - A x. d_b holds the result
-#if 1
- #if 1
-    int pos = get_global_id(0);
     for (int j = 0; j <= pos; j++) {
         x = TwoProductFMA(d_a[j * n + pos], -d_x[j], &r);
 
-        Accumulate(l_working, x);
-        if (r != 0.0)
-            Accumulate(l_working, r);
-    }
-    Accumulate(l_working, d_b[pos]);
-    d_b[pos] = Round(l_working);
-
- #else
-    if (get_global_id(0) == 0) {
-        for (int i = 0; i < n; i++) {
-            for (uint it = 0; it < BIN_COUNT; it++)
-                l_working[it] = 0;
-
-            for (int j = 0; j <= i; j++) {
-                x = TwoProductFMA(d_a[j * n + i], -d_x[j], &r);
-                Accumulate(l_working, x);
-                if(r != 0.0)
-                    Accumulate(l_working, r);
-            }
-            Accumulate(l_working, d_b[i]);
-            d_b[i] = Round(l_working);
-        }
-    }
- #endif
-#else
-    for (int j = 0; j < n; j += BLOCK_SIZE) {
-        // multiply only lower triangular part
-        if (get_group_id(0) * BLOCK_SIZE < j)
-            break;
-
-        // cache part of x
-        cache[lidx] = d_x[j + lidx];
-        for (int i = 0; i < BLOCK_SIZE; i++) {
-            // d = a[i,j] * x[j]
-            x = TwoProductFMA(d_a[(j + i) * n + get_group_id(0) * BLOCK_SIZE + lidx], -cache[i], &r);
-
-            // accumulate the result of multiplication
-            fpe[0] = KnuthTwoSum(fpe[0], x, &s);
+        fpe[0] = KnuthTwoSum(fpe[0], x, &s);
+        x = s;
+        if(x != 0.0) {
+            fpe[1] = KnuthTwoSum(fpe[1], x, &s);
             x = s;
             if(x != 0.0) {
-                fpe[1] = KnuthTwoSum(fpe[1], x, &s);
+                fpe[2] = KnuthTwoSum(fpe[2], x, &s);
                 x = s;
-                if(x != 0.0) {
-                    fpe[2] = KnuthTwoSum(fpe[2], x, &s);
-                    x = s;
+            }
+        }
+        if(x != 0.0) {
+            Accumulate(l_working, x);
+            //So, there is not space in FPEs -- need to flush to the accumulator
+            Accumulate(l_working, fpe[0]);
+            Accumulate(l_working, fpe[1]);
+            Accumulate(l_working, fpe[2]);
+            fpe[0] = 0.0;
+            fpe[1] = 0.0;
+            fpe[2] = 0.0;
+        }
+
+        if(r != 0.0) {
+            fpe[0] = KnuthTwoSum(fpe[0], r, &s);
+            r = s;
+            if(r != 0.0) {
+                fpe[1] = KnuthTwoSum(fpe[1], r, &s);
+                r = s;
+                if(r != 0.0) {
+                    fpe[2] = KnuthTwoSum(fpe[2], r, &s);
+                    r = s;
                 }
             }
-            if(x != 0.0) {
-                Accumulate(l_working, x);
+            if(r != 0.0) {
+                Accumulate(l_working, r);
                 Accumulate(l_working, fpe[0]);
                 Accumulate(l_working, fpe[1]);
                 Accumulate(l_working, fpe[2]);
@@ -588,34 +566,10 @@ void __gemv(
                 fpe[1] = 0.0;
                 fpe[2] = 0.0;
             }
-
-            // accumulate the error of multiplication
-            if(r != 0.0) {
-                fpe[0] = KnuthTwoSum(fpe[0], r, &s);
-                r = s;
-                if(r != 0.0) {
-                    fpe[1] = KnuthTwoSum(fpe[1], r, &s);
-                    r = s;
-                    if(r != 0.0) {
-                        fpe[2] = KnuthTwoSum(fpe[2], r, &s);
-                        r = s;
-                    }
-                }
-                // if r is still not zero
-                if (r != 0.0) {
-                    Accumulate(l_working, r);
-                    Accumulate(l_working, fpe[0]);
-                    Accumulate(l_working, fpe[1]);
-                    Accumulate(l_working, fpe[2]);
-                    fpe[0] = 0.0;
-                    fpe[1] = 0.0;
-                    fpe[2] = 0.0;
-                }
-            }
         }
     }
-    //Accumulate(l_working, d_b[get_group_id(0) * threadsx + lidx]);
-    x = d_b[get_group_id(0) * threadsx + lidx];
+
+    x = d_b[pos];
     fpe[0] = KnuthTwoSum(fpe[0], x, &s);
     x = s;
     if(x != 0.0) {
@@ -628,14 +582,12 @@ void __gemv(
     }
     if(x != 0.0)
         Accumulate(l_working, x);
-
     Accumulate(l_working, fpe[0]);
     Accumulate(l_working, fpe[1]);
     Accumulate(l_working, fpe[2]);
-    d_b[get_group_id(0) * threadsx + lidx] = Round(l_working);
-#endif
 
-    // Wait for d_b/superaccumulators to be visible to other blocks
+    d_b[pos] = Round(l_working);
+
     barrier(CLK_GLOBAL_MEM_FENCE);
 }
 
@@ -647,8 +599,7 @@ void __axpy(
     int lidx = get_local_id(0);
 
     // ExAXPY: x = x + xm. d_x contains the final result
-    d_x[get_group_id(0) * threadsx + lidx] += d_b[get_group_id(0) * threadsx + lidx];
-    //d_x[get_group_id(0) * threadsx + lidx] = KnuthTwoSum(d_x[get_group_id(0) * threadsx + lidx], d_b[get_group_id(0) * threadsx + lidx], &r);
+    d_x[get_global_id(0)] += d_b[get_global_id(0)];
 }
 
 __kernel void trsv_lnn(
@@ -662,7 +613,6 @@ __kernel void trsv_lnn(
     __local volatile double *xs,
     const uint n
 ){
-
     // At first we call ExTRSV. d_x holds the result
     __trsv_lnn(d_x, d_a, sync, d_Superaccs, cache, row, xs, n);
 
@@ -670,17 +620,9 @@ __kernel void trsv_lnn(
     /* ExGEMV: rm = A x - b. d_b holds the result
        ExTRSV: A rm = xm. d_b contains the result
        ExAXPY: x = x + xm. d_x contains the final result */
-
     __gemv(d_b, d_a, d_x, d_Superaccs, cache, n);
-    d_x[get_global_id(0)] = d_b[get_global_id(0)];
-    /*if (get_global_id(0) == 0) {
-        for(uint i = 0; i < n; i++)
-            d_x[i] = d_b[i];
-    }*/
-    return;
 
     trsv_init(sync);
-    barrier(CLK_GLOBAL_MEM_FENCE);
     __trsv_lnn(d_b, d_a, sync, d_Superaccs, cache, row, xs, n);
 
     __axpy(d_x, d_b, n);

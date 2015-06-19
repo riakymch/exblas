@@ -28,11 +28,12 @@ static void copyVector(uint n, double *x, double *y) {
 #include <mpfr.h>
 
 static double extrsvVsMPFR(double *extrsv, uint n, double *a, uint lda, double *x, uint incx) {
+#if 1
     // Compare to the results from Matlab
     FILE *pFilex;
     size_t resx;
-    pFilex = fopen("matrices/x_test_trsv_gemv_64.bin", "rb");
-    //pFilex = fopen("matrices/x_test_trsv_final_64.bin", "rb");
+    //pFilex = fopen("matrices/x_test_trsv_gemv_64.bin", "rb");
+    pFilex = fopen("matrices/x_test_trsv_final_64.bin", "rb");
     //pFilex = fopen("matrices/x_test_trsv_64.bin", "rb");
     if (pFilex == NULL) {
         fprintf(stderr, "Cannot open files to read matrix and vector\n");
@@ -70,6 +71,7 @@ static double extrsvVsMPFR(double *extrsv, uint n, double *a, uint lda, double *
     printf("ExTRSV vs Matlab = %.16g\n", nrm2);
 
     return nrm2;
+#else
 
     mpfr_t sum, dot, div, op1, op2;
 
@@ -97,20 +99,10 @@ static double extrsvVsMPFR(double *extrsv, uint n, double *a, uint lda, double *
         mpfr_div(div, sum, op1, MPFR_RNDN);
         extrsv_mpfr[i] = mpfr_get_d(div, MPFR_RNDN);
     }
-    for(uint i = 0; i < n; i++) {
+    /*for(uint i = 0; i < n; i++) {
         printf("%.16g\t", extrsv_mpfr[i]);
     }
-    printf("\n\n");
-
-    //naive trsv
-    double *trsvn = (double *) malloc(n * sizeof(double));
-    copyVector(n, trsvn, x);
-    for (uint i = 0; i < n; i++) {
-        double sum = 0.0;
-        for(uint j = 0; j < i; j++)
-            sum -= a[j * n + i] * trsvn[j];
-        trsvn[i] = (sum + trsvn[i]) / a[i * (n + 1)];
-    }
+    printf("\n\n");*/
 
     //compare the GPU and MPFR results
 #if 0
@@ -123,15 +115,14 @@ static double extrsvVsMPFR(double *extrsv, uint n, double *a, uint lda, double *
     nrm = ::sqrt(nrm) / ::sqrt(val);
 #else
     //Inf norm
-    double nrm = 0.0, val = 0.0, nrm1 = 0.0;
+    double nrm = 0.0, val = 0.0;
     for(uint i = 0; i < n; i++) {
         val = std::max(val, fabs(extrsv_mpfr[i]));
         nrm = std::max(nrm, fabs(extrsv[i] - extrsv_mpfr[i]));
-        nrm1 = std::max(nrm1, fabs(trsvn[i] - extrsv_mpfr[i]));
+        printf("%.16g\t", fabs(extrsv[i] - extrsv_mpfr[i]));
     }
     nrm = nrm / val;
-    nrm1 = nrm1 / val;
-    //printf("nrm1 = %.16g\t", nrm1);
+    printf("\n\n");
 #endif
 
     // test ||b - A * extrsv||
@@ -168,7 +159,9 @@ static double extrsvVsMPFR(double *extrsv, uint n, double *a, uint lda, double *
     mpfr_free_cache();
 
     return nrm;
+#endif
 }
+
 #else
 static double extrsvVsSuperacc(uint n, double *extrsv, double *superacc) {
     double nrm = 0.0, val = 0.0;
@@ -267,7 +260,7 @@ int main(int argc, char *argv[]) {
     if ((!superacc) || (err != 0))
         fprintf(stderr, "Cannot allocate memory with posix_memalign\n");
 
-    /*copyVector(n, superacc, xorig);
+    copyVector(n, superacc, xorig);
     extrsv('L', 'N', 'N', n, a, n, superacc, 1, 0);
 #ifdef EXBLAS_VS_MPFR
     norm = extrsvVsMPFR(superacc, n, a, n, xorig, 1);
@@ -275,7 +268,7 @@ int main(int argc, char *argv[]) {
     if (norm > eps) {
         is_pass = false;
     }
-#endif*/
+#endif
 
     copyVector(n, x, xorig);
     extrsv('L', 'N', 'N', n, a, n, x, 1, 1);
