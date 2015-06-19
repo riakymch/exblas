@@ -508,7 +508,6 @@ void __gemv(
     __global double *d_a,
     __global double *d_x,
     __global long *d_Superaccs,
-    __local double *cache,
     const uint n
 ){
     int pos = get_global_id(0);
@@ -587,7 +586,6 @@ void __gemv(
     Accumulate(l_working, fpe[2]);
 
     d_b[pos] = Round(l_working);
-
     barrier(CLK_GLOBAL_MEM_FENCE);
 }
 
@@ -596,10 +594,10 @@ void __axpy(
     __global double *d_b,
     const uint n
 ){
-    int lidx = get_local_id(0);
+    int pos = get_global_id(0);
 
     // ExAXPY: x = x + xm. d_x contains the final result
-    d_x[get_global_id(0)] += d_b[get_global_id(0)];
+    d_x[pos] += d_b[pos];
 }
 
 __kernel void trsv_lnn(
@@ -620,7 +618,7 @@ __kernel void trsv_lnn(
     /* ExGEMV: rm = A x - b. d_b holds the result
        ExTRSV: A rm = xm. d_b contains the result
        ExAXPY: x = x + xm. d_x contains the final result */
-    __gemv(d_b, d_a, d_x, d_Superaccs, cache, n);
+    __gemv(d_b, d_a, d_x, d_Superaccs, n);
 
     trsv_init(sync);
     __trsv_lnn(d_b, d_a, sync, d_Superaccs, cache, row, xs, n);

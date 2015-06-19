@@ -28,7 +28,7 @@ static void copyVector(uint n, double *x, double *y) {
 #include <mpfr.h>
 
 static double extrsvVsMPFR(double *extrsv, uint n, double *a, uint lda, double *x, uint incx) {
-#if 1
+#if 0
     // Compare to the results from Matlab
     FILE *pFilex;
     size_t resx;
@@ -73,36 +73,27 @@ static double extrsvVsMPFR(double *extrsv, uint n, double *a, uint lda, double *
     return nrm2;
 #else
 
-    mpfr_t sum, dot, div, op1, op2;
+    mpfr_t sum, dot;
 
     double *extrsv_mpfr = (double *) malloc(n * sizeof(double));
     copyVector(n, extrsv_mpfr, x);
 
-    mpfr_init2(op1, 53);
-    mpfr_init2(op2, 53);
-    mpfr_init2(dot, 106);
-    mpfr_init2(div, 2098);
+    mpfr_init2(dot, 128);
     mpfr_init2(sum, 2098);
 
     //Produce a result matrix of TRSV using MPFR
     for(uint i = 0; i < n; i++) {
         // sum += a[i,j] * x[j], j < i
-        mpfr_set_d(sum, extrsv_mpfr[i], MPFR_RNDN);
+        mpfr_set_d(sum, 0.0, MPFR_RNDN);
         for(uint j = 0; j < i; j++) {
-            mpfr_set_d(op1, a[j * n + i], MPFR_RNDN);
-            mpfr_set_d(op2, extrsv_mpfr[j], MPFR_RNDN);
-            mpfr_mul(dot, op1, op2, MPFR_RNDN);
-            mpfr_sub(sum, sum, dot, MPFR_RNDN);
+            mpfr_set_d(dot, a[j * n + i], MPFR_RNDN);
+            mpfr_mul_d(dot, dot, -extrsv_mpfr[j], MPFR_RNDN);
+            mpfr_add(sum, sum, dot, MPFR_RNDN);
         }
-        // x[i] = sum / a[i,i]
-        mpfr_set_d(op1, a[i * (n + 1)], MPFR_RNDN);
-        mpfr_div(div, sum, op1, MPFR_RNDN);
-        extrsv_mpfr[i] = mpfr_get_d(div, MPFR_RNDN);
+        mpfr_add_d(sum, sum, extrsv_mpfr[i], MPFR_RNDN);
+        mpfr_div_d(sum, sum, a[i * (n + 1)], MPFR_RNDN);
+        extrsv_mpfr[i] = mpfr_get_d(sum, MPFR_RNDN);
     }
-    /*for(uint i = 0; i < n; i++) {
-        printf("%.16g\t", extrsv_mpfr[i]);
-    }
-    printf("\n\n");*/
 
     //compare the GPU and MPFR results
 #if 0
@@ -215,10 +206,10 @@ int main(int argc, char *argv[]) {
     //Reading matrix A and vector b from files
     FILE *pFileA, *pFileb;
     size_t resA, resb;
-    pFileA = fopen("matrices/A_lnn_64_9.76e+08.bin", "rb");
-    pFileb = fopen("matrices/b_lnn_64_9.76e+08.bin", "rb");
-    //pFileA = fopen("matrices/A_lnn_64_9.30e+13.bin", "rb");
-    //pFileb = fopen("matrices/b_lnn_64_9.30e+13.bin", "rb");
+    //pFileA = fopen("matrices/A_lnn_64_9.76e+08.bin", "rb");
+    //pFileb = fopen("matrices/b_lnn_64_9.76e+08.bin", "rb");
+    pFileA = fopen("matrices/A_lnn_64_9.30e+13.bin", "rb");
+    pFileb = fopen("matrices/b_lnn_64_9.30e+13.bin", "rb");
     //pFileA = fopen("matrices/A_lnn_64_9.53e+21.bin", "rb");
     //pFileb = fopen("matrices/b_lnn_64_9.53e+21.bin", "rb");
     //pFileA = fopen("matrices/A_lnn_64_7.58e+40.bin", "rb");
@@ -260,7 +251,7 @@ int main(int argc, char *argv[]) {
     if ((!superacc) || (err != 0))
         fprintf(stderr, "Cannot allocate memory with posix_memalign\n");
 
-    copyVector(n, superacc, xorig);
+    /*copyVector(n, superacc, xorig);
     extrsv('L', 'N', 'N', n, a, n, superacc, 1, 0);
 #ifdef EXBLAS_VS_MPFR
     norm = extrsvVsMPFR(superacc, n, a, n, xorig, 1);
@@ -268,7 +259,7 @@ int main(int argc, char *argv[]) {
     if (norm > eps) {
         is_pass = false;
     }
-#endif
+#endif*/
 
     copyVector(n, x, xorig);
     extrsv('L', 'N', 'N', n, a, n, x, 1, 1);
