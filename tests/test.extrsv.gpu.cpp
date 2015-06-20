@@ -28,12 +28,12 @@ static void copyVector(uint n, double *x, double *y) {
 #include <mpfr.h>
 
 static double extrsvVsMPFR(double *extrsv, uint n, double *a, uint lda, double *x, uint incx) {
-#if 0
+#if 1
     // Compare to the results from Matlab
     FILE *pFilex;
     size_t resx;
-    //pFilex = fopen("matrices/x_test_trsv_gemv_64.bin", "rb");
-    pFilex = fopen("matrices/x_test_trsv_final_64.bin", "rb");
+    pFilex = fopen("matrices/x_test_trsv_gemv_e13_64.bin", "rb");
+    //pFilex = fopen("matrices/x_test_trsv_final_64.bin", "rb");
     //pFilex = fopen("matrices/x_test_trsv_64.bin", "rb");
     if (pFilex == NULL) {
         fprintf(stderr, "Cannot open files to read matrix and vector\n");

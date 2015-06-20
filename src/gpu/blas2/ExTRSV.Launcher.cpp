@@ -11,6 +11,8 @@
 ////////////////////////////////////////////////////////////////////////////////
 #define TRSV_INIT "trsv_init"
 #define TRSV_KERNEL "trsv_lnn"
+#define GEMV_KERNEL "gemv"
+#define AXPY_KERNEL "axpy"
 #ifdef AMD
   #define THREADSX   32
   #define THREADSY    1
@@ -26,6 +28,7 @@ static char* cSources = NULL;                // Buffer to hold source for compil
 
 static cl_program       cpProgram;           //OpenCL program
 static cl_kernel        ckInit, ckTRSV;      //OpenCL kernels
+static cl_kernel        ckAXPY, ckGEMV;      //OpenCL kernels
 static cl_command_queue cqDefaultCommandQue; //Default command queue
 static cl_mem           d_sync;
 static cl_mem           d_Superaccs;
@@ -100,6 +103,18 @@ extern "C" cl_int initExTRSV(
             printf("Error in clCreateKernel: trsv_lnn, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
             return EXIT_FAILURE;
         }
+        if (NbFPE == 1) {
+            ckGEMV = clCreateKernel(cpProgram, GEMV_KERNEL, &ciErrNum);
+            if (ciErrNum != CL_SUCCESS) {
+                printf("Error in clCreateKernel: gemv, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
+                return EXIT_FAILURE;
+            }
+            ckAXPY = clCreateKernel(cpProgram, AXPY_KERNEL, &ciErrNum);
+            if (ciErrNum != CL_SUCCESS) {
+                printf("Error in clCreateKernel: axpy, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
+                return EXIT_FAILURE;
+            }
+        }
 
     //printf("...allocating internal buffer\n");
         d_Superaccs = clCreateBuffer(cxGPUContext, CL_MEM_READ_WRITE, n * THREADSY * bin_count * sizeof(cl_long), NULL, &ciErrNum);
@@ -128,6 +143,10 @@ extern "C" void closeExTRSV(void){
     ciErrNum = clReleaseMemObject(d_Superaccs);
     ciErrNum |= clReleaseKernel(ckInit);
     ciErrNum |= clReleaseKernel(ckTRSV);
+    if (ckGEMV)
+        ciErrNum |= clReleaseKernel(ckGEMV);
+    if (ckAXPY)
+        ciErrNum |= clReleaseKernel(ckAXPY);
     ciErrNum |= clReleaseProgram(cpProgram);
 
     if (ciErrNum != CL_SUCCESS) {
@@ -244,7 +263,6 @@ extern "C" size_t ExTRSVIR(
         uint i = 0;
         ciErrNum  = clSetKernelArg(ckTRSV, i++, sizeof(cl_mem),  (void *)&d_x);
         ciErrNum &= clSetKernelArg(ckTRSV, i++, sizeof(cl_mem),  (void *)&d_a);
-        ciErrNum  = clSetKernelArg(ckTRSV, i++, sizeof(cl_mem),  (void *)&d_b);
         ciErrNum &= clSetKernelArg(ckTRSV, i++, sizeof(cl_mem),  (void *)&d_sync);
         ciErrNum &= clSetKernelArg(ckTRSV, i++, sizeof(cl_mem),  (void *)&d_Superaccs);
         ciErrNum &= clSetKernelArg(ckTRSV, i++, BLOCK_SIZE * BLOCK_SIZE * sizeof(cl_double),  NULL);
@@ -258,6 +276,30 @@ extern "C" size_t ExTRSVIR(
         }
 
         ciErrNum = clEnqueueNDRangeKernel(cqCommandQueue, ckTRSV, 2, NULL, TotalNbThreads, NbThreadsPerWorkGroup, 0, NULL, NULL);
+        if (ciErrNum != CL_SUCCESS) {
+            printf("ciErrNum = %d\n", ciErrNum);
+            printf("Error in clEnqueueNDRangeKernel, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
+            *ciErrNumRes = EXIT_FAILURE;
+            return 0;
+        }
+    }
+    {
+        size_t NbThreadsPerWorkGroup[] = {THREADSX, THREADSY};
+        size_t TotalNbThreads[] = {n, THREADSY};
+
+        uint i = 0;
+        ciErrNum  = clSetKernelArg(ckGEMV, i++, sizeof(cl_mem),  (void *)&d_b);
+        ciErrNum &= clSetKernelArg(ckGEMV, i++, sizeof(cl_mem),  (void *)&d_a);
+        ciErrNum &= clSetKernelArg(ckGEMV, i++, sizeof(cl_mem),  (void *)&d_x);
+        ciErrNum &= clSetKernelArg(ckGEMV, i++, sizeof(cl_mem),  (void *)&d_Superaccs);
+        ciErrNum &= clSetKernelArg(ckGEMV, i++, sizeof(cl_uint), (void *)&n);
+        if (ciErrNum != CL_SUCCESS) {
+            printf("Error in clSetKernelArg, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
+            *ciErrNumRes = EXIT_FAILURE;
+            return 0;
+        }
+
+        ciErrNum = clEnqueueNDRangeKernel(cqCommandQueue, ckGEMV, 2, NULL, TotalNbThreads, NbThreadsPerWorkGroup, 0, NULL, NULL);
         if (ciErrNum != CL_SUCCESS) {
             printf("ciErrNum = %d\n", ciErrNum);
             printf("Error in clEnqueueNDRangeKernel, Line %u in file %s !!!\n\n", __LINE__, __FILE__);

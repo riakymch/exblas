@@ -302,7 +302,7 @@ __kernel void trsv_init(
 }
 
 
-kernel void trsv_lnn(
+void __trsv_lnn(
     __global double *d_x,
     __global double *d_a,
     __global volatile int *sync,
@@ -503,7 +503,7 @@ kernel void trsv_lnn(
 }
 
 
-kernel void gemv(
+void __gemv(
     __global double *d_b,
     __global double *d_a,
     __global double *d_x,
@@ -585,11 +585,11 @@ kernel void gemv(
     Accumulate(l_working, fpe[1]);
     Accumulate(l_working, fpe[2]);
 
-    d_x[pos] = Round(l_working);
+    d_b[pos] = Round(l_working);
     barrier(CLK_GLOBAL_MEM_FENCE);
 }
 
-kernel void axpy(
+void __axpy(
     __global double *d_x,
     __global double *d_b,
     const uint n
@@ -600,8 +600,7 @@ kernel void axpy(
     d_x[pos] += d_b[pos];
 }
 
-#if 0
-void trsv_lnn(
+__kernel void trsv_lnn(
     __global double *d_x,
     __global double *d_a,
     __global double *d_b,
@@ -626,5 +625,4 @@ void trsv_lnn(
 
     __axpy(d_x, d_b, n);
 }
-#endif
 
