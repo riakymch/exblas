@@ -32,9 +32,9 @@ static double extrsvVsMPFR(double *extrsv, uint n, double *a, uint lda, double *
     // Compare to the results from Matlab
     FILE *pFilex;
     size_t resx;
-    pFilex = fopen("matrices/x_test_trsv_gemv_e13_64.bin", "rb");
+    //pFilex = fopen("matrices/x_test_trsv_gemv_e13_64.bin", "rb");
     //pFilex = fopen("matrices/x_test_trsv_final_64.bin", "rb");
-    //pFilex = fopen("matrices/x_test_trsv_64.bin", "rb");
+    pFilex = fopen("matrices/x_test_trsv_e21_64.bin", "rb");
     if (pFilex == NULL) {
         fprintf(stderr, "Cannot open files to read matrix and vector\n");
         exit(1);
@@ -208,10 +208,10 @@ int main(int argc, char *argv[]) {
     size_t resA, resb;
     //pFileA = fopen("matrices/A_lnn_64_9.76e+08.bin", "rb");
     //pFileb = fopen("matrices/b_lnn_64_9.76e+08.bin", "rb");
-    pFileA = fopen("matrices/A_lnn_64_9.30e+13.bin", "rb");
-    pFileb = fopen("matrices/b_lnn_64_9.30e+13.bin", "rb");
-    //pFileA = fopen("matrices/A_lnn_64_9.53e+21.bin", "rb");
-    //pFileb = fopen("matrices/b_lnn_64_9.53e+21.bin", "rb");
+    //pFileA = fopen("matrices/A_lnn_64_9.30e+13.bin", "rb");
+    //pFileb = fopen("matrices/b_lnn_64_9.30e+13.bin", "rb");
+    pFileA = fopen("matrices/A_lnn_64_9.53e+21.bin", "rb");
+    pFileb = fopen("matrices/b_lnn_64_9.53e+21.bin", "rb");
     //pFileA = fopen("matrices/A_lnn_64_7.58e+40.bin", "rb");
     //pFileb = fopen("matrices/b_lnn_64_7.58e+40.bin", "rb");
     if ((pFileA == NULL) || (pFileb == NULL)) {

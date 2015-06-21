@@ -585,7 +585,7 @@ kernel void gemv(
     Accumulate(l_working, fpe[1]);
     Accumulate(l_working, fpe[2]);
 
-    d_x[pos] = Round(l_working);
+    d_b[pos] = Round(l_working);
     barrier(CLK_GLOBAL_MEM_FENCE);
 }
 
