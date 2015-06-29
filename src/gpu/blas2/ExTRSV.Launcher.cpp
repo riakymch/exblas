@@ -10,7 +10,7 @@
 // OpenCL launcher for bitonic sort kernel
 ////////////////////////////////////////////////////////////////////////////////
 #define TRSV_INIT "trsv_init"
-#define TRSV_KERNEL "trsv_lnn"
+#define TRSV_KERNEL "trsv"
 #define GEMV_KERNEL "gemv"
 #define AXPY_KERNEL "axpy"
 #ifdef AMD
@@ -79,7 +79,7 @@ extern "C" cl_int initExTRSV(
 
     //printf("...building ExTRSV program\n");
         char compileOptionsBak[256];
-        sprintf(compileOptionsBak, "%s -DNBFPE=%d", compileOptions, NbFPE);
+        sprintf(compileOptionsBak, "%s -DNBFPE=%d -DN=%d", compileOptions, NbFPE, n);
         ciErrNum = clBuildProgram(cpProgram, 0, NULL, compileOptionsBak, NULL, NULL);
         if (ciErrNum != CL_SUCCESS) {
             printf("Error in clBuildProgram, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
@@ -191,10 +191,10 @@ extern "C" size_t ExTRSV(
         }
     }
     {
-        size_t NbThreadsPerWorkGroup[] = {THREADSX, THREADSY};
-        size_t TotalNbThreads[] = {n, THREADSY};
-        //size_t NbThreadsPerWorkGroup[] = {1, 1};
-        //size_t TotalNbThreads[] = {1, 1};
+        //size_t NbThreadsPerWorkGroup[] = {THREADSX, THREADSY};
+        //size_t TotalNbThreads[] = {n, THREADSY};
+        size_t NbThreadsPerWorkGroup[] = {1, 1};
+        size_t TotalNbThreads[] = {1, 1};
 
         uint i = 0;
         ciErrNum  = clSetKernelArg(ckTRSV, i++, sizeof(cl_mem),  (void *)&d_x);

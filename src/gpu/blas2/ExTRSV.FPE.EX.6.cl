@@ -274,7 +274,7 @@ __kernel void trsv_init(
 }
 
 
-__kernel void trsv_lnn(
+__kernel void trsv(
     __global double *d_x,
     __global double *d_a,
     __global int *sync,

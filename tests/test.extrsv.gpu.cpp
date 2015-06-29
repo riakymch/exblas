@@ -35,7 +35,8 @@ static double extrsvVsMPFR(double *extrsv, uint n, double *a, uint lda, double *
     //pFilex = fopen("matrices/x_test_trsv_gemv_e13_64.bin", "rb");
     //pFilex = fopen("matrices/x_test_trsv_final_64.bin", "rb");
     //pFilex = fopen("matrices/x_test_trsv_e21_64.bin", "rb");
-    pFilex = fopen("matrices/x_test_trsv_e40_64.bin", "rb");
+    //pFilex = fopen("matrices/x_test_trsv_e40_64.bin", "rb");
+    pFilex = fopen("matrices/unn/xe_unn_100_3.08e+07.bin", "rb");
     if (pFilex == NULL) {
         fprintf(stderr, "Cannot open files to read matrix and vector\n");
         exit(1);
@@ -83,6 +84,7 @@ static double extrsvVsMPFR(double *extrsv, uint n, double *a, uint lda, double *
     mpfr_init2(sum, 2098);
 
     //Produce a result matrix of TRSV using MPFR
+#if 0
     for(uint i = 0; i < n; i++) {
         // sum += a[i,j] * x[j], j < i
         mpfr_set_d(sum, 0.0, MPFR_RNDN);
@@ -95,6 +97,20 @@ static double extrsvVsMPFR(double *extrsv, uint n, double *a, uint lda, double *
         mpfr_div_d(sum, sum, a[i * (n + 1)], MPFR_RNDN);
         extrsv_mpfr[i] = mpfr_get_d(sum, MPFR_RNDN);
     }
+#else
+    for(int i = n-1; i >= 0; i--) {
+        // sum += a[i,j] * x[j], j < i
+        mpfr_set_d(sum, 0.0, MPFR_RNDN);
+        for(int j = i+1; j < n; j++) {
+            mpfr_set_d(dot, a[j * n + i], MPFR_RNDN);
+            mpfr_mul_d(dot, dot, -extrsv_mpfr[j], MPFR_RNDN);
+            mpfr_add(sum, sum, dot, MPFR_RNDN);
+        }
+        mpfr_add_d(sum, sum, extrsv_mpfr[i], MPFR_RNDN);
+        mpfr_div_d(sum, sum, a[i * (n + 1)], MPFR_RNDN);
+        extrsv_mpfr[i] = mpfr_get_d(sum, MPFR_RNDN);
+    }
+#endif
 
     //compare the GPU and MPFR results
 #if 0
@@ -111,7 +127,7 @@ static double extrsvVsMPFR(double *extrsv, uint n, double *a, uint lda, double *
     for(uint i = 0; i < n; i++) {
         val = std::max(val, fabs(extrsv_mpfr[i]));
         nrm = std::max(nrm, fabs(extrsv[i] - extrsv_mpfr[i]));
-        printf("%.16g\t", fabs(extrsv[i] - extrsv_mpfr[i]));
+        //printf("%.16g\t", fabs(extrsv[i] - extrsv_mpfr[i]));
     }
     nrm = nrm / val;
     printf("\n\n");
@@ -213,8 +229,10 @@ int main(int argc, char *argv[]) {
     //pFileb = fopen("matrices/b_lnn_64_9.30e+13.bin", "rb");
     //pFileA = fopen("matrices/A_lnn_64_9.53e+21.bin", "rb");
     //pFileb = fopen("matrices/b_lnn_64_9.53e+21.bin", "rb");
-    pFileA = fopen("matrices/A_lnn_64_7.58e+40.bin", "rb");
-    pFileb = fopen("matrices/b_lnn_64_7.58e+40.bin", "rb");
+    //pFileA = fopen("matrices/A_lnn_64_7.58e+40.bin", "rb");
+    //pFileb = fopen("matrices/b_lnn_64_7.58e+40.bin", "rb");
+    pFileA = fopen("matrices/unn/A_unn_100_3.08e+07.bin", "rb");
+    pFileb = fopen("matrices/unn/b_unn_100_3.08e+07.bin", "rb");
     if ((pFileA == NULL) || (pFileb == NULL)) {
         fprintf(stderr, "Cannot open files to read matrix and vector\n");
         exit(1);
@@ -252,15 +270,16 @@ int main(int argc, char *argv[]) {
     if ((!superacc) || (err != 0))
         fprintf(stderr, "Cannot allocate memory with posix_memalign\n");
 
-    /*copyVector(n, superacc, xorig);
-    extrsv('L', 'N', 'N', n, a, n, superacc, 1, 0);
+    copyVector(n, superacc, xorig);
+    extrsv('U', 'N', 'N', n, a, n, superacc, 1, 0);
 #ifdef EXBLAS_VS_MPFR
     norm = extrsvVsMPFR(superacc, n, a, n, xorig, 1);
     printf("Superacc error = %.16g\n", norm);
     if (norm > eps) {
         is_pass = false;
     }
-#endif*/
+#endif
+    exit(0);
 
     copyVector(n, x, xorig);
     extrsv('L', 'N', 'N', n, a, n, x, 1, 1);
@@ -271,7 +290,6 @@ int main(int argc, char *argv[]) {
         is_pass = false;
     }
 #endif
-    exit(0);
 
     copyVector(n, x, xorig);
     extrsv('L', 'N', 'N', n, a, n, x, 1, 3);

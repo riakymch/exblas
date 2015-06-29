@@ -302,7 +302,7 @@ __kernel void trsv_init(
 }
 
 
-kernel void trsv_lnn(
+kernel void trsv(
     __global double *d_x,
     __global double *d_a,
     __global volatile int *sync,
@@ -601,7 +601,7 @@ kernel void axpy(
 }
 
 #if 0
-void trsv_lnn(
+void trsv(
     __global double *d_x,
     __global double *d_a,
     __global double *d_b,
@@ -613,7 +613,7 @@ void trsv_lnn(
     const uint n
 ){
     // At first we call ExTRSV. d_x holds the result
-    __trsv_lnn(d_x, d_a, sync, d_Superaccs, cache, row, xs, n);
+    __trsv(d_x, d_a, sync, d_Superaccs, cache, row, xs, n);
 
     // One step of iterative refinement
     /* ExGEMV: rm = A x - b. d_b holds the result
@@ -622,7 +622,7 @@ void trsv_lnn(
     __gemv(d_b, d_a, d_x, d_Superaccs, n);
 
     trsv_init(sync);
-    __trsv_lnn(d_b, d_a, sync, d_Superaccs, cache, row, xs, n);
+    __trsv(d_b, d_a, sync, d_Superaccs, cache, row, xs, n);
 
     __axpy(d_x, d_b, n);
 }

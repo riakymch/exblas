@@ -273,7 +273,7 @@ __kernel void trsv_init(
    sync[1] = 0;  // Next row to assign
 }
 
-__kernel void trsv_lnn(
+__kernel void trsv(
     __global double *d_x,
     __global double *d_a,
     __global int *sync,

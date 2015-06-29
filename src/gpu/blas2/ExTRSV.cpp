@@ -86,8 +86,10 @@ int extrsv(char uplo, char transa, char diag, int n, double *a, int lda, double 
     strcat(path, "/include/cl/");
 
     // with superaccumulators only
-    if (fpe == 0)
-        return runExTRSV(n, a, lda, x, incx, 0, strcat(path, "ExTRSV.Superacc.cl"));
+    if (fpe == 0) {
+        //path = (uplo == 'L') ? strcat(path, "ExTRSV.lnn.Superacc.cl") : strcat(path, "ExTRSV.unn.Superacc.cl");
+        return runExTRSV(n, a, lda, x, incx, 0, (uplo == 'L') ? strcat(path, "ExTRSV.lnn.Superacc.cl") : strcat(path, "ExTRSV.unn.Superacc.cl"));
+    }
 
     // FPE with IR
     if (fpe == 1)
