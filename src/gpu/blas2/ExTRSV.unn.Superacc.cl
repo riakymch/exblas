@@ -197,8 +197,8 @@ void wait_until_ge(
 ){
     if(tid == 0) {
         // Only read global memory when necessary
-        if (*col_done < col_to_wait) {
-            while(*sync < col_to_wait) {}
+        if (*col_done > col_to_wait) {
+            while(*sync > col_to_wait) {}
             *col_done = *sync;
         }
     }
@@ -211,7 +211,7 @@ void nextRow(
    __global volatile int *address
 ){
    if(get_local_id(0)==0 && get_local_id(1)==0)
-      *old = atomic_add(address, 1);
+      *old = atomic_dec(address);
 
    barrier(CLK_GLOBAL_MEM_FENCE);
 }
@@ -236,9 +236,9 @@ void tocache(
     if(trans == 0) {
         for (int i = 0; i < nbi; i += ty) {
             if (x > (i + y))
-                cache[(i + y) * nbi + x] = -a[(i + y) * lda + x];
-            else if ((i + y) < nbi)
                 cache[(i + y) * nbi + x] = 0.0;
+            else if ((i + y) < nbi)
+                cache[(i + y) * nbi + x] = -a[(i + y) * lda + x];
             if (!isunit && (x == (i + y)))
                 cache[x * (nbi + 1)] = a[x * (lda + 1)];
         }
@@ -252,8 +252,8 @@ void tocache(
 __kernel void trsv_init(
     __global int *sync
 ){
-   sync[0] = N; // Last ready column
-   sync[1] = N-1;  // Next row to assign
+   sync[0] = N;   // Last ready column
+   sync[1] = N-1; // Next row to assign
 }
 
 
@@ -274,7 +274,7 @@ __kernel void trsv(
     int lda = threadsx * threadsy;
 
 #if 1
- #if 1
+ #if 0
     for (int i = n-1; i >= 0; i--) {
         double sum = 0.0;
         for (int j = i + 1; j < n; j++)
@@ -285,11 +285,11 @@ __kernel void trsv(
  #else
 
     // Get row handled by this block
-    *row = n-1;
+    *row = N;
     nextRow(row, &sync[1]);
 
     // Copy diagonal block to shared memory
-    tocache(&d_a[(n + 1) * (*row - BLOCK_SIZE)], cache, BLOCK_SIZE, lda, 0, isunit, tid, n);
+    tocache(&d_a[*row * BLOCK_SIZE * n + *row * BLOCK_SIZE], cache, BLOCK_SIZE, lda, 0, isunit, tid, n);
     barrier(CLK_LOCAL_MEM_FENCE);
 
     // Loop over blocks as they become available
@@ -297,7 +297,7 @@ __kernel void trsv(
     int col_done = -1;
 
     double x, r;
-    for (int col = 0; col < *row; col++) {
+    for (int col = *row; col >= 0; col--) {
         wait_until_ge(tid, &sync[0], col, &col_done); // Wait for diagonal block to be done
         #ifdef NVIDIA
             #pragma unroll
@@ -315,30 +315,34 @@ __kernel void trsv(
         #ifdef NVIDIA
             #pragma unroll
         #endif
-        for (uint i = 0; i < BLOCK_SIZE; i++) {
+        for (int i = BLOCK_SIZE - 1; i >= 0; i--) {
             if (lidx == i) {
-                Accumulate(l_working, d_x[*row * threadsx + lidx]);
+                //Accumulate(l_working, d_x[*row * BLOCK_SIZE + lidx]);
 
-                val = Round(l_working);
+                //val = Round(l_working);
+                val += d_x[*row * BLOCK_SIZE + lidx];
                 if (!isunit)
                     val = val / cache[i * (BLOCK_SIZE + 1)];
                 *xs = val;
             }
-            if (lidx > i) {
-                x = TwoProductFMA(cache[i * BLOCK_SIZE + lidx], *xs, &r);
+            if (lidx < i) {
+                /*x = TwoProductFMA(cache[i * BLOCK_SIZE + lidx], *xs, &r);
 
                 Accumulate(l_working, x);
                 if (r != 0.0)
                     Accumulate(l_working, r);
+                */
+                //val += *xs * d_a[*row * BLOCK_SIZE * n + *row * (i + 1) * BLOCK_SIZE + lidx];
+                val += cache[i * BLOCK_SIZE + lidx];
             }
         }
-        d_x[*row * BLOCK_SIZE + tid] = val;
+        d_x[*row * BLOCK_SIZE + lidx] = val;
     }
 
     // Notify other blocks that soln is ready for this row
     barrier(CLK_GLOBAL_MEM_FENCE); // Wait for d_x to be visible to other blocks
     if(tid == 0)
-        atomic_add(&sync[0], 1);   // Use atomicAdd to bypass L1 miss
+        atomic_dec(&sync[0]);   // Use atomicAdd to bypass L1 miss
     barrier(CLK_GLOBAL_MEM_FENCE); // Flush sync[0] asap
  #endif
 #else
