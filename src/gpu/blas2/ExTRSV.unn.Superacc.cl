@@ -252,8 +252,8 @@ void tocache(
 __kernel void trsv_init(
     __global int *sync
 ){
-   sync[0] = N;   // Last ready column
-   sync[1] = N-1; // Next row to assign
+   sync[0] = N;     // Last ready column
+   sync[1] = N - 1; // Next row to assign
 }
 
 
@@ -284,7 +284,6 @@ __kernel void trsv(
  #else
 
     // Get row handled by this block
-    *row = N;
     nextRow(row, &sync[1]);
 
     // Copy diagonal block to shared memory
@@ -293,24 +292,21 @@ __kernel void trsv(
 
     // Loop over blocks as they become available
     double val = 0.0;
-    int col_done = -1;
+    int col_done = N;
 
     double x, r;
-    for (int col = *row; col >= 0; col--) {
+    for (int col = *row - 1; col >= 0; col--) {
         wait_until_ge(tid, &sync[0], col, &col_done); // Wait for diagonal block to be done
         #ifdef NVIDIA
             #pragma unroll
         #endif
-        for (int j = 0; j < BLOCK_SIZE; j+=threadsy) {
-            double xp = -d_x[col * BLOCK_SIZE + lidy + j];
-            val += d_a[(col * BLOCK_SIZE + lidy) * n + *row * BLOCK_SIZE + lidx + j * n] * xp;
-        }
+        for (int j = 0; j < BLOCK_SIZE; j+=threadsy)
+            val -= d_a[(col * BLOCK_SIZE + lidy) * n + *row * BLOCK_SIZE + lidx + j * n] * d_x[col * BLOCK_SIZE + j];
     }
     barrier(CLK_LOCAL_MEM_FENCE);
 
     // Apply update from diagonal block (row, row)
     if (lidy == 0) {
-        double val = 0.0;
         #ifdef NVIDIA
             #pragma unroll
         #endif
