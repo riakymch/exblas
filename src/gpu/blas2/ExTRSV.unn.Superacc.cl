@@ -273,7 +273,7 @@ __kernel void trsv(
     int isunit = 0;
     int lda = threadsx * threadsy;
 
-#if 0
+#if 1
     for (int i = n-1; i >= 0; i--) {
         double sum = 0.0;
         for (int j = i + 1; j < n; j++)
