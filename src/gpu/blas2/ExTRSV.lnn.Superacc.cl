@@ -277,7 +277,6 @@ __kernel void trsv(
     __global long *l_working = d_Superaccs + (get_group_id(0) * lda + lidx) * BIN_COUNT;
 
     // Get row handled by this block
-    *row = 0;
     nextRow(row, &sync[1]);
 
     // Copy diagonal block to shared memory
