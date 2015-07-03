@@ -86,25 +86,27 @@ int extrsv(char uplo, char transa, char diag, int n, double *a, int lda, double 
     strcat(path, "/include/cl/");
 
     // with superaccumulators only
-    if (fpe == 0) {
-        //path = (uplo == 'L') ? strcat(path, "ExTRSV.lnn.Superacc.cl") : strcat(path, "ExTRSV.unn.Superacc.cl");
+    if (fpe == 0)
         return runExTRSV(n, a, lda, x, incx, 0, (uplo == 'L') ? strcat(path, "ExTRSV.lnn.Superacc.cl") : strcat(path, "ExTRSV.unn.Superacc.cl"));
-    }
 
     // FPE with IR
     if (fpe == 1)
-        return runExTRSV(n, a, lda, x, incx, fpe, strcat(path, "ExTRSV.FPE.IR.cl"));
+        //return runExTRSV(n, a, lda, x, incx, fpe, strcat(path, "ExTRSV.FPE.IR.cl"));
+        return runExTRSV(n, a, lda, x, incx, fpe, (uplo == 'L') ? strcat(path, "ExTRSV.lnn.FPE.IR.cl") : strcat(path, "ExTRSV.unn.FPE.IR.cl"));
 
     if (early_exit) {
         if (fpe <= 4)
-            return runExTRSV(n, a, lda, x, incx, 4, strcat(path, "ExTRSV.FPE.EX.4.cl"));
+            //return runExTRSV(n, a, lda, x, incx, 4, strcat(path, "ExTRSV.FPE.EX.4.cl"));
+            return runExTRSV(n, a, lda, x, incx, 4, (uplo == 'L') ? strcat(path, "ExTRSV.lnn.FPE.EX.4.cl") : strcat(path, "ExTRSV.unn.FPE.EX.4.cl"));
         if (fpe <= 6)
-            return runExTRSV(n, a, lda, x, incx, 6, strcat(path, "ExTRSV.FPE.EX.6.cl"));
+            //return runExTRSV(n, a, lda, x, incx, 6, strcat(path, "ExTRSV.FPE.EX.6.cl"));
+            return runExTRSV(n, a, lda, x, incx, 6, (uplo == 'L') ? strcat(path, "ExTRSV.lnn.FPE.EX.6.cl") : strcat(path, "ExTRSV.unn.FPE.EX.6.cl"));
         if (fpe <= 8)
-            return runExTRSV(n, a, lda, x, incx, 8, strcat(path, "ExTRSV.FPE.EX.8.cl"));
-    } else { // ! early_exit
-        return runExTRSV(n, a, lda, x, incx, fpe, strcat(path, "ExTRSV.FPE.cl"));
-    }
+            //return runExTRSV(n, a, lda, x, incx, 8, strcat(path, "ExTRSV.FPE.EX.8.cl"));
+            return runExTRSV(n, a, lda, x, incx, 8, (uplo == 'L') ? strcat(path, "ExTRSV.lnn.FPE.EX.8.cl") : strcat(path, "ExTRSV.unn.FPE.EX.8.cl"));
+    } else // ! early_exit
+        //return runExTRSV(n, a, lda, x, incx, fpe, strcat(path, "ExTRSV.FPE.cl"));
+        return runExTRSV(n, a, lda, x, incx, fpe, (uplo == 'L') ? strcat(path, "ExTRSV.lnn.FPE.cl") : strcat(path, "ExTRSV.unn.FPE.cl"));
 
     return 0.0;
 }
