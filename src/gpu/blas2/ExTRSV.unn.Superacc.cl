@@ -300,7 +300,7 @@ __kernel void trsv(
 
     double x, r;
     for (int col = N-1; col > *row; col--) {
-        wait_until_ge(tid, &sync[0], 1, &col_done); // Wait for diagonal block to be done
+        wait_until_ge(tid, &sync[0], col, &col_done); // Wait for diagonal block to be done
         #ifdef NVIDIA
             #pragma unroll
         #endif
