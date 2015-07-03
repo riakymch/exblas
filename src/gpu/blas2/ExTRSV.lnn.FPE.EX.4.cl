@@ -230,7 +230,7 @@ void nextRow(
    __global volatile int *address
 ){
    if(get_local_id(0)==0 && get_local_id(1)==0)
-      *old = atomic_add(address, 1);
+      *old = atomic_inc(address);
 
    barrier(CLK_GLOBAL_MEM_FENCE);
 }
@@ -485,7 +485,7 @@ __kernel void trsv(
     // Notify other blocks that soln is ready for this row
     barrier(CLK_GLOBAL_MEM_FENCE); // Wait for d_x to be visible to other blocks
     if(tid == 0)
-        atomic_add(&sync[0], 1);   // Use atomicAdd to bypass L1 miss
+        atomic_inc(&sync[0]);       // Use atomic to bypass L1 miss
     barrier(CLK_GLOBAL_MEM_FENCE); // Flush sync[0] asap
 }
 

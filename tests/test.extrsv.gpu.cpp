@@ -279,9 +279,8 @@ int main(int argc, char *argv[]) {
         is_pass = false;
     }
 #endif
-    exit(0);
 
-    copyVector(n, x, xorig);
+    /*copyVector(n, x, xorig);
     extrsv('L', 'N', 'N', n, a, n, x, 1, 1);
 #ifdef EXBLAS_VS_MPFR
     norm = extrsvVsMPFR(x, n, a, n, xorig, 1);
@@ -289,10 +288,10 @@ int main(int argc, char *argv[]) {
     if (norm > eps) {
         is_pass = false;
     }
-#endif
+#endif*/
 
     copyVector(n, x, xorig);
-    extrsv('L', 'N', 'N', n, a, n, x, 1, 3);
+    extrsv('U', 'N', 'N', n, a, n, x, 1, 3);
 #ifdef EXBLAS_VS_MPFR
     norm = extrsvVsMPFR(x, n, a, n, xorig, 1);
     printf("FPE3 error = %.16g\n", norm);
@@ -304,6 +303,7 @@ int main(int argc, char *argv[]) {
         is_pass = false;
     }
 #endif
+    exit(0);
 
     copyVector(n, x, xorig);
     extrsv('L', 'N', 'N', n, a, n, x, 1, 4);

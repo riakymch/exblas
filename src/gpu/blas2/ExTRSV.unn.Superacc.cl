@@ -338,7 +338,7 @@ __kernel void trsv(
                     Accumulate(l_working, r);
             }
         }
-        d_x[*row * BLOCK_SIZE + lidx] = val;
+        d_x[*row * BLOCK_SIZE + tid] = val;
     }
 
     // Notify other blocks that soln is ready for this row
