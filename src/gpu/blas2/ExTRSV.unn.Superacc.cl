@@ -273,7 +273,7 @@ __kernel void trsv(
     int isunit = 0;
     int lda = threadsx * threadsy;
 
-#if 1
+#if 0
     for (int i = n-1; i >= 0; i--) {
         double sum = 0.0;
         for (int j = i + 1; j < n; j++)
@@ -282,6 +282,8 @@ __kernel void trsv(
         d_x[i] = sum / d_a[i * (n + 1)];
     }
  #else
+    //__global long *l_working = d_Superaccs + get_group_id(0) * lda * BIN_COUNT + tid;
+    __global long *l_working = d_Superaccs + (get_group_id(0) * lda + lidx) * BIN_COUNT;
 
     // Get row handled by this block
     nextRow(row, &sync[1]);
@@ -291,35 +293,49 @@ __kernel void trsv(
     barrier(CLK_LOCAL_MEM_FENCE);
 
     // Loop over blocks as they become available
-    double val = 0.0;
+    // Initialize accumulators
+    for (uint i = 0; i < BIN_COUNT; i++)
+        l_working[i] = 0.0;
     int col_done = N;
 
     double x, r;
-    for (int col = *row - 1; col >= 0; col--) {
-        wait_until_ge(tid, &sync[0], col, &col_done); // Wait for diagonal block to be done
+    for (int col = N-1; col > *row; col--) {
+        wait_until_ge(tid, &sync[0], 1, &col_done); // Wait for diagonal block to be done
         #ifdef NVIDIA
             #pragma unroll
         #endif
-        for (int j = 0; j < BLOCK_SIZE; j+=threadsy)
-            val -= d_a[(col * BLOCK_SIZE + lidy) * n + *row * BLOCK_SIZE + lidx + j * n] * d_x[col * BLOCK_SIZE + j];
+        for (int j = 0; j < BLOCK_SIZE; j+=threadsy) {
+            double xp = -d_x[col * BLOCK_SIZE + j];
+            x = TwoProductFMA(d_a[(col * BLOCK_SIZE + lidy) * n + *row * BLOCK_SIZE + lidx + j * n], xp, &r);
+
+            Accumulate(l_working, x);
+            if (r != 0.0)
+                Accumulate(l_working, r);
+        }
     }
     barrier(CLK_LOCAL_MEM_FENCE);
 
     // Apply update from diagonal block (row, row)
     if (lidy == 0) {
+        double val = 0.0;
         #ifdef NVIDIA
             #pragma unroll
         #endif
         for (int i = BLOCK_SIZE - 1; i >= 0; i--) {
             if (lidx == i) {
-                val += d_x[*row * BLOCK_SIZE + lidx];
+                Accumulate(l_working, d_x[*row * BLOCK_SIZE + lidx]);
+
+                val = Round(l_working);
                 if (!isunit)
                     val = val / cache[i * (BLOCK_SIZE + 1)];
                 *xs = val;
             }
             if (lidx < i) {
-                //val += *xs * d_a[*row * BLOCK_SIZE * n + *row * (i + 1) * BLOCK_SIZE + lidx];
-                val += *xs * cache[i * BLOCK_SIZE + lidx];
+                x = TwoProductFMA(cache[i * BLOCK_SIZE + lidx], *xs, &r);
+
+                Accumulate(l_working, x);
+                if (r != 0.0)
+                    Accumulate(l_working, r);
             }
         }
         d_x[*row * BLOCK_SIZE + lidx] = val;
@@ -328,7 +344,7 @@ __kernel void trsv(
     // Notify other blocks that soln is ready for this row
     barrier(CLK_GLOBAL_MEM_FENCE); // Wait for d_x to be visible to other blocks
     if(tid == 0)
-        atomic_dec(&sync[0]);   // Use atomicAdd to bypass L1 miss
+        atomic_dec(&sync[0]);      // Use atomicAdd to bypass L1 miss
     barrier(CLK_GLOBAL_MEM_FENCE); // Flush sync[0] asap
 #endif
 }
