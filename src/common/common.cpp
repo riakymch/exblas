@@ -34,8 +34,8 @@ void init_fpuniform(double *a, int n, int range, int emax) {
 
 void init_fpuniform_matrix(char uplo, char diag, double *a, int n, int range, int emax) {
     if (uplo == 'U') {
-        for(int i = 0; i != n; ++i)
-            for(int j = 0; j >= i; ++j)
+        for(int i = n-1; i >= 0; i--)
+            for(int j = i; j < n; ++j)
                 if ((diag == 'U') && (j == i))
                     a[j * n + i] = 1.0;
                 else
@@ -65,8 +65,8 @@ void init_lognormal_matrix(char uplo, char diag, double * a, int n, double mean,
     std::lognormal_distribution<> d(mean, stddev);
 
     if (uplo == 'U') {
-        for(int i = 0; i != n; ++i)
-            for(int j = 0; j >= i; ++j)
+        for(int i = n-1; i >= 0; i--)
+            for(int j = i; j < n; ++j)
                 if ((diag == 'U') && (j == i))
                     a[i * n + j] = 1.0;
                 else
