@@ -369,15 +369,11 @@ kernel void trsv(
             }
 
             if(r != 0.0) {
-                fpe[0] = KnuthTwoSum(fpe[0], r, &s);
+                fpe[1] = KnuthTwoSum(fpe[1], r, &s);
                 r = s;
                 if(r != 0.0) {
-                    fpe[1] = KnuthTwoSum(fpe[1], r, &s);
+                    fpe[2] = KnuthTwoSum(fpe[2], r, &s);
                     r = s;
-                    if(r != 0.0) {
-                        fpe[2] = KnuthTwoSum(fpe[2], r, &s);
-                        r = s;
-                    }
                 }
                 if(r != 0.0) {
                     Accumulate(l_working, r);
@@ -437,9 +433,9 @@ kernel void trsv(
 #endif
 #endif
                 // Set FPE to zero
-                fpe[2] = 0.0;
-                fpe[1] = 0.0;
                 fpe[0] = 0.0;
+                fpe[1] = 0.0;
+                fpe[2] = 0.0;
 
                 if (!isunit)
                     val = val / cache[i * (BLOCK_SIZE + 1)];
@@ -470,15 +466,11 @@ kernel void trsv(
                 }
 
                 if(r != 0.0) {
-                    fpe[0] = KnuthTwoSum(fpe[0], r, &s);
+                    fpe[1] = KnuthTwoSum(fpe[1], r, &s);
                     r = s;
                     if(r != 0.0) {
-                        fpe[1] = KnuthTwoSum(fpe[1], r, &s);
+                        fpe[2] = KnuthTwoSum(fpe[2], r, &s);
                         r = s;
-                        if(r != 0.0) {
-                            fpe[2] = KnuthTwoSum(fpe[2], r, &s);
-                            r = s;
-                        }
                     }
                     if(r != 0.0) {
                         Accumulate(l_working, r);
@@ -546,15 +538,11 @@ kernel void gemv(
         }
 
         if(r != 0.0) {
-            fpe[0] = KnuthTwoSum(fpe[0], r, &s);
+            fpe[1] = KnuthTwoSum(fpe[1], r, &s);
             r = s;
             if(r != 0.0) {
-                fpe[1] = KnuthTwoSum(fpe[1], r, &s);
+                fpe[2] = KnuthTwoSum(fpe[2], r, &s);
                 r = s;
-                if(r != 0.0) {
-                    fpe[2] = KnuthTwoSum(fpe[2], r, &s);
-                    r = s;
-                }
             }
             if(r != 0.0) {
                 Accumulate(l_working, r);
