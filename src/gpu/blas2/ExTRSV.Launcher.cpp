@@ -143,10 +143,14 @@ extern "C" void closeExTRSV(void){
     ciErrNum = clReleaseMemObject(d_Superaccs);
     ciErrNum |= clReleaseKernel(ckInit);
     ciErrNum |= clReleaseKernel(ckTRSV);
-    if (ckGEMV)
+    if (ckGEMV) {
         ciErrNum |= clReleaseKernel(ckGEMV);
-    if (ckAXPY)
+        ckGEMV = NULL;
+    }
+    if (ckAXPY) {
         ciErrNum |= clReleaseKernel(ckAXPY);
+        ckAXPY = NULL;
+    }
     ciErrNum |= clReleaseProgram(cpProgram);
 
     if (ciErrNum != CL_SUCCESS) {

@@ -108,7 +108,7 @@ int extrsv(char uplo, char transa, char diag, int n, double *a, int lda, double 
         //return runExTRSV(n, a, lda, x, incx, fpe, strcat(path, "ExTRSV.FPE.cl"));
         return runExTRSV(n, a, lda, x, incx, fpe, (uplo == 'L') ? strcat(path, "ExTRSV.lnn.FPE.cl") : strcat(path, "ExTRSV.unn.FPE.cl"));
 
-    return 0.0;
+    return 0;
 }
 
 int runExTRSV(int n, double *a, int lda, double *x, int incx, int fpe, const char* program_file){
@@ -238,14 +238,12 @@ int runExTRSV(int n, double *a, int lda, double *x, int incx, int fpe, const cha
          //Release kernels and program
          //Shutting down and freeing memory...
             closeExTRSV();
-            if(d_a)
-                clReleaseMemObject(d_a);
-            if(d_x)
-                clReleaseMemObject(d_x);
-            if(cqCommandQueue)
-                clReleaseCommandQueue(cqCommandQueue);
-            if(cxGPUContext)
-                clReleaseContext(cxGPUContext);
+            clReleaseMemObject(d_a);
+            clReleaseMemObject(d_x);
+            if(fpe == 1)
+                clReleaseMemObject(d_b);
+            clReleaseCommandQueue(cqCommandQueue);
+            clReleaseContext(cxGPUContext);
     }
 
     return EXIT_SUCCESS;

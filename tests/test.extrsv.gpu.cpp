@@ -249,13 +249,13 @@ int main(int argc, char *argv[]) {
     fclose(pFileb);
 #else
     if(lognormal) {
-        init_lognormal_matrix('L', 'N', a, n, mean, stddev);
+        init_lognormal_matrix(uplo, 'N', a, n, mean, stddev);
         init_lognormal(xorig, n, mean, stddev);
     } else if ((argc > 7) && (argv[7][0] == 'i')) {
         init_ill_cond(a, n * n, range);
         init_ill_cond(xorig, n, range);
     } else {
-        init_fpuniform_matrix('L', 'N', a, n, range, emax);
+        init_fpuniform_matrix(uplo, 'N', a, n, range, emax);
         init_fpuniform(xorig, n, range, emax);
     }
 #endif
@@ -280,7 +280,7 @@ int main(int argc, char *argv[]) {
     }
 #endif
 
-    /*copyVector(n, x, xorig);
+    copyVector(n, x, xorig);
     extrsv(uplo, 'N', 'N', n, a, n, x, 1, 1);
 #ifdef EXBLAS_VS_MPFR
     norm = extrsvVsMPFR(uplo, x, n, a, n, xorig, 1);
@@ -288,7 +288,7 @@ int main(int argc, char *argv[]) {
     if (norm > eps) {
         is_pass = false;
     }
-#endif*/
+#endif
 
     copyVector(n, x, xorig);
     extrsv(uplo, 'N', 'N', n, a, n, x, 1, 3);
