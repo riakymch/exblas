@@ -341,7 +341,7 @@ __kernel void trsv(
                 #ifdef NVIDIA
                     #pragma unroll
                 #endif
-                for(uint it = 0; it != NBFPE; ++it) {
+                for(uint it = NBFPE-3; it != NBFPE; ++it) {
                     fpe[it] = KnuthTwoSum(fpe[it], r, &s);
                     r = s;
                 }
@@ -421,7 +421,7 @@ __kernel void trsv(
                     #ifdef NVIDIA
                         #pragma unroll
                     #endif
-                    for(uint it = 0; it != NBFPE; ++it) {
+                    for(uint it = NBFPE-3; it != NBFPE; ++it) {
                         fpe[it] = KnuthTwoSum(fpe[it], r, &s);
                         r = s;
                     }

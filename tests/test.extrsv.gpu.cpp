@@ -185,12 +185,15 @@ static double extrsvVsSuperacc(uint n, double *extrsv, double *superacc) {
 
 
 int main(int argc, char *argv[]) {
+    char uplo = 'U';
     uint n = 64;
     bool lognormal = false;
     if(argc > 1)
-        n = atoi(argv[1]);
-    if(argc > 4) {
-        if(argv[4][0] == 'n') {
+        uplo = argv[1][0];
+    if(argc > 2)
+        n = atoi(argv[2]);
+    if(argc > 5) {
+        if(argv[5][0] == 'n') {
             lognormal = true;
         }
     }
@@ -199,15 +202,15 @@ int main(int argc, char *argv[]) {
     int emax = 0;
     double mean = 1., stddev = 1.;
     if(lognormal) {
-        stddev = strtod(argv[2], 0);
-        mean = strtod(argv[3], 0);
+        stddev = strtod(argv[3], 0);
+        mean = strtod(argv[4], 0);
     }
     else {
-        if(argc > 2) {
-            range = atoi(argv[2]);
-        }
         if(argc > 3) {
-            emax = atoi(argv[3]);
+            range = atoi(argv[3]);
+        }
+        if(argc > 4) {
+            emax = atoi(argv[4]);
         }
     }
 
@@ -251,7 +254,7 @@ int main(int argc, char *argv[]) {
     if(lognormal) {
         init_lognormal_matrix('L', 'N', a, n, mean, stddev);
         init_lognormal(xorig, n, mean, stddev);
-    } else if ((argc > 6) && (argv[6][0] == 'i')) {
+    } else if ((argc > 7) && (argv[7][0] == 'i')) {
         init_ill_cond(a, n * n, range);
         init_ill_cond(xorig, n, range);
     } else {
@@ -271,7 +274,7 @@ int main(int argc, char *argv[]) {
         fprintf(stderr, "Cannot allocate memory with posix_memalign\n");
 
     copyVector(n, superacc, xorig);
-    extrsv('U', 'N', 'N', n, a, n, superacc, 1, 0);
+    extrsv(uplo, 'N', 'N', n, a, n, superacc, 1, 0);
 #ifdef EXBLAS_VS_MPFR
     norm = extrsvVsMPFR(superacc, n, a, n, xorig, 1);
     printf("Superacc error = %.16g\n", norm);
@@ -281,7 +284,7 @@ int main(int argc, char *argv[]) {
 #endif
 
     /*copyVector(n, x, xorig);
-    extrsv('L', 'N', 'N', n, a, n, x, 1, 1);
+    extrsv(uplo, 'N', 'N', n, a, n, x, 1, 1);
 #ifdef EXBLAS_VS_MPFR
     norm = extrsvVsMPFR(x, n, a, n, xorig, 1);
     printf("FPE IR error = %.16g\n", norm);
@@ -291,7 +294,7 @@ int main(int argc, char *argv[]) {
 #endif*/
 
     copyVector(n, x, xorig);
-    extrsv('U', 'N', 'N', n, a, n, x, 1, 3);
+    extrsv(uplo, 'N', 'N', n, a, n, x, 1, 3);
 #ifdef EXBLAS_VS_MPFR
     norm = extrsvVsMPFR(x, n, a, n, xorig, 1);
     printf("FPE3 error = %.16g\n", norm);
@@ -303,10 +306,9 @@ int main(int argc, char *argv[]) {
         is_pass = false;
     }
 #endif
-    exit(0);
 
     copyVector(n, x, xorig);
-    extrsv('L', 'N', 'N', n, a, n, x, 1, 4);
+    extrsv(uplo, 'N', 'N', n, a, n, x, 1, 4);
 #ifdef EXBLAS_VS_MPFR
     norm = extrsvVsMPFR(x, n, a, n, xorig, 1);
     printf("FPE4 error = %.16g\n", norm);
@@ -320,7 +322,7 @@ int main(int argc, char *argv[]) {
 #endif
 
     copyVector(n, x, xorig);
-    extrsv('L', 'N', 'N', n, a, n, x, 1, 8);
+    extrsv(uplo, 'N', 'N', n, a, n, x, 1, 8);
 #ifdef EXBLAS_VS_MPFR
     norm = extrsvVsMPFR(x, n, a, n, xorig, 1);
     printf("FPE8 error = %.16g\n", norm);
@@ -334,7 +336,7 @@ int main(int argc, char *argv[]) {
 #endif
 
     copyVector(n, x, xorig);
-    extrsv('L', 'N', 'N', n, a, n, x, 1, 4, true);
+    extrsv(uplo, 'N', 'N', n, a, n, x, 1, 4, true);
 #ifdef EXBLAS_VS_MPFR
     norm = extrsvVsMPFR(x, n, a, n, xorig, 1);
     printf("FPE4EE error = %.16g\n", norm);
@@ -348,7 +350,7 @@ int main(int argc, char *argv[]) {
 #endif
 
     copyVector(n, x, xorig);
-    extrsv('L', 'N', 'N', n, a, n, x, 1, 6, true);
+    extrsv(uplo, 'N', 'N', n, a, n, x, 1, 6, true);
 #ifdef EXBLAS_VS_MPFR
     norm = extrsvVsMPFR(x, n, a, n, xorig, 1);
     printf("FPE6EE error = %.16g\n", norm);
@@ -362,7 +364,7 @@ int main(int argc, char *argv[]) {
 #endif
 
     copyVector(n, x, xorig);
-    extrsv('L', 'N', 'N', n, a, n, x, 1, 8, true);
+    extrsv(uplo, 'N', 'N', n, a, n, x, 1, 8, true);
 #ifdef EXBLAS_VS_MPFR
     norm = extrsvVsMPFR(x, n, a, n, xorig, 1);
     printf("FPE8EE error = %.16g\n", norm);
