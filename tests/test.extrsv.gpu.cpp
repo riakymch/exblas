@@ -27,16 +27,18 @@ static void copyVector(uint n, double *x, double *y) {
 #include <cstddef>
 #include <mpfr.h>
 
-static double extrsvVsMPFR(double *extrsv, uint n, double *a, uint lda, double *x, uint incx) {
+static double extrsvVsMPFR(char uplo, double *extrsv, uint n, double *a, uint lda, double *x, uint incx) {
 #if 1
     // Compare to the results from Matlab
     FILE *pFilex;
     size_t resx;
-    //pFilex = fopen("matrices/x_test_trsv_gemv_e13_64.bin", "rb");
-    //pFilex = fopen("matrices/x_test_trsv_final_64.bin", "rb");
-    //pFilex = fopen("matrices/x_test_trsv_e21_64.bin", "rb");
-    //pFilex = fopen("matrices/x_test_trsv_e40_64.bin", "rb");
-    pFilex = fopen("matrices/unn/xe_unn_100_3.08e+07.bin", "rb");
+    if (uplo == 'L') {
+        pFilex = fopen("matrices/lnn/x_test_trsv_final_64.bin", "rb");
+        //pFilex = fopen("matrices/lnn/x_test_trsv_e21_64.bin", "rb");
+        //pFilex = fopen("matrices/lnn/x_test_trsv_e40_64.bin", "rb");
+    } else if (uplo == 'U') {
+        pFilex = fopen("matrices/unn/xe_unn_100_3.08e+07.bin", "rb");
+    }
     if (pFilex == NULL) {
         fprintf(stderr, "Cannot open files to read matrix and vector\n");
         exit(1);
@@ -49,14 +51,6 @@ static double extrsvVsMPFR(double *extrsv, uint n, double *a, uint lda, double *
         exit(1);
     }
     fclose(pFilex);
-
-    for(uint i = 0; i < n; i++)
-        printf("%.16g\t", xmatlab[i]);
-    printf("\n\n");
-
-    for(uint i = 0; i < n; i++)
-        printf("%.16g\t", extrsv[i]);
-    printf("\n\n");
 
     //Inf norm
     double nrm2 = 0.0, val2 = 0.0;
@@ -226,16 +220,19 @@ int main(int argc, char *argv[]) {
     //Reading matrix A and vector b from files
     FILE *pFileA, *pFileb;
     size_t resA, resb;
-    //pFileA = fopen("matrices/A_lnn_64_9.76e+08.bin", "rb");
-    //pFileb = fopen("matrices/b_lnn_64_9.76e+08.bin", "rb");
-    //pFileA = fopen("matrices/A_lnn_64_9.30e+13.bin", "rb");
-    //pFileb = fopen("matrices/b_lnn_64_9.30e+13.bin", "rb");
-    //pFileA = fopen("matrices/A_lnn_64_9.53e+21.bin", "rb");
-    //pFileb = fopen("matrices/b_lnn_64_9.53e+21.bin", "rb");
-    //pFileA = fopen("matrices/A_lnn_64_7.58e+40.bin", "rb");
-    //pFileb = fopen("matrices/b_lnn_64_7.58e+40.bin", "rb");
-    pFileA = fopen("matrices/unn/A_unn_100_3.08e+07.bin", "rb");
-    pFileb = fopen("matrices/unn/b_unn_100_3.08e+07.bin", "rb");
+    if (uplo == 'L') {
+        pFileA = fopen("matrices/lnn/A_lnn_64_9.76e+08.bin", "rb");
+        pFileb = fopen("matrices/lnn/b_lnn_64_9.76e+08.bin", "rb");
+        //pFileA = fopen("matrices/lnn/A_lnn_64_9.30e+13.bin", "rb");
+        //pFileb = fopen("matrices/lnn/b_lnn_64_9.30e+13.bin", "rb");
+        //pFileA = fopen("matrices/lnn/A_lnn_64_9.53e+21.bin", "rb");
+        //pFileb = fopen("matrices/lnn/b_lnn_64_9.53e+21.bin", "rb");
+        //pFileA = fopen("matrices/lnn/A_lnn_64_7.58e+40.bin", "rb");
+        //pFileb = fopen("matrices/lnn/b_lnn_64_7.58e+40.bin", "rb");
+    } else if (uplo == 'U') {
+        pFileA = fopen("matrices/unn/A_unn_100_3.08e+07.bin", "rb");
+        pFileb = fopen("matrices/unn/b_unn_100_3.08e+07.bin", "rb");
+    }
     if ((pFileA == NULL) || (pFileb == NULL)) {
         fprintf(stderr, "Cannot open files to read matrix and vector\n");
         exit(1);
@@ -276,7 +273,7 @@ int main(int argc, char *argv[]) {
     copyVector(n, superacc, xorig);
     extrsv(uplo, 'N', 'N', n, a, n, superacc, 1, 0);
 #ifdef EXBLAS_VS_MPFR
-    norm = extrsvVsMPFR(superacc, n, a, n, xorig, 1);
+    norm = extrsvVsMPFR(uplo, superacc, n, a, n, xorig, 1);
     printf("Superacc error = %.16g\n", norm);
     if (norm > eps) {
         is_pass = false;
@@ -286,7 +283,7 @@ int main(int argc, char *argv[]) {
     /*copyVector(n, x, xorig);
     extrsv(uplo, 'N', 'N', n, a, n, x, 1, 1);
 #ifdef EXBLAS_VS_MPFR
-    norm = extrsvVsMPFR(x, n, a, n, xorig, 1);
+    norm = extrsvVsMPFR(uplo, x, n, a, n, xorig, 1);
     printf("FPE IR error = %.16g\n", norm);
     if (norm > eps) {
         is_pass = false;
@@ -296,7 +293,7 @@ int main(int argc, char *argv[]) {
     copyVector(n, x, xorig);
     extrsv(uplo, 'N', 'N', n, a, n, x, 1, 3);
 #ifdef EXBLAS_VS_MPFR
-    norm = extrsvVsMPFR(x, n, a, n, xorig, 1);
+    norm = extrsvVsMPFR(uplo, x, n, a, n, xorig, 1);
     printf("FPE3 error = %.16g\n", norm);
     if (norm > eps) {
         is_pass = false;
@@ -310,7 +307,7 @@ int main(int argc, char *argv[]) {
     copyVector(n, x, xorig);
     extrsv(uplo, 'N', 'N', n, a, n, x, 1, 4);
 #ifdef EXBLAS_VS_MPFR
-    norm = extrsvVsMPFR(x, n, a, n, xorig, 1);
+    norm = extrsvVsMPFR(uplo, x, n, a, n, xorig, 1);
     printf("FPE4 error = %.16g\n", norm);
     if (norm > eps) {
         is_pass = false;
@@ -324,7 +321,7 @@ int main(int argc, char *argv[]) {
     copyVector(n, x, xorig);
     extrsv(uplo, 'N', 'N', n, a, n, x, 1, 8);
 #ifdef EXBLAS_VS_MPFR
-    norm = extrsvVsMPFR(x, n, a, n, xorig, 1);
+    norm = extrsvVsMPFR(uplo, x, n, a, n, xorig, 1);
     printf("FPE8 error = %.16g\n", norm);
     if (norm > eps) {
         is_pass = false;
@@ -338,7 +335,7 @@ int main(int argc, char *argv[]) {
     copyVector(n, x, xorig);
     extrsv(uplo, 'N', 'N', n, a, n, x, 1, 4, true);
 #ifdef EXBLAS_VS_MPFR
-    norm = extrsvVsMPFR(x, n, a, n, xorig, 1);
+    norm = extrsvVsMPFR(uplo, x, n, a, n, xorig, 1);
     printf("FPE4EE error = %.16g\n", norm);
     if (norm > eps) {
         is_pass = false;
@@ -352,7 +349,7 @@ int main(int argc, char *argv[]) {
     copyVector(n, x, xorig);
     extrsv(uplo, 'N', 'N', n, a, n, x, 1, 6, true);
 #ifdef EXBLAS_VS_MPFR
-    norm = extrsvVsMPFR(x, n, a, n, xorig, 1);
+    norm = extrsvVsMPFR(uplo, x, n, a, n, xorig, 1);
     printf("FPE6EE error = %.16g\n", norm);
     if (norm > eps) {
         is_pass = false;
@@ -366,7 +363,7 @@ int main(int argc, char *argv[]) {
     copyVector(n, x, xorig);
     extrsv(uplo, 'N', 'N', n, a, n, x, 1, 8, true);
 #ifdef EXBLAS_VS_MPFR
-    norm = extrsvVsMPFR(x, n, a, n, xorig, 1);
+    norm = extrsvVsMPFR(uplo, x, n, a, n, xorig, 1);
     printf("FPE8EE error = %.16g\n", norm);
     if (norm > eps) {
         is_pass = false;
