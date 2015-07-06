@@ -27,7 +27,7 @@ static void copyVector(uint n, double *x, double *y) {
 #include <cstddef>
 #include <mpfr.h>
 
-static double extrsvVsMPFR(char uplo, double *extrsv, uint n, double *a, uint lda, double *x, uint incx) {
+static double extrsvVsMPFR(char uplo, double *extrsv, int n, double *a, uint lda, double *x, uint incx) {
 #if 0
     // Compare to the results from Matlab
     FILE *pFilex;
@@ -79,10 +79,10 @@ static double extrsvVsMPFR(char uplo, double *extrsv, uint n, double *a, uint ld
 
     //Produce a result matrix of TRSV using MPFR
     if (uplo == 'L') {
-        for(uint i = 0; i < n; i++) {
+        for(int i = 0; i < n; i++) {
             // sum += a[i,j] * x[j], j < i
             mpfr_set_d(sum, 0.0, MPFR_RNDN);
-            for(uint j = 0; j < i; j++) {
+            for(int j = 0; j < i; j++) {
                 mpfr_set_d(dot, a[j * n + i], MPFR_RNDN);
                 mpfr_mul_d(dot, dot, -extrsv_mpfr[j], MPFR_RNDN);
                 mpfr_add(sum, sum, dot, MPFR_RNDN);
@@ -118,7 +118,7 @@ static double extrsvVsMPFR(char uplo, double *extrsv, uint n, double *a, uint ld
 #else
     //Inf norm
     double nrm = 0.0, val = 0.0;
-    for(uint i = 0; i < n; i++) {
+    for(int i = 0; i < n; i++) {
         val = std::max(val, fabs(extrsv_mpfr[i]));
         nrm = std::max(nrm, fabs(extrsv[i] - extrsv_mpfr[i]));
         //printf("%.16g\t", fabs(extrsv[i] - extrsv_mpfr[i]));
@@ -230,6 +230,7 @@ int main(int argc, char *argv[]) {
         init_fpuniform_matrix(uplo, 'N', a, n, range, emax);
         init_fpuniform(xorig, n, range, emax);
     }
+#endif
     copyVector(n, x, xorig);
 
     fprintf(stderr, "%d x %d\n", n, n);
