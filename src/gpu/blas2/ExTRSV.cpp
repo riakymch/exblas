@@ -91,7 +91,6 @@ int extrsv(char uplo, char transa, char diag, int n, double *a, int lda, double 
 
     // FPE with IR
     if (fpe == 1)
-        //return runExTRSV(n, a, lda, x, incx, fpe, strcat(path, "ExTRSV.FPE.IR.cl"));
         return runExTRSV(n, a, lda, x, incx, fpe, (uplo == 'L') ? strcat(path, "ExTRSV.lnn.FPE.IR.cl") : strcat(path, "ExTRSV.unn.FPE.IR.cl"));
 
     if (early_exit) {
@@ -159,6 +158,15 @@ int runExTRSV(int n, double *a, int lda, double *x, int incx, int fpe, const cha
             printf("Error in clCreateBuffer for d_x, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
             exit(EXIT_FAILURE);
         }
+        cl_mem d_b;
+        if (fpe == 1) {
+            // for IR case
+            d_b = clCreateBuffer(cxGPUContext, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, n * sizeof(cl_double), x, &ciErrNum);
+            if (ciErrNum != CL_SUCCESS) {
+                printf("Error in clCreateBuffer for d_b, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
+                exit(EXIT_FAILURE);
+            }
+        }
 
 
     {
@@ -168,7 +176,12 @@ int runExTRSV(int n, double *a, int lda, double *x, int incx, int fpe, const cha
             exit(EXIT_FAILURE);
 
         //Running OpenCL dSum with %u elements...
-        ExTRSV(NULL, n, d_a, lda, d_x, incx, &ciErrNum);
+        if (fpe == 1) {
+            // for IR case
+            ExTRSVIR(NULL, n, d_a, lda, d_x, incx, d_b, &ciErrNum);
+        } else {
+            ExTRSV(NULL, n, d_a, lda, d_x, incx, &ciErrNum);
+        }
         if (ciErrNum != CL_SUCCESS)
             exit(EXIT_FAILURE);
 
@@ -184,7 +197,12 @@ int runExTRSV(int n, double *a, int lda, double *x, int incx, int fpe, const cha
                 exit(EXIT_FAILURE);
             }
 
-            ExTRSV(NULL, n, d_a, lda, d_x, incx, &ciErrNum);
+            if (fpe == 1) {
+                // for IR case
+                ExTRSVIR(NULL, n, d_a, lda, d_x, incx, d_b, &ciErrNum);
+            } else {
+                ExTRSV(NULL, n, d_a, lda, d_x, incx, &ciErrNum);
+            }
 
             ciErrNum  = clEnqueueMarker(cqCommandQueue, &endMark);
             ciErrNum |= clFinish(cqCommandQueue);
