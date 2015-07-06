@@ -45,6 +45,10 @@ cl_device_id GetOCLDevice(cl_platform_id pPlatform) {
 
   cl_uint uiNumDevices = 0;
   cl_int err = clGetDeviceIDs(pPlatform, CL_DEVICE_TYPE_GPU, 10, dDevices, &uiNumDevices);
+  if (err != CL_SUCCESS) {
+        printf("Error in clGetDeviceIDs, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
+	exit(0);
+  }
 
   for (cl_int ui = 0; ui < (cl_int) uiNumDevices; ++ui) {
       err = clGetDeviceInfo(dDevices[ui], CL_DEVICE_NAME, 128 * sizeof(char), dDeviceName, NULL);
