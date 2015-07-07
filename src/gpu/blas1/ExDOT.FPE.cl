@@ -232,20 +232,36 @@ void ExDOT(
             a[i] = KnuthTwoSum(a[i], x, &s);
             x = s;
         }
-        if (x != 0.0)
+        if (x != 0.0) {
             Accumulate(l_workingBase, x);
+            #ifdef NVIDIA
+                #pragma unroll
+            #endif
+            for(uint i = 0; i != NBFPE; ++i) {
+                Accumulate(l_workingBase, a[i]);
+                a[i] = 0.0;
+            }
+        }
 
         if (r != 0.0) {
             #ifdef NVIDIA
                 #pragma unroll
             #endif
-            for(uint i = 0; i != NBFPE; ++i) {
+            for(uint i = NBFPE-3; i != NBFPE; ++i) {
                 double s;
                 a[i] = KnuthTwoSum(a[i], r, &s);
                 r = s;
             }
-            if (r != 0.0)
+            if (r != 0.0) {
                 Accumulate(l_workingBase, r);
+                #ifdef NVIDIA
+                    #pragma unroll
+                #endif
+                for(uint i = 0; i != NBFPE; ++i) {
+                    Accumulate(l_workingBase, a[i]);
+                    a[i] = 0.0;
+                }
+            }
         }
     }
     //Flush FPEs to the superacc

@@ -244,8 +244,22 @@ void ExSUM(
                 }
             }
         }
-        if(x != 0.0)
+        if(x != 0.0) {
             Accumulate(l_workingBase, x);
+            //Flush to the superacc
+            Accumulate(l_workingBase, a[0]);
+            Accumulate(l_workingBase, a[1]);
+            Accumulate(l_workingBase, a[2]);
+            Accumulate(l_workingBase, a[3]);
+            Accumulate(l_workingBase, a[4]);
+            Accumulate(l_workingBase, a[5]);
+            a[0] = 0.0;
+            a[1] = 0.0;
+            a[2] = 0.0;
+            a[3] = 0.0;
+            a[4] = 0.0;
+            a[5] = 0.0;
+        }
     }
     //Flush to the superacc
     Accumulate(l_workingBase, a[0]);

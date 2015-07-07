@@ -235,26 +235,38 @@ void ExDOT(
                 }
             }
         }
-        if(x != 0.0)
+        if(x != 0.0) {
             Accumulate(l_workingBase, x);
+            //Flush to the superacc
+            Accumulate(l_workingBase, a[0]);
+            Accumulate(l_workingBase, a[1]);
+            Accumulate(l_workingBase, a[2]);
+            Accumulate(l_workingBase, a[3]);
+            a[0] = 0.0;
+            a[1] = 0.0;
+            a[2] = 0.0;
+            a[3] = 0.0;
+        }
 
         if(r != 0.0) {
-            a[0] = KnuthTwoSum(a[0], r, &s);
+            a[2] = KnuthTwoSum(a[2], r, &s);
             r = s;
             if (r != 0.0) {
-                a[1] = KnuthTwoSum(a[1], r, &s);
+                a[3] = KnuthTwoSum(a[3], r, &s);
                 r = s;
-                if (r != 0.0) {
-                    a[2] = KnuthTwoSum(a[2], r, &s);
-                    r = s;
-                    if (r != 0.0) {
-                        a[3] = KnuthTwoSum(a[3], r, &s);
-                        r = s;
-                    }
-                }
             }
-            if(r != 0.0)
+            if(r != 0.0) {
                 Accumulate(l_workingBase, r);
+                //Flush to the superacc
+                Accumulate(l_workingBase, a[0]);
+                Accumulate(l_workingBase, a[1]);
+                Accumulate(l_workingBase, a[2]);
+                Accumulate(l_workingBase, a[3]);
+                a[0] = 0.0;
+                a[1] = 0.0;
+                a[2] = 0.0;
+                a[3] = 0.0;
+            }
         }
     }
     //Flush to the superacc

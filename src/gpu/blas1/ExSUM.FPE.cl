@@ -231,9 +231,17 @@ void ExSUM(
             a[i] = KnuthTwoSum(a[i], x, &s);
             x = s;
         }
-        if(x != 0.0)
+        if(x != 0.0) {
             //TODO: do NOT propagate NaNs
             Accumulate(l_workingBase, x);
+            #ifdef NVIDIA
+                #pragma unroll
+            #endif
+            for(uint i = 0; i != NBFPE; ++i) {
+                Accumulate(l_workingBase, a[i]);
+                a[i] = 0.0;
+            }
+        }
     }
     //Flush FPEs to the superacc
 #ifdef NVIDIA
