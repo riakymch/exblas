@@ -156,7 +156,8 @@ extern "C" size_t ExGEMM(
 
         ciErrNum = clEnqueueNDRangeKernel(cqCommandQueue, ckMatrixMul, 2, NULL, TotalNbThreads, NbThreadsPerWorkGroup, 0, 0, 0);
         if (ciErrNum != CL_SUCCESS) {
-            printf("Error in clEnqueueNDRangeKernel, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
+            ciErrNum == -5 ? printf("\nThere is a failure to allocate resources required by the OpenCL implementation on the device\n\n") : printf("ciErrNum = %d\n", ciErrNum);
+            //printf("Error in clEnqueueNDRangeKernel, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
             *ciErrNumRes = EXIT_FAILURE;
             return 0;
         }
