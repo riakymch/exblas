@@ -22,7 +22,6 @@
 
 /**
  * \defgroup common Common Definitions and Functions
- * \ingroup blas1
  */
 
 /**
@@ -78,6 +77,8 @@ void init_fpuniform(double *a, int n, int range, int emax);
  * \ingroup common
  * \brief Generates a real lower/upper unit/non-unit matrix with uniform distribution of ellements
  *
+ * \param uplo L|U lower or upper triangular matrix
+ * \param diag U|N unit or non-unit diagonal
  * \param a input/output matrix
  * \param n matrix size
  * \param range dynamic range of generated elements
@@ -100,6 +101,8 @@ void init_lognormal(double *a, int n, double mean, double stddev);
  * \ingroup common
  * \brief Generates a real lower/upper unit/non-unit matrux with log-uniform distribution of ellements
  *
+ * \param uplo L|U lower or upper triangular matrix
+ * \param diag U|N unit or non-unit diagonal
  * \param a input/output matrix
  * \param n matrix size
  * \param mean

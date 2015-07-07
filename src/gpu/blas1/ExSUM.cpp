@@ -81,11 +81,8 @@ double exsum(int Ng, double *ag, int inca, int fpe, bool early_exit) {
     strcat(path, "/include/cl/");
 
     // with superaccumulators only
-    if (fpe < 2) {
-        //return runExSUM(Ng, ag, inca, 0, strcat(path, "ExSUM.Superacc.old.cl"));
-        printf("Please use the size of FPE from this range [2, 8]\n");
-        exit(0);
-    }
+    if (fpe < 2)
+        return runExSUM(Ng, ag, inca, 0, strcat(path, "ExSUM.Superacc.cl"));
 
     if (early_exit) {
         if (fpe <= 4)
@@ -202,6 +199,7 @@ static double runExSUM(int N, double *h_a, int inca, int fpe, const char* progra
         //Retrieving results...
             ciErrNum = clEnqueueReadBuffer(cqCommandQueue, d_Res, CL_TRUE, 0, sizeof(cl_double), &h_Res, 0, NULL, NULL);
             if (ciErrNum != CL_SUCCESS) {
+                printf("ciErrNum = %d\n", ciErrNum);
                 printf("Error in clEnqueueReadBuffer Line %u in file %s !!!\n\n", __LINE__, __FILE__);
                 exit(EXIT_FAILURE);
             }

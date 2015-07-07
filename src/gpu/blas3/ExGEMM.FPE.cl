@@ -284,19 +284,37 @@ __kernel void matrixMul(
                         sum[l] = KnuthTwoSum(sum[l], x, &s); //Issues on Tesla
                         x = s;
                     }
-                    if(x != 0.0)
-                        Accumulate(p_workingBase, x);
-
-                    #ifdef NVIDIA
-                         #pragma unroll
-                    #endif
-                    for(uint l = 0; l != NBFPE; ++l) {
-                        double s; //residual of addition
-                        sum[l] = KnuthTwoSum(sum[l], r, &s); //Issues on Tesla
-                        r = s;
+                    if (x != 0.0) {
+                        Accumulate(l_workingBase, x);
+                        #ifdef NVIDIA
+                            #pragma unroll
+                        #endif
+                        for(uint i = 0; i != NBFPE; ++i) {
+                            Accumulate(l_workingBase, sum[i]);
+                            sum[i] = 0.0;
+                        }
                     }
-                    if(r != 0.0)
-                        Accumulate(p_workingBase, r);
+
+                    if (r != 0.0) {
+                        #ifdef NVIDIA
+                            #pragma unroll
+                        #endif
+                        for(uint i = NBFPE-3; i != NBFPE; ++i) {
+                            double s;
+                            sum[i] = KnuthTwoSum(sum[i], r, &s);
+                            r = s;
+                        }
+                        if (r != 0.0) {
+                            Accumulate(l_workingBase, r);
+                            #ifdef NVIDIA
+                                #pragma unroll
+                            #endif
+                            for(uint i = 0; i != NBFPE; ++i) {
+                                Accumulate(l_workingBase, sum[i]);
+                                sum[i] = 0.0;
+                            }
+                        }
+                    }
                 }
 
                 //Synchronize to make sure that the preceding computation is done before 

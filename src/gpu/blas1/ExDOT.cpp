@@ -58,7 +58,7 @@ static double min(double arr[], int size) {
  * \param incb specifies the increment for the elements of b
  * \param fpe size of floating-point expansion
  * \param program_file path to the file with kernels
- * \return Contains the reproducible and accurate sum of elements of a real vector
+ * \return Contains the reproducible and accurate dot product of two real vectors
  */
 static double runExDOT(int N, double *a, int inca, double *b, int incb, int fpe, const char* program_file);
 
@@ -85,11 +85,8 @@ double exdot(int Ng, double *ag, int inca, double *bg, int incb, int fpe, bool e
     strcat(path, "/include/cl/");
 
     // with superaccumulators only
-    if (fpe < 3) {
-        //return runExDOT(Ng, ag, inca, bg, incb, 0, strcat(path, "ExDOT.Superacc.cl"));
-        printf("Please use the size of FPE from this range [3, 8]\n");
-        exit(0);
-    }
+    if (fpe < 3)
+        return runExDOT(Ng, ag, inca, bg, incb, 0, strcat(path, "ExDOT.Superacc.cl"));
 
     if (early_exit) {
         if (fpe <= 4)

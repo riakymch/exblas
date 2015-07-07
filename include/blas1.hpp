@@ -46,6 +46,11 @@
 double exsum(int Ng, double *ag, int inca, int fpe, bool early_exit = false);
 
 /**
+ * \defgroup ExDOT Dot Product Functions
+ * \ingroup blas1
+ */
+
+/**
  * \ingroup ExDOT
  * \brief Parallel dot forms the dot product of two vectors with our
  *     multi-level reproducible and accurate algorithm.

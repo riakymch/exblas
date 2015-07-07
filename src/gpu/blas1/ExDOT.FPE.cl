@@ -10,9 +10,6 @@
     #pragma OPENCL EXTENSION cl_nv_pragma_unroll       : enable
 #endif
 
-//Data type used for input data fetches
-typedef double data_t;
-
 #define BIN_COUNT      39
 #define K               8                   // High-radix carry-save bits
 #define digits         56
@@ -200,28 +197,32 @@ void Accumulate(__local volatile long *sa, double x) {
     }
 }
 
+
 __kernel __attribute__((reqd_work_group_size(WORKGROUP_SIZE, 1, 1)))
 void ExDOT(
     __global long *d_PartialSuperaccs,
-    __global data_t *d_a,
+    __global double *d_a,
     const uint inca,
-    __global data_t *d_b,
+    __global double *d_b,
     const uint incb,
     const uint NbElements
 ) {
     __local long l_sa[WARP_COUNT * BIN_COUNT] __attribute__((aligned(8)));
     __local long *l_workingBase = l_sa + (get_local_id(0) & (WARP_COUNT - 1));
+    __local bool l_sa_check[WARP_COUNT];
+    __local bool *l_workingBase_check = l_sa_check + (get_local_id(0) & (WARP_COUNT - 1));
 
     //Initialize superaccs
     for (uint i = 0; i < BIN_COUNT; i++)
         l_workingBase[i * WARP_COUNT] = 0;
+    *l_workingBase_check = false;
     barrier(CLK_LOCAL_MEM_FENCE);
 
     //Read data from global memory and scatter it to sub-superaccs
     double a[NBFPE] = {0.0};
     for(uint pos = get_global_id(0); pos < NbElements; pos += get_global_size(0)) {
         double r = 0.0;
-        data_t x = TwoProductFMA(d_a[pos], d_b[pos], &r);
+        double x = TwoProductFMA(d_a[pos], d_b[pos], &r);
 
         #ifdef NVIDIA
             #pragma unroll
@@ -231,20 +232,36 @@ void ExDOT(
             a[i] = KnuthTwoSum(a[i], x, &s);
             x = s;
         }
-        if (x != 0.0)
+        if (x != 0.0) {
             Accumulate(l_workingBase, x);
+            #ifdef NVIDIA
+                #pragma unroll
+            #endif
+            for(uint i = 0; i != NBFPE; ++i) {
+                Accumulate(l_workingBase, a[i]);
+                a[i] = 0.0;
+            }
+        }
 
         if (r != 0.0) {
             #ifdef NVIDIA
                 #pragma unroll
             #endif
-            for(uint i = 0; i != NBFPE; ++i) {
+            for(uint i = NBFPE-3; i != NBFPE; ++i) {
                 double s;
                 a[i] = KnuthTwoSum(a[i], r, &s);
                 r = s;
             }
-            if (r != 0.0)
+            if (r != 0.0) {
                 Accumulate(l_workingBase, r);
+                #ifdef NVIDIA
+                    #pragma unroll
+                #endif
+                for(uint i = 0; i != NBFPE; ++i) {
+                    Accumulate(l_workingBase, a[i]);
+                    a[i] = 0.0;
+                }
+            }
         }
     }
     //Flush FPEs to the superacc

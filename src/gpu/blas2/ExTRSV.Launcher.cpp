@@ -10,20 +10,25 @@
 // OpenCL launcher for bitonic sort kernel
 ////////////////////////////////////////////////////////////////////////////////
 #define TRSV_INIT "trsv_init"
-#define TRSV_KERNEL "trsv_lnn"
+#define TRSV_KERNEL "trsv"
+#define GEMV_KERNEL "gemv"
+#define AXPY_KERNEL "axpy"
 #ifdef AMD
-  #define THREADSX 32
-  #define THREADSY  4
+  #define THREADSX   32
+  #define THREADSY    1
+  #define BLOCK_SIZE 32
 #else
-  #define THREADSX 32
-  #define THREADSY  1
+  #define THREADSX   32
+  #define THREADSY    1
+  #define BLOCK_SIZE 32
 #endif
 
 static size_t szKernelLength;                // Byte size of kernel code
 static char* cSources = NULL;                // Buffer to hold source for compilation
 
 static cl_program       cpProgram;           //OpenCL program
-static cl_kernel        ckInit, ckKernel;    //OpenCL kernels
+static cl_kernel        ckInit, ckTRSV;      //OpenCL kernels
+static cl_kernel        ckAXPY, ckGEMV;      //OpenCL kernels
 static cl_command_queue cqDefaultCommandQue; //Default command queue
 static cl_mem           d_sync;
 static cl_mem           d_Superaccs;
@@ -32,7 +37,7 @@ static cl_mem           d_Superaccs;
 static char  compileOptions[256] = "-DUSE_KNUTH -DBLOCK_SIZE=32 -Dthreadsx=32 -Dthreadsy=1";
 #else
 //static char  compileOptions[256] = "-DNVIDIA -DUSE_KNUTH -DBLOCK_SIZE=32 -Dthreadsx=32 -Dthreadsy=1 -cl-mad-enable -cl-fast-relaxed-math"; // -cl-nv-verbose";
-static char  compileOptions[256] = "-DNVIDIA -DUSE_KNUTH -DBLOCK_SIZE=32 -Dthreadsx=32 -Dthreadsy=1";
+static char  compileOptions[256] = "-DNVIDIA -DUSE_KNUTH -DBLOCK_SIZE=32 -Dthreadsx=32 -Dthreadsy=1 -cl-mad-enable";
 #endif
 
 
@@ -74,7 +79,7 @@ extern "C" cl_int initExTRSV(
 
     //printf("...building ExTRSV program\n");
         char compileOptionsBak[256];
-        sprintf(compileOptionsBak, "%s -DNBFPE=%d", compileOptions, NbFPE);
+        sprintf(compileOptionsBak, "%s -DNBFPE=%d -DN=%d", compileOptions, NbFPE, n / BLOCK_SIZE);
         ciErrNum = clBuildProgram(cpProgram, 0, NULL, compileOptionsBak, NULL, NULL);
         if (ciErrNum != CL_SUCCESS) {
             printf("Error in clBuildProgram, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
@@ -93,10 +98,22 @@ extern "C" cl_int initExTRSV(
             printf("Error in clCreateKernel: trsv_init, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
             return EXIT_FAILURE;
         }
-        ckKernel = clCreateKernel(cpProgram, TRSV_KERNEL, &ciErrNum);
+        ckTRSV = clCreateKernel(cpProgram, TRSV_KERNEL, &ciErrNum);
         if (ciErrNum != CL_SUCCESS) {
             printf("Error in clCreateKernel: trsv_lnn, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
             return EXIT_FAILURE;
+        }
+        if (NbFPE == 1) {
+            ckGEMV = clCreateKernel(cpProgram, GEMV_KERNEL, &ciErrNum);
+            if (ciErrNum != CL_SUCCESS) {
+                printf("Error in clCreateKernel: gemv, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
+                return EXIT_FAILURE;
+            }
+            ckAXPY = clCreateKernel(cpProgram, AXPY_KERNEL, &ciErrNum);
+            if (ciErrNum != CL_SUCCESS) {
+                printf("Error in clCreateKernel: axpy, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
+                return EXIT_FAILURE;
+            }
         }
 
     //printf("...allocating internal buffer\n");
@@ -125,7 +142,15 @@ extern "C" void closeExTRSV(void){
 
     ciErrNum = clReleaseMemObject(d_Superaccs);
     ciErrNum |= clReleaseKernel(ckInit);
-    ciErrNum |= clReleaseKernel(ckKernel);
+    ciErrNum |= clReleaseKernel(ckTRSV);
+    if (ckGEMV) {
+        ciErrNum |= clReleaseKernel(ckGEMV);
+        ckGEMV = NULL;
+    }
+    if (ckAXPY) {
+        ciErrNum |= clReleaseKernel(ckAXPY);
+        ckAXPY = NULL;
+    }
     ciErrNum |= clReleaseProgram(cpProgram);
 
     if (ciErrNum != CL_SUCCESS) {
@@ -170,26 +195,27 @@ extern "C" size_t ExTRSV(
         }
     }
     {
-        //size_t NbThreadsPerWorkGroup[] = {THREADSX, THREADSY};
-        //size_t TotalNbThreads[] = {n, THREADSY};
-        size_t NbThreadsPerWorkGroup[] = {1, 1};
-        size_t TotalNbThreads[] = {1, 1};
+        size_t NbThreadsPerWorkGroup[] = {THREADSX, THREADSY};
+        size_t TotalNbThreads[] = {n, THREADSY};
 
         uint i = 0;
-        ciErrNum  = clSetKernelArg(ckKernel, i++, sizeof(cl_mem),  (void *)&d_x);
-        ciErrNum &= clSetKernelArg(ckKernel, i++, sizeof(cl_mem),  (void *)&d_a);
-        ciErrNum &= clSetKernelArg(ckKernel, i++, sizeof(cl_mem),  (void *)&d_x);
-        ciErrNum &= clSetKernelArg(ckKernel, i++, sizeof(cl_mem),  (void *)&d_sync);
-        ciErrNum &= clSetKernelArg(ckKernel, i++, sizeof(cl_mem),  (void *)&d_Superaccs);
-        ciErrNum &= clSetKernelArg(ckKernel, i++, sizeof(cl_uint), (void *)&n);
+        ciErrNum  = clSetKernelArg(ckTRSV, i++, sizeof(cl_mem),  (void *)&d_x);
+        ciErrNum &= clSetKernelArg(ckTRSV, i++, sizeof(cl_mem),  (void *)&d_a);
+        ciErrNum &= clSetKernelArg(ckTRSV, i++, sizeof(cl_mem),  (void *)&d_sync);
+        ciErrNum &= clSetKernelArg(ckTRSV, i++, sizeof(cl_mem),  (void *)&d_Superaccs);
+        ciErrNum &= clSetKernelArg(ckTRSV, i++, BLOCK_SIZE * BLOCK_SIZE * sizeof(cl_double),  NULL);
+        ciErrNum &= clSetKernelArg(ckTRSV, i++, sizeof(cl_int),  NULL);
+        ciErrNum &= clSetKernelArg(ckTRSV, i++, sizeof(cl_double),  NULL);
+        ciErrNum &= clSetKernelArg(ckTRSV, i++, sizeof(cl_uint), (void *)&n);
         if (ciErrNum != CL_SUCCESS) {
             printf("Error in clSetKernelArg, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
             *ciErrNumRes = EXIT_FAILURE;
             return 0;
         }
 
-        ciErrNum = clEnqueueNDRangeKernel(cqCommandQueue, ckKernel, 2, NULL, TotalNbThreads, NbThreadsPerWorkGroup, 0, NULL, NULL);
+        ciErrNum = clEnqueueNDRangeKernel(cqCommandQueue, ckTRSV, 2, NULL, TotalNbThreads, NbThreadsPerWorkGroup, 0, NULL, NULL);
         if (ciErrNum != CL_SUCCESS) {
+            printf("ciErrNum = %d\n", ciErrNum);
             printf("Error in clEnqueueNDRangeKernel, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
             *ciErrNumRes = EXIT_FAILURE;
             return 0;
@@ -213,6 +239,7 @@ extern "C" size_t ExTRSVIR(
     if(!cqCommandQueue)
         cqCommandQueue = cqDefaultCommandQue;
 
+    // TRSV init
     {
         size_t NbThreadsPerWorkGroup = 1;
         size_t TotalNbThreads = NbThreadsPerWorkGroup;
@@ -232,25 +259,125 @@ extern "C" size_t ExTRSVIR(
             return 0;
         }
     }
+    // ExTRSV
     {
         size_t NbThreadsPerWorkGroup[] = {THREADSX, THREADSY};
         size_t TotalNbThreads[] = {n, THREADSY};
 
         uint i = 0;
-        ciErrNum  = clSetKernelArg(ckKernel, i++, sizeof(cl_mem),  (void *)&d_x);
-        ciErrNum &= clSetKernelArg(ckKernel, i++, sizeof(cl_mem),  (void *)&d_a);
-        ciErrNum &= clSetKernelArg(ckKernel, i++, sizeof(cl_mem),  (void *)&d_b);
-        ciErrNum &= clSetKernelArg(ckKernel, i++, sizeof(cl_mem),  (void *)&d_sync);
-        ciErrNum &= clSetKernelArg(ckKernel, i++, sizeof(cl_mem),  (void *)&d_Superaccs);
-        ciErrNum &= clSetKernelArg(ckKernel, i++, sizeof(cl_uint), (void *)&n);
+        ciErrNum  = clSetKernelArg(ckTRSV, i++, sizeof(cl_mem),  (void *)&d_x);
+        ciErrNum &= clSetKernelArg(ckTRSV, i++, sizeof(cl_mem),  (void *)&d_a);
+        ciErrNum &= clSetKernelArg(ckTRSV, i++, sizeof(cl_mem),  (void *)&d_sync);
+        ciErrNum &= clSetKernelArg(ckTRSV, i++, sizeof(cl_mem),  (void *)&d_Superaccs);
+        ciErrNum &= clSetKernelArg(ckTRSV, i++, BLOCK_SIZE * BLOCK_SIZE * sizeof(cl_double),  NULL);
+        ciErrNum &= clSetKernelArg(ckTRSV, i++, sizeof(cl_int),  NULL);
+        ciErrNum &= clSetKernelArg(ckTRSV, i++, sizeof(cl_double),  NULL);
+        ciErrNum &= clSetKernelArg(ckTRSV, i++, sizeof(cl_uint), (void *)&n);
         if (ciErrNum != CL_SUCCESS) {
             printf("Error in clSetKernelArg, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
             *ciErrNumRes = EXIT_FAILURE;
             return 0;
         }
 
-        ciErrNum = clEnqueueNDRangeKernel(cqCommandQueue, ckKernel, 2, NULL, TotalNbThreads, NbThreadsPerWorkGroup, 0, NULL, NULL);
+        ciErrNum = clEnqueueNDRangeKernel(cqCommandQueue, ckTRSV, 2, NULL, TotalNbThreads, NbThreadsPerWorkGroup, 0, NULL, NULL);
         if (ciErrNum != CL_SUCCESS) {
+            printf("ciErrNum = %d\n", ciErrNum);
+            printf("Error in clEnqueueNDRangeKernel, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
+            *ciErrNumRes = EXIT_FAILURE;
+            return 0;
+        }
+    }
+    // IR: ExGEMV
+    {
+        size_t NbThreadsPerWorkGroup[] = {THREADSX, THREADSY};
+        size_t TotalNbThreads[] = {n, THREADSY};
+
+        uint i = 0;
+        ciErrNum  = clSetKernelArg(ckGEMV, i++, sizeof(cl_mem),  (void *)&d_b);
+        ciErrNum &= clSetKernelArg(ckGEMV, i++, sizeof(cl_mem),  (void *)&d_a);
+        ciErrNum &= clSetKernelArg(ckGEMV, i++, sizeof(cl_mem),  (void *)&d_x);
+        ciErrNum &= clSetKernelArg(ckGEMV, i++, sizeof(cl_mem),  (void *)&d_Superaccs);
+        ciErrNum &= clSetKernelArg(ckGEMV, i++, sizeof(cl_uint), (void *)&n);
+        if (ciErrNum != CL_SUCCESS) {
+            printf("Error in clSetKernelArg, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
+            *ciErrNumRes = EXIT_FAILURE;
+            return 0;
+        }
+
+        ciErrNum = clEnqueueNDRangeKernel(cqCommandQueue, ckGEMV, 2, NULL, TotalNbThreads, NbThreadsPerWorkGroup, 0, NULL, NULL);
+        if (ciErrNum != CL_SUCCESS) {
+            printf("ciErrNum = %d\n", ciErrNum);
+            printf("Error in clEnqueueNDRangeKernel, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
+            *ciErrNumRes = EXIT_FAILURE;
+            return 0;
+        }
+    }
+    // IR: ExTRSV -- init
+    {
+        size_t NbThreadsPerWorkGroup = 1;
+        size_t TotalNbThreads = NbThreadsPerWorkGroup;
+
+        uint i = 0;
+        ciErrNum  = clSetKernelArg(ckInit, i++, sizeof(cl_mem),  (void *)&d_sync);
+        if (ciErrNum != CL_SUCCESS) {
+            printf("Error in clSetKernelArg, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
+            *ciErrNumRes = EXIT_FAILURE;
+            return 0;
+        }
+
+        ciErrNum = clEnqueueNDRangeKernel(cqCommandQueue, ckInit, 1, NULL, &TotalNbThreads, &NbThreadsPerWorkGroup, 0, NULL, NULL);
+        if (ciErrNum != CL_SUCCESS) {
+            printf("Error in clEnqueueNDRangeKernel, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
+            *ciErrNumRes = EXIT_FAILURE;
+            return 0;
+        }
+    }
+    // IR: ExTRSV
+    {
+        size_t NbThreadsPerWorkGroup[] = {THREADSX, THREADSY};
+        size_t TotalNbThreads[] = {n, THREADSY};
+
+        uint i = 0;
+        ciErrNum  = clSetKernelArg(ckTRSV, i++, sizeof(cl_mem),  (void *)&d_b);
+        ciErrNum &= clSetKernelArg(ckTRSV, i++, sizeof(cl_mem),  (void *)&d_a);
+        ciErrNum &= clSetKernelArg(ckTRSV, i++, sizeof(cl_mem),  (void *)&d_sync);
+        ciErrNum &= clSetKernelArg(ckTRSV, i++, sizeof(cl_mem),  (void *)&d_Superaccs);
+        ciErrNum &= clSetKernelArg(ckTRSV, i++, BLOCK_SIZE * BLOCK_SIZE * sizeof(cl_double),  NULL);
+        ciErrNum &= clSetKernelArg(ckTRSV, i++, sizeof(cl_int),  NULL);
+        ciErrNum &= clSetKernelArg(ckTRSV, i++, sizeof(cl_double),  NULL);
+        ciErrNum &= clSetKernelArg(ckTRSV, i++, sizeof(cl_uint), (void *)&n);
+        if (ciErrNum != CL_SUCCESS) {
+            printf("Error in clSetKernelArg, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
+            *ciErrNumRes = EXIT_FAILURE;
+            return 0;
+        }
+
+        ciErrNum = clEnqueueNDRangeKernel(cqCommandQueue, ckTRSV, 2, NULL, TotalNbThreads, NbThreadsPerWorkGroup, 0, NULL, NULL);
+        if (ciErrNum != CL_SUCCESS) {
+            printf("ciErrNum = %d\n", ciErrNum);
+            printf("Error in clEnqueueNDRangeKernel, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
+            *ciErrNumRes = EXIT_FAILURE;
+            return 0;
+        }
+    }
+    // IR: ExAXPY
+    {
+        size_t NbThreadsPerWorkGroup[] = {THREADSX, THREADSY};
+        size_t TotalNbThreads[] = {n, THREADSY};
+
+        uint i = 0;
+        ciErrNum  = clSetKernelArg(ckAXPY, i++, sizeof(cl_mem),  (void *)&d_x);
+        ciErrNum &= clSetKernelArg(ckAXPY, i++, sizeof(cl_mem),  (void *)&d_b);
+        ciErrNum &= clSetKernelArg(ckAXPY, i++, sizeof(cl_uint), (void *)&n);
+        if (ciErrNum != CL_SUCCESS) {
+            printf("Error in clSetKernelArg, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
+            *ciErrNumRes = EXIT_FAILURE;
+            return 0;
+        }
+
+        ciErrNum = clEnqueueNDRangeKernel(cqCommandQueue, ckAXPY, 2, NULL, TotalNbThreads, NbThreadsPerWorkGroup, 0, NULL, NULL);
+        if (ciErrNum != CL_SUCCESS) {
+            printf("ciErrNum = %d\n", ciErrNum);
             printf("Error in clEnqueueNDRangeKernel, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
             *ciErrNumRes = EXIT_FAILURE;
             return 0;

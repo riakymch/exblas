@@ -49,7 +49,7 @@ extern "C" cl_int initExSUM(
 ){
     cl_int ciErrNum;
     NbElements = NbElems;
-    vector_number = 2;
+    //vector_number = 2;
 
     // Read the OpenCL kernel in from source file
     FILE *program_handle;

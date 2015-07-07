@@ -298,33 +298,51 @@ __kernel void matrixMul(
                             }
                         }
                     }
-                    if(x != 0.0)
-                        Accumulate(p_workingBase, x);
+                    if(x != 0.0) {
+                        Accumulate(l_workingBase, x);
+                        //Flush to the superacc
+                        Accumulate(l_workingBase, sum[0]);
+                        Accumulate(l_workingBase, sum[1]);
+                        Accumulate(l_workingBase, sum[2]);
+                        Accumulate(l_workingBase, sum[3]);
+                        Accumulate(l_workingBase, sum[4]);
+                        Accumulate(l_workingBase, sum[5]);
+                        sum[0] = 0.0;
+                        sum[1] = 0.0;
+                        sum[2] = 0.0;
+                        sum[3] = 0.0;
+                        sum[4] = 0.0;
+                        sum[5] = 0.0;
+                    }
 
-                    sum[0] = KnuthTwoSum(sum[0], r, &s);
-                    r = s;
                     if(r != 0.0) {
-                        sum[1] = KnuthTwoSum(sum[1], r, &s);
+                        sum[3] = KnuthTwoSum(sum[3], r, &s);
                         r = s;
-                        if(r != 0.0) {
-                            sum[2] = KnuthTwoSum(sum[2], r, &s);
+                        if (r != 0.0) {
+                            sum[4] = KnuthTwoSum(sum[4], r, &s);
                             r = s;
-                            if(r != 0.0) {
-                                sum[3] = KnuthTwoSum(sum[3], r, &s);
+                            if (r != 0.0) {
+                                sum[5] = KnuthTwoSum(sum[5], r, &s);
                                 r = s;
-                                if(r != 0.0) {
-                                    sum[4] = KnuthTwoSum(sum[4], r, &s);
-                                    r = s;
-                                    if(r != 0.0) {
-                                        sum[5] = KnuthTwoSum(sum[5], r, &s);
-                                        r = s;
-                                    }
-                                }
                             }
                         }
+                        if (r != 0.0) {
+                            Accumulate(l_workingBase, r);
+                            //Flush to the superacc
+                            Accumulate(l_workingBase, sum[0]);
+                            Accumulate(l_workingBase, sum[1]);
+                            Accumulate(l_workingBase, sum[2]);
+                            Accumulate(l_workingBase, sum[3]);
+                            Accumulate(l_workingBase, sum[4]);
+                            Accumulate(l_workingBase, sum[5]);
+                            sum[0] = 0.0;
+                            sum[1] = 0.0;
+                            sum[2] = 0.0;
+                            sum[3] = 0.0;
+                            sum[4] = 0.0;
+                            sum[5] = 0.0;
+                        }
                     }
-                    if(r != 0.0)
-                        Accumulate(p_workingBase, r);
                 }
 
                 //Synchronize to make sure that the preceding computation is done before 
