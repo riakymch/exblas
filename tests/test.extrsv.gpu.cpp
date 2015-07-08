@@ -28,16 +28,17 @@ static void copyVector(uint n, double *x, double *y) {
 #include <mpfr.h>
 
 static double extrsvVsMPFR(char uplo, double *extrsv, int n, double *a, uint lda, double *x, uint incx) {
-#if 0
+#if 1
     // Compare to the results from Matlab
     FILE *pFilex;
     size_t resx;
     if (uplo == 'L') {
-        pFilex = fopen("matrices/lnn/x_test_trsv_final_64.bin", "rb");
+        pFilex = fopen("matrices/lnn/x_test_trsv_lnn_e08_64_Axb.bin", "rb");
         //pFilex = fopen("matrices/lnn/x_test_trsv_e21_64.bin", "rb");
         //pFilex = fopen("matrices/lnn/x_test_trsv_e40_64.bin", "rb");
     } else if (uplo == 'U') {
-        pFilex = fopen("matrices/unn/xe_unn_100_3.08e+07.bin", "rb");
+        //pFilex = fopen("matrices/unn/xe_unn_100_3.08e+07.bin", "rb");
+        pFilex = fopen("matrices/unn/x_test_trsv_unn_e07_64_Axb.bin", "rb");
     }
     if (pFilex == NULL) {
         fprintf(stderr, "Cannot open files to read matrix and vector\n");
@@ -54,7 +55,7 @@ static double extrsvVsMPFR(char uplo, double *extrsv, int n, double *a, uint lda
 
     //Inf norm
     double nrm2 = 0.0, val2 = 0.0;
-    for(uint i = 0; i < n; i++) {
+    /*for(int i = 0; i < n; i++) {
         val2 = std::max(val2, fabs(xmatlab[i]));
         nrm2 = std::max(nrm2, fabs(extrsv[i] - xmatlab[i]));
         if (fabs(extrsv[i] - xmatlab[i]) != 0.0)
@@ -64,7 +65,72 @@ static double extrsvVsMPFR(char uplo, double *extrsv, int n, double *a, uint lda
     printf("\n\n");
     printf("ExTRSV vs Matlab = %.16g \t %.16g\n", nrm2, val2);
     nrm2 = nrm2 / val2;
-    printf("ExTRSV vs Matlab = %.16g\n", nrm2);
+    printf("ExTRSV vs Matlab = %.16g\n", nrm2);*/
+
+    mpfr_t sum, dot, result[n];
+
+    // mpfr
+    double *extrsv_mpfr = (double *) malloc(n * sizeof(double));
+    copyVector(n, extrsv_mpfr, x);
+
+    mpfr_init2(dot, 128);
+    mpfr_init2(sum, 2098);
+    for(int i = 0; i < n; i++) {
+        mpfr_init2(result[i], 2098);
+        mpfr_set_d(result[i], x[i], MPFR_RNDN);
+    }
+
+    //Produce a result matrix of TRSV using MPFR
+    if (uplo == 'L') {
+        for(int i = 0; i < n; i++) {
+            // sum += a[i,j] * x[j], j < i
+            mpfr_set_d(sum, 0.0, MPFR_RNDN);
+            for(int j = 0; j < i; j++) {
+                mpfr_set_d(dot, a[j * n + i], MPFR_RNDN);
+                mpfr_mul(dot, dot, result[j], MPFR_RNDN);
+                mpfr_add(sum, sum, dot, MPFR_RNDN);
+            }
+            mpfr_add(result[i], sum, result[i], MPFR_RNDN);
+            //mpfr_div_d(sum, sum, a[i * (n + 1)], MPFR_RNDN);
+            //extrsv_mpfr[i] = mpfr_get_d(sum, MPFR_RNDN);
+            extrsv_mpfr[i] = mpfr_get_d(result[i], MPFR_RNDN);
+        }
+    } else if (uplo == 'U') {
+        for(int i = n-1; i >= 0; i--) {
+            // sum += a[i,j] * x[j], j < i
+            mpfr_set_d(sum, 0.0, MPFR_RNDN);
+            for(int j = i + 1; j < n; j++) {
+                mpfr_set_d(dot, a[j * n + i], MPFR_RNDN);
+                mpfr_mul_d(dot, dot, extrsv_mpfr[j], MPFR_RNDN);
+                mpfr_add(sum, sum, dot, MPFR_RNDN);
+            }
+            mpfr_add_d(sum, sum, extrsv_mpfr[i], MPFR_RNDN);
+            //mpfr_div_d(sum, sum, a[i * (n + 1)], MPFR_RNDN);
+            extrsv_mpfr[i] = mpfr_get_d(sum, MPFR_RNDN);
+        }
+    }
+
+    //Inf norm
+    double nrm = 0.0, val = 0.0;
+    for(int i = 0; i < n; i++) {
+        printf("%.16g\t", fabs(xmatlab[i]));
+    }
+    printf("\n\n");
+    for(int i = 0; i < n; i++) {
+        printf("%.16g\t", fabs(extrsv_mpfr[i]));
+    }
+    printf("\n\n");
+    for(int i = 0; i < n; i++) {
+        val = std::max(val, fabs(extrsv_mpfr[i]));
+        //nrm = std::max(nrm, fabs(extrsv[i] - extrsv_mpfr[i]));
+        //printf("%.16g\t", fabs(extrsv[i] - extrsv_mpfr[i]));
+        nrm = std::max(nrm, fabs(xmatlab[i] - extrsv_mpfr[i]));
+        printf("%.16g\t", fabs(xmatlab[i] - extrsv_mpfr[i]));
+    }
+    printf("\n\n");
+    printf("ExTRSV vs MPFR = %.16g \t %.16g\n", nrm, val);
+    nrm = nrm / val;
+    printf("ExTRSV vs MPFR = %.16g\n", nrm);
 
     return nrm2;
 #else
@@ -185,7 +251,7 @@ int main(int argc, char *argv[]) {
     if ((!a) || (!x) || (!xorig) || (err != 0))
         fprintf(stderr, "Cannot allocate memory with posix_memalign\n");
 
-#if 0
+#if 1
     //Reading matrix A and vector b from files
     FILE *pFileA, *pFileb;
     size_t resA, resb;
@@ -213,6 +279,9 @@ int main(int argc, char *argv[]) {
         fprintf(stderr, "Cannot read matrix and vector from files\n");
         exit(1);
     }
+
+    //for (int i = 0; i < n; i++)
+    //    a[i * (n + 1)] = 1.0;
 
     fclose(pFileA);
     fclose(pFileb);
@@ -242,7 +311,7 @@ int main(int argc, char *argv[]) {
     if ((!superacc) || (err != 0))
         fprintf(stderr, "Cannot allocate memory with posix_memalign\n");
 
-    copyVector(n, superacc, xorig);
+    /*copyVector(n, superacc, xorig);
     extrsv(uplo, 'N', 'N', n, a, n, superacc, 1, 0);
 #ifdef EXBLAS_VS_MPFR
     norm = extrsvVsMPFR(uplo, superacc, n, a, n, xorig, 1);
@@ -251,6 +320,11 @@ int main(int argc, char *argv[]) {
         is_pass = false;
     }
 #endif
+    */
+
+    copyVector(n, x, xorig);
+    norm = extrsvVsMPFR(uplo, x, n, a, n, xorig, 1);
+    exit(0);
 
     copyVector(n, x, xorig);
     extrsv(uplo, 'N', 'N', n, a, n, x, 1, 1);
@@ -261,6 +335,7 @@ int main(int argc, char *argv[]) {
         is_pass = false;
     }
 #endif
+    exit(0);
 
     copyVector(n, x, xorig);
     extrsv(uplo, 'N', 'N', n, a, n, x, 1, 3);
