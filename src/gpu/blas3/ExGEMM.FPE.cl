@@ -285,12 +285,12 @@ __kernel void matrixMul(
                         x = s;
                     }
                     if (x != 0.0) {
-                        Accumulate(l_workingBase, x);
+                        Accumulate(p_workingBase, x);
                         #ifdef NVIDIA
                             #pragma unroll
                         #endif
                         for(uint i = 0; i != NBFPE; ++i) {
-                            Accumulate(l_workingBase, sum[i]);
+                            Accumulate(p_workingBase, sum[i]);
                             sum[i] = 0.0;
                         }
                     }
@@ -305,12 +305,12 @@ __kernel void matrixMul(
                             r = s;
                         }
                         if (r != 0.0) {
-                            Accumulate(l_workingBase, r);
+                            Accumulate(p_workingBase, r);
                             #ifdef NVIDIA
                                 #pragma unroll
                             #endif
                             for(uint i = 0; i != NBFPE; ++i) {
-                                Accumulate(l_workingBase, sum[i]);
+                                Accumulate(p_workingBase, sum[i]);
                                 sum[i] = 0.0;
                             }
                         }

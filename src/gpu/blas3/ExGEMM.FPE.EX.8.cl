@@ -307,16 +307,16 @@ __kernel void matrixMul(
                         }
                     }
                     if(x != 0.0) {
-                        Accumulate(l_workingBase, x);
+                        Accumulate(p_workingBase, x);
                         //Flush to the superacc
-                        Accumulate(l_workingBase, sum[0]);
-                        Accumulate(l_workingBase, sum[1]);
-                        Accumulate(l_workingBase, sum[2]);
-                        Accumulate(l_workingBase, sum[3]);
-                        Accumulate(l_workingBase, sum[4]);
-                        Accumulate(l_workingBase, sum[5]);
-                        Accumulate(l_workingBase, sum[6]);
-                        Accumulate(l_workingBase, sum[7]);
+                        Accumulate(p_workingBase, sum[0]);
+                        Accumulate(p_workingBase, sum[1]);
+                        Accumulate(p_workingBase, sum[2]);
+                        Accumulate(p_workingBase, sum[3]);
+                        Accumulate(p_workingBase, sum[4]);
+                        Accumulate(p_workingBase, sum[5]);
+                        Accumulate(p_workingBase, sum[6]);
+                        Accumulate(p_workingBase, sum[7]);
                         sum[0] = 0.0;
                         sum[1] = 0.0;
                         sum[2] = 0.0;
@@ -339,16 +339,16 @@ __kernel void matrixMul(
                             }
                         }
                         if(r != 0.0) {
-                            Accumulate(l_workingBase, r);
+                            Accumulate(p_workingBase, r);
                             //Flush to the superacc
-                            Accumulate(l_workingBase, sum[0]);
-                            Accumulate(l_workingBase, sum[1]);
-                            Accumulate(l_workingBase, sum[2]);
-                            Accumulate(l_workingBase, sum[3]);
-                            Accumulate(l_workingBase, sum[4]);
-                            Accumulate(l_workingBase, sum[5]);
-                            Accumulate(l_workingBase, sum[6]);
-                            Accumulate(l_workingBase, sum[7]);
+                            Accumulate(p_workingBase, sum[0]);
+                            Accumulate(p_workingBase, sum[1]);
+                            Accumulate(p_workingBase, sum[2]);
+                            Accumulate(p_workingBase, sum[3]);
+                            Accumulate(p_workingBase, sum[4]);
+                            Accumulate(p_workingBase, sum[5]);
+                            Accumulate(p_workingBase, sum[6]);
+                            Accumulate(p_workingBase, sum[7]);
                             sum[0] = 0.0;
                             sum[1] = 0.0;
                             sum[2] = 0.0;
