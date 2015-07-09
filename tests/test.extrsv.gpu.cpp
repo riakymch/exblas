@@ -33,12 +33,12 @@ static double extrsvVsMPFR(char uplo, double *extrsv, int n, double *a, uint lda
     FILE *pFilex;
     size_t resx;
     if (uplo == 'L') {
-        pFilex = fopen("matrices/lnn/x_test_trsv_lnn_e08_64_Axb.bin", "rb");
+        pFilex = fopen("matrices/lnn/x_test_trsv_lnn_e08_64.bin", "rb");
         //pFilex = fopen("matrices/lnn/x_test_trsv_e21_64.bin", "rb");
         //pFilex = fopen("matrices/lnn/x_test_trsv_e40_64.bin", "rb");
     } else if (uplo == 'U') {
         //pFilex = fopen("matrices/unn/xe_unn_100_3.08e+07.bin", "rb");
-        pFilex = fopen("matrices/unn/x_test_trsv_unn_e07_64_Axb.bin", "rb");
+        pFilex = fopen("matrices/unn/x_test_trsv_unn_e07_64.bin", "rb");
     }
     if (pFilex == NULL) {
         fprintf(stderr, "Cannot open files to read matrix and vector\n");
@@ -67,57 +67,50 @@ static double extrsvVsMPFR(char uplo, double *extrsv, int n, double *a, uint lda
     nrm2 = nrm2 / val2;
     printf("ExTRSV vs Matlab = %.16g\n", nrm2);*/
 
-    mpfr_t sum, dot, result[n];
+    mpfr_t sum, dot;
 
     // mpfr
     double *extrsv_mpfr = (double *) malloc(n * sizeof(double));
     copyVector(n, extrsv_mpfr, x);
 
-    mpfr_init2(dot, 128);
+    mpfr_init2(dot, 192);
     mpfr_init2(sum, 2098);
-    for(int i = 0; i < n; i++) {
-        mpfr_init2(result[i], 2098);
-        mpfr_set_d(result[i], x[i], MPFR_RNDN);
-    }
 
     //Produce a result matrix of TRSV using MPFR
     if (uplo == 'L') {
         for(int i = 0; i < n; i++) {
             // sum += a[i,j] * x[j], j < i
-            mpfr_set_d(sum, 0.0, MPFR_RNDN);
+            mpfr_set_d(sum, extrsv_mpfr[i], MPFR_RNDN);
             for(int j = 0; j < i; j++) {
                 mpfr_set_d(dot, a[j * n + i], MPFR_RNDN);
-                mpfr_mul(dot, dot, result[j], MPFR_RNDN);
-                mpfr_add(sum, sum, dot, MPFR_RNDN);
+                mpfr_mul_d(dot, dot, extrsv_mpfr[j], MPFR_RNDN);
+                mpfr_sub(sum, sum, dot, MPFR_RNDN);
             }
-            mpfr_add(result[i], sum, result[i], MPFR_RNDN);
-            //mpfr_div_d(sum, sum, a[i * (n + 1)], MPFR_RNDN);
-            //extrsv_mpfr[i] = mpfr_get_d(sum, MPFR_RNDN);
-            extrsv_mpfr[i] = mpfr_get_d(result[i], MPFR_RNDN);
+            extrsv_mpfr[i] = mpfr_get_d(sum, MPFR_RNDN);
+            extrsv_mpfr[i] = extrsv_mpfr[i] / a[i * (n + 1)];
         }
     } else if (uplo == 'U') {
         for(int i = n-1; i >= 0; i--) {
             // sum += a[i,j] * x[j], j < i
-            mpfr_set_d(sum, 0.0, MPFR_RNDN);
+            mpfr_set_d(sum, extrsv_mpfr[i], MPFR_RNDN);
             for(int j = i + 1; j < n; j++) {
                 mpfr_set_d(dot, a[j * n + i], MPFR_RNDN);
                 mpfr_mul_d(dot, dot, extrsv_mpfr[j], MPFR_RNDN);
-                mpfr_add(sum, sum, dot, MPFR_RNDN);
+                mpfr_sub(sum, sum, dot, MPFR_RNDN);
             }
-            mpfr_add_d(sum, sum, extrsv_mpfr[i], MPFR_RNDN);
-            //mpfr_div_d(sum, sum, a[i * (n + 1)], MPFR_RNDN);
             extrsv_mpfr[i] = mpfr_get_d(sum, MPFR_RNDN);
+            extrsv_mpfr[i] = extrsv_mpfr[i] / a[i * (n + 1)];
         }
     }
 
     //Inf norm
     double nrm = 0.0, val = 0.0;
     for(int i = 0; i < n; i++) {
-        printf("%.16g\t", fabs(xmatlab[i]));
+        printf("%.16g\t", xmatlab[i]);
     }
     printf("\n\n");
     for(int i = 0; i < n; i++) {
-        printf("%.16g\t", fabs(extrsv_mpfr[i]));
+        printf("%.16g\t", extrsv_mpfr[i]);
     }
     printf("\n\n");
     for(int i = 0; i < n; i++) {
