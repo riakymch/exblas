@@ -89,10 +89,6 @@ int extrsv(char uplo, char transa, char diag, int n, double *a, int lda, double 
     if (fpe == 0)
         return runExTRSV(n, a, lda, x, incx, 0, (uplo == 'L') ? strcat(path, "ExTRSV.lnn.Superacc.cl") : strcat(path, "ExTRSV.unn.Superacc.cl"));
 
-    // FPE with IR
-    if (fpe == 1)
-        return runExTRSV(n, a, lda, x, incx, fpe, (uplo == 'L') ? strcat(path, "ExTRSV.lnn.FPE.IR.cl") : strcat(path, "ExTRSV.unn.FPE.IR.cl"));
-
     if (early_exit) {
         if (fpe <= 4)
             //return runExTRSV(n, a, lda, x, incx, 4, strcat(path, "ExTRSV.FPE.EX.4.cl"));
