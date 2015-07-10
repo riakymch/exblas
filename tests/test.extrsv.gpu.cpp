@@ -28,7 +28,7 @@ static void copyVector(uint n, double *x, double *y) {
 #include <mpfr.h>
 
 static double extrsvVsMPFR(char uplo, double *extrsv, int n, double *a, uint lda, double *x, uint incx) {
-#if 1
+#if 0
     // Compare to the results from Matlab
     FILE *pFilex;
     size_t resx;
@@ -244,7 +244,7 @@ int main(int argc, char *argv[]) {
     if ((!a) || (!x) || (!xorig) || (err != 0))
         fprintf(stderr, "Cannot allocate memory with posix_memalign\n");
 
-#if 1
+#if 0
     //Reading matrix A and vector b from files
     FILE *pFileA, *pFileb;
     size_t resA, resb;
@@ -304,7 +304,7 @@ int main(int argc, char *argv[]) {
     if ((!superacc) || (err != 0))
         fprintf(stderr, "Cannot allocate memory with posix_memalign\n");
 
-    /*copyVector(n, superacc, xorig);
+    copyVector(n, superacc, xorig);
     extrsv(uplo, 'N', 'N', n, a, n, superacc, 1, 0);
 #ifdef EXBLAS_VS_MPFR
     norm = extrsvVsMPFR(uplo, superacc, n, a, n, xorig, 1);
@@ -313,11 +313,6 @@ int main(int argc, char *argv[]) {
         is_pass = false;
     }
 #endif
-    */
-
-    copyVector(n, x, xorig);
-    norm = extrsvVsMPFR(uplo, x, n, a, n, xorig, 1);
-    exit(0);
 
     copyVector(n, x, xorig);
     extrsv(uplo, 'N', 'N', n, a, n, x, 1, 1);
@@ -328,7 +323,6 @@ int main(int argc, char *argv[]) {
         is_pass = false;
     }
 #endif
-    exit(0);
 
     copyVector(n, x, xorig);
     extrsv(uplo, 'N', 'N', n, a, n, x, 1, 3);
