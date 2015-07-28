@@ -11,6 +11,10 @@
 #include "ExSUM.hpp"
 #include "blas1.hpp"
 
+#ifdef EXBLAS_TIMING
+    #define iterations 50
+#endif
+
 
 /*
  * Parallel summation using our algorithm
@@ -108,6 +112,8 @@ double ExSUMSuperacc(int N, double *a, int inca) {
     double dacc;
 #ifndef EXBLAS_MPI
  #ifdef EXBLAS_TIMING
+   double mint = 10000;
+   for(int iter = 0; iter != iterations; ++iter) {
     uint64_t tstart = rdtsc();
  #endif
 #endif
@@ -129,7 +135,9 @@ double ExSUMSuperacc(int N, double *a, int inca) {
 #ifdef EXBLAS_TIMING
     uint64_t tend = rdtsc();
     double t = double(tend - tstart) / N;
-    printf("time = %f\n", t);
+    mint = std::min(mint, t);
+   }
+    fprintf(stderr, "%f ", mint);
 #endif
 
     return dacc;
@@ -186,14 +194,16 @@ template<typename CACHE> double ExSUMFPE(int N, double *a, int inca) {
     // OpenMP sum+reduction
     int const linesize = 16;    // * sizeof(int32_t)
     int maxthreads = omp_get_max_threads();
-    std::vector<Superaccumulator> acc(maxthreads);
-    std::vector<int32_t> ready(maxthreads * linesize);
     double dacc;
 #ifndef EXBLAS_MPI
  #ifdef EXBLAS_TIMING
+   double mint = 10000;
+   for(int iter = 0; iter != iterations; ++iter) {
     uint64_t tstart = rdtsc();
  #endif
 #endif
+    std::vector<Superaccumulator> acc(maxthreads);
+    std::vector<int32_t> ready(maxthreads * linesize);
     
 #pragma omp parallel
     {
@@ -229,8 +239,10 @@ template<typename CACHE> double ExSUMFPE(int N, double *a, int inca) {
 
 #ifdef EXBLAS_TIMING
     uint64_t tend = rdtsc();
-    double t = double(tend - tstart)/N;
-    printf("time = %f\n", t);
+    double t = double(tend - tstart) / N;
+    mint = std::min(mint, t);
+   }
+    fprintf(stderr, "%f ", mint);
 #endif
 
     return dacc;
