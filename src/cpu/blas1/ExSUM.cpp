@@ -70,36 +70,16 @@ double exsum(int Ng, double *ag, int inca, int fpe, bool early_exit) {
     // with superaccumulators only
     if (fpe < 2)
         return ExSUMSuperacc(N, a, inca);
-    // there is no need and no improvement at all in using the early-exit technique for FPE of size 2
-    if (fpe == 2)
-        return (ExSUMFPE<FPExpansionVect<Vec4d, 2> >)(N, a, inca);
 
     if (early_exit) {
-        if (fpe == 3)
-            return (ExSUMFPE<FPExpansionVect<Vec4d, 3, FPExpansionTraits<true> > >)(N, a, inca);
-        if (fpe == 4)
+        if (fpe <= 4)
             return (ExSUMFPE<FPExpansionVect<Vec4d, 4, FPExpansionTraits<true> > >)(N, a, inca);
-        if (fpe == 5)
-            return (ExSUMFPE<FPExpansionVect<Vec4d, 5, FPExpansionTraits<true> > >)(N, a, inca);
-        if (fpe == 6)
+        if (fpe <= 6)
             return (ExSUMFPE<FPExpansionVect<Vec4d, 6, FPExpansionTraits<true> > >)(N, a, inca);
-        if (fpe == 7)
-            return (ExSUMFPE<FPExpansionVect<Vec4d, 7, FPExpansionTraits<true> > >)(N, a, inca);
-        if (fpe == 8)
+        if (fpe <= 8)
             return (ExSUMFPE<FPExpansionVect<Vec4d, 8, FPExpansionTraits<true> > >)(N, a, inca);
     } else { // ! early_exit
-        if (fpe == 3)
-            return (ExSUMFPE<FPExpansionVect<Vec4d, 3> >)(N, a, inca);
-        if (fpe == 4)
-            return (ExSUMFPE<FPExpansionVect<Vec4d, 4> >)(N, a, inca);
-        if (fpe == 5)
-            return (ExSUMFPE<FPExpansionVect<Vec4d, 5> >)(N, a, inca);
-        if (fpe == 6)
-            return (ExSUMFPE<FPExpansionVect<Vec4d, 6> >)(N, a, inca);
-        if (fpe == 7)
-            return (ExSUMFPE<FPExpansionVect<Vec4d, 7> >)(N, a, inca);
-        if (fpe == 8)
-            return (ExSUMFPE<FPExpansionVect<Vec4d, 8> >)(N, a, inca);
+        return (ExSUMFPE<FPExpansionVect<Vec4d, fpe> >)(N, a, inca);
     }
 
     return 0.0;
@@ -111,30 +91,31 @@ double exsum(int Ng, double *ag, int inca, int fpe, bool early_exit) {
 double ExSUMSuperacc(int N, double *a, int inca) {
     double dacc;
 #ifdef EXBLAS_TIMING
-    double mint = 10000;
-   for(int iter = 0; iter != iterations; ++iter) {
-    uint64_t tstart = rdtsc();
+    double t, mint = 10000;
+    uint64_t tstart, tend;
+    for(int iter = 0; iter != iterations; ++iter) {
+    	tstart = rdtsc();
 #endif
 
-    TBBlongsum tbbsum(a);
-    tbb::parallel_reduce(tbb::blocked_range<size_t>(0, N, inca), tbbsum);
+        TBBlongsum tbbsum(a);
+        tbb::parallel_reduce(tbb::blocked_range<size_t>(0, N, inca), tbbsum);
 #ifndef EXBLAS_MPI
-    tbbsum.acc.Normalize();
-    std::vector<int64_t> result(tbbsum.acc.get_f_words() + tbbsum.acc.get_e_words(), 0);
-    //MPI_Reduce((int64_t *) &tbbsum.acc.accumulator[0], (int64_t *) &acc_fin.accumulator[0], get_f_words() + get_e_words(), MPI_LONG, MPI_SUM, 0, MPI_COMM_WORLD);
-    MPI_Reduce(&(tbbsum.acc.get_accumulator()[0]), &(result[0]), tbbsum.acc.get_f_words() + tbbsum.acc.get_e_words(), MPI_LONG, MPI_SUM, 0, MPI_COMM_WORLD);
+        tbbsum.acc.Normalize();
+        std::vector<int64_t> result(tbbsum.acc.get_f_words() + tbbsum.acc.get_e_words(), 0);
+        //MPI_Reduce((int64_t *) &tbbsum.acc.accumulator[0], (int64_t *) &acc_fin.accumulator[0], get_f_words() + get_e_words(), MPI_LONG, MPI_SUM, 0, MPI_COMM_WORLD);
+        MPI_Reduce(&(tbbsum.acc.get_accumulator()[0]), &(result[0]), tbbsum.acc.get_f_words() + tbbsum.acc.get_e_words(), MPI_LONG, MPI_SUM, 0, MPI_COMM_WORLD);
 
-    Superaccumulator acc_fin(result);
-    dacc = acc_fin.Round();
+        Superaccumulator acc_fin(result);
+        dacc = acc_fin.Round();
 #else
-    dacc = tbbsum.acc.Round();
+        dacc = tbbsum.acc.Round();
 #endif
 
 #ifdef EXBLAS_TIMING
-    uint64_t tend = rdtsc();
-    double t = double(tend - tstart) / N;
-    mint = std::min(mint, t);
-   }
+        tend = rdtsc();
+        t = double(tend - tstart) / N;
+        mint = std::min(mint, t);
+    }
     fprintf(stderr, "%f ", mint);
 #endif
 
@@ -194,50 +175,51 @@ template<typename CACHE> double ExSUMFPE(int N, double *a, int inca) {
     int maxthreads = omp_get_max_threads();
     double dacc;
 #ifdef EXBLAS_TIMING
-    double mint = 10000;
-   for(int iter = 0; iter != iterations; ++iter) {
-    uint64_t tstart = rdtsc();
+    double t, mint = 10000;
+    uint64_t tstart, tend;
+    for(int iter = 0; iter != iterations; ++iter) {
+        tstart = rdtsc();
 #endif
-    std::vector<Superaccumulator> acc(maxthreads);
-    std::vector<int32_t> ready(maxthreads * linesize);
+        std::vector<Superaccumulator> acc(maxthreads);
+        std::vector<int32_t> ready(maxthreads * linesize);
     
-#pragma omp parallel
-    {
-        unsigned int tid = omp_get_thread_num();
-        unsigned int tnum = omp_get_num_threads();
+        #pragma omp parallel
+        {
+            unsigned int tid = omp_get_thread_num();
+            unsigned int tnum = omp_get_num_threads();
 
-        CACHE cache(acc[tid]);
-        *(int32_t volatile *)(&ready[tid * linesize]) = 0;  // Race here, who cares?
+            CACHE cache(acc[tid]);
+            *(int32_t volatile *)(&ready[tid * linesize]) = 0;  // Race here, who cares?
 
-        int l = ((tid * int64_t(N)) / tnum) & ~7ul;
-        int r = ((((tid+1) * int64_t(N)) / tnum) & ~7ul) - 1;
+            int l = ((tid * int64_t(N)) / tnum) & ~7ul;
+            int r = ((((tid+1) * int64_t(N)) / tnum) & ~7ul) - 1;
 
-        for(int i = l; i < r; i+=8) {
-            asm ("# myloop");
-            cache.Accumulate(Vec4d().load_a(a + i), Vec4d().load_a(a + i + 4));
+            for(int i = l; i < r; i+=8) {
+                asm ("# myloop");
+                cache.Accumulate(Vec4d().load_a(a + i), Vec4d().load_a(a + i + 4));
+            }
+            cache.Flush();
+            acc[tid].Normalize();
+
+            Reduction(tid, tnum, ready, acc, linesize);
         }
-        cache.Flush();
-        acc[tid].Normalize();
-
-        Reduction(tid, tnum, ready, acc, linesize);
-    }
 #ifndef EXBLAS_MPI
-    acc[0].Normalize();
-    std::vector<int64_t> result(acc[0].get_f_words() + acc[0].get_e_words(), 0);
-    MPI_Reduce(&(acc[0].get_accumulator()[0]), &(result[0]), acc[0].get_f_words() + acc[0].get_e_words(), MPI_LONG, MPI_SUM, 0, MPI_COMM_WORLD);
-    //MPI_Reduce((int64_t *) &acc[0].accumulator[0], (int64_t *) &acc_fin.accumulator[0], get_f_words() + get_e_words(), MPI_LONG, MPI_SUM, 0, MPI_COMM_WORLD);
+        acc[0].Normalize();
+        std::vector<int64_t> result(acc[0].get_f_words() + acc[0].get_e_words(), 0);
+        MPI_Reduce(&(acc[0].get_accumulator()[0]), &(result[0]), acc[0].get_f_words() + acc[0].get_e_words(), MPI_LONG, MPI_SUM, 0, MPI_COMM_WORLD);
+        //MPI_Reduce((int64_t *) &acc[0].accumulator[0], (int64_t *) &acc_fin.accumulator[0], get_f_words() + get_e_words(), MPI_LONG, MPI_SUM, 0, MPI_COMM_WORLD);
 
-    Superaccumulator acc_fin(result);
-    dacc = acc_fin.Round();
+        Superaccumulator acc_fin(result);
+        dacc = acc_fin.Round();
 #else
-    dacc = acc[0].Round();
+        dacc = acc[0].Round();
 #endif    
 
 #ifdef EXBLAS_TIMING
-    uint64_t tend = rdtsc();
-    double t = double(tend - tstart) / N;
-    mint = std::min(mint, t);
-   }
+        tend = rdtsc();
+        t = double(tend - tstart) / N;
+        mint = std::min(mint, t);
+    }
     fprintf(stderr, "%f ", mint);
 #endif
 

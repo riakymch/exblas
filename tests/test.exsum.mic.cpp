@@ -96,9 +96,7 @@ int main(int argc, char * argv[]) {
     exsum_fpe4ee = exsum(N, a, 1, 4, true);
     exsum_fpe6ee = exsum(N, a, 1, 6, true);
     exsum_fpe8ee = exsum(N, a, 1, 8, true);
-#ifdef EXBLAS_MPI
-    if (p == 0) {
-#endif
+
     printf("  exsum with superacc = %.16g\n", exsum_acc);
     printf("  exsum with FPE2 and superacc = %.16g\n", exsum_fpe2);
     printf("  exsum with FPE4 and superacc = %.16g\n", exsum_fpe4);
