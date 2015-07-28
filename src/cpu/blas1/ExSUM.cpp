@@ -12,7 +12,7 @@
 #include "blas1.hpp"
 
 #ifdef EXBLAS_TIMING
-    #define iterations 50
+    #define iterations 20
 #endif
 
 
@@ -79,7 +79,20 @@ double exsum(int Ng, double *ag, int inca, int fpe, bool early_exit) {
         if (fpe <= 8)
             return (ExSUMFPE<FPExpansionVect<Vec4d, 8, FPExpansionTraits<true> > >)(N, a, inca);
     } else { // ! early_exit
-        return (ExSUMFPE<FPExpansionVect<Vec4d, fpe> >)(N, a, inca);
+        if (fpe == 2) 
+	    return (ExSUMFPE<FPExpansionVect<Vec4d, 2> >)(N, a, inca);
+        if (fpe == 3) 
+	    return (ExSUMFPE<FPExpansionVect<Vec4d, 3> >)(N, a, inca);
+        if (fpe == 4) 
+	    return (ExSUMFPE<FPExpansionVect<Vec4d, 4> >)(N, a, inca);
+        if (fpe == 5) 
+	    return (ExSUMFPE<FPExpansionVect<Vec4d, 5> >)(N, a, inca);
+        if (fpe == 6) 
+	    return (ExSUMFPE<FPExpansionVect<Vec4d, 6> >)(N, a, inca);
+        if (fpe == 7) 
+	    return (ExSUMFPE<FPExpansionVect<Vec4d, 7> >)(N, a, inca);
+        if (fpe == 8) 
+	    return (ExSUMFPE<FPExpansionVect<Vec4d, 8> >)(N, a, inca);
     }
 
     return 0.0;
@@ -99,7 +112,7 @@ double ExSUMSuperacc(int N, double *a, int inca) {
 
         TBBlongsum tbbsum(a);
         tbb::parallel_reduce(tbb::blocked_range<size_t>(0, N, inca), tbbsum);
-#ifndef EXBLAS_MPI
+#ifdef EXBLAS_MPI
         tbbsum.acc.Normalize();
         std::vector<int64_t> result(tbbsum.acc.get_f_words() + tbbsum.acc.get_e_words(), 0);
         //MPI_Reduce((int64_t *) &tbbsum.acc.accumulator[0], (int64_t *) &acc_fin.accumulator[0], get_f_words() + get_e_words(), MPI_LONG, MPI_SUM, 0, MPI_COMM_WORLD);
@@ -203,7 +216,7 @@ template<typename CACHE> double ExSUMFPE(int N, double *a, int inca) {
 
             Reduction(tid, tnum, ready, acc, linesize);
         }
-#ifndef EXBLAS_MPI
+#ifdef EXBLAS_MPI
         acc[0].Normalize();
         std::vector<int64_t> result(acc[0].get_f_words() + acc[0].get_e_words(), 0);
         MPI_Reduce(&(acc[0].get_accumulator()[0]), &(result[0]), acc[0].get_f_words() + acc[0].get_e_words(), MPI_LONG, MPI_SUM, 0, MPI_COMM_WORLD);
