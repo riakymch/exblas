@@ -110,17 +110,15 @@ double exsum(int Ng, double *ag, int inca, int fpe, bool early_exit) {
  */
 double ExSUMSuperacc(int N, double *a, int inca) {
     double dacc;
-#ifndef EXBLAS_MPI
- #ifdef EXBLAS_TIMING
-   double mint = 10000;
+#ifdef EXBLAS_TIMING
+    double mint = 10000;
    for(int iter = 0; iter != iterations; ++iter) {
     uint64_t tstart = rdtsc();
- #endif
 #endif
 
     TBBlongsum tbbsum(a);
     tbb::parallel_reduce(tbb::blocked_range<size_t>(0, N, inca), tbbsum);
-#ifdef EXBLAS_MPI
+#ifndef EXBLAS_MPI
     tbbsum.acc.Normalize();
     std::vector<int64_t> result(tbbsum.acc.get_f_words() + tbbsum.acc.get_e_words(), 0);
     //MPI_Reduce((int64_t *) &tbbsum.acc.accumulator[0], (int64_t *) &acc_fin.accumulator[0], get_f_words() + get_e_words(), MPI_LONG, MPI_SUM, 0, MPI_COMM_WORLD);
@@ -195,12 +193,10 @@ template<typename CACHE> double ExSUMFPE(int N, double *a, int inca) {
     int const linesize = 16;    // * sizeof(int32_t)
     int maxthreads = omp_get_max_threads();
     double dacc;
-#ifndef EXBLAS_MPI
- #ifdef EXBLAS_TIMING
-   double mint = 10000;
+#ifdef EXBLAS_TIMING
+    double mint = 10000;
    for(int iter = 0; iter != iterations; ++iter) {
     uint64_t tstart = rdtsc();
- #endif
 #endif
     std::vector<Superaccumulator> acc(maxthreads);
     std::vector<int32_t> ready(maxthreads * linesize);
@@ -225,7 +221,7 @@ template<typename CACHE> double ExSUMFPE(int N, double *a, int inca) {
 
         Reduction(tid, tnum, ready, acc, linesize);
     }
-#ifdef EXBLAS_MPI
+#ifndef EXBLAS_MPI
     acc[0].Normalize();
     std::vector<int64_t> result(acc[0].get_f_words() + acc[0].get_e_words(), 0);
     MPI_Reduce(&(acc[0].get_accumulator()[0]), &(result[0]), acc[0].get_f_words() + acc[0].get_e_words(), MPI_LONG, MPI_SUM, 0, MPI_COMM_WORLD);
