@@ -1,7 +1,7 @@
 # Copyright (c) 2013-2015 Inria and University Pierre and Marie Curie
 # All rights reserved.
 
-# add exblas
+# add bitrep
 include_directories ("/home/iakymchuk/soft/lib/bitrep/src")
 link_directories ("/home/iakymchuk/soft/lib/bitrep/build")
 set (EXTRA_LIBS ${EXTRA_LIBS} bitrepreduce)
