@@ -1,6 +1,11 @@
 # Copyright (c) 2013-2015 Inria and University Pierre and Marie Curie
 # All rights reserved.
 
+# add exblas
+include_directories ("/home/iakymchuk/soft/lib/bitrep/src")
+link_directories ("/home/iakymchuk/soft/lib/bitrep/build")
+set (EXTRA_LIBS ${EXTRA_LIBS} bitrepreduce)
+
 # Testing
 add_executable (test.exsum ${PROJECT_SOURCE_DIR}/tests/test.exsum.cpu.cpp)
 target_link_libraries (test.exsum ${EXTRA_LIBS})
