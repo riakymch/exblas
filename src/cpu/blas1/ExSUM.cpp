@@ -12,7 +12,7 @@
 #include "blas1.hpp"
 
 #ifdef EXBLAS_TIMING
-    #define iterations 20
+    #define iterations 50
 #endif
 
 

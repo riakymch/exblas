@@ -16,9 +16,6 @@
 #include "blas1.hpp"
 #include "common.hpp"
 
-// bitrep
-#include "reduce.h"
-
 
 #ifdef EXBLAS_VS_MPFR
 #include <cstddef>
@@ -113,13 +110,6 @@ int main(int argc, char * argv[]) {
     exsum_fpe4ee = exsum(N, a, 1, 4, true);
     exsum_fpe6ee = exsum(N, a, 1, 6, true);
     exsum_fpe8ee = exsum(N, a, 1, 8, true);
-    // bitrep
-    //typedef double (*reducefunc_t)(int, const double*);
-    //reducefunc_t reducefunc = bitrep::singlesweep_3;
-    double bitrepres1 = bitrep::singlesweep<1>(N, a);
-    double bitrepres2 = bitrep::singlesweep<2>(N, a);
-    double bitrepres3 = bitrep::singlesweep<3>(N, a);
-    double bitrepres4 = bitrep::singlesweep<4>(N, a);
 
 #ifdef EXBLAS_MPI
     if (p == 0) {
@@ -130,10 +120,6 @@ int main(int argc, char * argv[]) {
     printf("  exsum with FPE4 early-exit and superacc = %.16g\n", exsum_fpe4ee);
     printf("  exsum with FPE6 early-exit and superacc = %.16g\n", exsum_fpe6ee);
     printf("  exsum with FPE8 early-exit and superacc = %.16g\n", exsum_fpe8ee);
-    printf("  bitrep1 = %.16g\n", bitrepres1);
-    printf("  bitrep2 = %.16g\n", bitrepres2);
-    printf("  bitrep3 = %.16g\n", bitrepres3);
-    printf("  bitrep4 = %.16g\n", bitrepres4);
 
 #ifdef EXBLAS_VS_MPFR
     double exsumMPFR = ExSUMVsMPFR(N, a);
