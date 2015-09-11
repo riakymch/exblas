@@ -5,5 +5,6 @@ export OMP_NUM_THREADS=240
 export MIC_OMP_NUM_THREADS=240
 
 for i in $(seq 16 29); do
-    micnativeloadex ./../build/tests/test.exsum -a "$i 1" > /dev/null
+    ./test.exsum $i 1 > /dev/null
+    #micnativeloadex ./../build/tests/test.exsum -a "$i 1" > /dev/null
 done

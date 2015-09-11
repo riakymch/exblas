@@ -3,8 +3,7 @@ export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:"$HOME/lib"
 export KMP_AFFINITY=compact
 export OMP_NUM_THREADS=236
 
-#N=23
-N=21
+N=26
 
 micnativeloadex ./../build/tests/test.exsum -a "$N 1" > /dev/null
 micnativeloadex ./../build/tests/test.exsum -a "$N 10" > /dev/null
