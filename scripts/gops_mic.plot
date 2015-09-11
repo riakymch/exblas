@@ -6,7 +6,7 @@ set ylabel "Gacc/s" font "Times, 26"
 set xrange [1000:1.e+09]
 set logscale x 10
 set yrange [0:]
-set output "| epstopdf --filter > ../imgs/exsum.gops.mic.15.07.28.r1.pdf"
+set output "| epstopdf --filter > ../imgs/exsum.gops.mic.15.09.11.pdf"
 
 # legend
 set key width -3.5 samplen 1.8
