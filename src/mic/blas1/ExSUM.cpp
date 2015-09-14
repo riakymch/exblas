@@ -138,10 +138,12 @@ template<typename CACHE> double ExSUMFPE(int N, double * a, int inca) {
     double t, mint = 10000;
     uint64_t tstart, tend;
     for(int iter = 0; iter != iterations; ++iter) {
-        tstart = rdtsc();
 #endif
         std::vector<Superaccumulator> acc(maxthreads);
         std::vector<int32_t> ready(maxthreads * linesize);
+#ifdef EXBLAS_TIMING
+        tstart = rdtsc();
+#endif
 
         #pragma omp parallel
         {
