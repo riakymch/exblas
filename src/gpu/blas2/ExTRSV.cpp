@@ -182,7 +182,7 @@ int runExTRSV(int n, double *a, int lda, double *x, int incx, int fpe, const cha
             exit(EXIT_FAILURE);
 
 #ifdef EXBLAS_TIMING
-        double gpuTime[NUM_ITER];
+        double t, mint = 10000;
         cl_event startMark, endMark;
 
         for(uint iter = 0; iter < NUM_ITER; iter++) {
@@ -214,13 +214,14 @@ int runExTRSV(int n, double *a, int lda, double *x, int incx, int fpe, const cha
                 printf("Error in clGetEventProfilingInfo Line %u in file %s !!!\n\n", __LINE__, __FILE__);
                 exit(EXIT_FAILURE);
             }
-            gpuTime[iter] = 1e-9 * ((unsigned long)endTime - (unsigned long)startTime); // / (double)NUM_ITER;
+            t = 1e-9 * ((unsigned long)endTime - (unsigned long)startTime);
+	    mint = std::min(t, mint);
         }
 
-        double minTime = min(gpuTime, NUM_ITER);
         double perf = n * n;
-        perf = (perf / minTime) * 1e-9;
-        printf("NbFPE = %u \t N = %u \t \t Time = %.8f s \t Performance = %.4f GFLOPS\n", fpe, n, minTime, perf);
+        perf = (perf / mint) * 1e-9;
+        printf("NbFPE = %u \t N = %u \t \t Time = %.8f s \t Performance = %.4f GFLOPS\n", fpe, n, mint, perf);
+	fprintf(stderr, "%f ", mint);
 #endif
 
         //Retrieving results...
