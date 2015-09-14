@@ -161,7 +161,7 @@ static double runExSUM(int N, double *h_a, int inca, int fpe, const char* progra
                 exit(EXIT_FAILURE);
 
 #ifdef EXBLAS_TIMING
-        double gpuTime[NUM_ITER];
+        double t, mint = 10000;
         cl_event startMark, endMark;
 
         for(uint iter = 0; iter < NUM_ITER; iter++) {
@@ -188,12 +188,15 @@ static double runExSUM(int N, double *h_a, int inca, int fpe, const char* progra
                 printf("Error in clGetEventProfilingInfo Line %u in file %s !!!\n\n", __LINE__, __FILE__);
                 exit(EXIT_FAILURE);
             }
-            gpuTime[iter] = 1e-9 * ((unsigned long)endTime - (unsigned long)startTime); // / (double)NUM_ITER;
+            t = 1e-9 * ((unsigned long)endTime - (unsigned long)startTime);
+	    mint = std::min(mint, t);
         }
 
-        double minTime = min(gpuTime, NUM_ITER);
-        printf("NbFPE = %u \t NbElements = %u \t \t Time = %.8f s \t Throughput = %.4f GB/s\n",
-          fpe, N, minTime, ((1e-9 * N * sizeof(double)) / minTime));
+        //double minTime = min(gpuTime, NUM_ITER);
+        //printf("NbFPE = %u \t NbElements = %u \t \t Time = %.8f s \t Throughput = %.4f GB/s\n",
+          //fpe, N, minTime, ((1e-9 * N * sizeof(double)) / minTime));
+        fprintf(stderr, "%f ", mint);
+        
 #endif
 
         //Retrieving results...
