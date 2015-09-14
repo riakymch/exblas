@@ -143,7 +143,13 @@ int main(int argc, char *argv[]) {
         }
     }
 
-    fprintf(stderr, "%d \t %d \t %d\n", m, n, k);
+    fprintf(stderr, "%d %d %d ", m, n, k);
+
+    if(lognormal) {
+        fprintf(stderr, "%f ", stddev);
+    } else {
+        fprintf(stderr, "%d ", range);
+    }
 
     bool is_pass = true;
     double *superacc;

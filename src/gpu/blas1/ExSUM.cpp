@@ -25,26 +25,9 @@
 #include "blas1.hpp"
 #include "ExSUM.Launcher.hpp"
 
-#ifdef EXBLAS_TIMING
-#include <cassert>
 
 #define NUM_ITER 20
 
-static double min(double arr[], int size) {
-    assert(arr != NULL);
-    assert(size >= 0);
-
-    if ((arr == NULL) || (size <= 0))
-       return NAN;
-
-    double val = DBL_MAX; 
-    for (int i = 0; i < size; i++)
-        if (val > arr[i])
-            val = arr[i];
-
-    return val;
-}
-#endif
 
 /**
  * \ingroup ExSUM
@@ -196,7 +179,6 @@ static double runExSUM(int N, double *h_a, int inca, int fpe, const char* progra
         //printf("NbFPE = %u \t NbElements = %u \t \t Time = %.8f s \t Throughput = %.4f GB/s\n",
           //fpe, N, minTime, ((1e-9 * N * sizeof(double)) / minTime));
         fprintf(stderr, "%f ", mint);
-        
 #endif
 
         //Retrieving results...

@@ -25,26 +25,9 @@
 #include "blas2.hpp"
 #include "ExTRSV.Launcher.hpp"
 
-#ifdef EXBLAS_TIMING
-#include <cassert>
 
 #define NUM_ITER 20
 
-static double min(double arr[], int size) {
-    assert(arr != NULL);
-    assert(size >= 0);
-
-    if ((arr == NULL) || (size <= 0))
-       return NAN;
-
-    double val = DBL_MAX; 
-    for (int i = 0; i < size; i++)
-        if (val > arr[i])
-            val = arr[i];
-
-    return val;
-}
-#endif
 
 /**
  * \ingroup ExTRSV
