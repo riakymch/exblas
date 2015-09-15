@@ -1,9 +1,9 @@
-#!/bin/sh
+#!/bin/bash
 
-nbMax=32768
-step=2
+nbMax=2048
+step=64
 
-for i in $(seq 5 11);
+for ((i=64; i<=${nbMax}; i+=${step}))
 do
     ./../build/tests/test.exgemm $i $i $i 1 > /dev/null 
 done

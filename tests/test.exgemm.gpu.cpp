@@ -90,9 +90,9 @@ int main(int argc, char *argv[]) {
     int m = 64, n = 64, k = 64;
     bool lognormal = false;
     if(argc > 3) {
-        m = 1 << atoi(argv[1]);
-        n = 1 << atoi(argv[2]);
-        k = 1 << atoi(argv[3]);
+        m = atoi(argv[1]);
+        n = atoi(argv[2]);
+        k = atoi(argv[3]);
     }
     if(argc > 6) {
         if(argv[6][0] == 'n') {
