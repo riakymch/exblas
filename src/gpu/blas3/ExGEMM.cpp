@@ -83,8 +83,6 @@ int exgemm(char transa, char transb, int m, int n, int k, double alpha, double *
     // with superaccumulators only
     if (fpe < 3) {
         return runExGEMM(m, n, k, alpha, a, lda, b, ldb, beta, c, ldc, 0, strcat(path, "ExGEMM.Superacc.cl"));
-        //printf("Please use the size of FPE from this range [2, 8]\n");
-        //exit(0);
     }
 
     if (early_exit) {
@@ -149,6 +147,7 @@ static int runExGEMM(int m, int n, int k, double alpha, double *h_a, int lda, do
             exit(EXIT_FAILURE);
         }
         cl_mem d_c = clCreateBuffer(cxGPUContext, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, m * n * sizeof(cl_double), h_c, &ciErrNum);
+        //cl_mem d_c = clCreateBuffer(cxGPUContext, CL_MEM_WRITE_ONLY, m * n * sizeof(cl_double), h_c, &ciErrNum);
         if (ciErrNum != CL_SUCCESS) {
             printf("Error in clCreateBuffer for d_c, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
             exit(EXIT_FAILURE);

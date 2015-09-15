@@ -21,7 +21,7 @@
 #include <cstddef>
 #include <mpfr.h>
 
-double exgemmVsMPFR(double *exgemm, uint m, uint n, uint k, double alpha, double *a, uint lda, double *b, uint ldb) {
+static double exgemmVsMPFR(double *exgemm, uint m, uint n, uint k, double alpha, double *a, uint lda, double *b, uint ldb, double*c, uint ldc) {
     double *exgemm_mpfr;
     mpfr_t sum, dot, op1;
 
@@ -41,7 +41,8 @@ double exgemmVsMPFR(double *exgemm, uint m, uint n, uint k, double alpha, double
                 mpfr_mul_d(dot, op1, b[l * n + j], MPFR_RNDN);
                 mpfr_add(sum, sum, dot, MPFR_RNDN);
             }
-            exgemm_mpfr[i * n + j] = mpfr_get_d(sum, MPFR_RNDD);
+            //exgemm_mpfr[i * n + j] = mpfr_get_d(sum, MPFR_RNDD);
+            exgemm_mpfr[i * n + j] = c[i * n + j] + mpfr_get_d(sum, MPFR_RNDD);
         }
     }
 
@@ -75,15 +76,47 @@ double exgemmVsMPFR(double *exgemm, uint m, uint n, uint k, double alpha, double
     return norm;
 }
 #else
-double exgemmVsSuperacc(double *exgemm, double *superacc, uint m, uint n, uint k) {
-    double norm = 0.0;
-    for (uint i = 0; i < m * n; i++)
-        norm += pow((exgemm[i] - superacc[i]) / superacc[i], 2);
-    norm = ::sqrt(norm);
+static double exgemmVsSuperacc(double *exgemm, double *superacc, uint m, uint n, uint k) {
+#if 0
+    //Frobenius Norm
+    double norm = 0.0, val = 0.0;
+    for (uint i = 0; i < m * n; i++) {
+        norm += pow(exgemm[i] - superacc[i], 2);
+        val += pow(superacc[i], 2);
+    }
+    norm = ::sqrt(norm) / ::sqrt(val);
+#else
+    //Inf norm -- maximum absolute row sum norm
+    double norm = 0.0, val = 0.0;
+    for(uint i = 0; i < m; i++) {
+        double rowsum = 0.0, valrowsum = 0.0;
+        for(uint j = 0; j < n; j++) {
+            rowsum += fabs(exgemm[i * n + j] - superacc[i * n + j]);
+            valrowsum += fabs(superacc[i * n + j]);
+        }
+        val = std::max(val, valrowsum);
+        norm = std::max(norm, rowsum);
+    }
+    norm = norm / val;
+#endif
 
     return norm;
 }
 #endif
+
+static inline void copyMatrix(uint m, uint n, double* c, double* c_orig){
+    for(uint i = 0; i < m; i++)
+        for(uint j = 0; j < n; j++)
+	    c[i * n + j] = c_orig[i * n + j];
+}
+
+static inline void printMatrix(uint m, uint n, double* c){
+    for(uint i = 0; i < m; i++) {
+        for(uint j = 0; j < n; j++)
+	    printf("%f ", c[i * n + j]);
+	printf("\n");
+    }
+}
 
 
 int main(int argc, char *argv[]) {
@@ -117,11 +150,12 @@ int main(int argc, char *argv[]) {
     }
 
     double eps = 1e-15;
-    double *a, *b, *c;
+    double *a, *b, *c, *c_orig;
     int err = posix_memalign((void **) &a, 64, m * k * sizeof(double));
     err &= posix_memalign((void **) &b, 64, k * n * sizeof(double));
     err &= posix_memalign((void **) &c, 64, m * n * sizeof(double));
-    if ((!a) || (!b) || (!c) || (err != 0))
+    err &= posix_memalign((void **) &c_orig, 64, m * n * sizeof(double));
+    if ((!a) || (!b) || (!c) || (!c_orig) || (err != 0))
         fprintf(stderr, "Cannot allocate memory with posix_memalign\n");
     if(lognormal) {
         init_lognormal(a, m * k, mean, stddev);
@@ -142,6 +176,7 @@ int main(int argc, char *argv[]) {
             init_fpuniform(c, m * n, range, emax);
         }
     }
+    copyMatrix(m, n, c_orig, c);
 
     fprintf(stderr, "%d %d %d ", m, n, k);
 
@@ -157,19 +192,21 @@ int main(int argc, char *argv[]) {
     err = posix_memalign((void **) &superacc, 64, m * n * sizeof(double));
     if ((!superacc) || (err != 0))
         fprintf(stderr, "Cannot allocate memory with posix_memalign\n");
+    copyMatrix(m, n, superacc, c);
 
-    exgemm('N', 'N', m, n, k, 1.0, a, k, b, n, 0.0, superacc, n, 1);
+    exgemm('N', 'N', m, n, k, 1.0, a, k, b, n, 1.0, superacc, n, 1);
 #ifdef EXBLAS_VS_MPFR
-    norm = exgemmVsMPFR(superacc, m, n, k, 1.0, a, k, b, n);
+    norm = exgemmVsMPFR(superacc, m, n, k, 1.0, a, k, b, n, c_orig, n);
     printf("Superacc error = %.16g\n", norm);
     if (norm > eps) {
         is_pass = false;
     }
 #endif
 
-    exgemm('N', 'N', m, n, k, 1.0, a, k, b, n, 0.0, c, n, 3);
+    copyMatrix(m, n, c, c_orig);
+    exgemm('N', 'N', m, n, k, 1.0, a, k, b, n, 1.0, c, n, 3);
 #ifdef EXBLAS_VS_MPFR
-    norm = exgemmVsMPFR(c, m, n, k, 1.0, a, k, b, n);
+    norm = exgemmVsMPFR(c, m, n, k, 1.0, a, k, b, n, c_orig, n);
     printf("FPE3 error = %.16g\n", norm);
     if (norm > eps) {
         is_pass = false;
@@ -180,9 +217,10 @@ int main(int argc, char *argv[]) {
     }
 #endif
 
-    exgemm('N', 'N', m, n, k, 1.0, a, k, b, n, 0.0, c, n, 4);
+    copyMatrix(m, n, c, c_orig);
+    exgemm('N', 'N', m, n, k, 1.0, a, k, b, n, 1.0, c, n, 4);
 #ifdef EXBLAS_VS_MPFR
-    norm = exgemmVsMPFR(c, m, n, k, 1.0, a, k, b, n);
+    norm = exgemmVsMPFR(c, m, n, k, 1.0, a, k, b, n, c_orig, n);
     printf("FPE4 error = %.16g\n", norm);
     if (norm > eps) {
         is_pass = false;
@@ -193,9 +231,10 @@ int main(int argc, char *argv[]) {
     }
 #endif
 
-    exgemm('N', 'N', m, n, k, 1.0, a, k, b, n, 0.0, c, n, 8);
+    copyMatrix(m, n, c, c_orig);
+    exgemm('N', 'N', m, n, k, 1.0, a, k, b, n, 1.0, c, n, 8);
 #ifdef EXBLAS_VS_MPFR
-    norm = exgemmVsMPFR(c, m, n, k, 1.0, a, k, b, n);
+    norm = exgemmVsMPFR(c, m, n, k, 1.0, a, k, b, n, c_orig, n);
     printf("FPE8 error = %.16g\n", norm);
     if (norm > eps) {
         is_pass = false;
@@ -206,9 +245,10 @@ int main(int argc, char *argv[]) {
     }
 #endif
 
-    exgemm('N', 'N', m, n, k, 1.0, a, k, b, n, 0.0, c, n, 4, true);
+    copyMatrix(m, n, c, c_orig);
+    exgemm('N', 'N', m, n, k, 1.0, a, k, b, n, 1.0, c, n, 4, true);
 #ifdef EXBLAS_VS_MPFR
-    norm = exgemmVsMPFR(c, m, n, k, 1.0, a, k, b, n);
+    norm = exgemmVsMPFR(c, m, n, k, 1.0, a, k, b, n, c_orig, n);
     printf("FPE4EE error = %.16g\n", norm);
     if (norm > eps) {
         is_pass = false;
@@ -219,9 +259,10 @@ int main(int argc, char *argv[]) {
     }
 #endif
 
-    exgemm('N', 'N', m, n, k, 1.0, a, k, b, n, 0.0, c, n, 6, true);
+    copyMatrix(m, n, c, c_orig);
+    exgemm('N', 'N', m, n, k, 1.0, a, k, b, n, 1.0, c, n, 6, true);
 #ifdef EXBLAS_VS_MPFR
-    norm = exgemmVsMPFR(c, m, n, k, 1.0, a, k, b, n);
+    norm = exgemmVsMPFR(c, m, n, k, 1.0, a, k, b, n, c_orig, n);
     printf("FPE6EE error = %.16g\n", norm);
     if (norm > eps) {
         is_pass = false;
@@ -232,9 +273,10 @@ int main(int argc, char *argv[]) {
     }
 #endif
 
-    exgemm('N', 'N', m, n, k, 1.0, a, k, b, n, 0.0, c, n, 8, true);
+    copyMatrix(m, n, c, c_orig);
+    exgemm('N', 'N', m, n, k, 1.0, a, k, b, n, 1.0, c, n, 8, true);
 #ifdef EXBLAS_VS_MPFR
-    norm = exgemmVsMPFR(c, m, n, k, 1.0, a, k, b, n);
+    norm = exgemmVsMPFR(c, m, n, k, 1.0, a, k, b, n, c_orig, n);
     printf("FPE8EE error = %.16g\n", norm);
     if (norm > eps) {
         is_pass = false;
