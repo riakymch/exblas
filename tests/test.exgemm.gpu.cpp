@@ -232,6 +232,20 @@ int main(int argc, char *argv[]) {
 #endif
 
     copyMatrix(m, n, c, c_orig);
+    exgemm('N', 'N', m, n, k, 1.0, a, k, b, n, 1.0, c, n, 6);
+#ifdef EXBLAS_VS_MPFR
+    norm = exgemmVsMPFR(c, m, n, k, 1.0, a, k, b, n, c_orig, n);
+    printf("FPE6 error = %.16g\n", norm);
+    if (norm > eps) {
+        is_pass = false;
+    }
+#else
+    if (exgemmVsSuperacc(c, superacc, m, n, k) > eps) {
+        is_pass = false;
+    }
+#endif
+
+    copyMatrix(m, n, c, c_orig);
     exgemm('N', 'N', m, n, k, 1.0, a, k, b, n, 1.0, c, n, 8);
 #ifdef EXBLAS_VS_MPFR
     norm = exgemmVsMPFR(c, m, n, k, 1.0, a, k, b, n, c_orig, n);
