@@ -286,12 +286,13 @@ __kernel void matrixMul(
                     }
                     if (x != 0.0) {
                         Accumulate(p_workingBase, x);
+		        //flush FPE
                         #ifdef NVIDIA
                             #pragma unroll
                         #endif
-                        for(uint i = 0; i != NBFPE; ++i) {
-                            Accumulate(p_workingBase, sum[i]);
-                            sum[i] = 0.0;
+                        for(uint l = 0; l != NBFPE; ++l) {
+                            Accumulate(p_workingBase, sum[l]);
+                            sum[l] = 0.0;
                         }
                     }
 
@@ -299,20 +300,13 @@ __kernel void matrixMul(
                         #ifdef NVIDIA
                             #pragma unroll
                         #endif
-                        for(uint i = NBFPE-3; i != NBFPE; ++i) {
+                        for(uint l = NBFPE/2; l != NBFPE; ++l) {
                             double s;
-                            sum[i] = KnuthTwoSum(sum[i], r, &s);
+                            sum[l] = KnuthTwoSum(sum[l], r, &s);
                             r = s;
                         }
                         if (r != 0.0) {
                             Accumulate(p_workingBase, r);
-                            #ifdef NVIDIA
-                                #pragma unroll
-                            #endif
-                            for(uint i = 0; i != NBFPE; ++i) {
-                                Accumulate(p_workingBase, sum[i]);
-                                sum[i] = 0.0;
-                            }
                         }
                     }
                 }
