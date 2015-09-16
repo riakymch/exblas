@@ -5,7 +5,7 @@
 #PBS -l walltime=00:40:00
 #PBS -N exsum
 #PBS -j oe
-#PBS -o exsum.gops.mesu.15.09.11.txt
+#PBS -o exsum.gops.mesu.15.09.16.txt
 
 # load modules
 . /usr/share/modules/init/sh
