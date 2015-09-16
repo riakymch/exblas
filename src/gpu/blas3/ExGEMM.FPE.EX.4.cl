@@ -304,14 +304,31 @@ __kernel void matrixMul(
                     }
 
                     //if(r != 0.0) {
+                    sum[0] = KnuthTwoSum(sum[0], r, &s);
+                    r = s;
+                    if(r != 0.0) {
+                        sum[1] = KnuthTwoSum(sum[1], r, &s);
+                        r = s;
+                        if(r != 0.0) {
                         sum[2] = KnuthTwoSum(sum[2], r, &s);
                         r = s;
                         if (r != 0.0) {
                             sum[3] = KnuthTwoSum(sum[3], r, &s);
                             r = s;
                         }
+			    }
+			}
                         if(r != 0.0) {
                             Accumulate(p_workingBase, r);
+                            //Flush to the superacc
+                            Accumulate(p_workingBase, sum[0]);
+                            Accumulate(p_workingBase, sum[1]);
+                            Accumulate(p_workingBase, sum[2]);
+                            Accumulate(p_workingBase, sum[3]);
+                            sum[0] = 0.0;
+                            sum[1] = 0.0;
+                            sum[2] = 0.0;
+                            sum[3] = 0.0;
                         }
                     //}
                 }
@@ -326,6 +343,10 @@ __kernel void matrixMul(
             Accumulate(p_workingBase, sum[1]);
             Accumulate(p_workingBase, sum[2]);
             Accumulate(p_workingBase, sum[3]);
+            sum[0] = 0.0;
+            sum[1] = 0.0;
+            sum[2] = 0.0;
+            sum[3] = 0.0;
 
             //TODO: the first non-zero from rigth
             int c = (m * by + bx) * BLOCK_SIZE;
