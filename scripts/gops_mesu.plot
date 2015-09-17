@@ -4,8 +4,8 @@ set xlabel "Array size" font "Times, 26"
 set ylabel "Gacc/s" font "Times, 26"
 set xrange [1000:1.e+09]
 set logscale x 10
-set yrange [0:]
-set output "| epstopdf --filter > ../imgs/mpi.np1.n24.15.07.28.pdf"
+set yrange [0:25]
+set output "| epstopdf --filter > ../imgs/exsum.gops.mesu.15.09.16.pdf"
 
 # legend
 set key width -3.5 samplen 1.8
@@ -16,9 +16,10 @@ set tmargin .5
 set rmargin 2.5
 set lmargin 6.5
 
-plot "../results/mpi.np1.n24.15.07.28.txt" using 1:(2.6/$3) with lines lt 1 lw 4.0 title "Superacc", \
+plot "../results/exsum.gops.mesu.15.09.16.txt" using 1:(2.6/$3) with lines lt 1 lw 4.0 title "Superacc", \
     "" using 1:(2.6/$4) with lines lt 8 lw 4.0 title "FPE2 + Superacc", \
     "" using 1:(2.6/$5) with lines lt 2 lw 4.0 title "FPE4 + Superacc", \
+    "" using 1:(2.6/$6) with lines lt 4 lw 4.0 title "FPE4EE + Superacc", \
     "" using 1:(2.6/$8) with lines lt 3 lw 4.0 title "FPE8EE + Superacc"
 
 #plot "../results/.txt" using 1:($20) with lines lt 4 lw 4.0 title "Parallel FP sum", \
