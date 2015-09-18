@@ -297,14 +297,14 @@ __kernel void matrixMul(
                     }
 
                     //if (r != 0.0) {
-                        /*#ifdef NVIDIA
+                        #ifdef NVIDIA
                             #pragma unroll
                         #endif
                         for(uint l = 0; l != NBFPE; ++l) {
                             double s;
                             sum[l] = KnuthTwoSum(sum[l], r, &s);
                             r = s;
-                        }*/
+                        }
                         if (r != 0.0) {
                             Accumulate(p_workingBase, r);
 		            /*//flush FPE
