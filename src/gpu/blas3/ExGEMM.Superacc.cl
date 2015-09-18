@@ -195,7 +195,7 @@ void Accumulate(long *sa, double x) {
 
 ///////////////////////////////////////////////////////////////////////////////
 // Matrix multiplication on the device: C := beta * C + alpha * A * B.
-//     So far just C = A * B
+//     So far just C = C + A * B
 ////////////////////////////////////////////////////////////////////////////////
 __kernel void matrixMul(
     uint m,
@@ -277,7 +277,7 @@ __kernel void matrixMul(
             }
 
             int c = (n * by + bx) * BLOCK_SIZE;
-            C[c + n * ty + tx] = Round(p_workingBase);
+            C[c + n * ty + tx] += Round(p_workingBase);
     //    }
     //}
 }

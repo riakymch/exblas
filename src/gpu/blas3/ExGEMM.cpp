@@ -25,26 +25,9 @@
 #include "blas3.hpp"
 #include "ExGEMM.Launcher.hpp"
 
-#ifdef EXBLAS_TIMING
-#include <cassert>
 
 #define NUM_ITER 20
 
-double min(double arr[], int size) {
-    assert(arr != NULL);
-    assert(size >= 0);
-
-    if ((arr == NULL) || (size <= 0))
-       return NAN;
-
-    double val = DBL_MAX; 
-    for (int i = 0; i < size; i++)
-        if (val > arr[i])
-            val = arr[i];
-
-    return val;
-}
-#endif
 
 /**
  * \ingroup ExGEMM
@@ -100,8 +83,6 @@ int exgemm(char transa, char transb, int m, int n, int k, double alpha, double *
     // with superaccumulators only
     if (fpe < 3) {
         return runExGEMM(m, n, k, alpha, a, lda, b, ldb, beta, c, ldc, 0, strcat(path, "ExGEMM.Superacc.cl"));
-        //printf("Please use the size of FPE from this range [2, 8]\n");
-        //exit(0);
     }
 
     if (early_exit) {
@@ -166,6 +147,7 @@ static int runExGEMM(int m, int n, int k, double alpha, double *h_a, int lda, do
             exit(EXIT_FAILURE);
         }
         cl_mem d_c = clCreateBuffer(cxGPUContext, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, m * n * sizeof(cl_double), h_c, &ciErrNum);
+        //cl_mem d_c = clCreateBuffer(cxGPUContext, CL_MEM_WRITE_ONLY, m * n * sizeof(cl_double), h_c, &ciErrNum);
         if (ciErrNum != CL_SUCCESS) {
             printf("Error in clCreateBuffer for d_c, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
             exit(EXIT_FAILURE);
@@ -184,7 +166,7 @@ static int runExGEMM(int m, int n, int k, double alpha, double *h_a, int lda, do
                 exit(EXIT_FAILURE);
 
 #ifdef EXBLAS_TIMING
-        double gpuTime[NUM_ITER];
+        double t, mint = 10000;
         cl_event startMark, endMark;
 
         for(uint iter = 0; iter < NUM_ITER; iter++) {
@@ -211,13 +193,14 @@ static int runExGEMM(int m, int n, int k, double alpha, double *h_a, int lda, do
                 printf("Error in clGetEventProfilingInfo Line %u in file %s !!!\n\n", __LINE__, __FILE__);
                 exit(EXIT_FAILURE);
             }
-            gpuTime[iter] = 1e-9 * ((unsigned long)endTime - (unsigned long)startTime); // / (double)NUM_ITER;
+            t = 1e-9 * ((unsigned long)endTime - (unsigned long)startTime);
+	    mint = std::min(t, mint);
         }
 
-        double minTime = min(gpuTime, NUM_ITER);
         double perf = 2.0 * m * n * k;
-        perf = (perf / minTime) * 1e-9;
-        printf("NbFPE = %u \t M = %u \t N = %u \t K = %u \t Time = %.8f s \t Performance = %.4f GFLOPS\n", fpe, m, n, k, minTime, perf);
+        perf = (perf / mint) * 1e-9;
+        printf("NbFPE = %u \t M = %u \t N = %u \t K = %u \t Time = %.8f s \t Performance = %.4f GFLOPS\n", fpe, m, n, k, mint, perf);
+	fprintf(stderr, "%f ", mint);
 #endif
 
         //Retrieving results...

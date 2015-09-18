@@ -12,6 +12,7 @@
     #include <mpi.h>
 #endif
 
+// exblas
 #include "blas1.hpp"
 #include "common.hpp"
 
@@ -109,6 +110,7 @@ int main(int argc, char * argv[]) {
     exsum_fpe4ee = exsum(N, a, 1, 4, true);
     exsum_fpe6ee = exsum(N, a, 1, 6, true);
     exsum_fpe8ee = exsum(N, a, 1, 8, true);
+
 #ifdef EXBLAS_MPI
     if (p == 0) {
 #endif

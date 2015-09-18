@@ -204,7 +204,7 @@ void Accumulate(long *sa, double x) {
 
 ///////////////////////////////////////////////////////////////////////////////
 // Matrix multiplication on the device: C := beta * C + alpha * A * B.
-//     So far just C = A * B
+//     So far just C = C + A * B
 ////////////////////////////////////////////////////////////////////////////////
 __kernel void matrixMul(
     uint m,
@@ -286,35 +286,37 @@ __kernel void matrixMul(
                     }
                     if (x != 0.0) {
                         Accumulate(p_workingBase, x);
+		        //flush FPE to the superacc
                         #ifdef NVIDIA
                             #pragma unroll
                         #endif
-                        for(uint i = 0; i != NBFPE; ++i) {
-                            Accumulate(p_workingBase, sum[i]);
-                            sum[i] = 0.0;
+                        for(uint l = 0; l != NBFPE; ++l) {
+                            Accumulate(p_workingBase, sum[l]);
+                            sum[l] = 0.0;
                         }
                     }
 
-                    if (r != 0.0) {
-                        #ifdef NVIDIA
+                    //if (r != 0.0) {
+                        /*#ifdef NVIDIA
                             #pragma unroll
                         #endif
-                        for(uint i = NBFPE-3; i != NBFPE; ++i) {
+                        for(uint l = 0; l != NBFPE; ++l) {
                             double s;
-                            sum[i] = KnuthTwoSum(sum[i], r, &s);
+                            sum[l] = KnuthTwoSum(sum[l], r, &s);
                             r = s;
-                        }
+                        }*/
                         if (r != 0.0) {
                             Accumulate(p_workingBase, r);
+		            /*//flush FPE
                             #ifdef NVIDIA
                                 #pragma unroll
                             #endif
-                            for(uint i = 0; i != NBFPE; ++i) {
-                                Accumulate(p_workingBase, sum[i]);
-                                sum[i] = 0.0;
-                            }
+                            for(uint l = 0; l != NBFPE; ++l) {
+                                Accumulate(p_workingBase, sum[l]);
+                                sum[l] = 0.0;
+                            }*/
                         }
-                    }
+                    //}
                 }
 
                 //Synchronize to make sure that the preceding computation is done before 
@@ -331,7 +333,7 @@ __kernel void matrixMul(
 
             //TODO: the first non-zero from rigth
             int c = (n * by + bx) * BLOCK_SIZE;
-            C[c + n * ty + tx] = Round(p_workingBase);
+            C[c + n * ty + tx] += Round(p_workingBase);
         }
     //}
 }

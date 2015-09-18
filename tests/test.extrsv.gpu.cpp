@@ -112,7 +112,7 @@ int main(int argc, char *argv[]) {
     if(argc > 1)
         uplo = argv[1][0];
     if(argc > 2)
-        n = atoi(argv[2]);
+        n = 1 << atoi(argv[2]);
     if(argc > 5) {
         if(argv[5][0] == 'n') {
             lognormal = true;
@@ -158,7 +158,13 @@ int main(int argc, char *argv[]) {
     }
     copyVector(n, x, xorig);
 
-    fprintf(stderr, "%d x %d\n", n, n);
+    fprintf(stderr, "%d ", n);
+
+    if(lognormal) {
+        fprintf(stderr, "%f ", stddev);
+    } else {
+        fprintf(stderr, "%d ", range);
+    }
 
     bool is_pass = true;
     double *superacc;
@@ -192,38 +198,10 @@ int main(int argc, char *argv[]) {
 #endif
 
     copyVector(n, x, xorig);
-    extrsv(uplo, 'N', 'N', n, a, n, x, 1, 4);
-#ifdef EXBLAS_VS_MPFR
-    norm = extrsvVsMPFR(uplo, x, n, a, n, xorig, 1);
-    printf("FPE4 error = %.16g\n", norm);
-    if (norm > eps) {
-        is_pass = false;
-    }
-#else
-    if (extrsvVsSuperacc(n, x, superacc) > eps) {
-        is_pass = false;
-    }
-#endif
-
-    copyVector(n, x, xorig);
     extrsv(uplo, 'N', 'N', n, a, n, x, 1, 8);
 #ifdef EXBLAS_VS_MPFR
     norm = extrsvVsMPFR(uplo, x, n, a, n, xorig, 1);
     printf("FPE8 error = %.16g\n", norm);
-    if (norm > eps) {
-        is_pass = false;
-    }
-#else
-    if (extrsvVsSuperacc(n, x, superacc) > eps) {
-        is_pass = false;
-    }
-#endif
-
-    copyVector(n, x, xorig);
-    extrsv(uplo, 'N', 'N', n, a, n, x, 1, 4, true);
-#ifdef EXBLAS_VS_MPFR
-    norm = extrsvVsMPFR(uplo, x, n, a, n, xorig, 1);
-    printf("FPE4EE error = %.16g\n", norm);
     if (norm > eps) {
         is_pass = false;
     }

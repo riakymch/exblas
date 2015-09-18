@@ -204,7 +204,7 @@ void Accumulate(long *sa, double x) {
 
 ///////////////////////////////////////////////////////////////////////////////
 // Matrix multiplication on the device: C := beta * C + alpha * A * B.
-//     So far just C = A * B
+//     So far just C = C + A * B
 ////////////////////////////////////////////////////////////////////////////////
 __kernel void matrixMul(
     uint m,
@@ -303,16 +303,20 @@ __kernel void matrixMul(
                         sum[3] = 0.0;
                     }
 
-                    if(r != 0.0) {
-                        sum[2] = KnuthTwoSum(sum[2], r, &s);
+                    /*if(r != 0.0) {
+                        sum[1] = KnuthTwoSum(sum[1], r, &s);
                         r = s;
-                        if (r != 0.0) {
-                            sum[3] = KnuthTwoSum(sum[3], r, &s);
+                        if(r != 0.0) {
+                            sum[2] = KnuthTwoSum(sum[2], r, &s);
                             r = s;
-                        }
+                            if (r != 0.0) {
+                                sum[3] = KnuthTwoSum(sum[3], r, &s);
+                                r = s;
+                            }
+			}*/
                         if(r != 0.0) {
                             Accumulate(p_workingBase, r);
-                            //Flush to the superacc
+                            /*//Flush to the superacc
                             Accumulate(p_workingBase, sum[0]);
                             Accumulate(p_workingBase, sum[1]);
                             Accumulate(p_workingBase, sum[2]);
@@ -320,9 +324,9 @@ __kernel void matrixMul(
                             sum[0] = 0.0;
                             sum[1] = 0.0;
                             sum[2] = 0.0;
-                            sum[3] = 0.0;
+                            sum[3] = 0.0;*/
                         }
-                    }
+                    //}
                 }
 
                 //Synchronize to make sure that the preceding computation is done before 
@@ -335,10 +339,14 @@ __kernel void matrixMul(
             Accumulate(p_workingBase, sum[1]);
             Accumulate(p_workingBase, sum[2]);
             Accumulate(p_workingBase, sum[3]);
+            sum[0] = 0.0;
+            sum[1] = 0.0;
+            sum[2] = 0.0;
+            sum[3] = 0.0;
 
             //TODO: the first non-zero from rigth
             int c = (m * by + bx) * BLOCK_SIZE;
-            C[c + m * ty + tx] = Round(p_workingBase);
+            C[c + m * ty + tx] += Round(p_workingBase);
         }
     //}
 }
