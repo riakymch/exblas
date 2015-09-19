@@ -316,7 +316,7 @@ __kernel void matrixMul(
                     }
 
                     //if(r != 0.0) {
-                    sum[0] = KnuthTwoSum(sum[0], x, &s);
+                    /*sum[0] = KnuthTwoSum(sum[0], x, &s);
                     x = s;
                     if(x != 0.0) {
                         sum[1] = KnuthTwoSum(sum[1], x, &s);
@@ -337,7 +337,7 @@ __kernel void matrixMul(
 			  	}
 			    }
 			}
-                    }
+                    }*/
                         if (r != 0.0) {
                             Accumulate(p_workingBase, r);
                             /*//Flush to the superacc
