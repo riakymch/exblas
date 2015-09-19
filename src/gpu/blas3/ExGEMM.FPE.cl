@@ -296,7 +296,7 @@ __kernel void matrixMul(
                         }
                     }
 
-                    if (r != 0.0) {
+                    //if (r != 0.0) {
                         #ifdef NVIDIA
                             #pragma unroll
                         #endif
@@ -307,16 +307,16 @@ __kernel void matrixMul(
                         }
                         if (r != 0.0) {
                             Accumulate(p_workingBase, r);
-		            /*//flush FPE
+		            //flush FPE
                             #ifdef NVIDIA
                                 #pragma unroll
                             #endif
                             for(uint l = 0; l != NBFPE; ++l) {
                                 Accumulate(p_workingBase, sum[l]);
                                 sum[l] = 0.0;
-                            }*/
+                            }
                         }
-                    }
+                    //}
                 }
 
                 //Synchronize to make sure that the preceding computation is done before 
