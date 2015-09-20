@@ -296,7 +296,7 @@ __kernel void matrixMul(
                         }
                     }
 
-                    //if (r != 0.0) {
+                    if (r != 0.0) {
                         #ifdef NVIDIA
                             #pragma unroll
                         #endif
@@ -316,7 +316,7 @@ __kernel void matrixMul(
                                 sum[l] = 0.0;
                             }
                         }
-                    //}
+                    }
                 }
 
                 //Synchronize to make sure that the preceding computation is done before 
