@@ -303,7 +303,7 @@ __kernel void matrixMul(
                         sum[3] = 0.0;
                     }
 
-                    if(r != 0.0) {
+                    //if(r != 0.0) {
                         /*sum[0] = KnuthTwoSum(sum[0], r, &s);
                         r = s;
                         if(r != 0.0) {*/
@@ -330,7 +330,7 @@ __kernel void matrixMul(
                             sum[2] = 0.0;
                             sum[3] = 0.0;*/
                         }
-                    }
+                    //}
                 }
 
                 //Synchronize to make sure that the preceding computation is done before 
