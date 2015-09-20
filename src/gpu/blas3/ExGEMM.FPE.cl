@@ -300,7 +300,7 @@ __kernel void matrixMul(
                         #ifdef NVIDIA
                             #pragma unroll
                         #endif
-                        for(uint l = 0; l != NBFPE; ++l) {
+                        for(uint l = NBFPE-3; l != NBFPE; ++l) {
                             double s;
                             sum[l] = KnuthTwoSum(sum[l], r, &s);
                             r = s;
