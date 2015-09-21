@@ -239,7 +239,7 @@ void ExSUM(
         }
         if(x != 0.0) {
             Accumulate(l_workingBase, x);
-            //Flush to the superacc
+            //Flush FPEs to superaccs
             Accumulate(l_workingBase, a[0]);
             Accumulate(l_workingBase, a[1]);
             Accumulate(l_workingBase, a[2]);
@@ -250,7 +250,7 @@ void ExSUM(
             a[3] = 0.0;
         }
     }
-    //Flush to the superacc
+    //Flush FPEs to superaccs
     Accumulate(l_workingBase, a[0]);
     Accumulate(l_workingBase, a[1]);
     Accumulate(l_workingBase, a[2]);

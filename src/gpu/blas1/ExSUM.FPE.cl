@@ -234,6 +234,7 @@ void ExSUM(
         if(x != 0.0) {
             //TODO: do NOT propagate NaNs
             Accumulate(l_workingBase, x);
+	    // Flush FPEs to superaccs
             #ifdef NVIDIA
                 #pragma unroll
             #endif
@@ -243,7 +244,7 @@ void ExSUM(
             }
         }
     }
-    //Flush FPEs to the superacc
+    //Flush FPEs to superaccs
 #ifdef NVIDIA
     #pragma unroll
 #endif
