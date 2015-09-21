@@ -309,12 +309,14 @@ __kernel void matrixMul(
                             Accumulate(p_workingBase, r);
 		            //flush FPE
                             #ifdef NVIDIA
-                                #pragma unroll
-                            #endif
-                            for(uint l = 0; l != NBFPE; ++l) {
-                                Accumulate(p_workingBase, sum[l]);
-                                sum[l] = 0.0;
-                            }
+                                #ifdef NVIDIA
+                                    #pragma unroll
+                                #endif
+                                for(uint l = 0; l != NBFPE; ++l) {
+                                    Accumulate(p_workingBase, sum[l]);
+                                    sum[l] = 0.0;
+                                }
+			    #endif
                         }
                     //}
                 }
