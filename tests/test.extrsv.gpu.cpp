@@ -112,7 +112,7 @@ int main(int argc, char *argv[]) {
     if(argc > 1)
         uplo = argv[1][0];
     if(argc > 2)
-        n = 1 << atoi(argv[2]);
+        n = atoi(argv[2]);
     if(argc > 5) {
         if(argv[5][0] == 'n') {
             lognormal = true;
