@@ -6,6 +6,7 @@
 #pragma OPENCL EXTENSION cl_khr_fp64                   : enable  // For double precision numbers
 #pragma OPENCL EXTENSION cl_khr_int64_base_atomics     : enable  // For 64 atomic operations
 #pragma OPENCL EXTENSION cl_khr_byte_addressable_store : enable
+#pragma OPENCL EXTENSION cl_amd_printf : enable
 #ifdef NVIDIA
     #pragma OPENCL EXTENSION cl_nv_pragma_unroll       : enable
 #endif
@@ -79,20 +80,20 @@ double OddRoundSumNonnegative(double th, double tl) {
 }
 
 int Normalize(__global long *accumulator, int *imin, int *imax) {
-    long carry_in = accumulator[*imin] >> digits;
-    accumulator[*imin] -= carry_in << digits;
+    long carry_in = (accumulator[*imin] >> digits);
+    accumulator[*imin] -= (carry_in << digits);
     int i;
     // Sign-extend all the way
     for (i = *imin + 1; i < BIN_COUNT; ++i) {
         accumulator[i] += carry_in;
-        long carry_out = accumulator[i] >> digits;    // Arithmetic shift
+        long carry_out = (accumulator[i] >> digits);    // Arithmetic shift
         accumulator[i] -= (carry_out << digits);
         carry_in = carry_out;
     }
     *imax = i - 1;
 
     // Do not cancel the last carry to avoid losing information
-    accumulator[*imax] += carry_in << digits;
+    accumulator[*imax] += (carry_in << digits);
 
     return carry_in < 0;
 }
@@ -223,9 +224,9 @@ void ExSUM(
     double a[NBFPE] = {0.0};
     for(uint pos = get_global_id(0); pos < NbElements; pos += get_global_size(0)) {
         double x = d_Data[pos];
-#ifdef NVIDIA
-        #pragma unroll
-#endif
+        #ifdef NVIDIA
+            #pragma unroll
+        #endif
         for(uint i = 0; i != NBFPE; ++i) {
             double s;
             a[i] = KnuthTwoSum(a[i], x, &s);
@@ -245,9 +246,9 @@ void ExSUM(
         }
     }
     //Flush FPEs to superaccs
-#ifdef NVIDIA
-    #pragma unroll
-#endif
+    #ifdef NVIDIA
+        #pragma unroll
+    #endif
     for(uint i = 0; i != NBFPE; ++i)
         Accumulate(l_workingBase, a[i]);
     barrier(CLK_LOCAL_MEM_FENCE);
@@ -263,12 +264,12 @@ void ExSUM(
         d_PartialSuperaccs[get_group_id(0) * BIN_COUNT + pos] = sum;
     }
 
-    barrier(CLK_LOCAL_MEM_FENCE);
+    /*barrier(CLK_LOCAL_MEM_FENCE);
     if (pos == 0) {
         int imin = 0;
         int imax = 38;
         Normalize(&d_PartialSuperaccs[get_group_id(0) * BIN_COUNT], &imin, &imax);
-    }
+    }*/
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -276,17 +277,17 @@ void ExSUM(
 ////////////////////////////////////////////////////////////////////////////////
 __kernel __attribute__((reqd_work_group_size(MERGE_WORKGROUP_SIZE, 1, 1)))
 void ExSUMComplete(
-    __global double *d_Res,
+    __global double *d_Superacc,
     __global long *d_PartialSuperaccs,
     uint PartialSuperaccusCount
 ) {
     uint lid = get_local_id(0);
-
-    //Reduce to one work group
     uint gid = get_group_id(0);
-#if 0
+
+#if 1 
     __local long l_Data[MERGE_WORKGROUP_SIZE];
 
+    //Reduce to one work group
     long sum = 0;
     for(uint i = lid; i < PartialSuperaccusCount; i += MERGE_WORKGROUP_SIZE)
         sum += d_PartialSuperaccs[gid + i * BIN_COUNT];
@@ -300,8 +301,11 @@ void ExSUMComplete(
             l_Data[lid] += l_Data[lid + stride];
     }
 
-    if(lid == 0)
+    if(lid == 0) {
         d_Superacc[gid] = l_Data[0];
+	//printf("%d\n", l_Data[0]);
+	printf("Hello World");
+    }
 #else
     if (lid < BIN_COUNT) {
         long sum = 0;
