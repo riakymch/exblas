@@ -181,8 +181,8 @@ void AccumulateWord(__local volatile long *sa, int i, long x) {
     }
 }
 
-//void Accumulate(__local volatile long *sa, __local bool *res, double x) {
-void Accumulate(__local volatile long *sa, double x) {
+void Accumulate(__local volatile long *sa, __local bool *res, double x) {
+//void Accumulate(__local volatile long *sa, double x) {
     if (x == 0)
         return;
 
@@ -198,10 +198,10 @@ void Accumulate(__local volatile long *sa, double x) {
         double xrounded = rint(xscaled);
         long xint = (long) xrounded;
 
-        AccumulateWord(sa, i, xint);
-        /*atom_add(&sa[i * WARP_COUNT], xint);
+        //AccumulateWord(sa, i, xint);
+        atom_add(&sa[i * WARP_COUNT], xint);
         if ((sa[i * WARP_COUNT] & 0x000000000000003F) > 0)
-            *res = true;*/
+            *res = true;
 
         xscaled -= xrounded;
         xscaled *= deltaScale;
@@ -217,22 +217,22 @@ void ExSUM(
 ) {
     __local long l_sa[WARP_COUNT * BIN_COUNT] __attribute__((aligned(8)));
     __local long *l_workingBase = l_sa + (get_local_id(0) & (WARP_COUNT - 1));
-    //__local bool l_sa_check[WARP_COUNT];
-    //__local bool *l_workingBase_check = l_sa_check + (get_local_id(0) & (WARP_COUNT - 1));
+    __local bool l_sa_check[WARP_COUNT];
+    __local bool *l_workingBase_check = l_sa_check + (get_local_id(0) & (WARP_COUNT - 1));
 
     //Initialize superaccs
     for (uint i = 0; i < BIN_COUNT; i++)
         l_workingBase[i * WARP_COUNT] = 0;
-    //*l_workingBase_check = false;
+    *l_workingBase_check = false;
     barrier(CLK_LOCAL_MEM_FENCE);
 
     //Read data from global memory and scatter it to sub-superaccs
     for(uint pos = get_global_id(0); pos < NbElements; pos += get_global_size(0)) {
         double x = d_Data[pos];
 
-        //Accumulate(l_workingBase, l_workingBase_check, x);
-        Accumulate(l_workingBase, x);
-        /*if (*l_workingBase_check) {
+        //Accumulate(l_workingBase, x);
+        Accumulate(l_workingBase, l_workingBase_check, x);
+        if (*l_workingBase_check) {
             barrier(CLK_LOCAL_MEM_FENCE);
             // TODO: check the performance, because here all threads from the first warp (half of it) and involved. So, it may cause some memory contention.
             if (get_local_id(0) < WARP_COUNT){
@@ -242,7 +242,7 @@ void ExSUM(
             }
             *l_workingBase_check = false;
             barrier(CLK_LOCAL_MEM_FENCE);
-        }*/
+        }
     }
     barrier(CLK_LOCAL_MEM_FENCE);
 
@@ -258,11 +258,11 @@ void ExSUM(
     }
 
     barrier(CLK_LOCAL_MEM_FENCE);
-    /*if (pos == 0) {
+    if (pos == 0) {
         int imin = 0;
         int imax = 38;
         Normalize(&d_PartialSuperaccs[get_group_id(0) * BIN_COUNT], &imin, &imax);
-    }*/
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
