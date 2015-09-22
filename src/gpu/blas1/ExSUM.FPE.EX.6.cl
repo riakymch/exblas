@@ -198,8 +198,8 @@ void AccumulateWord(__local volatile long *sa, int i, long x) {
     }
 }
 
-void Accumulate(__local volatile long *sa, __local bool *res, double x) {
-//void Accumulate(__local volatile long *sa, double x) {
+//void Accumulate(__local volatile long *sa, __local bool *res, double x) {
+void Accumulate(__local volatile long *sa, double x) {
     if (x == 0)
         return;
 
@@ -215,10 +215,10 @@ void Accumulate(__local volatile long *sa, __local bool *res, double x) {
         double xrounded = rint(xscaled);
         long xint = (long) xrounded;
 
-        //AccumulateWord(sa, i, xint);
-        atom_add(&sa[i * WARP_COUNT], xint);
+        AccumulateWord(sa, i, xint);
+        /*atom_add(&sa[i * WARP_COUNT], xint);
         if ((sa[i * WARP_COUNT] & 0x000000000000003F) > 0)
-            *res = true;
+            *res = true;*/
 
         xscaled -= xrounded;
         xscaled *= deltaScale;
@@ -234,13 +234,13 @@ void ExSUM(
 ) {
     __local long l_sa[WARP_COUNT * BIN_COUNT] __attribute__((aligned(8)));
     __local long *l_workingBase = l_sa + (get_local_id(0) & (WARP_COUNT - 1));
-    __local bool l_sa_check[WARP_COUNT];
-    __local bool *l_workingBase_check = l_sa_check + (get_local_id(0) & (WARP_COUNT - 1));
+    //__local bool l_sa_check[WARP_COUNT];
+    //__local bool *l_workingBase_check = l_sa_check + (get_local_id(0) & (WARP_COUNT - 1));
 
     //Initialize superaccs
     for (uint i = 0; i < BIN_COUNT; i++)
         l_workingBase[i * WARP_COUNT] = 0;
-    *l_workingBase_check = false;
+    //*l_workingBase_check = false;
     barrier(CLK_LOCAL_MEM_FENCE);
 
     //Read data from global memory and scatter it to sub-superaccs
@@ -271,15 +271,15 @@ void ExSUM(
             }
         }
         if(x != 0.0) {
-            /*Accumulate(l_workingBase, x);
+            Accumulate(l_workingBase, x);
             //Flush FPEs to superaccs
             Accumulate(l_workingBase, a[0]);
             Accumulate(l_workingBase, a[1]);
             Accumulate(l_workingBase, a[2]);
             Accumulate(l_workingBase, a[3]);
             Accumulate(l_workingBase, a[4]);
-            Accumulate(l_workingBase, a[5]);*/
-            Accumulate(l_workingBase, l_workingBase_check, x);
+            Accumulate(l_workingBase, a[5]);
+            /*Accumulate(l_workingBase, l_workingBase_check, x);
             if (*l_workingBase_check) {
                 barrier(CLK_LOCAL_MEM_FENCE);
                 if (get_local_id(0) < WARP_COUNT){
@@ -314,24 +314,31 @@ void ExSUM(
                     Normalize_local(l_workingBase, &imin, &imax);
                 }
                 *l_workingBase_check = false;
-            }
+                barrier(CLK_LOCAL_MEM_FENCE);
+            }*/
             a[0] = 0.0;
             a[1] = 0.0;
             a[2] = 0.0;
             a[3] = 0.0;
             a[4] = 0.0;
             a[5] = 0.0;
-            barrier(CLK_LOCAL_MEM_FENCE);
         }
     }
+    barrier(CLK_LOCAL_MEM_FENCE);
+    if (get_local_id(0) < WARP_COUNT){
+        int imin = 0;
+        int imax = 38;
+        Normalize_local(l_workingBase, &imin, &imax);
+    }
+    barrier(CLK_LOCAL_MEM_FENCE);
     //Flush FPEs to superaccs
-    /*Accumulate(l_workingBase, a[0]);
+    Accumulate(l_workingBase, a[0]);
     Accumulate(l_workingBase, a[1]);
     Accumulate(l_workingBase, a[2]);
     Accumulate(l_workingBase, a[3]);
     Accumulate(l_workingBase, a[4]);
-    Accumulate(l_workingBase, a[5]);*/
-    Accumulate(l_workingBase, l_workingBase_check, a[0]);
+    Accumulate(l_workingBase, a[5]);
+    /*Accumulate(l_workingBase, l_workingBase_check, a[0]);
     Accumulate(l_workingBase, l_workingBase_check, a[1]);
     Accumulate(l_workingBase, l_workingBase_check, a[2]);
     if (*l_workingBase_check) {
@@ -355,7 +362,7 @@ void ExSUM(
             Normalize_local(l_workingBase, &imin, &imax);
         }
         *l_workingBase_check = false;
-    }
+    }*/
     barrier(CLK_LOCAL_MEM_FENCE);
 
     //Merge sub-superaccs into work-group partial-accumulator
@@ -370,11 +377,11 @@ void ExSUM(
     }
 
     barrier(CLK_LOCAL_MEM_FENCE);
-    if (pos == 0) {
+    /*if (pos == 0) {
         int imin = 0;
         int imax = 38;
         Normalize(&d_PartialSuperaccs[get_group_id(0) * BIN_COUNT], &imin, &imax);
-    }
+    }*/
 }
 
 ////////////////////////////////////////////////////////////////////////////////
