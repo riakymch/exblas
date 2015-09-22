@@ -234,14 +234,14 @@ void ExSUM(
         if(x != 0.0) {
             //TODO: do NOT propagate NaNs
             Accumulate(l_workingBase, x);
-            /*// Flush FPEs to superaccs
+            // Flush FPEs to superaccs
             #ifdef NVIDIA
                 #pragma unroll
             #endif
             for(uint i = 0; i != NBFPE; ++i) {
                 Accumulate(l_workingBase, a[i]);
                 a[i] = 0.0;
-            }*/
+            }
         }
     }
     //Flush FPEs to superaccs
@@ -263,8 +263,8 @@ void ExSUM(
         d_PartialSuperaccs[get_group_id(0) * BIN_COUNT + pos] = sum;
     }
 
-    /*barrier(CLK_LOCAL_MEM_FENCE);
-    if (pos == 0) {
+    barrier(CLK_LOCAL_MEM_FENCE);
+    /*if (pos == 0) {
         int imin = 0;
         int imax = 38;
         Normalize(&d_PartialSuperaccs[get_group_id(0) * BIN_COUNT], &imin, &imax);
@@ -276,7 +276,7 @@ void ExSUM(
 ////////////////////////////////////////////////////////////////////////////////
 __kernel __attribute__((reqd_work_group_size(MERGE_WORKGROUP_SIZE, 1, 1)))
 void ExSUMComplete(
-    __global double *d_Superacc,
+    __global long *d_Superacc,
     __global long *d_PartialSuperaccs,
     uint PartialSuperaccusCount
 ) {
@@ -300,9 +300,8 @@ void ExSUMComplete(
             l_Data[lid] += l_Data[lid + stride];
     }
 
-    if(lid == 0) {
+    if(lid == 0)
         d_Superacc[gid] = l_Data[0];
-    }
 #else
     if (lid < BIN_COUNT) {
         long sum = 0;
@@ -345,8 +344,7 @@ void ExSUMRound(
     __global long *d_Superacc
 ){
     uint pos = get_local_id(0);
-    if (pos == 0) {
+    if (pos == 0)
         d_Res[0] = Round(d_Superacc);
-    }
 }
 

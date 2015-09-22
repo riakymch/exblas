@@ -9,12 +9,11 @@
 
 
 #define BIN_COUNT      39
-#define K              8                    // High-radix carry-save bits
+#define K               8                   // High-radix carry-save bits
 #define digits         56
 #define deltaScale     72057594037927936.0  // Assumes K>0
 #define f_words        20
-#define TSAFE          0
-#define EARLY_EXIT     1
+#define TSAFE           0
 #define WORKGROUP_SIZE (WARP_COUNT * WARP_SIZE)
 
 
@@ -281,7 +280,7 @@ void ExSUM(
 ////////////////////////////////////////////////////////////////////////////////
 __kernel __attribute__((reqd_work_group_size(MERGE_WORKGROUP_SIZE, 1, 1)))
 void ExSUMComplete(
-    __global double *d_Superacc,
+    __global long *d_Superacc,
     __global long *d_PartialSuperaccs,
     uint PartialSuperaccusCount
 ) {
