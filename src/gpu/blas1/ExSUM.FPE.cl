@@ -6,7 +6,6 @@
 #pragma OPENCL EXTENSION cl_khr_fp64                   : enable  // For double precision numbers
 #pragma OPENCL EXTENSION cl_khr_int64_base_atomics     : enable  // For 64 atomic operations
 #pragma OPENCL EXTENSION cl_khr_byte_addressable_store : enable
-#pragma OPENCL EXTENSION cl_amd_printf : enable
 #ifdef NVIDIA
     #pragma OPENCL EXTENSION cl_nv_pragma_unroll       : enable
 #endif
@@ -127,9 +126,9 @@ double Round(__global long *accumulator) {
     //Compute sticky
     long sticky = 0;
     for (int j = imin; j != i - 1; ++j)
-        sticky |= negative ? (1l << digits) - accumulator[j] : accumulator[j];
+        sticky |= negative ? ((1l << digits) - accumulator[j]) : accumulator[j];
 
-    long loword = negative ? (1l << digits) - accumulator[i - 1] : accumulator[i - 1];
+    long loword = negative ? ((1l << digits) - accumulator[i - 1]) : accumulator[i - 1];
     loword |= !!sticky;
     double lo = ldexp((double) loword, (i - 1 - f_words) * digits);
 
@@ -235,14 +234,14 @@ void ExSUM(
         if(x != 0.0) {
             //TODO: do NOT propagate NaNs
             Accumulate(l_workingBase, x);
-	    // Flush FPEs to superaccs
+            /*// Flush FPEs to superaccs
             #ifdef NVIDIA
                 #pragma unroll
             #endif
             for(uint i = 0; i != NBFPE; ++i) {
                 Accumulate(l_workingBase, a[i]);
                 a[i] = 0.0;
-            }
+            }*/
         }
     }
     //Flush FPEs to superaccs
@@ -303,8 +302,6 @@ void ExSUMComplete(
 
     if(lid == 0) {
         d_Superacc[gid] = l_Data[0];
-	//printf("%d\n", l_Data[0]);
-	printf("Hello World");
     }
 #else
     if (lid < BIN_COUNT) {
@@ -348,7 +345,8 @@ void ExSUMRound(
     __global long *d_Superacc
 ){
     uint pos = get_local_id(0);
-    if (pos == 0)
+    if (pos == 0) {
         d_Res[0] = Round(d_Superacc);
+    }
 }
 
