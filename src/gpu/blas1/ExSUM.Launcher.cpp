@@ -24,7 +24,11 @@ static cl_command_queue cqDefaultCommandQue; //Default command queue for Superac
 static cl_mem           d_Superacc;
 static cl_mem           d_PartialSuperaccs;
 
+#ifdef AMD
 static const uint PARTIAL_SUPERACCS_COUNT = 1024;
+#else
+static const uint PARTIAL_SUPERACCS_COUNT = 512;
+#endif
 static const uint WORKGROUP_SIZE          = 256;
 static const uint MERGE_WORKGROUP_SIZE    = 64;
 static const uint MERGE_SUPERACCS_SIZE    = 128;
