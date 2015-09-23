@@ -270,14 +270,15 @@ void ExSUM(
 ////////////////////////////////////////////////////////////////////////////////
 __kernel __attribute__((reqd_work_group_size(MERGE_WORKGROUP_SIZE, 1, 1)))
 void ExSUMComplete(
-    __global long *d_Superacc,
+    //__global long *d_Superacc,
+    __global double *d_Res,
     __global long *d_PartialSuperaccs,
     uint PartialSuperaccusCount
 ) {
     uint lid = get_local_id(0);
     uint gid = get_group_id(0);
 
-#if 1
+#if 0
     __local long l_Data[MERGE_WORKGROUP_SIZE];
 
     //Reduce to one work group
