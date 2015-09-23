@@ -300,13 +300,13 @@ void ExSUM(
             a[3] = 0.0;
         }
     }
-        barrier(CLK_LOCAL_MEM_FENCE);
-        if (get_local_id(0) < WARP_COUNT){
-            int imin = 0;
-            int imax = 38;
-            Normalize_local(l_workingBase, &imin, &imax);
-        }
-        barrier(CLK_LOCAL_MEM_FENCE);
+    /*barrier(CLK_LOCAL_MEM_FENCE);
+    if (get_local_id(0) < WARP_COUNT){
+        int imin = 0;
+        int imax = 38;
+        Normalize_local(l_workingBase, &imin, &imax);
+    }
+    barrier(CLK_LOCAL_MEM_FENCE);*/
     //Flush FPEs to superaccs
     Accumulate(l_workingBase, a[0]);
     Accumulate(l_workingBase, a[1]);

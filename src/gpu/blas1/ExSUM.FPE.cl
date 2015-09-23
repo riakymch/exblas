@@ -292,13 +292,13 @@ void ExSUM(
             }
         }
     }
-    barrier(CLK_LOCAL_MEM_FENCE);
+    /*barrier(CLK_LOCAL_MEM_FENCE);
     if (get_local_id(0) < WARP_COUNT){
         int imin = 0;
         int imax = 38;
         Normalize_local(l_workingBase, &imin, &imax);
     }
-    barrier(CLK_LOCAL_MEM_FENCE);
+    barrier(CLK_LOCAL_MEM_FENCE);*/
     //Flush FPEs to superaccs
     #ifdef NVIDIA
         #pragma unroll
