@@ -336,6 +336,7 @@ void ExSUM(
         int imax = 38;
         Normalize(&d_PartialSuperaccs[get_group_id(0) * BIN_COUNT], &imin, &imax);
     }
+    barrier(CLK_LOCAL_MEM_FENCE);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
