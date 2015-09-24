@@ -21,11 +21,14 @@ static cl_kernel        ckComplete;
 static cl_command_queue cqDefaultCommandQue; //Default command queue for Superaccumulator
 static cl_mem           d_PartialSuperaccs;
 
-static const uint PARTIAL_SUPERACCS_COUNT = 512; //1024
+#ifdef AMD
+static const uint PARTIAL_SUPERACCS_COUNT = 1024;
+#else
+static const uint PARTIAL_SUPERACCS_COUNT = 1024;
+#endif
 static const uint WORKGROUP_SIZE          = 256;
-static const uint MERGE_WORKGROUP_SIZE    = 64;  //256
-static const uint MERGE_SUPERACCS_SIZE    = 128; //--
-static uint vector_number                 = 1;
+static const uint MERGE_WORKGROUP_SIZE    = 64;
+static const uint MERGE_SUPERACCS_SIZE    = 128;
 static uint NbElements;
 
 #ifdef AMD
@@ -144,7 +147,6 @@ extern "C" size_t ExDOT(
     {
         NbThreadsPerWorkGroup  = WORKGROUP_SIZE;
         TotalNbThreads = PARTIAL_SUPERACCS_COUNT * NbThreadsPerWorkGroup;
-        uint NbElems = NbElements / vector_number;
 
         cl_uint i = 0;
         ciErrNum  = clSetKernelArg(ckKernel, i++, sizeof(cl_mem),  (void *)&d_PartialSuperaccs);
@@ -152,7 +154,7 @@ extern "C" size_t ExDOT(
         ciErrNum |= clSetKernelArg(ckKernel, i++, sizeof(cl_uint),  (void *)&inca);
         ciErrNum |= clSetKernelArg(ckKernel, i++, sizeof(cl_mem),  (void *)&d_b);
         ciErrNum |= clSetKernelArg(ckKernel, i++, sizeof(cl_uint),  (void *)&incb);
-        ciErrNum |= clSetKernelArg(ckKernel, i++, sizeof(cl_uint), (void *)&NbElems);
+        ciErrNum |= clSetKernelArg(ckKernel, i++, sizeof(cl_uint), (void *)&NbElements);
         if (ciErrNum != CL_SUCCESS) {
             printf("Error in clSetKernelArg, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
             *ciErrNumRes = EXIT_FAILURE;
