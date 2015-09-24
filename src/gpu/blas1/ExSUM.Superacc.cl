@@ -234,7 +234,6 @@ void ExSUM(
         /*Accumulate(l_workingBase, l_workingBase_check, x);
         if (*l_workingBase_check) {
             barrier(CLK_LOCAL_MEM_FENCE);
-            // TODO: check the performance, because here all threads from the first warp (half of it) and involved. So, it may cause some memory contention.
             if (get_local_id(0) < WARP_COUNT){
                 int imin = 0;
                 int imax = 38;
