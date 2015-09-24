@@ -11,6 +11,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 #define EXSUM_KERNEL          "ExSUM"
 #define EXSUM_COMPLETE_KERNEL "ExSUMComplete"
+#define ROUND_KERNEL          "ExSUMRound"
 
 static size_t szKernelLength;                // Byte size of kernel code
 static char* cSources = NULL;                // Buffer to hold source for compilation
@@ -18,15 +19,19 @@ static char* cSources = NULL;                // Buffer to hold source for compil
 static cl_program       cpProgram;           //OpenCL Superaccumulator program
 static cl_kernel        ckKernel;            //OpenCL Superaccumulator kernels
 static cl_kernel        ckComplete;
+static cl_kernel        ckRound;
 static cl_command_queue cqDefaultCommandQue; //Default command queue for Superaccumulator
 static cl_mem           d_Superacc;
 static cl_mem           d_PartialSuperaccs;
 
+#ifdef AMD
+static const uint PARTIAL_SUPERACCS_COUNT = 1024;
+#else
 static const uint PARTIAL_SUPERACCS_COUNT = 512;
+#endif
 static const uint WORKGROUP_SIZE          = 256;
 static const uint MERGE_WORKGROUP_SIZE    = 64;
 static const uint MERGE_SUPERACCS_SIZE    = 128;
-static uint vector_number                 = 1;
 static uint NbElements;
 
 #ifdef AMD
@@ -49,11 +54,10 @@ extern "C" cl_int initExSUM(
 ){
     cl_int ciErrNum;
     NbElements = NbElems;
-    //vector_number = 2;
 
     // Read the OpenCL kernel in from source file
     FILE *program_handle;
-    //printf("Load the program sources (%s)...\n", program_file);
+    // Load the program sources
     program_handle = fopen(program_file, "r");
     if (!program_handle) {
         fprintf(stderr, "Failed to load kernel.\n");
@@ -99,6 +103,11 @@ extern "C" cl_int initExSUM(
             printf("Error in clCreateKernel: ExSUMComplete, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
             return EXIT_FAILURE;
         }
+        ckRound = clCreateKernel(cpProgram, ROUND_KERNEL, &ciErrNum);
+        if (ciErrNum != CL_SUCCESS) {
+            printf("Error in clCreateKernel: Round, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
+            return EXIT_FAILURE;
+        }
 
     //printf("...allocating internal buffer\n");
         uint size = PARTIAL_SUPERACCS_COUNT;
@@ -130,6 +139,7 @@ extern "C" void closeExSUM(void){
     ciErrNum |= clReleaseMemObject(d_Superacc);
     ciErrNum |= clReleaseKernel(ckKernel);
     ciErrNum |= clReleaseKernel(ckComplete);
+    ciErrNum |= clReleaseKernel(ckRound);
     ciErrNum |= clReleaseProgram(cpProgram);
     if (ciErrNum != CL_SUCCESS) {
         printf("Error in closeExSUM(), Line %u in file %s !!!\n\n", __LINE__, __FILE__);
@@ -155,13 +165,12 @@ extern "C" size_t ExSUM(
     {
         NbThreadsPerWorkGroup  = WORKGROUP_SIZE;
         TotalNbThreads = PARTIAL_SUPERACCS_COUNT * NbThreadsPerWorkGroup;
-        uint NbElems = NbElements / vector_number;
 
         cl_uint i = 0;
         ciErrNum  = clSetKernelArg(ckKernel, i++, sizeof(cl_mem),  (void *)&d_PartialSuperaccs);
         ciErrNum |= clSetKernelArg(ckKernel, i++, sizeof(cl_mem),  (void *)&d_a);
-        ciErrNum |= clSetKernelArg(ckKernel, i++, sizeof(cl_uint),  (void *)&inca);
-        ciErrNum |= clSetKernelArg(ckKernel, i++, sizeof(cl_uint), (void *)&NbElems);
+        ciErrNum |= clSetKernelArg(ckKernel, i++, sizeof(cl_uint), (void *)&inca);
+        ciErrNum |= clSetKernelArg(ckKernel, i++, sizeof(cl_uint), (void *)&NbElements);
         if (ciErrNum != CL_SUCCESS) {
             printf("Error in clSetKernelArg, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
             *ciErrNumRes = EXIT_FAILURE;
@@ -179,9 +188,11 @@ extern "C" size_t ExSUM(
     {
         NbThreadsPerWorkGroup = MERGE_WORKGROUP_SIZE;
         TotalNbThreads = NbThreadsPerWorkGroup;
+        //TotalNbThreads *= bin_count;
         TotalNbThreads *= PARTIAL_SUPERACCS_COUNT / MERGE_SUPERACCS_SIZE;
 
         cl_uint i = 0;
+        //ciErrNum  = clSetKernelArg(ckComplete, i++, sizeof(cl_mem),  (void *)&d_Superacc);
         ciErrNum  = clSetKernelArg(ckComplete, i++, sizeof(cl_mem),  (void *)&d_Res);
         ciErrNum |= clSetKernelArg(ckComplete, i++, sizeof(cl_mem),  (void *)&d_PartialSuperaccs);
         ciErrNum |= clSetKernelArg(ckComplete, i++, sizeof(cl_uint), (void *)&PARTIAL_SUPERACCS_COUNT);
@@ -199,6 +210,27 @@ extern "C" size_t ExSUM(
             return 0;
         }
     }
+
+    /*{
+        NbThreadsPerWorkGroup = MERGE_WORKGROUP_SIZE;
+        TotalNbThreads = NbThreadsPerWorkGroup;
+
+        cl_uint i = 0;
+        ciErrNum  = clSetKernelArg(ckRound, i++, sizeof(cl_mem),  (void *)&d_Res);
+        ciErrNum |= clSetKernelArg(ckRound, i++, sizeof(cl_mem),  (void *)&d_Superacc);
+        if (ciErrNum != CL_SUCCESS) {
+            printf("Error in clSetKernelArg, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
+           *ciErrNumRes = EXIT_FAILURE;
+            return 0;
+        }
+
+        ciErrNum = clEnqueueNDRangeKernel(cqCommandQueue, ckRound, 1, NULL, &TotalNbThreads, &NbThreadsPerWorkGroup, 0, NULL, NULL);
+        if (ciErrNum != CL_SUCCESS) {
+            printf("Error in clEnqueueNDRangeKernel, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
+           *ciErrNumRes = EXIT_FAILURE;
+            return 0;
+        }
+    }*/
 
     return WORKGROUP_SIZE;
 }

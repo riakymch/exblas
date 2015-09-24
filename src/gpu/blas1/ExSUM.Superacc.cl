@@ -60,39 +60,39 @@ double OddRoundSumNonnegative(double th, double tl) {
 }
 
 int Normalize_local(__local long *accumulator, int *imin, int *imax) {
-    long carry_in = accumulator[*imin * WARP_COUNT] >> digits;
-    accumulator[*imin * WARP_COUNT] -= carry_in << digits;
+    long carry_in = (accumulator[*imin * WARP_COUNT] >> digits);
+    accumulator[*imin * WARP_COUNT] -= (carry_in << digits);
     int i;
     // Sign-extend all the way
     for (i = *imin + 1; i < BIN_COUNT; ++i) {
         accumulator[i * WARP_COUNT] += carry_in;
-        long carry_out = accumulator[i * WARP_COUNT] >> digits;    // Arithmetic shift
+        long carry_out = (accumulator[i * WARP_COUNT] >> digits);    // Arithmetic shift
         accumulator[i * WARP_COUNT] -= (carry_out << digits);
         carry_in = carry_out;
     }
     *imax = i - 1;
 
     // Do not cancel the last carry to avoid losing information
-    accumulator[*imax * WARP_COUNT] += carry_in << digits;
+    accumulator[*imax * WARP_COUNT] += (carry_in << digits);
 
     return carry_in < 0;
 }
 
 int Normalize(__global long *accumulator, int *imin, int *imax) {
-    long carry_in = accumulator[*imin] >> digits;
-    accumulator[*imin] -= carry_in << digits;
+    long carry_in = (accumulator[*imin] >> digits);
+    accumulator[*imin] -= (carry_in << digits);
     int i;
     // Sign-extend all the way
     for (i = *imin + 1; i < BIN_COUNT; ++i) {
         accumulator[i] += carry_in;
-        long carry_out = accumulator[i] >> digits;    // Arithmetic shift
+        long carry_out = (accumulator[i] >> digits);    // Arithmetic shift
         accumulator[i] -= (carry_out << digits);
         carry_in = carry_out;
     }
     *imax = i - 1;
 
     // Do not cancel the last carry to avoid losing information
-    accumulator[*imax] += carry_in << digits;
+    accumulator[*imax] += (carry_in << digits);
 
     return carry_in < 0;
 }
@@ -182,6 +182,7 @@ void AccumulateWord(__local volatile long *sa, int i, long x) {
 }
 
 void Accumulate(__local volatile long *sa, __local bool *res, double x) {
+//void Accumulate(__local volatile long *sa, double x) {
     if (x == 0)
         return;
 
@@ -229,6 +230,7 @@ void ExSUM(
     for(uint pos = get_global_id(0); pos < NbElements; pos += get_global_size(0)) {
         double x = d_Data[pos];
 
+        //Accumulate(l_workingBase, x);
         Accumulate(l_workingBase, l_workingBase_check, x);
         if (*l_workingBase_check) {
             barrier(CLK_LOCAL_MEM_FENCE);
@@ -268,17 +270,18 @@ void ExSUM(
 ////////////////////////////////////////////////////////////////////////////////
 __kernel __attribute__((reqd_work_group_size(MERGE_WORKGROUP_SIZE, 1, 1)))
 void ExSUMComplete(
+    //__global long *d_Superacc,
     __global double *d_Res,
     __global long *d_PartialSuperaccs,
     uint PartialSuperaccusCount
 ) {
     uint lid = get_local_id(0);
-
-    //Reduce to one work group
     uint gid = get_group_id(0);
+
 #if 0
     __local long l_Data[MERGE_WORKGROUP_SIZE];
 
+    //Reduce to one work group
     long sum = 0;
     for(uint i = lid; i < PartialSuperaccusCount; i += MERGE_WORKGROUP_SIZE)
         sum += d_PartialSuperaccs[gid + i * BIN_COUNT];

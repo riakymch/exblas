@@ -9,12 +9,11 @@
 
 
 #define BIN_COUNT      39
-#define K              8                    // High-radix carry-save bits
+#define K               8                   // High-radix carry-save bits
 #define digits         56
 #define deltaScale     72057594037927936.0  // Assumes K>0
 #define f_words        20
-#define TSAFE          0
-#define EARLY_EXIT     1
+#define TSAFE           0
 #define WORKGROUP_SIZE (WARP_COUNT * WARP_SIZE)
 
 
@@ -76,21 +75,40 @@ double OddRoundSumNonnegative(double th, double tl) {
     return thdb.d;
 }
 
+int Normalize_local(__local long *accumulator, int *imin, int *imax) {
+    long carry_in = (accumulator[*imin * WARP_COUNT] >> digits);
+    accumulator[*imin * WARP_COUNT] -= (carry_in << digits);
+    int i;
+    // Sign-extend all the way
+    for (i = *imin + 1; i < BIN_COUNT; ++i) {
+        accumulator[i * WARP_COUNT] += carry_in;
+        long carry_out = (accumulator[i * WARP_COUNT] >> digits);    // Arithmetic shift
+        accumulator[i * WARP_COUNT] -= (carry_out << digits);
+        carry_in = carry_out;
+    }
+    *imax = i - 1;
+
+    // Do not cancel the last carry to avoid losing information
+    accumulator[*imax * WARP_COUNT] += (carry_in << digits);
+
+    return carry_in < 0;
+}
+
 int Normalize(__global long *accumulator, int *imin, int *imax) {
-    long carry_in = accumulator[*imin] >> digits;
-    accumulator[*imin] -= carry_in << digits;
+    long carry_in = (accumulator[*imin] >> digits);
+    accumulator[*imin] -= (carry_in << digits);
     int i;
     // Sign-extend all the way
     for (i = *imin + 1; i < BIN_COUNT; ++i) {
         accumulator[i] += carry_in;
-        long carry_out = accumulator[i] >> digits;    // Arithmetic shift
+        long carry_out = (accumulator[i] >> digits);    // Arithmetic shift
         accumulator[i] -= (carry_out << digits);
         carry_in = carry_out;
     }
     *imax = i - 1;
 
     // Do not cancel the last carry to avoid losing information
-    accumulator[*imax] += carry_in << digits;
+    accumulator[*imax] += (carry_in << digits);
 
     return carry_in < 0;
 }
@@ -180,6 +198,7 @@ void AccumulateWord(__local volatile long *sa, int i, long x) {
     }
 }
 
+//void Accumulate(__local volatile long *sa, __local bool *res, double x) {
 void Accumulate(__local volatile long *sa, double x) {
     if (x == 0)
         return;
@@ -197,6 +216,9 @@ void Accumulate(__local volatile long *sa, double x) {
         long xint = (long) xrounded;
 
         AccumulateWord(sa, i, xint);
+        /*atom_add(&sa[i * WARP_COUNT], xint);
+        if ((sa[i * WARP_COUNT] & 0x000000000000003F) > 0)
+            *res = true;*/
 
         xscaled -= xrounded;
         xscaled *= deltaScale;
@@ -212,10 +234,13 @@ void ExSUM(
 ) {
     __local long l_sa[WARP_COUNT * BIN_COUNT] __attribute__((aligned(8)));
     __local long *l_workingBase = l_sa + (get_local_id(0) & (WARP_COUNT - 1));
+    //__local bool l_sa_check[WARP_COUNT];
+    //__local bool *l_workingBase_check = l_sa_check + (get_local_id(0) & (WARP_COUNT - 1));
 
     //Initialize superaccs
     for (uint i = 0; i < BIN_COUNT; i++)
         l_workingBase[i * WARP_COUNT] = 0;
+    //*l_workingBase_check = false;
     barrier(CLK_LOCAL_MEM_FENCE);
 
     //Read data from global memory and scatter it to sub-superaccs
@@ -239,22 +264,67 @@ void ExSUM(
         }
         if(x != 0.0) {
             Accumulate(l_workingBase, x);
-            //Flush to the superacc
+            /*Accumulate(l_workingBase, l_workingBase_check, x);
+            if (*l_workingBase_check) {
+                barrier(CLK_LOCAL_MEM_FENCE);
+                if (get_local_id(0) < WARP_COUNT){
+                    int imin = 0;
+                    int imax = 38;
+                    Normalize_local(l_workingBase, &imin, &imax);
+                }
+                *l_workingBase_check = false;
+                barrier(CLK_LOCAL_MEM_FENCE);
+            }*/
+            //Flush FPEs to superaccs
             Accumulate(l_workingBase, a[0]);
             Accumulate(l_workingBase, a[1]);
             Accumulate(l_workingBase, a[2]);
             Accumulate(l_workingBase, a[3]);
+            /*Accumulate(l_workingBase, l_workingBase_check, a[0]);
+            Accumulate(l_workingBase, l_workingBase_check, a[1]);
+            Accumulate(l_workingBase, l_workingBase_check, a[2]);
+            Accumulate(l_workingBase, l_workingBase_check, a[3]);
+            if (*l_workingBase_check) {
+                barrier(CLK_LOCAL_MEM_FENCE);
+                if (get_local_id(0) < WARP_COUNT){
+                    int imin = 0;
+                    int imax = 38;
+                    Normalize_local(l_workingBase, &imin, &imax);
+                }
+                *l_workingBase_check = false;
+                barrier(CLK_LOCAL_MEM_FENCE);
+            }*/
             a[0] = 0.0;
             a[1] = 0.0;
             a[2] = 0.0;
             a[3] = 0.0;
         }
     }
-    //Flush to the superacc
+    /*barrier(CLK_LOCAL_MEM_FENCE);
+    if (get_local_id(0) < WARP_COUNT){
+        int imin = 0;
+        int imax = 38;
+        Normalize_local(l_workingBase, &imin, &imax);
+    }
+    barrier(CLK_LOCAL_MEM_FENCE);*/
+    //Flush FPEs to superaccs
     Accumulate(l_workingBase, a[0]);
     Accumulate(l_workingBase, a[1]);
     Accumulate(l_workingBase, a[2]);
     Accumulate(l_workingBase, a[3]);
+    /*Accumulate(l_workingBase, l_workingBase_check, a[0]);
+    Accumulate(l_workingBase, l_workingBase_check, a[1]);
+    Accumulate(l_workingBase, l_workingBase_check, a[2]);
+    Accumulate(l_workingBase, l_workingBase_check, a[3]);
+    if (*l_workingBase_check) {
+        barrier(CLK_LOCAL_MEM_FENCE);
+        if (get_local_id(0) < WARP_COUNT){
+            int imin = 0;
+            int imax = 38;
+            Normalize_local(l_workingBase, &imin, &imax);
+        }
+        *l_workingBase_check = false;
+    }*/
     barrier(CLK_LOCAL_MEM_FENCE);
 
     //Merge sub-superaccs into work-group partial-accumulator
@@ -281,17 +351,18 @@ void ExSUM(
 ////////////////////////////////////////////////////////////////////////////////
 __kernel __attribute__((reqd_work_group_size(MERGE_WORKGROUP_SIZE, 1, 1)))
 void ExSUMComplete(
+    //__global long *d_Superacc,
     __global double *d_Res,
     __global long *d_PartialSuperaccs,
     uint PartialSuperaccusCount
 ) {
     uint lid = get_local_id(0);
-
-    //Reduce to one work group
     uint gid = get_group_id(0);
+
 #if 0
     __local long l_Data[MERGE_WORKGROUP_SIZE];
 
+    //Reduce to one work group
     long sum = 0;
     for(uint i = lid; i < PartialSuperaccusCount; i += MERGE_WORKGROUP_SIZE)
         sum += d_PartialSuperaccs[gid + i * BIN_COUNT];
