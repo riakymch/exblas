@@ -244,7 +244,7 @@ void ExDOT(
             }
         }
 
-        if (r != 0.0) {
+        //if (r != 0.0) {
             #ifdef NVIDIA
                 #pragma unroll
             #endif
@@ -265,7 +265,7 @@ void ExDOT(
                     a[i] = 0.0;
                 }
             }
-        }
+        //}
     }
     //Flush FPEs to superaccs
     #ifdef NVIDIA

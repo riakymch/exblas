@@ -272,7 +272,7 @@ void ExDOT(
             a[7] = 0.0;
         }
 
-        if(r != 0.0) {
+        //if(r != 0.0) {
             a[1] = KnuthTwoSum(a[1], x, &s);
             x = s;
             if (x != 0.0) {
@@ -316,7 +316,7 @@ void ExDOT(
                 a[6] = 0.0;
                 a[7] = 0.0;
             }
-        }
+        //}
     }
     //Flush FPEs to superaccs
     Accumulate(l_workingBase, a[0]);
