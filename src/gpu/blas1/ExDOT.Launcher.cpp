@@ -24,7 +24,7 @@ static cl_mem           d_PartialSuperaccs;
 #ifdef AMD
 static const uint PARTIAL_SUPERACCS_COUNT = 768;
 #else
-static const uint PARTIAL_SUPERACCS_COUNT = 768;
+static const uint PARTIAL_SUPERACCS_COUNT = 512;
 #endif
 static const uint WORKGROUP_SIZE          = 256;
 static const uint MERGE_WORKGROUP_SIZE    = 64;
