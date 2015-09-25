@@ -234,6 +234,7 @@ void ExDOT(
         }
         if (x != 0.0) {
             Accumulate(l_workingBase, x);
+            // Flush FPEs to superaccs
             #ifdef NVIDIA
                 #pragma unroll
             #endif
@@ -254,6 +255,7 @@ void ExDOT(
             }
             if (r != 0.0) {
                 Accumulate(l_workingBase, r);
+                // Flush FPEs to superaccs
                 #ifdef NVIDIA
                     #pragma unroll
                 #endif
@@ -264,7 +266,7 @@ void ExDOT(
             }
         }
     }
-    //Flush FPEs to the superacc
+    //Flush FPEs to superaccs
     #ifdef NVIDIA
         #pragma unroll
     #endif
@@ -301,8 +303,6 @@ void ExDOTComplete(
     uint PartialSuperaccusCount
 ) {
     uint lid = get_local_id(0);
-
-    //Reduce to one work group
     uint gid = get_group_id(0);
 
     if (lid < BIN_COUNT) {
