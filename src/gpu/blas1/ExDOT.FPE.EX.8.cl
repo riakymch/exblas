@@ -254,7 +254,7 @@ void ExDOT(
         if(x != 0.0) {
             Accumulate(l_workingBase, x);
             //Flush FPEs to superaccs
-            /*Accumulate(l_workingBase, a[0]);
+            Accumulate(l_workingBase, a[0]);
             Accumulate(l_workingBase, a[1]);
             Accumulate(l_workingBase, a[2]);
             Accumulate(l_workingBase, a[3]);
@@ -269,7 +269,7 @@ void ExDOT(
             a[4] = 0.0;
             a[5] = 0.0;
             a[6] = 0.0;
-            a[7] = 0.0;*/
+            a[7] = 0.0;
         }
 
         if(r != 0.0) {

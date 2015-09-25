@@ -257,13 +257,13 @@ void ExDOT(
             if (r != 0.0) {
                 Accumulate(l_workingBase, r);
                 // Flush FPEs to superaccs
-                /*#ifdef NVIDIA
+                #ifdef NVIDIA
                     #pragma unroll
                 #endif
                 for(uint i = 0; i != NBFPE; ++i) {
                     Accumulate(l_workingBase, a[i]);
                     a[i] = 0.0;
-                }*/
+                }
             }
         }
     }
