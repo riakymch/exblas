@@ -33,10 +33,10 @@ def plotNbElementsVSGbsAll(input1, input2, output):
         superacc.append([line[0], float(line[2])]);
         fpe3.append([line[0], float(line[3])]);
         fpe4.append([line[0], float(line[4])]);
-        #fpe8.append([line[0], float(line[6])]);
-        fpe4ee.append([line[0], float(line[5])]);
-        fpe6ee.append([line[0], float(line[6])]);
-        fpe8ee.append([line[0], float(line[7])]);
+        fpe8.append([line[0], float(line[5])]);
+        fpe4ee.append([line[0], float(line[6])]);
+        fpe6ee.append([line[0], float(line[7])]);
+        fpe8ee.append([line[0], float(line[8])]);
     f.close()
 
     # plot the results
@@ -66,12 +66,12 @@ def plotNbElementsVSGbsAll(input1, input2, output):
     plotsuperacc = Gnuplot.Data(superacc, with_='lines lt 1 lw 4.0', title="Superacc")
     plotfpe3 = Gnuplot.Data(fpe3, with_='lines lt 5 lw 4.0', title="FPE3 + Superacc")
     plotfpe4 = Gnuplot.Data(fpe4, with_='lines lt 2 lw 4.0', title="FPE4 + Superacc")
-    #plotfpe8 = Gnuplot.Data(fpe8, with_='lines lt 9 lw 4.0', title="FPE8 + Superacc")
+    plotfpe8 = Gnuplot.Data(fpe8, with_='lines lt 9 lw 4.0', title="FPE8 + Superacc")
     plotfpe4ee = Gnuplot.Data(fpe4ee, with_='lines lt 8 lw 4.0', title="FPE4EE + Superacc")
     plotfpe6ee = Gnuplot.Data(fpe6ee, with_='lines lt 7 lw 4.0', title="FPE6EE + Superacc")
     plotfpe8ee = Gnuplot.Data(fpe8ee, with_='lines lt 3 lw 4.0', title="FPE8EE + Superacc")
 
-    gp.plot(plotdot, plotsuperacc, plotfpe3, plotfpe4, plotfpe4ee, plotfpe6ee, plotfpe8ee)
+    gp.plot(plotdot, plotsuperacc, plotfpe3, plotfpe4, plotfpe8, plotfpe4ee, plotfpe6ee, plotfpe8ee)
     return
 
 plotNbElementsVSGbsAll(sys.argv[1], sys.argv[2], sys.argv[3])
