@@ -249,7 +249,7 @@ void ExDOT(
         }
 
         if(r != 0.0) {
-            a[0] = KnuthTwoSum(sum[0], r, &s);
+            a[0] = KnuthTwoSum(a[0], r, &s);
             r = s;
             if(r != 0.0) {
             a[1] = KnuthTwoSum(a[1], r, &s);
