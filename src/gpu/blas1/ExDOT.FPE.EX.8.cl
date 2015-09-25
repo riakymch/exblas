@@ -272,8 +272,8 @@ void ExDOT(
             a[7] = 0.0;
         }
 
-        //if(r != 0.0) {
-            a[1] = KnuthTwoSum(a[1], x, &s);
+        if(r != 0.0) {
+            /*a[1] = KnuthTwoSum(a[1], x, &s);
             x = s;
             if (x != 0.0) {
                 a[2] = KnuthTwoSum(a[2], x, &s);
@@ -284,7 +284,7 @@ void ExDOT(
                     if (x != 0.0) {
                         a[4] = KnuthTwoSum(a[4], x, &s);
                         x = s;
-                        if (x != 0.0) {
+                        if (x != 0.0) {*/
             a[5] = KnuthTwoSum(a[5], r, &s);
             r = s;
             if (r != 0.0) {
@@ -295,11 +295,11 @@ void ExDOT(
                     r = s;
                 }
             }
-            }}}}
+            //}}}}
             if(r != 0.0) {
                 Accumulate(l_workingBase, r);
                 //Flush FPEs to superaccs
-                /*Accumulate(l_workingBase, a[0]);
+                Accumulate(l_workingBase, a[0]);
                 Accumulate(l_workingBase, a[1]);
                 Accumulate(l_workingBase, a[2]);
                 Accumulate(l_workingBase, a[3]);
@@ -314,9 +314,9 @@ void ExDOT(
                 a[4] = 0.0;
                 a[5] = 0.0;
                 a[6] = 0.0;
-                a[7] = 0.0;*/
+                a[7] = 0.0;
             }
-        //}
+        }
     }
     //Flush FPEs to superaccs
     Accumulate(l_workingBase, a[0]);
