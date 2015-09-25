@@ -248,7 +248,8 @@ void ExDOT(
             #ifdef NVIDIA
                 #pragma unroll
             #endif
-            for(uint i = NBFPE-3; i != NBFPE; ++i) {
+            //for(uint i = NBFPE-3; i != NBFPE; ++i) {
+            for(uint i = 0; i != NBFPE; ++i) {
                 double s;
                 a[i] = KnuthTwoSum(a[i], r, &s);
                 r = s;

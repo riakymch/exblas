@@ -249,6 +249,9 @@ void ExDOT(
         }
 
         if(r != 0.0) {
+            a[0] = KnuthTwoSum(sum[0], r, &s);
+            r = s;
+            if(r != 0.0) {
             a[1] = KnuthTwoSum(a[1], r, &s);
             r = s;
             if (r != 0.0) {
@@ -258,6 +261,7 @@ void ExDOT(
                     a[3] = KnuthTwoSum(a[3], r, &s);
                     r = s;
                 }
+            }
             }
             if(r != 0.0) {
                 Accumulate(l_workingBase, r);
