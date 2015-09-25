@@ -198,10 +198,38 @@ int main(int argc, char *argv[]) {
 #endif
 
     copyVector(n, x, xorig);
+    extrsv(uplo, 'N', 'N', n, a, n, x, 1, 4);
+#ifdef EXBLAS_VS_MPFR
+    norm = extrsvVsMPFR(uplo, x, n, a, n, xorig, 1);
+    printf("FPE4 error = %.16g\n", norm);
+    if (norm > eps) {
+        is_pass = false;
+    }
+#else
+    if (extrsvVsSuperacc(n, x, superacc) > eps) {
+        is_pass = false;
+    }
+#endif
+
+    copyVector(n, x, xorig);
     extrsv(uplo, 'N', 'N', n, a, n, x, 1, 8);
 #ifdef EXBLAS_VS_MPFR
     norm = extrsvVsMPFR(uplo, x, n, a, n, xorig, 1);
     printf("FPE8 error = %.16g\n", norm);
+    if (norm > eps) {
+        is_pass = false;
+    }
+#else
+    if (extrsvVsSuperacc(n, x, superacc) > eps) {
+        is_pass = false;
+    }
+#endif
+
+    copyVector(n, x, xorig);
+    extrsv(uplo, 'N', 'N', n, a, n, x, 1, 4, true);
+#ifdef EXBLAS_VS_MPFR
+    norm = extrsvVsMPFR(uplo, x, n, a, n, xorig, 1);
+    printf("FPE6EE error = %.16g\n", norm);
     if (norm > eps) {
         is_pass = false;
     }
