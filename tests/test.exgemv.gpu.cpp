@@ -27,7 +27,7 @@ static void copyVector(uint n, double *x, double *y) {
 #include <cstddef>
 #include <mpfr.h>
 
-static double exgemvVsMPFR(char trans, double *exgemv, int m, int n, double alpha, double *a, uint lda, double *x, uint incx, double beta, double *y, uint incy) {
+static double exgemvVsMPFR(char trans, const double *exgemv, int m, int n, double alpha, const double *a, uint lda, const double *x, uint incx, double beta, const double *y, uint incy) {
     mpfr_t sum, dot;
 
     double *exgemv_mpfr = (double *) malloc(n * sizeof(double));
@@ -43,10 +43,10 @@ static double exgemvVsMPFR(char trans, double *exgemv, int m, int n, double alph
             mpfr_mul_d(dot, dot, alpha, MPFR_RNDN);
             mpfr_mul_d(dot, dot, x[j], MPFR_RNDN);
             mpfr_add(sum, sum, dot, MPFR_RNDN);
-            mpfr_set_d(dot, y[j], MPFR_RNDN);
-            mpfr_mul_d(dot, dot, beta, MPFR_RNDN);
-            mpfr_add(sum, sum, dot, MPFR_RNDN);
         }
+        mpfr_set_d(dot, y[i], MPFR_RNDN);
+        mpfr_mul_d(dot, dot, beta, MPFR_RNDN);
+        mpfr_add(sum, sum, dot, MPFR_RNDN);
         exgemv_mpfr[i] = mpfr_get_d(sum, MPFR_RNDN);
     }
 
