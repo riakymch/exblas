@@ -14,7 +14,7 @@ if (USE_EXBLAS)
 endif (USE_EXBLAS)
 
 # compiler flags
-set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -march=native -fabi-version=0 -O3 -Wall")
+set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -march=native -fabi-version=0 -O3 -Wall -Wno-comment -Wno-maybe-uninitialized")
 
 include (tests/OpenCL)
 # architecture specific flags

@@ -136,7 +136,7 @@ int main(int argc, char *argv[]) {
     exdot_fpe8ee = fabs(exdotMPFR - exdot_fpe8ee) / fabs(exdotMPFR);
     if ((exdot_acc > eps) || (exdot_fpe3 > eps) || (exdot_fpe4 > eps) || (exdot_fpe8 > eps) || (exdot_fpe4ee > eps) || (exdot_fpe6ee > eps) || (exdot_fpe8ee > eps)) {
         is_pass = false;
-        printf("FAILED: %.16g \t %.16g \t %.16g \t %.16g \t %.16g \t %.16g\n", exdot_acc, exdot_fpe3, exdot_fpe4, exdot_fpe8, exdot_fpe4ee, exdot_fpe6ee, exdot_fpe8ee);
+        printf("FAILED: %.16g \t %.16g \t %.16g \t %.16g \t %.16g \t %.16g \t %.16g\n", exdot_acc, exdot_fpe3, exdot_fpe4, exdot_fpe8, exdot_fpe4ee, exdot_fpe6ee, exdot_fpe8ee);
     }
 #else
     exdot_fpe3 = fabs(exdot_acc - exdot_fpe3) / fabs(exdot_acc);
@@ -147,7 +147,7 @@ int main(int argc, char *argv[]) {
     exdot_fpe8ee = fabs(exdot_acc - exdot_fpe8ee) / fabs(exdot_acc);
     if ((exdot_fpe3 > eps) || (exdot_fpe4 > eps) || (exdot_fpe8 > eps) || (exdot_fpe4ee > eps) || (exdot_fpe6ee > eps) || (exdot_fpe8ee > eps)) {
         is_pass = false;
-        printf("FAILED: %.16g \t %.16g \t %.16g \t %.16g \t %.16g\n", exdot_fpe3, exdot_fpe4, exdot_fpe8, exdot_fpe4ee, exdot_fpe6ee, exdot_fpe8ee);
+        printf("FAILED: %.16g \t %.16g \t %.16g \t %.16g \t %.16g \t %.16g\n", exdot_fpe3, exdot_fpe4, exdot_fpe8, exdot_fpe4ee, exdot_fpe6ee, exdot_fpe8ee);
     }
 #endif
     fprintf(stderr, "\n");

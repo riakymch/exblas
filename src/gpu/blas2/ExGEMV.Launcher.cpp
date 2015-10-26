@@ -20,17 +20,14 @@ static size_t szKernelLength;                // Byte size of kernel code
 static char* cSources = NULL;                // Buffer to hold source for compilation
 
 static cl_program       cpProgram;           //OpenCL program
-static cl_kernel        ckInit, ckTRSV;      //OpenCL kernels
-static cl_kernel        ckAXPY, ckGEMV;      //OpenCL kernels
+static cl_kernel        ckGEMV;              //OpenCL kernels
 static cl_command_queue cqDefaultCommandQue; //Default command queue
-static cl_mem           d_sync;
 static cl_mem           d_Superaccs;
 
 #ifdef AMD
 static char  compileOptions[256] = "-DUSE_KNUTH -DBLOCK_SIZE=32";
 #else
-//static char  compileOptions[256] = "-DNVIDIA -DUSE_KNUTH -DBLOCK_SIZE=32 -Dthreadsx=32 -Dthreadsy=1 -cl-mad-enable -cl-fast-relaxed-math"; // -cl-nv-verbose";
-static char  compileOptions[256] = "-DNVIDIA -DUSE_KNUTH -cl-mad-enable";
+static char  compileOptions[256] = "-DNVIDIA -DUSE_KNUTH -DBLOCK_SIZE=32 -cl-mad-enable -cl-fast-relaxed-math"; // -cl-nv-verbose";
 #endif
 
 
@@ -42,6 +39,7 @@ extern "C" cl_int initExGEMV(
     cl_command_queue cqParamCommandQue,
     cl_device_id cdDevice,
     const char* program_file,
+    const uint m,
     const uint NbFPE
 ){
     cl_int ciErrNum;
@@ -92,7 +90,7 @@ extern "C" cl_int initExGEMV(
         }
 
     //printf("...allocating internal buffer\n");
-        d_Superaccs = clCreateBuffer(cxGPUContext, CL_MEM_READ_WRITE, n * BLOCK_SIZE * bin_count * sizeof(cl_long), NULL, &ciErrNum);
+        d_Superaccs = clCreateBuffer(cxGPUContext, CL_MEM_READ_WRITE, m * bin_count * sizeof(cl_long), NULL, &ciErrNum);
         if (ciErrNum != CL_SUCCESS) {
             printf("Error in clCreateBuffer, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
             return EXIT_FAILURE;
@@ -150,7 +148,7 @@ extern "C" size_t ExGEMV(
         size_t TotalNbThreads[] = {m, n};
 
         uint i = 0;
-        ciErrNum = clSetKernelArg(ckGEMV, i++, sizeof(cl_uint), (void *)&m);
+        ciErrNum  = clSetKernelArg(ckGEMV, i++, sizeof(cl_uint), (void *)&m);
         ciErrNum &= clSetKernelArg(ckGEMV, i++, sizeof(cl_uint), (void *)&n);
         ciErrNum &= clSetKernelArg(ckGEMV, i++, sizeof(cl_double), (void *)&alpha);
         ciErrNum &= clSetKernelArg(ckGEMV, i++, sizeof(cl_mem),  (void *)&d_a);
