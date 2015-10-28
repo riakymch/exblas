@@ -18,7 +18,7 @@
 #endif
 
 
-static void copyVector(uint n, double *x, double *y) {
+static void copyVector(uint n, double *x, const double *y) {
     for (uint i = 0; i < n; i++)
         x[i] = y[i];
 }
@@ -27,7 +27,7 @@ static void copyVector(uint n, double *x, double *y) {
 #include <cstddef>
 #include <mpfr.h>
 
-static double extrsvVsMPFR(char uplo, double *extrsv, int n, double *a, uint lda, double *x, uint incx) {
+static double extrsvVsMPFR(char uplo, const double *extrsv, int n, const double *a, uint lda, const double *x, uint incx) {
     mpfr_t sum, dot;
 
     double *extrsv_mpfr = (double *) malloc(n * sizeof(double));

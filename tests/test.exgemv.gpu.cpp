@@ -18,7 +18,7 @@
 #endif
 
 
-static void copyVector(uint n, double *x, double *y) {
+static void copyVector(uint n, double *x, const double *y) {
     for (uint i = 0; i < n; i++)
         x[i] = y[i];
 }
@@ -92,7 +92,7 @@ static double exgemvVsSuperacc(uint n, double *exgemv, double *superacc) {
 
 int main(int argc, char *argv[]) {
     char trans = 'N';
-    uint m = 64, n = 64;
+    uint m = 256, n = 256;
     bool lognormal = false;
     if(argc > 1)
         trans = argv[1][0];
@@ -174,6 +174,7 @@ int main(int argc, char *argv[]) {
         is_pass = false;
     }
 #endif
+    exit(0);
 
     copyVector(n, y, yorig);
     exgemv(trans, m, n, alpha, a, n, x, 1, beta, y, 1, 3);

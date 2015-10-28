@@ -51,6 +51,8 @@ typedef long long int bintype;
  * \param cdDevice Device ID
  * \param program_file OpenCL file to execute
  * \param m nb of rows of matrix A
+ * \param imt nb of threads in row, wg size
+ * \param p nb of columns in the resulting matrix
  * \param NbFPE Size of FPEs
  * \return Status
  */
@@ -60,6 +62,8 @@ extern "C" cl_int initExGEMV(
     cl_device_id cdDevice,
     const char* program_file,
     const uint m,
+    const uint imt,
+    const uint ip,
     const uint NbFPE
 );
 

@@ -149,7 +149,7 @@ int runExGEMV(int m, int n, double alpha, double *a, int lda, double *x, int inc
 
     {
         //Initializing OpenCL dSum...
-        ciErrNum = initExGEMV(cxGPUContext, cqCommandQueue, cdDevice, program_file, m, fpe);
+        ciErrNum = initExGEMV(cxGPUContext, cqCommandQueue, cdDevice, program_file, m, 256, 1, fpe);
         if (ciErrNum != CL_SUCCESS)
             exit(EXIT_FAILURE);
 
