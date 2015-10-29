@@ -214,14 +214,12 @@ __kernel void gemv(
     barrier(CLK_LOCAL_MEM_FENCE); // sync group
 
     __global long *l_working = d_Superaccs + get_global_id(ROW_DIM) * BIN_COUNT;
-
     // Initialize accumulators
     for (uint i = 0; i < BIN_COUNT; i++)
         l_working[i] = 0.0;
 
     // Compute partial dot product
     double xs, r;
-    double sum = 0.0;
     for (int k = 0; k < ncols; k++) {
         xs = TwoProductFMA(a[get_global_id(ROW_DIM) + m * (col0 + k)], work[k], &r);
 
@@ -232,17 +230,7 @@ __kernel void gemv(
 
     // Store in Y (P columns per row)
     Accumulate(l_working, y[get_global_id(ROW_DIM) + m * get_global_id(COL_DIM)]);
-    barrier(CLK_LOCAL_MEM_FENCE); // sync group
     y[get_global_id(ROW_DIM)] = Round(l_working);
-
-    /*// Compute partial dot product
-    double sum = 0.0;
-    for (int k = 0; k < ncols; k++) {
-        sum += a[get_global_id(ROW_DIM)+m*(col0+k)] * work[k];
-    }
-
-    // Store in Y (P columns per row)
-    y[get_global_id(ROW_DIM)+m*get_global_id(COL_DIM)] += sum;*/
 }
 
 // Reduce M = get_global_size(0) rows of P values in matrix Y.

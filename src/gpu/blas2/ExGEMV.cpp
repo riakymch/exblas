@@ -190,10 +190,12 @@ int runExGEMV(int m, int n, double alpha, double *a, int lda, double *x, int inc
             mint = std::min(t, mint);
         }
 
-        double perf = 2 * n * n;
+        double perf = 2 * m * n;
         perf = (perf / mint) * 1e-9;
-        printf("NbFPE = %u \t N = %u \t \t Time = %.8f s \t Performance = %.4f GFLOPS\n", fpe, n, mint, perf);
-        fprintf(stderr, "%f ", mint);
+        double throughput = (m * n + m + n) * sizeof(double);
+        throughput = (throughput / mint) * 1e-9;
+        printf("NbFPE = %u \t M = %u \t N = %u \t Time = %.8f s \t Throughput = %.4f GB/s \t Performance = %.4f GFLOPS\n", fpe, m, n, mint, throughput, perf);
+        fprintf(stderr, "%f\n", mint);
 #endif
 
         //Retrieving results...

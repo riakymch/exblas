@@ -27,12 +27,22 @@ double randDouble(int emin, int emax, int neg_ratio) {
     return ldexp(x, e);
 }
 
-void init_fpuniform(double *a, int n, int range, int emax) {
+void init_fpuniform(const int n, double *a, int range, int emax) {
     for(int i = 0; i != n; ++i)
         a[i] = randDouble(emax-range, emax, 1);
 }
 
-void init_fpuniform_matrix(char uplo, char diag, double *a, int n, int range, int emax) {
+void init_fpuniform_matrix(const bool iscolumnwise, const int m, const int n, double *a, const int lda, const int range, const int emax) {
+    //Generate numbers on several bins starting from emax
+    for(int i = 0; i < m; ++i)
+        for(int j = 0; j < n; ++j)
+            if (iscolumnwise)
+                a[j * lda + i] = randDouble(0, range, 1);
+            else
+                a[i * lda + j] = randDouble(0, range, 1);
+}
+
+void init_fpuniform_tr_matrix(const char uplo, const char diag, const int n, double *a, const int range, const int emax) {
     if (uplo == 'U') {
         for(int i = n-1; i >= 0; i--)
             for(int j = i; j < n; ++j)
@@ -50,7 +60,7 @@ void init_fpuniform_matrix(char uplo, char diag, double *a, int n, int range, in
     }
 }
 
-void init_lognormal(double * a, int n, double mean, double stddev) {
+void init_lognormal(const int n, double * a, double mean, double stddev) {
     std::random_device rd;
     std::default_random_engine gen(rd());
     std::lognormal_distribution<> d(mean, stddev);
@@ -59,7 +69,20 @@ void init_lognormal(double * a, int n, double mean, double stddev) {
         a[i] = d(gen);
 }
 
-void init_lognormal_matrix(char uplo, char diag, double * a, int n, double mean, double stddev) {
+void init_lognormal_matrix(const bool iscolumnwise, const int m, const int n, double *a, const int lda, const double mean, const double stddev) {
+    std::random_device rd;
+    std::default_random_engine gen(rd());
+    std::lognormal_distribution<> d(mean, stddev);
+
+    for(int i = 0; i < m; ++i)
+        for(int j = 0; j < n; ++j)
+            if (iscolumnwise)
+                a[j * lda + i] = d(gen);
+            else
+                a[i * lda + j] = d(gen);
+}
+
+void init_lognormal_tr_matrix(const char uplo, const char diag, const int n, double * a, const double mean, const double stddev) {
     std::random_device rd;
     std::default_random_engine gen(rd());
     std::lognormal_distribution<> d(mean, stddev);
@@ -81,7 +104,7 @@ void init_lognormal_matrix(char uplo, char diag, double * a, int n, double mean,
     }
 }
 
-void init_ill_cond(double *a, int n, double c) {
+void init_ill_cond(const int n, double *a, double c) {
     int n2 = round(n / 2);
 
     for(int i = 0; i != n; ++i)
@@ -115,7 +138,7 @@ void init_ill_cond(double *a, int n, double c) {
     free(e);
 }
 
-void init_naive(double *a, int n) {
+void init_naive(const int n, double *a) {
     for(int i = 0; i != n; ++i)
         a[i] = 1.1;
 }

@@ -17,21 +17,15 @@
     #include <CL/opencl.h>
 #endif
 
-
-static void copyVector(uint n, double *x, const double *y) {
-    for (uint i = 0; i < n; i++)
-        x[i] = y[i];
-}
-
 #ifdef EXBLAS_VS_MPFR
 #include <cstddef>
 #include <mpfr.h>
 
-static double exgemvVsMPFR(char trans, const double *exgemv, int m, int n, double alpha, const double *a, uint lda, const double *x, uint incx, double beta, const double *y, uint incy) {
+// matrix is stored in column-major order
+static double exgemvVsMPFR(const bool iscolumnwise, char trans, const double *exgemv, int m, int n, double alpha, const double *a, uint lda, const double *x, uint incx, double beta, const double *y, uint incy) {
     mpfr_t sum, dot;
 
     double *exgemv_mpfr = (double *) malloc(n * sizeof(double));
-    copyVector(n, exgemv_mpfr, x);
 
     mpfr_init2(dot, 128);
     mpfr_init2(sum, 2098);
@@ -39,7 +33,10 @@ static double exgemvVsMPFR(char trans, const double *exgemv, int m, int n, doubl
     for(int i = 0; i < m; i++) {
         mpfr_set_d(sum, 0.0, MPFR_RNDN);
         for(int j = 0; j < n; j++) {
-            mpfr_set_d(dot, a[j * n + i], MPFR_RNDN);
+            if (iscolumnwise)
+                mpfr_set_d(dot, a[j * lda + i], MPFR_RNDN);
+            else
+                mpfr_set_d(dot, a[i * lda + j], MPFR_RNDN);
             mpfr_mul_d(dot, dot, alpha, MPFR_RNDN);
             mpfr_mul_d(dot, dot, x[j], MPFR_RNDN);
             mpfr_add(sum, sum, dot, MPFR_RNDN);
@@ -65,7 +62,6 @@ static double exgemvVsMPFR(char trans, const double *exgemv, int m, int n, doubl
     for(int i = 0; i < n; i++) {
         val = std::max(val, fabs(exgemv_mpfr[i]));
         nrm = std::max(nrm, fabs(exgemv[i] - exgemv_mpfr[i]));
-        //printf("%.16g\t", fabs(exgemv[i] - exgemv_mpfr[i]));
     }
     nrm = nrm / val;
 #endif
@@ -89,11 +85,19 @@ static double exgemvVsSuperacc(uint n, double *exgemv, double *superacc) {
 }
 #endif
 
+static void copyVector(uint n, double *x, const double *y) {
+    for (uint i = 0; i < n; i++)
+        x[i] = y[i];
+}
+
 
 int main(int argc, char *argv[]) {
     char trans = 'N';
     uint m = 256, n = 256;
+    bool iscolumnwise = true;
+    int lda = m;
     bool lognormal = false;
+
     if(argc > 1)
         trans = argv[1][0];
     if(argc > 2)
@@ -127,30 +131,30 @@ int main(int argc, char *argv[]) {
     double *a, *x, *y, *yorig;
     int err = posix_memalign((void **) &a, 64, m * n * sizeof(double));
     err &= posix_memalign((void **) &x, 64, n * sizeof(double));
-    err &= posix_memalign((void **) &y, 64, n * sizeof(double));
-    err &= posix_memalign((void **) &yorig, 64, n * sizeof(double));
+    err &= posix_memalign((void **) &y, 64, m * sizeof(double));
+    err &= posix_memalign((void **) &yorig, 64, m * sizeof(double));
     if ((!a) || (!x) || (!y) || (!yorig) || (err != 0))
         fprintf(stderr, "Cannot allocate memory with posix_memalign\n");
 
     if(lognormal) {
         printf("init_lognormal_matrix\n");
-        init_lognormal_matrix(trans, 'N', a, n, mean, stddev);
-        init_lognormal(x, n, mean, stddev);
-        init_lognormal(yorig, n, mean, stddev);
+        init_lognormal_matrix(iscolumnwise, m, n, a, lda, mean, stddev);
+        init_lognormal(n, x, mean, stddev);
+        init_lognormal(m, yorig, mean, stddev);
     } else if ((argc > 5) && (argv[5][0] == 'i')) {
         printf("init_ill_cond\n");
-        init_ill_cond(a, m * n, range);
-        init_ill_cond(x, n, range);
-        init_ill_cond(yorig, n, range);
+        init_ill_cond(m * n, a, range);
+        init_ill_cond(n, x, range);
+        init_ill_cond(m, yorig, range);
     } else {
         printf("init_fpuniform_matrix\n");
-        init_fpuniform_matrix(trans, 'N', a, n, range, emax);
-        init_fpuniform(x, n, range, emax);
-        init_fpuniform(yorig, n, range, emax);
+        init_fpuniform_matrix(iscolumnwise, m, n, a, lda, range, emax);
+        init_fpuniform(n, x, range, emax);
+        init_fpuniform(m, yorig, range, emax);
     }
-    copyVector(n, y, yorig);
+    copyVector(m, y, yorig);
 
-    fprintf(stderr, "%d ", n);
+    fprintf(stderr, "%d %d ", m, n);
 
     if(lognormal) {
         fprintf(stderr, "%f ", stddev);
@@ -165,10 +169,10 @@ int main(int argc, char *argv[]) {
     if ((!superacc) || (err != 0))
         fprintf(stderr, "Cannot allocate memory with posix_memalign\n");
 
-    copyVector(n, superacc, yorig);
-    exgemv(trans, m, n, alpha, a, n, x, 1, beta, superacc, 1, 0);
+    copyVector(m, superacc, yorig);
+    exgemv(trans, m, n, alpha, a, lda, x, 1, beta, superacc, 1, 0);
 #ifdef EXBLAS_VS_MPFR
-    norm = exgemvVsMPFR(trans, superacc, m, n, alpha, a, n, x, 1, beta, yorig, 1);
+    norm = exgemvVsMPFR(iscolumnwise, trans, superacc, m, n, alpha, a, lda, x, 1, beta, yorig, 1);
     printf("Superacc error = %.16g\n", norm);
     if (norm > eps) {
         is_pass = false;
@@ -176,89 +180,77 @@ int main(int argc, char *argv[]) {
 #endif
     exit(0);
 
-    copyVector(n, y, yorig);
-    exgemv(trans, m, n, alpha, a, n, x, 1, beta, y, 1, 3);
+    copyVector(m, y, yorig);
+    exgemv(trans, m, n, alpha, a, lda, x, 1, beta, y, 1, 3);
 #ifdef EXBLAS_VS_MPFR
-    norm = exgemvVsMPFR(trans, y, m, n, alpha, a, n, x, 1, beta, yorig, 1);
+    norm = exgemvVsMPFR(iscolumnwise, trans, y, m, n, alpha, a, lda, x, 1, beta, yorig, 1);
+#else
+    norm = exgemvVsSuperacc(n, x, superacc);
+#endif
     printf("FPE3 error = %.16g\n", norm);
     if (norm > eps) {
         is_pass = false;
     }
-#else
-    if (exgemvVsSuperacc(n, x, superacc) > eps) {
-        is_pass = false;
-    }
-#endif
 
-    copyVector(n, y, yorig);
-    exgemv(trans, m, n, alpha, a, n, x, 1, beta, y, 1, 4);
+    copyVector(m, y, yorig);
+    exgemv(trans, m, n, alpha, a, lda, x, 1, beta, y, 1, 4);
 #ifdef EXBLAS_VS_MPFR
-    norm = exgemvVsMPFR(trans, y, m, n, alpha, a, n, x, 1, beta, yorig, 1);
+    norm = exgemvVsMPFR(iscolumnwise, trans, y, m, n, alpha, a, lda, x, 1, beta, yorig, 1);
+#else
+    norm = exgemvVsSuperacc(n, x, superacc);
+#endif
     printf("FPE4 error = %.16g\n", norm);
     if (norm > eps) {
         is_pass = false;
     }
-#else
-    if (exgemvVsSuperacc(n, x, superacc) > eps) {
-        is_pass = false;
-    }
-#endif
 
-    copyVector(n, y, yorig);
-    exgemv(trans, m, n, alpha, a, n, x, 1, beta, y, 1, 8);
+    copyVector(m, y, yorig);
+    exgemv(trans, m, n, alpha, a, lda, x, 1, beta, y, 1, 8);
 #ifdef EXBLAS_VS_MPFR
-    norm = exgemvVsMPFR(trans, y, m, n, alpha, a, n, x, 1, beta, yorig, 1);
+    norm = exgemvVsMPFR(iscolumnwise, trans, y, m, n, alpha, a, lda, x, 1, beta, yorig, 1);
+#else
+    norm = exgemvVsSuperacc(n, x, superacc);
+#endif
     printf("FPE8 error = %.16g\n", norm);
     if (norm > eps) {
         is_pass = false;
     }
-#else
-    if (exgemvVsSuperacc(n, x, superacc) > eps) {
-        is_pass = false;
-    }
-#endif
 
-    copyVector(n, y, yorig);
-    exgemv(trans, m, n, alpha, a, n, x, 1, beta, y, 1, 4, true);
+    copyVector(m, y, yorig);
+    exgemv(trans, m, n, alpha, a, lda, x, 1, beta, y, 1, 4, true);
 #ifdef EXBLAS_VS_MPFR
-    norm = exgemvVsMPFR(trans, y, m, n, alpha, a, n, x, 1, beta, yorig, 1);
+    norm = exgemvVsMPFR(iscolumnwise, trans, y, m, n, alpha, a, lda, x, 1, beta, yorig, 1);
+#else
+    norm = exgemvVsSuperacc(n, x, superacc);
+#endif
     printf("FPE6EE error = %.16g\n", norm);
     if (norm > eps) {
         is_pass = false;
     }
-#else
-    if (exgemvVsSuperacc(n, x, superacc) > eps) {
-        is_pass = false;
-    }
-#endif
 
-    copyVector(n, y, yorig);
-    exgemv(trans, m, n, alpha, a, n, x, 1, beta, y, 1, 6, true);
+    copyVector(m, y, yorig);
+    exgemv(trans, m, n, alpha, a, lda, x, 1, beta, y, 1, 6, true);
 #ifdef EXBLAS_VS_MPFR
-    norm = exgemvVsMPFR(trans, y, m, n, alpha, a, n, x, 1, beta, yorig, 1);
+    norm = exgemvVsMPFR(iscolumnwise, trans, y, m, n, alpha, a, lda, x, 1, beta, yorig, 1);
+#else
+    norm = exgemvVsSuperacc(n, x, superacc);
+#endif
     printf("FPE6EE error = %.16g\n", norm);
     if (norm > eps) {
         is_pass = false;
     }
-#else
-    if (exgemvVsSuperacc(n, x, superacc) > eps) {
-        is_pass = false;
-    }
-#endif
 
-    copyVector(n, y, yorig);
-    exgemv(trans, m, n, alpha, a, n, x, 1, beta, y, 1, 8, true);
+    copyVector(m, y, yorig);
+    exgemv(trans, m, n, alpha, a, lda, x, 1, beta, y, 1, 8, true);
 #ifdef EXBLAS_VS_MPFR
-    norm = exgemvVsMPFR(trans, y, m, n, alpha, a, n, x, 1, beta, yorig, 1);
+    norm = exgemvVsMPFR(iscolumnwise, trans, y, m, n, alpha, a, lda, x, 1, beta, yorig, 1);
+#else
+    norm = exgemvVsSuperacc(n, x, superacc);
+#endif
     printf("FPE8EE error = %.16g\n", norm);
     if (norm > eps) {
         is_pass = false;
     }
-#else
-    if (exgemvVsSuperacc(n, x, superacc) > eps) {
-        is_pass = false;
-    }
-#endif
     fprintf(stderr, "\n");
 
     if (is_pass)
