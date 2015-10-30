@@ -207,9 +207,9 @@ __kernel void gemv(
     int ncols = n / get_global_size(COL_DIM); // nb values to load
     int col0 = ncols * get_global_id(COL_DIM); // first value to load
     for (int k = 0; k < ncols; k += get_local_size(ROW_DIM)) {
-        int col = k+get_local_id(ROW_DIM);
+        int col = k + get_local_id(ROW_DIM);
         if (col < ncols)
-            work[col] = x[col0+col];
+            work[col] = x[col0 + col];
     }
     barrier(CLK_LOCAL_MEM_FENCE); // sync group
 

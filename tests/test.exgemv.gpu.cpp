@@ -21,6 +21,16 @@
 #include <cstddef>
 #include <mpfr.h>
 
+extern "C" void printVector(
+    const uint n,
+    const double *a
+){
+    printf("x = [");
+    for (uint i = 0; i < n; i++)
+        printf("%.4g, ", a[i]);
+    printf("]\n");
+}
+
 // matrix is stored in column-major order
 static double exgemvVsMPFR(const bool iscolumnwise, char trans, const double *exgemv, int m, int n, double alpha, const double *a, uint lda, const double *x, uint incx, double beta, const double *y, uint incy) {
     mpfr_t sum, dot;
@@ -95,7 +105,6 @@ int main(int argc, char *argv[]) {
     char trans = 'N';
     uint m = 256, n = 256;
     bool iscolumnwise = true;
-    int lda = m;
     bool lognormal = false;
 
     if(argc > 1)
@@ -109,6 +118,7 @@ int main(int argc, char *argv[]) {
             lognormal = true;
         }
     }
+    int lda = m;
 
     int range = 1;
     int emax = 0;
