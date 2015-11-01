@@ -213,7 +213,7 @@ __kernel void gemv(
     }
     barrier(CLK_LOCAL_MEM_FENCE); // sync group
 
-    __global long *l_working = d_Superaccs + get_global_id(ROW_DIM) * BIN_COUNT;
+    __global long *l_working = d_Superaccs + (get_global_id(ROW_DIM) + m * get_global_id(COL_DIM))* BIN_COUNT;
     // Initialize accumulators
     for (uint i = 0; i < BIN_COUNT; i++)
         l_working[i] = 0.0;
@@ -230,7 +230,6 @@ __kernel void gemv(
 
     // Store in Y (P columns per row)
     Accumulate(l_working, y[get_global_id(ROW_DIM) + m * get_global_id(COL_DIM)]);
-    y[get_global_id(ROW_DIM)] = Round(l_working);
 }
 
 // Reduce M = get_global_size(0) rows of P values in matrix Y.
@@ -242,8 +241,9 @@ __kernel void gemv_reduce(
     __global double *y
 ) {
     int row = get_global_id(ROW_DIM);
-    //int col = get_global_id(COL_DIM);
+    int col = get_global_id(COL_DIM);
 
+    y[get_global_id(ROW_DIM) + m * get_global_id(COL_DIM)] = Round(d_Superaccs + (row + m * col) * BIN_COUNT);
     /*long sum = 0;
     for (int i = 0; i < p; i++)
         sum += d_Superaccs[(row + m * i) * BIN_COUNT + col];
