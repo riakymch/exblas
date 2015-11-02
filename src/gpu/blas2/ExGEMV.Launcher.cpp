@@ -187,7 +187,7 @@ extern "C" size_t ExGEMV(
             return 0;
         }
     }
-    {
+    /*{
         size_t NbThreadsPerWorkGroup[] = {mt, 1};
         size_t TotalNbThreads[] = {m, 1};
 
@@ -208,7 +208,7 @@ extern "C" size_t ExGEMV(
             *ciErrNumRes = EXIT_FAILURE;
             return 0;
         }
-    }
+    }*/
 
     return EXIT_SUCCESS;
 }

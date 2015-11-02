@@ -230,6 +230,7 @@ __kernel void gemv(
 
     // Store in Y (P columns per row)
     Accumulate(l_working, y[get_global_id(ROW_DIM) + m * get_global_id(COL_DIM)]);
+    y[get_global_id(ROW_DIM) + m * get_global_id(COL_DIM)] = Round(l_working);
 }
 
 // Reduce M = get_global_size(0) rows of P values in matrix Y.
@@ -241,19 +242,40 @@ __kernel void gemv_reduce(
     __global double *y
 ) {
     int row = get_global_id(ROW_DIM);
-    int col = get_global_id(COL_DIM);
+    long suma[BIN_COUNT];
+    for (int j = 0; j < BIN_COUNT; j++)
+        suma[j] = 0;
 
-    y[get_global_id(ROW_DIM) + m * get_global_id(COL_DIM)] = Round(d_Superaccs + (row + m * col) * BIN_COUNT);
-    /*long sum = 0;
-    for (int i = 0; i < p; i++)
-        sum += d_Superaccs[(row + m * i) * BIN_COUNT + col];
-    d_Superaccs[row * BIN_COUNT + col] = sum;*/
+    for(int col = 0; col < p; col++) {
+        for (int j = 0; j < BIN_COUNT; j++) {
+            suma[j] += d_Superaccs[(row + m * col) * BIN_COUNT + j];
+        }
+    }
+    for (int j = 0; j < BIN_COUNT; j++)
+        d_Superaccs[row * BIN_COUNT + j] = suma[j];
+    y[row] = Round(d_Superaccs + row * BIN_COUNT);
 
-    //if (col == 0)
-        //y[row] = Round(&d_Superaccs[row * BIN_COUNT]);
+    /*//Version with k x bin_count threads
+    int lid = get_local_id(COL_DIM);
 
-    /*double sum = 0.0;
+    if (lid < BIN_COUNT) {
+        //y[get_global_id(ROW_DIM) + m * get_global_id(COL_DIM)] = Round(d_Superaccs + (row + m * col) * BIN_COUNT);
+        long sum = 0;
+        for (int j = 0; j < p; j++) {
+            sum += d_Superaccs[(row + m * j) * BIN_COUNT + lid];
+        }
+        d_Superaccs[row * BIN_COUNT + lid] = sum;
+    }
+    barrier(CLK_LOCAL_MEM_FENCE); // sync group
+
+    if (lid == 0)
+        y[row] = Round(d_Superaccs + row * BIN_COUNT);*/
+
+    /*//Original
+    int row = get_global_id(ROW_DIM);
+
+    double sum = 0.0;
     for (int col = 0; col < p; col++)
-        sum += y[row + m*col];
+        sum += y[row + m * col];
     y[row] = sum;*/
 }
