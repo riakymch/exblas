@@ -172,12 +172,10 @@ static double runExSUM(int N, double *h_a, int inca, int fpe, const char* progra
                 exit(EXIT_FAILURE);
             }
             t = 1e-9 * ((unsigned long)endTime - (unsigned long)startTime);
-	    mint = std::min(mint, t);
+            mint = std::min(mint, t);
         }
 
-        //double minTime = min(gpuTime, NUM_ITER);
-        //printf("NbFPE = %u \t NbElements = %u \t \t Time = %.8f s \t Throughput = %.4f GB/s\n",
-          //fpe, N, minTime, ((1e-9 * N * sizeof(double)) / minTime));
+        printf("NbFPE = %u \t NbElements = %u \t \t Time = %.8f s \t Throughput = %.4f GB/s\n", fpe, N, mint, ((1e-9 * N * sizeof(double)) / mint));
         fprintf(stderr, "%f ", mint);
 #endif
 
