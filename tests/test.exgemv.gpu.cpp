@@ -188,7 +188,6 @@ int main(int argc, char *argv[]) {
         is_pass = false;
     }
 #endif
-    exit(0);
 
     copyVector(m, y, yorig);
     exgemv(trans, m, n, alpha, a, lda, x, 1, beta, y, 1, 3);
@@ -233,7 +232,7 @@ int main(int argc, char *argv[]) {
 #else
     norm = exgemvVsSuperacc(n, x, superacc);
 #endif
-    printf("FPE6EE error = %.16g\n", norm);
+    printf("FPE4EE error = %.16g\n", norm);
     if (norm > eps) {
         is_pass = false;
     }
