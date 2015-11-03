@@ -257,7 +257,6 @@ int main(int argc, char *argv[]) {
         is_pass = false;
     }
 #endif
-    exit(0);
 
     copyMatrix(iscolumnwise, m, n, c, ldc, c_orig);
     exgemm('N', 'N', m, n, k, alpha, a, lda, b, ldb, beta, c, ldc, 3);
