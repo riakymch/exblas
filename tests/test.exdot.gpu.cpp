@@ -83,18 +83,18 @@ int main(int argc, char *argv[]) {
     if ((!a) || (!b) || (err != 0))
         fprintf(stderr, "Cannot allocate memory with posix_memalign\n");
     if(lognormal) {
-        init_lognormal(a, N, mean, stddev);
-        init_lognormal(b, N, mean, stddev);
+        init_lognormal(N, a, mean, stddev);
+        init_lognormal(N, b, mean, stddev);
     } else if ((argc > 4) && (argv[4][0] == 'i')) {
-        init_ill_cond(a, N, range);
-        init_ill_cond(b, N, range);
+        init_ill_cond(N, a, range);
+        init_ill_cond(N, b, range);
     } else {
         if(range == 1){
-            init_naive(a, N);
-            init_naive(b, N);
+            init_naive(N, a);
+            init_naive(N, b);
         } else {
-            init_fpuniform(a, N, range, emax);
-            init_fpuniform(b, N, range, emax);
+            init_fpuniform(N, a, range, emax);
+            init_fpuniform(N, b, range, emax);
         }
     }
 
@@ -136,7 +136,7 @@ int main(int argc, char *argv[]) {
     exdot_fpe8ee = fabs(exdotMPFR - exdot_fpe8ee) / fabs(exdotMPFR);
     if ((exdot_acc > eps) || (exdot_fpe3 > eps) || (exdot_fpe4 > eps) || (exdot_fpe8 > eps) || (exdot_fpe4ee > eps) || (exdot_fpe6ee > eps) || (exdot_fpe8ee > eps)) {
         is_pass = false;
-        printf("FAILED: %.16g \t %.16g \t %.16g \t %.16g \t %.16g \t %.16g\n", exdot_acc, exdot_fpe3, exdot_fpe4, exdot_fpe8, exdot_fpe4ee, exdot_fpe6ee, exdot_fpe8ee);
+        printf("FAILED: %.16g \t %.16g \t %.16g \t %.16g \t %.16g \t %.16g \t %.16g\n", exdot_acc, exdot_fpe3, exdot_fpe4, exdot_fpe8, exdot_fpe4ee, exdot_fpe6ee, exdot_fpe8ee);
     }
 #else
     exdot_fpe3 = fabs(exdot_acc - exdot_fpe3) / fabs(exdot_acc);
@@ -147,7 +147,7 @@ int main(int argc, char *argv[]) {
     exdot_fpe8ee = fabs(exdot_acc - exdot_fpe8ee) / fabs(exdot_acc);
     if ((exdot_fpe3 > eps) || (exdot_fpe4 > eps) || (exdot_fpe8 > eps) || (exdot_fpe4ee > eps) || (exdot_fpe6ee > eps) || (exdot_fpe8ee > eps)) {
         is_pass = false;
-        printf("FAILED: %.16g \t %.16g \t %.16g \t %.16g \t %.16g\n", exdot_fpe3, exdot_fpe4, exdot_fpe8, exdot_fpe4ee, exdot_fpe6ee, exdot_fpe8ee);
+        printf("FAILED: %.16g \t %.16g \t %.16g \t %.16g \t %.16g \t %.16g\n", exdot_fpe3, exdot_fpe4, exdot_fpe8, exdot_fpe4ee, exdot_fpe6ee, exdot_fpe8ee);
     }
 #endif
     fprintf(stderr, "\n");

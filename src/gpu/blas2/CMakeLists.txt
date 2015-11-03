@@ -1,7 +1,25 @@
 # Copyright (c) 2013-2015 Inria and University Pierre and Marie Curie
 # All rights reserved.
 
-# Testing
+# Testing ExGEMV
+add_executable (test.exgemv ${PROJECT_SOURCE_DIR}/tests/test.exgemv.gpu.cpp)
+target_link_libraries (test.exgemv ${EXTRA_LIBS})
+
+if (EXBLAS_GPU_NVIDIA)
+   # add the install targets
+   install (TARGETS test.exgemv DESTINATION ${PROJECT_BINARY_DIR}/tests)
+
+   add_test (TestExGEMVNaiveNumbers test.exgemv N 256 256)
+   set_tests_properties (TestExGEMVNaiveNumbers PROPERTIES PASS_REGULAR_EXPRESSION "TestPassed; ALL OK!")
+   add_test (TestExGEMVLogUnifDist test.exgemv N 256 256 50 0 n)
+   set_tests_properties (TestExGEMVLogUnifDist PROPERTIES PASS_REGULAR_EXPRESSION "TestPassed; ALL OK")
+   add_test (TestExGEMVFpUnifDist test.exgemv N 256 256 10 0 y)
+   set_tests_properties (TestExGEMVFpUnifDist PROPERTIES PASS_REGULAR_EXPRESSION "TestPassed; ALL OK!")
+   add_test (TestExGEMVIllConditioned test.exgemv N 256 256 1e+50 0 i)
+   set_tests_properties (TestExGEMVIllConditioned PROPERTIES PASS_REGULAR_EXPRESSION "TestPassed; ALL OK!")
+endif (EXBLAS_GPU_NVIDIA)
+
+# Testing ExTRSV
 add_executable (test.extrsv ${PROJECT_SOURCE_DIR}/tests/test.extrsv.gpu.cpp)
 target_link_libraries (test.extrsv ${EXTRA_LIBS})
 

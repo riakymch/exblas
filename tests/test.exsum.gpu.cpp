@@ -74,14 +74,14 @@ int main(int argc, char *argv[]) {
     if ((!a) || (err != 0))
         fprintf(stderr, "Cannot allocate memory with posix_memalign\n");
     if(lognormal) {
-        init_lognormal(a, N, mean, stddev);
+        init_lognormal(N, a, mean, stddev);
     } else if ((argc > 4) && (argv[4][0] == 'i')) {
-        init_ill_cond(a, N, range);
+        init_ill_cond(N, a, range);
     } else {
         if(range == 1){
-            init_naive(a, N);
+            init_naive(N, a);
         } else {
-            init_fpuniform(a, N, range, emax);
+            init_fpuniform(N, a, range, emax);
         }
     }
 

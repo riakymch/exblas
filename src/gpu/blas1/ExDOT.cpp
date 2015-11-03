@@ -181,12 +181,11 @@ static double runExDOT(int N, double *h_a, int inca, double *h_b, int incb, int 
                 exit(EXIT_FAILURE);
             }
             t = 1e-9 * ((unsigned long)endTime - (unsigned long)startTime);
-	    mint = std::min(t, mint);
+            mint = std::min(t, mint);
         }
 
-        printf("NbFPE = %u \t NbElements = %u \t \t Time = %.8f s \t Throughput = %.4f GB/s\n",
-          fpe, N, mint, ((1e-9 * N * sizeof(double)) / mint));
-	fprintf(stderr, "%f ", mint);
+        printf("NbFPE = %u \t NbElements = %u \t \t Time = %.8f s \t Throughput = %.4f GB/s\n", fpe, N, mint, ((1e-9 * 2 * N * sizeof(double)) / mint));
+        fprintf(stderr, "%f ", mint);
 #endif
 
         //Retrieving results

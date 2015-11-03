@@ -18,7 +18,7 @@
 #endif
 
 
-static void copyVector(uint n, double *x, double *y) {
+static void copyVector(uint n, double *x, const double *y) {
     for (uint i = 0; i < n; i++)
         x[i] = y[i];
 }
@@ -27,7 +27,7 @@ static void copyVector(uint n, double *x, double *y) {
 #include <cstddef>
 #include <mpfr.h>
 
-static double extrsvVsMPFR(char uplo, double *extrsv, int n, double *a, uint lda, double *x, uint incx) {
+static double extrsvVsMPFR(char uplo, const double *extrsv, int n, const double *a, uint lda, const double *x, uint incx) {
     mpfr_t sum, dot;
 
     double *extrsv_mpfr = (double *) malloc(n * sizeof(double));
@@ -144,17 +144,17 @@ int main(int argc, char *argv[]) {
         fprintf(stderr, "Cannot allocate memory with posix_memalign\n");
 
     if(lognormal) {
-        printf("init_lognormal_matrix\n");
-        init_lognormal_matrix(uplo, 'N', a, n, mean, stddev);
-        init_lognormal(xorig, n, mean, stddev);
+        printf("init_lognormal_tr_matrix\n");
+        init_lognormal_tr_matrix(uplo, 'N', n, a, mean, stddev);
+        init_lognormal(n, xorig, mean, stddev);
     } else if ((argc > 5) && (argv[5][0] == 'i')) {
         printf("init_ill_cond\n");
-        init_ill_cond(a, n * n, range);
-        init_ill_cond(xorig, n, range);
+        init_ill_cond(n * n, a, range);
+        init_ill_cond(n, xorig, range);
     } else {
-        printf("init_fpuniform_matrix\n");
-        init_fpuniform_matrix(uplo, 'N', a, n, range, emax);
-        init_fpuniform(xorig, n, range, emax);
+        printf("init_fpuniform_tr_matrix\n");
+        init_fpuniform_tr_matrix(uplo, 'N', n, a, range, emax);
+        init_fpuniform(n, xorig, range, emax);
     }
     copyVector(n, x, xorig);
 
@@ -187,15 +187,25 @@ int main(int argc, char *argv[]) {
     extrsv(uplo, 'N', 'N', n, a, n, x, 1, 3);
 #ifdef EXBLAS_VS_MPFR
     norm = extrsvVsMPFR(uplo, x, n, a, n, xorig, 1);
+#else
+    norm = extrsvVsSuperacc(n, x, superacc);
+#endif
     printf("FPE3 error = %.16g\n", norm);
     if (norm > eps) {
         is_pass = false;
     }
+
+    copyVector(n, x, xorig);
+    extrsv(uplo, 'N', 'N', n, a, n, x, 1, 4);
+#ifdef EXBLAS_VS_MPFR
+    norm = extrsvVsMPFR(uplo, x, n, a, n, xorig, 1);
 #else
-    if (extrsvVsSuperacc(n, x, superacc) > eps) {
+    norm = extrsvVsSuperacc(n, x, superacc);
+#endif
+    printf("FPE4 error = %.16g\n", norm);
+    if (norm > eps) {
         is_pass = false;
     }
-#endif
 
     copyVector(n, x, xorig);
     extrsv(uplo, 'N', 'N', n, a, n, x, 1, 4);
@@ -215,15 +225,25 @@ int main(int argc, char *argv[]) {
     extrsv(uplo, 'N', 'N', n, a, n, x, 1, 8);
 #ifdef EXBLAS_VS_MPFR
     norm = extrsvVsMPFR(uplo, x, n, a, n, xorig, 1);
+#else
+    norm = extrsvVsSuperacc(n, x, superacc);
+#endif
     printf("FPE8 error = %.16g\n", norm);
     if (norm > eps) {
         is_pass = false;
     }
+
+    copyVector(n, x, xorig);
+    extrsv(uplo, 'N', 'N', n, a, n, x, 1, 4, true);
+#ifdef EXBLAS_VS_MPFR
+    norm = extrsvVsMPFR(uplo, x, n, a, n, xorig, 1);
 #else
-    if (extrsvVsSuperacc(n, x, superacc) > eps) {
+    norm = extrsvVsSuperacc(n, x, superacc);
+#endif
+    printf("FPE6EE error = %.16g\n", norm);
+    if (norm > eps) {
         is_pass = false;
     }
-#endif
 
     copyVector(n, x, xorig);
     extrsv(uplo, 'N', 'N', n, a, n, x, 1, 4, true);
@@ -243,29 +263,25 @@ int main(int argc, char *argv[]) {
     extrsv(uplo, 'N', 'N', n, a, n, x, 1, 6, true);
 #ifdef EXBLAS_VS_MPFR
     norm = extrsvVsMPFR(uplo, x, n, a, n, xorig, 1);
+#else
+    norm = extrsvVsSuperacc(n, x, superacc);
+#endif
     printf("FPE6EE error = %.16g\n", norm);
     if (norm > eps) {
         is_pass = false;
     }
-#else
-    if (extrsvVsSuperacc(n, x, superacc) > eps) {
-        is_pass = false;
-    }
-#endif
 
     copyVector(n, x, xorig);
     extrsv(uplo, 'N', 'N', n, a, n, x, 1, 8, true);
 #ifdef EXBLAS_VS_MPFR
     norm = extrsvVsMPFR(uplo, x, n, a, n, xorig, 1);
+#else
+    norm = extrsvVsSuperacc(n, x, superacc);
+#endif
     printf("FPE8EE error = %.16g\n", norm);
     if (norm > eps) {
         is_pass = false;
     }
-#else
-    if (extrsvVsSuperacc(n, x, superacc) > eps) {
-        is_pass = false;
-    }
-#endif
     fprintf(stderr, "\n");
 
     if (is_pass)
