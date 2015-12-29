@@ -227,7 +227,7 @@ __kernel void gemv(
 
     // Compute partial dot product
     double al[NBFPE] = {0.0};
-    double xs, r;
+    double xs, r, s;
     for (int k = 0; k < ncols; k++) {
         xs = TwoProductFMA(a[get_global_id(ROW_DIM) + m * (col0 + k)], work[k], &r);
 
@@ -235,7 +235,6 @@ __kernel void gemv(
             #pragma unroll
         #endif
         for(uint i = 0; i != NBFPE; ++i) {
-            double s;
             al[i] = KnuthTwoSum(al[i], xs, &s);
             xs = s;
         }
@@ -256,7 +255,6 @@ __kernel void gemv(
                 #pragma unroll
             #endif
             for(uint i = NBFPE-3; i != NBFPE; ++i) {
-                double s;
                 al[i] = KnuthTwoSum(al[i], r, &s);
                 r = s;
             }
