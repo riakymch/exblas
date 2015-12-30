@@ -1,4 +1,4 @@
-ExBLAS -- Exact (fast, accurate, and reproducible) BLAS library v0.1
+ExBLAS -- Exact (fast, accurate, and reproducible) BLAS library v0.2
 =============================================
 ExBLAS aims at providing new algorithms and implementations for fundamental 
 linear algebra operations -- like those included in the BLAS library -- that 
@@ -11,6 +11,7 @@ order of computations, thread scheduling, or reduction tree schemes.
 The current version of the ExBLAS library is equipped with 
   * ExSUM -- Reproducible and accurate parallel reduction (parallel summation);
   * ExDOT -- Reproducible and accurate parallel dot product;
+  * ExGEMV -- Reproducible and accurate parallel matrix-vector product;
   * ExTRSV -- Reproducible and accurate parallel triangular solver;
   * ExGEMM -- Reproducible and accurate parallel matrix-matrix multiplication.
 These routines can be executed on a set of architectures: Intel Core i7 and 
