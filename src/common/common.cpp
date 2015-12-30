@@ -34,12 +34,15 @@ void init_fpuniform(const int n, double *a, int range, int emax) {
 
 void init_fpuniform_matrix(const bool iscolumnwise, const int m, const int n, double *a, const int lda, const int range, const int emax) {
     //Generate numbers on several bins starting from emax
-    for(int i = 0; i < m; ++i)
+    if (iscolumnwise) {
         for(int j = 0; j < n; ++j)
-            if (iscolumnwise)
+            for(int i = 0; i < m; ++i)
                 a[j * lda + i] = randDouble(0, range, 1);
-            else
+    } else {
+        for(int i = 0; i < m; ++i)
+            for(int j = 0; j < n; ++j)
                 a[i * lda + j] = randDouble(0, range, 1);
+    }
 }
 
 void init_fpuniform_tr_matrix(const char uplo, const char diag, const int n, double *a, const int range, const int emax) {
@@ -74,12 +77,15 @@ void init_lognormal_matrix(const bool iscolumnwise, const int m, const int n, do
     std::default_random_engine gen(rd());
     std::lognormal_distribution<> d(mean, stddev);
 
-    for(int i = 0; i < m; ++i)
+    if (iscolumnwise) {
         for(int j = 0; j < n; ++j)
-            if (iscolumnwise)
+            for(int i = 0; i < m; ++i)
                 a[j * lda + i] = d(gen);
-            else
+    } else {
+        for(int i = 0; i < m; ++i)
+            for(int j = 0; j < n; ++j)
                 a[i * lda + j] = d(gen);
+    }
 }
 
 void init_lognormal_tr_matrix(const char uplo, const char diag, const int n, double * a, const double mean, const double stddev) {

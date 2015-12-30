@@ -197,7 +197,7 @@ void Accumulate(long *sa, double x) {
 // Matrix multiplication on the device: C := beta * C + alpha * A * B.
 //     So far just C = C + A * B
 ////////////////////////////////////////////////////////////////////////////////
-__kernel void matrixMul(
+__kernel void gemm(
     uint m,
     uint n,
     uint k,

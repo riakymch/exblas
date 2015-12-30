@@ -170,10 +170,6 @@ static inline void copyMatrix(const bool iscolumnwise, const uint m, const uint 
 
 int main(int argc, char *argv[]) {
     int m = 64, n = 64, k = 64;
-    //bool iscolumnwise = true;
-    //int lda = m, ldb = k, ldc = m;
-    bool iscolumnwise = false;
-    int lda = k, ldb = n, ldc = n;
     double alpha = 1.0, beta = 1.0;
     bool lognormal = false;
 
@@ -182,6 +178,10 @@ int main(int argc, char *argv[]) {
         n = atoi(argv[2]);
         k = atoi(argv[3]);
     }
+    //bool iscolumnwise = true;
+    //int lda = m, ldb = k, ldc = m;
+    bool iscolumnwise = false;
+    int lda = k, ldb = n, ldc = n;
     if(argc > 6) {
         if(argv[6][0] == 'n') {
             lognormal = true;
