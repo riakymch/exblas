@@ -7,8 +7,8 @@
 #include <cstdio>
 #include <iostream>
 
-#include "common.hpp"
 #include "blas1.hpp"
+#include "common.hpp"
 
 #ifdef EXBLAS_VS_MPFR
 #include <cstddef>
@@ -61,18 +61,18 @@ int main(int argc, char * argv[]) {
     }
 
     double *a; 
-    posix_memalign((void **) &a, 64, N * sizeof(double));
-    if (!a)
+    int err = posix_memalign((void **) &a, 64, N * sizeof(double));
+    if ((!a) || (err != 0))
         fprintf(stderr, "Cannot allocate memory for the main array\n");
     if(lognormal) {
-        init_lognormal(a, N, mean, stddev);
+        init_lognormal(N, a, mean, stddev);
     } else if ((argc > 4) && (argv[4][0] == 'i')) {
-        init_ill_cond(a, N, range);
+        init_ill_cond(N, a, range);
     } else {
         if(range == 1){
-            init_naive(a, N);
+            init_naive(N, a);
         } else {
-            init_fpuniform(a, N, range, emax);
+            init_fpuniform(N, a, range, emax);
         }
     }
 

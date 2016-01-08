@@ -16,7 +16,6 @@ endif (USE_EXBLAS)
 # compiler flags
 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -march=native -fabi-version=0 -O3 -Wall -Wno-comment -Wno-maybe-uninitialized")
 
-include (tests/OpenCL)
 # architecture specific flags
 option (EXBLAS_GPU_AMD "By setting this option we enable compilation for AMD GPUs" OFF)
 option (EXBLAS_GPU_NVIDIA "By setting this option we enable compilation for NVIDIA GPUs" OFF)
@@ -27,12 +26,8 @@ if (EXBLAS_GPU_AMD)
 elseif (EXBLAS_GPU_NVIDIA)
     set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -masm=intel")
     include_directories( "/usr/local/cuda/include/" )
-    include_directories( "/home/data/RomanIakymchuk/CUDA/NVIDIA_GPU_Computing_SDK_v4.1/OpenCL/common/inc/" )
-    link_directories ( "/usr/lib/" )
     link_directories ( "/usr/local/cuda/lib64/" )
 endif (EXBLAS_GPU_AMD)
-#include_directories( ${OPENCL_INCLUDE_DIRS} )
-#link_directories ( ${OpenCL_LIBRARY} )
 set (EXTRA_LIBS ${EXTRA_LIBS} OpenCL)
 
 # enabling timing
