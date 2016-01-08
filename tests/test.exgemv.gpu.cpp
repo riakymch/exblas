@@ -189,12 +189,11 @@ int main(int argc, char *argv[]) {
     }
 #endif
 
-    copyVector(m, y, yorig);
     exgemv(trans, m, n, alpha, a, lda, x, 1, beta, y, 1, 3);
 #ifdef EXBLAS_VS_MPFR
     norm = exgemvVsMPFR(iscolumnwise, trans, y, m, n, alpha, a, lda, x, 1, beta, yorig, 1);
 #else
-    norm = exgemvVsSuperacc(n, x, superacc);
+    norm = exgemvVsSuperacc(n, y, superacc);
 #endif
     printf("FPE3 error = %.16g\n", norm);
     if (norm > eps) {
@@ -206,7 +205,7 @@ int main(int argc, char *argv[]) {
 #ifdef EXBLAS_VS_MPFR
     norm = exgemvVsMPFR(iscolumnwise, trans, y, m, n, alpha, a, lda, x, 1, beta, yorig, 1);
 #else
-    norm = exgemvVsSuperacc(n, x, superacc);
+    norm = exgemvVsSuperacc(n, y, superacc);
 #endif
     printf("FPE4 error = %.16g\n", norm);
     if (norm > eps) {
@@ -218,7 +217,7 @@ int main(int argc, char *argv[]) {
 #ifdef EXBLAS_VS_MPFR
     norm = exgemvVsMPFR(iscolumnwise, trans, y, m, n, alpha, a, lda, x, 1, beta, yorig, 1);
 #else
-    norm = exgemvVsSuperacc(n, x, superacc);
+    norm = exgemvVsSuperacc(n, y, superacc);
 #endif
     printf("FPE8 error = %.16g\n", norm);
     if (norm > eps) {
@@ -230,7 +229,7 @@ int main(int argc, char *argv[]) {
 #ifdef EXBLAS_VS_MPFR
     norm = exgemvVsMPFR(iscolumnwise, trans, y, m, n, alpha, a, lda, x, 1, beta, yorig, 1);
 #else
-    norm = exgemvVsSuperacc(n, x, superacc);
+    norm = exgemvVsSuperacc(n, y, superacc);
 #endif
     printf("FPE4EE error = %.16g\n", norm);
     if (norm > eps) {
@@ -242,7 +241,7 @@ int main(int argc, char *argv[]) {
 #ifdef EXBLAS_VS_MPFR
     norm = exgemvVsMPFR(iscolumnwise, trans, y, m, n, alpha, a, lda, x, 1, beta, yorig, 1);
 #else
-    norm = exgemvVsSuperacc(n, x, superacc);
+    norm = exgemvVsSuperacc(n, y, superacc);
 #endif
     printf("FPE6EE error = %.16g\n", norm);
     if (norm > eps) {
@@ -254,7 +253,7 @@ int main(int argc, char *argv[]) {
 #ifdef EXBLAS_VS_MPFR
     norm = exgemvVsMPFR(iscolumnwise, trans, y, m, n, alpha, a, lda, x, 1, beta, yorig, 1);
 #else
-    norm = exgemvVsSuperacc(n, x, superacc);
+    norm = exgemvVsSuperacc(n, y, superacc);
 #endif
     printf("FPE8EE error = %.16g\n", norm);
     if (norm > eps) {
