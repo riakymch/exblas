@@ -1,4 +1,4 @@
-ExBLAS -- Exact (fast, accurate, and reproducible) BLAS library v0.2
+ExBLAS -- Exact (fast, accurate, and reproducible) BLAS library v1.0
 =============================================
 ExBLAS aims at providing new algorithms and implementations for fundamental 
 linear algebra operations -- like those included in the BLAS library -- that 
