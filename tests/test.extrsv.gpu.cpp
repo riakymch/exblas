@@ -153,7 +153,7 @@ int main(int argc, char *argv[]) {
         printf("init_lognormal_tr_matrix\n");
         init_lognormal_tr_matrix(uplo, diag, n, a, mean, stddev);
         init_lognormal(n, xorig, mean, stddev);
-    } else if ((argc > 5) && (argv[5][0] == 'i')) {
+    } else if ((argc > 7) && (argv[7][0] == 'i')) {
         printf("init_ill_cond\n");
         init_ill_cond(n * n, a, range);
         init_ill_cond(n, xorig, range);
@@ -185,9 +185,6 @@ int main(int argc, char *argv[]) {
 #ifdef EXBLAS_VS_MPFR
     norm = extrsvVsMPFR(uplo, superacc, n, a, n, xorig, 1);
     printf("DTRSV error = %.16g\n", norm);
-    if (norm > eps) {
-        is_pass = false;
-    }
 #endif
 
     copyVector(n, superacc, xorig);
