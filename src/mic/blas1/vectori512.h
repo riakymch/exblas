@@ -1,7 +1,7 @@
 // 512-bit vector class for Intel Xeon Phi
 // Sylvain Collange <sylvain.collange@inria.fr>
 // Based on Agner Fog's Vector Class
-// (c) Copyright 2013 GNU General Public License http://www.gnu.org/licenses
+// (c) Copyright 2016 GNU General Public License http://www.gnu.org/licenses
 
 /**
  *  \file vectori512.h

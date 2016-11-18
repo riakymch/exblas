@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2013-2015 Inria and University Pierre and Marie Curie 
+ *  Copyright (c) 2016 Inria and University Pierre and Marie Curie 
  *  All rights reserved.
  */
 
@@ -107,14 +107,20 @@ static double extrsvVsSuperacc(uint n, double *extrsv, double *superacc) {
 
 int main(int argc, char *argv[]) {
     char uplo = 'U';
+    char transa = 'N';
+    char diag = 'U';
     uint n = 64;
     bool lognormal = false;
     if(argc > 1)
         uplo = argv[1][0];
     if(argc > 2)
-        n = atoi(argv[2]);
-    if(argc > 5) {
-        if(argv[5][0] == 'n') {
+        transa = argv[2][0];
+    if(argc > 3)
+        diag = argv[3][0];
+    if(argc > 4)
+        n = atoi(argv[4]);
+    if(argc > 7) {
+        if(argv[7][0] == 'n') {
             lognormal = true;
         }
     }
@@ -123,15 +129,15 @@ int main(int argc, char *argv[]) {
     int emax = 0;
     double mean = 1., stddev = 1.;
     if(lognormal) {
-        stddev = strtod(argv[3], 0);
-        mean = strtod(argv[4], 0);
+        stddev = strtod(argv[5], 0);
+        mean = strtod(argv[6], 0);
     }
     else {
-        if(argc > 3) {
-            range = atoi(argv[3]);
+        if(argc > 5) {
+            range = atoi(argv[5]);
         }
-        if(argc > 4) {
-            emax = atoi(argv[4]);
+        if(argc > 6) {
+            emax = atoi(argv[6]);
         }
     }
 
@@ -145,7 +151,7 @@ int main(int argc, char *argv[]) {
 
     if(lognormal) {
         printf("init_lognormal_tr_matrix\n");
-        init_lognormal_tr_matrix(uplo, 'N', n, a, mean, stddev);
+        init_lognormal_tr_matrix(uplo, diag, n, a, mean, stddev);
         init_lognormal(n, xorig, mean, stddev);
     } else if ((argc > 5) && (argv[5][0] == 'i')) {
         printf("init_ill_cond\n");
@@ -153,7 +159,7 @@ int main(int argc, char *argv[]) {
         init_ill_cond(n, xorig, range);
     } else {
         printf("init_fpuniform_tr_matrix\n");
-        init_fpuniform_tr_matrix(uplo, 'N', n, a, range, emax);
+        init_fpuniform_tr_matrix(uplo, diag, n, a, range, emax);
         init_fpuniform(n, xorig, range, emax);
     }
     copyVector(n, x, xorig);
@@ -173,8 +179,19 @@ int main(int argc, char *argv[]) {
     if ((!superacc) || (err != 0))
         fprintf(stderr, "Cannot allocate memory with posix_memalign\n");
 
+	// DTRSV on GPU
     copyVector(n, superacc, xorig);
-    extrsv(uplo, 'N', 'N', n, a, n, superacc, 1, 0);
+    extrsv(uplo, transa, diag, n, a, n, 0, superacc, 1, 0, 1);
+#ifdef EXBLAS_VS_MPFR
+    norm = extrsvVsMPFR(uplo, superacc, n, a, n, xorig, 1);
+    printf("DTRSV error = %.16g\n", norm);
+    if (norm > eps) {
+        is_pass = false;
+    }
+#endif
+
+    copyVector(n, superacc, xorig);
+    extrsv(uplo, transa, diag, n, a, n, 0, superacc, 1, 0, 0);
 #ifdef EXBLAS_VS_MPFR
     norm = extrsvVsMPFR(uplo, superacc, n, a, n, xorig, 1);
     printf("Superacc error = %.16g\n", norm);
@@ -184,7 +201,7 @@ int main(int argc, char *argv[]) {
 #endif
 
     copyVector(n, x, xorig);
-    extrsv(uplo, 'N', 'N', n, a, n, x, 1, 3);
+    extrsv(uplo, transa, diag, n, a, n, 0, x, 1, 0, 3);
 #ifdef EXBLAS_VS_MPFR
     norm = extrsvVsMPFR(uplo, x, n, a, n, xorig, 1);
 #else
@@ -196,7 +213,7 @@ int main(int argc, char *argv[]) {
     }
 
     copyVector(n, x, xorig);
-    extrsv(uplo, 'N', 'N', n, a, n, x, 1, 4);
+    extrsv(uplo, transa, diag, n, a, n, 0, x, 1, 0, 4);
 #ifdef EXBLAS_VS_MPFR
     norm = extrsvVsMPFR(uplo, x, n, a, n, xorig, 1);
 #else
@@ -208,21 +225,7 @@ int main(int argc, char *argv[]) {
     }
 
     copyVector(n, x, xorig);
-    extrsv(uplo, 'N', 'N', n, a, n, x, 1, 4);
-#ifdef EXBLAS_VS_MPFR
-    norm = extrsvVsMPFR(uplo, x, n, a, n, xorig, 1);
-    printf("FPE4 error = %.16g\n", norm);
-    if (norm > eps) {
-        is_pass = false;
-    }
-#else
-    if (extrsvVsSuperacc(n, x, superacc) > eps) {
-        is_pass = false;
-    }
-#endif
-
-    copyVector(n, x, xorig);
-    extrsv(uplo, 'N', 'N', n, a, n, x, 1, 8);
+    extrsv(uplo, transa, diag, n, a, n, 0, x, 1, 0, 8);
 #ifdef EXBLAS_VS_MPFR
     norm = extrsvVsMPFR(uplo, x, n, a, n, xorig, 1);
 #else
@@ -234,7 +237,19 @@ int main(int argc, char *argv[]) {
     }
 
     copyVector(n, x, xorig);
-    extrsv(uplo, 'N', 'N', n, a, n, x, 1, 4, true);
+    extrsv(uplo, transa, diag, n, a, n, 0, x, 1, 0, 4, true);
+#ifdef EXBLAS_VS_MPFR
+    norm = extrsvVsMPFR(uplo, x, n, a, n, xorig, 1);
+#else
+    norm = extrsvVsSuperacc(n, x, superacc);
+#endif
+    printf("FPE4EE error = %.16g\n", norm);
+    if (norm > eps) {
+        is_pass = false;
+    }
+
+    copyVector(n, x, xorig);
+    extrsv(uplo, transa, diag, n, a, n, 0, x, 1, 0, 6, true);
 #ifdef EXBLAS_VS_MPFR
     norm = extrsvVsMPFR(uplo, x, n, a, n, xorig, 1);
 #else
@@ -246,33 +261,7 @@ int main(int argc, char *argv[]) {
     }
 
     copyVector(n, x, xorig);
-    extrsv(uplo, 'N', 'N', n, a, n, x, 1, 4, true);
-#ifdef EXBLAS_VS_MPFR
-    norm = extrsvVsMPFR(uplo, x, n, a, n, xorig, 1);
-    printf("FPE6EE error = %.16g\n", norm);
-    if (norm > eps) {
-        is_pass = false;
-    }
-#else
-    if (extrsvVsSuperacc(n, x, superacc) > eps) {
-        is_pass = false;
-    }
-#endif
-
-    copyVector(n, x, xorig);
-    extrsv(uplo, 'N', 'N', n, a, n, x, 1, 6, true);
-#ifdef EXBLAS_VS_MPFR
-    norm = extrsvVsMPFR(uplo, x, n, a, n, xorig, 1);
-#else
-    norm = extrsvVsSuperacc(n, x, superacc);
-#endif
-    printf("FPE6EE error = %.16g\n", norm);
-    if (norm > eps) {
-        is_pass = false;
-    }
-
-    copyVector(n, x, xorig);
-    extrsv(uplo, 'N', 'N', n, a, n, x, 1, 8, true);
+    extrsv(uplo, transa, diag, n, a, n, 0, x, 1, 0, 8, true);
 #ifdef EXBLAS_VS_MPFR
     norm = extrsvVsMPFR(uplo, x, n, a, n, xorig, 1);
 #else

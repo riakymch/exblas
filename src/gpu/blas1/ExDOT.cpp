@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2013-2015 Inria and University Pierre and Marie Curie
+ *  Copyright (c) 2016 Inria and University Pierre and Marie Curie
  *  All rights reserved.
  */
 
@@ -37,13 +37,15 @@
  * \param N vector size
  * \param a vector
  * \param inca specifies the increment for the elements of a
- * \param b vector
+ * \param offseta specifies position in the vector a from its start
+ * \param bg vector
  * \param incb specifies the increment for the elements of b
+ * \param offsetb specifies position in the vector b from its start
  * \param fpe size of floating-point expansion
  * \param program_file path to the file with kernels
  * \return Contains the reproducible and accurate dot product of two real vectors
  */
-static double runExDOT(int N, double *a, int inca, double *b, int incb, int fpe, const char* program_file);
+static double runExDOT(const int N, double *h_a, const int inca, const int offseta, double *h_b, const int incb, const int offsetb, const int fpe, const char* program_file);
 
 /**
  * \ingroup ExDOT
@@ -56,35 +58,40 @@ static double runExDOT(int N, double *a, int inca, double *b, int incb, int fpe,
  * \param Ng vector size
  * \param ag vector
  * \param inca specifies the increment for the elements of a
+ * \param offseta specifies position in the vector a from its start
  * \param bg vector
  * \param incb specifies the increment for the elements of b
+ * \param offsetb specifies position in the vector b from its start
  * \param fpe stands for the floating-point expansions size (used in conjuction with superaccumulators)
  * \param early_exit specifies the optimization technique. By default, it is disabled
  * \return Contains the reproducible and accurate result of the dot product of two real vectors
  */
-double exdot(int Ng, double *ag, int inca, double *bg, int incb, int fpe, bool early_exit) {
+double exdot(const int Ng, double *ag, const int inca, const int offseta, double *bg, const int incb, const int offsetb, const int fpe, const bool early_exit) {
+    if (Ng <= 0)
+        return 0.0;
+
     char path[256];
     strcpy(path, EXBLAS_BINARY_DIR);
     strcat(path, "/include/cl/");
 
     // with superaccumulators only
     if (fpe < 3)
-        return runExDOT(Ng, ag, inca, bg, incb, 0, strcat(path, "ExDOT.Superacc.cl"));
+        return runExDOT(Ng, ag, inca, offseta, bg, incb, offsetb, 0, strcat(path, "ExDOT.Superacc.cl"));
 
     if (early_exit) {
         if (fpe <= 4)
-            return runExDOT(Ng, ag, inca, bg, incb, 4, strcat(path, "ExDOT.FPE.EX.4.cl"));
+            return runExDOT(Ng, ag, inca, offseta, bg, incb, offsetb, 4, strcat(path, "ExDOT.FPE.EX.4.cl"));
         if (fpe <= 6)
-            return runExDOT(Ng, ag, inca, bg, incb, 6, strcat(path, "ExDOT.FPE.EX.6.cl"));
+            return runExDOT(Ng, ag, inca, offseta, bg, incb, offsetb, 6, strcat(path, "ExDOT.FPE.EX.6.cl"));
         if (fpe <= 8)
-            return runExDOT(Ng, ag, inca, bg, incb, 8, strcat(path, "ExDOT.FPE.EX.8.cl"));
+            return runExDOT(Ng, ag, inca, offseta, bg, incb, offsetb, 8, strcat(path, "ExDOT.FPE.EX.8.cl"));
     } else // ! early_exit
-        return runExDOT(Ng, ag, inca, bg, incb, fpe, strcat(path, "ExDOT.FPE.cl"));
+        return runExDOT(Ng, ag, inca, offseta, bg, incb, offsetb, fpe, strcat(path, "ExDOT.FPE.cl"));
 
     return 0.0;
 }
 
-static double runExDOT(int N, double *h_a, int inca, double *h_b, int incb, int fpe, const char* program_file){
+static double runExDOT(const int N, double *h_a, const int inca, const int offseta, double *h_b, const int incb, const int offsetb, const int fpe, const char* program_file){
     double h_Res;
     cl_int ciErrNum;
 
@@ -118,7 +125,6 @@ static double runExDOT(int N, double *h_a, int inca, double *h_b, int incb, int 
         //Create a command-queue
         cl_command_queue cqCommandQueue = clCreateCommandQueue(cxGPUContext, cdDevice, CL_QUEUE_PROFILING_ENABLE, &ciErrNum);
         if (ciErrNum != CL_SUCCESS) {
-            printf("Error = %d\n", ciErrNum);
             printf("Error in clCreateCommandQueue, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
             exit(EXIT_FAILURE);
         }
@@ -126,6 +132,7 @@ static double runExDOT(int N, double *h_a, int inca, double *h_b, int incb, int 
         //Allocating OpenCL memory...
         cl_mem d_a = clCreateBuffer(cxGPUContext, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, N * sizeof(cl_double), h_a, &ciErrNum);
         if (ciErrNum != CL_SUCCESS) {
+            printf("N = %d\t ciErrNum = %d\n", N, ciErrNum);
             printf("Error in clCreateBuffer for d_a, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
             exit(EXIT_FAILURE);
         }
@@ -142,13 +149,13 @@ static double runExDOT(int N, double *h_a, int inca, double *h_b, int incb, int 
 
     {
         //Initializing OpenCL ExDOT
-            ciErrNum = initExDOT(cxGPUContext, cqCommandQueue, cdDevice, program_file, N, fpe);
+            ciErrNum = initExDOT(cxGPUContext, cqCommandQueue, cdDevice, program_file, fpe);
             if (ciErrNum != CL_SUCCESS)
                 exit(EXIT_FAILURE);
 
         //Running OpenCL ExDOT
             //Just a single launch or a warmup iteration
-            ExDOT(NULL, d_Res, d_a, inca, d_b, incb, &ciErrNum);
+            ExDOT(N, d_a, inca, offseta, d_b, incb, offsetb, NULL, d_Res, &ciErrNum);
             if (ciErrNum != CL_SUCCESS)
                 exit(EXIT_FAILURE);
 
@@ -158,15 +165,17 @@ static double runExDOT(int N, double *h_a, int inca, double *h_b, int incb, int 
 
         for(uint iter = 0; iter < NUM_ITER; iter++) {
             ciErrNum = clEnqueueMarker(cqCommandQueue, &startMark);
+            //ciErrNum = clEnqueueMarkerWithWaitList(cqCommandQueue, 0, NULL, &startMark);
             ciErrNum |= clFinish(cqCommandQueue);
             if (ciErrNum != CL_SUCCESS) {
                 printf("Error in clEnqueueMarker, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
                 exit(EXIT_FAILURE);
             }
 
-            ExDOT(NULL, d_Res, d_a, inca, d_b, incb, &ciErrNum);
+            ExDOT(N, d_a, inca, offseta, d_b, incb, offsetb, NULL, d_Res, &ciErrNum);
 
             ciErrNum  = clEnqueueMarker(cqCommandQueue, &endMark);
+            //ciErrNum = clEnqueueMarkerWithWaitList(cqCommandQueue, 0, NULL, &endMark);
             ciErrNum |= clFinish(cqCommandQueue);
             if (ciErrNum != CL_SUCCESS) {
                 printf("Error in clEnqueueMarker, Line %u in file %s !!!\n\n", __LINE__, __FILE__);

@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2013-2015 Inria and University Pierre and Marie Curie 
+ *  Copyright (c) 2016 Inria and University Pierre and Marie Curie 
  *  All rights reserved.
  */
 
@@ -202,8 +202,10 @@ void ExDOT(
     __global long *d_PartialSuperaccs,
     __global double *d_a,
     const uint inca,
+    const uint offseta,
     __global double *d_b,
     const uint incb,
+    const uint offsetb,
     const uint NbElements
 ) {
     __local long l_sa[WARP_COUNT * BIN_COUNT] __attribute__((aligned(8)));
@@ -216,90 +218,176 @@ void ExDOT(
 
     //Read data from global memory and scatter it to sub-superaccs
     double a[6] = {0.0};
-    for(uint pos = get_global_id(0); pos < NbElements; pos += get_global_size(0)){
-        double r = 0.0;
-        double x = TwoProductFMA(d_a[pos], d_b[pos], &r);
+	if ((offseta == 0) && (inca == 1) && (offsetb == 0) && (incb == 1)) {
+		for(uint pos = get_global_id(0); pos < NbElements; pos += get_global_size(0)){
+			double r = 0.0;
+			double x = TwoProductFMA(d_a[pos], d_b[pos], &r);
 
-        double s;
-        a[0] = KnuthTwoSum(a[0], x, &s);
-        x = s;
-        if (x != 0.0) {
-            a[1] = KnuthTwoSum(a[1], x, &s);
-            x = s;
-            if (x != 0.0) {
-                a[2] = KnuthTwoSum(a[2], x, &s);
-                x = s;
-                if (x != 0.0) {
-                    a[3] = KnuthTwoSum(a[3], x, &s);
-                    x = s;
-                    if (x != 0.0) {
-                        a[4] = KnuthTwoSum(a[4], x, &s);
-                        x = s;
-                        if (x != 0.0) {
-                            a[5] = KnuthTwoSum(a[5], x, &s);
-                            x = s;
-                        }
-                    }
-                }
-            }
-        }
-        if(x != 0.0) {
-            Accumulate(l_workingBase, x);
-            //Flush FPEs to superaccs
-            Accumulate(l_workingBase, a[0]);
-            Accumulate(l_workingBase, a[1]);
-            Accumulate(l_workingBase, a[2]);
-            Accumulate(l_workingBase, a[3]);
-            Accumulate(l_workingBase, a[4]);
-            Accumulate(l_workingBase, a[5]);
-            a[0] = 0.0;
-            a[1] = 0.0;
-            a[2] = 0.0;
-            a[3] = 0.0;
-            a[4] = 0.0;
-            a[5] = 0.0;
-        }
+			double s;
+			a[0] = KnuthTwoSum(a[0], x, &s);
+			x = s;
+			if (x != 0.0) {
+				a[1] = KnuthTwoSum(a[1], x, &s);
+				x = s;
+				if (x != 0.0) {
+					a[2] = KnuthTwoSum(a[2], x, &s);
+					x = s;
+					if (x != 0.0) {
+						a[3] = KnuthTwoSum(a[3], x, &s);
+						x = s;
+						if (x != 0.0) {
+							a[4] = KnuthTwoSum(a[4], x, &s);
+							x = s;
+							if (x != 0.0) {
+								a[5] = KnuthTwoSum(a[5], x, &s);
+								x = s;
+							}
+						}
+					}
+				}
+			}
+			if(x != 0.0) {
+				Accumulate(l_workingBase, x);
+				//Flush FPEs to superaccs
+				Accumulate(l_workingBase, a[0]);
+				Accumulate(l_workingBase, a[1]);
+				Accumulate(l_workingBase, a[2]);
+				Accumulate(l_workingBase, a[3]);
+				Accumulate(l_workingBase, a[4]);
+				Accumulate(l_workingBase, a[5]);
+				a[0] = 0.0;
+				a[1] = 0.0;
+				a[2] = 0.0;
+				a[3] = 0.0;
+				a[4] = 0.0;
+				a[5] = 0.0;
+			}
 
-        if(r != 0.0) {
-            /*a[0] = KnuthTwoSum(a[0], r, &s);
-            r = s;
-            if (r != 0.0) {
-                a[1] = KnuthTwoSum(a[1], r, &s);
-                r = s;
-                if (r != 0.0) {
-                    a[2] = KnuthTwoSum(a[2], r, &s);
-                    r = s;
-                    if (r != 0.0) {*/
-            a[3] = KnuthTwoSum(a[3], r, &s);
-            r = s;
-            if (r != 0.0) {
-                a[4] = KnuthTwoSum(a[4], r, &s);
-                r = s;
-                if (r != 0.0) {
-                    a[5] = KnuthTwoSum(a[5], r, &s);
-                    r = s;
-                }
-            }
-            //}}}
-            if(r != 0.0) {
-                Accumulate(l_workingBase, r);
-                //Flush FPEs to superaccs
-                Accumulate(l_workingBase, a[0]);
-                Accumulate(l_workingBase, a[1]);
-                Accumulate(l_workingBase, a[2]);
-                Accumulate(l_workingBase, a[3]);
-                Accumulate(l_workingBase, a[4]);
-                Accumulate(l_workingBase, a[5]);
-                a[0] = 0.0;
-                a[1] = 0.0;
-                a[2] = 0.0;
-                a[3] = 0.0;
-                a[4] = 0.0;
-                a[5] = 0.0;
-            }
-        }
-    }
-    //Flush FPEs to superaccs
+			if(r != 0.0) {
+				/*a[0] = KnuthTwoSum(a[0], r, &s);
+				r = s;
+				if (r != 0.0) {
+					a[1] = KnuthTwoSum(a[1], r, &s);
+					r = s;
+					if (r != 0.0) {
+						a[2] = KnuthTwoSum(a[2], r, &s);
+						r = s;
+						if (r != 0.0) {*/
+				a[3] = KnuthTwoSum(a[3], r, &s);
+				r = s;
+				if (r != 0.0) {
+					a[4] = KnuthTwoSum(a[4], r, &s);
+					r = s;
+					if (r != 0.0) {
+						a[5] = KnuthTwoSum(a[5], r, &s);
+						r = s;
+					}
+				}
+				//}}}
+				if(r != 0.0) {
+					Accumulate(l_workingBase, r);
+					//Flush FPEs to superaccs
+					Accumulate(l_workingBase, a[0]);
+					Accumulate(l_workingBase, a[1]);
+					Accumulate(l_workingBase, a[2]);
+					Accumulate(l_workingBase, a[3]);
+					Accumulate(l_workingBase, a[4]);
+					Accumulate(l_workingBase, a[5]);
+					a[0] = 0.0;
+					a[1] = 0.0;
+					a[2] = 0.0;
+					a[3] = 0.0;
+					a[4] = 0.0;
+					a[5] = 0.0;
+				}
+			}
+		}
+	} else {
+		for(uint pos = get_global_id(0); pos < NbElements; pos += get_global_size(0)){
+			double r = 0.0;
+			double x = TwoProductFMA(d_a[offseta + pos * inca], d_b[offsetb + pos * incb], &r);
+
+			double s;
+			a[0] = KnuthTwoSum(a[0], x, &s);
+			x = s;
+			if (x != 0.0) {
+				a[1] = KnuthTwoSum(a[1], x, &s);
+				x = s;
+				if (x != 0.0) {
+					a[2] = KnuthTwoSum(a[2], x, &s);
+					x = s;
+					if (x != 0.0) {
+						a[3] = KnuthTwoSum(a[3], x, &s);
+						x = s;
+						if (x != 0.0) {
+							a[4] = KnuthTwoSum(a[4], x, &s);
+							x = s;
+							if (x != 0.0) {
+								a[5] = KnuthTwoSum(a[5], x, &s);
+								x = s;
+							}
+						}
+					}
+				}
+			}
+			if(x != 0.0) {
+				Accumulate(l_workingBase, x);
+				//Flush FPEs to superaccs
+				Accumulate(l_workingBase, a[0]);
+				Accumulate(l_workingBase, a[1]);
+				Accumulate(l_workingBase, a[2]);
+				Accumulate(l_workingBase, a[3]);
+				Accumulate(l_workingBase, a[4]);
+				Accumulate(l_workingBase, a[5]);
+				a[0] = 0.0;
+				a[1] = 0.0;
+				a[2] = 0.0;
+				a[3] = 0.0;
+				a[4] = 0.0;
+				a[5] = 0.0;
+			}
+
+			if(r != 0.0) {
+				/*a[0] = KnuthTwoSum(a[0], r, &s);
+				r = s;
+				if (r != 0.0) {
+					a[1] = KnuthTwoSum(a[1], r, &s);
+					r = s;
+					if (r != 0.0) {
+						a[2] = KnuthTwoSum(a[2], r, &s);
+						r = s;
+						if (r != 0.0) {*/
+				a[3] = KnuthTwoSum(a[3], r, &s);
+				r = s;
+				if (r != 0.0) {
+					a[4] = KnuthTwoSum(a[4], r, &s);
+					r = s;
+					if (r != 0.0) {
+						a[5] = KnuthTwoSum(a[5], r, &s);
+						r = s;
+					}
+				}
+				//}}}
+				if(r != 0.0) {
+					Accumulate(l_workingBase, r);
+					//Flush FPEs to superaccs
+					Accumulate(l_workingBase, a[0]);
+					Accumulate(l_workingBase, a[1]);
+					Accumulate(l_workingBase, a[2]);
+					Accumulate(l_workingBase, a[3]);
+					Accumulate(l_workingBase, a[4]);
+					Accumulate(l_workingBase, a[5]);
+					a[0] = 0.0;
+					a[1] = 0.0;
+					a[2] = 0.0;
+					a[3] = 0.0;
+					a[4] = 0.0;
+					a[5] = 0.0;
+				}
+			}
+		}
+	}
+	//Flush FPEs to superaccs
     Accumulate(l_workingBase, a[0]);
     Accumulate(l_workingBase, a[1]);
     Accumulate(l_workingBase, a[2]);

@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2013-2015 Inria and University Pierre and Marie Curie
+ *  Copyright (c) 2016 Inria and University Pierre and Marie Curie
  *  All rights reserved.
  */
 
@@ -26,7 +26,7 @@
 #include "ExGEMV.Launcher.hpp"
 
 
-#define NUM_ITER 20
+#define NUM_ITER 5
 
 
 /**
@@ -39,16 +39,19 @@
  * \param alpha scalar
  * \param a matrix A
  * \param lda leading dimension of A
+ * \param offseta specifies position in the metrix A from its beginning
  * \param x vector
  * \param incx the increment for the elements of a
+ * \param offsetx specifies position in the vector x from its start
  * \param beta scalar
  * \param y vector
  * \param incy the increment for the elements of a
+ * \param offsety specifies position in the vector y from its start
  * \param fpe size of floating-point expansion
  * \param program_file path to the file with kernels
- * \return Contains the reproducible and accurate result of solving triangular system
+ * \return Contains the reproducible and accurate result of the matrix-vector product
  */
-int runExGEMV(int m, int n, double alpha, double *a, int lda, double *x, int incx, double beta, double *y, int incy, int fpe, const char* program_file);
+int runExGEMV(const int m, const int n, const double alpha, double *a, const int lda, const int offseta, double *x, const int incx, const int offsetx, const double beta, double *y, const int incy, const int offsety, const int fpe, const char* program_file);
 
 /**
  * \ingroup ExGEMV
@@ -62,38 +65,47 @@ int runExGEMV(int m, int n, double alpha, double *a, int lda, double *x, int inc
  * \param alpha scalar
  * \param a matrix A
  * \param lda leading dimension of A
+ * \param offseta specifies position in the metrix A from its beginning
  * \param x vector
  * \param incx the increment for the elements of a
+ * \param offsetx specifies position in the vector x from its start
  * \param beta scalar
  * \param y vector
  * \param incy the increment for the elements of a
+ * \param offsety specifies position in the vector y from its start
  * \param fpe size of floating-point expansion
  * \param early_exit specifies the optimization technique. By default, it is disabled
  * \return matrix C contains the reproducible and accurate result of the matrix product
  */
-int exgemv(char transa, int m, int n, double alpha, double *a, int lda, double *x, int incx, double beta, double *y, int incy, int fpe, bool early_exit) {
+int exgemv(const char transa, const int m, const int n, const double alpha, double *a, const int lda, const int offseta, double *x, const int incx, const int offsetx, const double beta, double *y, const int incy, const int offsety, const int fpe, const bool early_exit) {
     char path[256];
     strcpy(path, EXBLAS_BINARY_DIR);
     strcat(path, "/include/cl/");
 
     // with superaccumulators only
-    if (fpe == 0)
-        return runExGEMV(m, n, alpha,  a, lda, x, incx, beta, y, incy,  0, strcat(path, "ExGEMV.Superacc.cl"));
+    if (fpe == 0) {
+        return runExGEMV(m, n, alpha,  a, lda, offseta, x, incx, offsetx, beta, y, incy, offsety, 0, strcat(path, "ExGEMV.Superacc.cl"));
+    }
+
+    // DGEMV
+    if (fpe == 1) {
+        return runExGEMV(m, n, alpha,  a, lda, offseta, x, incx, offsetx, beta, y, incy, offsety, 1, strcat(path, "DGEMV.cl"));
+    }
 
     if (early_exit) {
         if (fpe <= 4)
-            return runExGEMV(m, n, alpha, a, lda, x, incx, beta, y, incy, 4, strcat(path, "ExGEMV.FPE.EX.4.cl"));
+            return runExGEMV(m, n, alpha, a, lda, offseta, x, incx, offsetx, beta, y, incy, offsety, 4, strcat(path, "ExGEMV.FPE.EX.4.cl"));
         if (fpe <= 6)
-            return runExGEMV(m, n, alpha, a, lda, x, incx, beta, y, incy, 6, strcat(path, "ExGEMV.FPE.EX.6.cl"));
+            return runExGEMV(m, n, alpha, a, lda, offseta, x, incx, offsetx, beta, y, incy, offsety,6, strcat(path, "ExGEMV.FPE.EX.6.cl"));
         if (fpe <= 8)
-            return runExGEMV(m, n, alpha, a, lda, x, incx, beta, y, incy, 8, strcat(path, "ExGEMV.FPE.EX.8.cl"));
+            return runExGEMV(m, n, alpha, a, lda, offseta, x, incx, offsetx, beta, y, incy, offsety, 8, strcat(path, "ExGEMV.FPE.EX.8.cl"));
     } else // ! early_exit
-        return runExGEMV(m, n, alpha, a, lda, x, incx, beta, y, incy, fpe, strcat(path, "ExGEMV.FPE.cl"));
+        return runExGEMV(m, n, alpha, a, lda, offseta, x, incx, offsetx, beta, y, incy, offsety, fpe, strcat(path, "ExGEMV.FPE.cl"));
 
     return 0;
 }
 
-int runExGEMV(int m, int n, double alpha, double *a, int lda, double *x, int incx, double beta, double *y, int incy, int fpe, const char* program_file){
+int runExGEMV(const int m, const int n, const double alpha, double *a, const int lda, const int offseta, double *x, const int incx, const int offsetx, const double beta, double *y, const int incy, const int offsety, const int fpe, const char* program_file) {
     cl_int ciErrNum;
 
     //printf("Initializing OpenCL...\n");
@@ -131,7 +143,7 @@ int runExGEMV(int m, int n, double alpha, double *a, int lda, double *x, int inc
         }
 
         //Allocating OpenCL memory...
-        cl_mem d_a = clCreateBuffer(cxGPUContext, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, n * n * sizeof(cl_double), a, &ciErrNum);
+        cl_mem d_a = clCreateBuffer(cxGPUContext, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, m * n * sizeof(cl_double), a, &ciErrNum);
         if (ciErrNum != CL_SUCCESS) {
             printf("Error in clCreateBuffer for d_a, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
             exit(EXIT_FAILURE);
@@ -141,7 +153,7 @@ int runExGEMV(int m, int n, double alpha, double *a, int lda, double *x, int inc
             printf("Error in clCreateBuffer for d_x, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
             exit(EXIT_FAILURE);
         }
-        cl_mem d_y = clCreateBuffer(cxGPUContext, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, n * sizeof(cl_double), y, &ciErrNum);
+        cl_mem d_y = clCreateBuffer(cxGPUContext, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, m * sizeof(cl_double), y, &ciErrNum);
         if (ciErrNum != CL_SUCCESS) {
             printf("Error in clCreateBuffer for d_y, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
             exit(EXIT_FAILURE);
@@ -149,12 +161,12 @@ int runExGEMV(int m, int n, double alpha, double *a, int lda, double *x, int inc
 
     {
         //Initializing OpenCL dSum...
-        ciErrNum = initExGEMV(cxGPUContext, cqCommandQueue, cdDevice, program_file, m, 256, 1, fpe);
+        ciErrNum = initExGEMV(cxGPUContext, cqCommandQueue, cdDevice, program_file, m, 1, fpe);
         if (ciErrNum != CL_SUCCESS)
             exit(EXIT_FAILURE);
 
         //Running OpenCL exgemv with %u elements...
-        ExGEMV(NULL, m, n, alpha, d_a, lda, d_x, incx, beta, d_y, incy, &ciErrNum);
+        ExGEMV(NULL, m, n, alpha, d_a, lda, offseta, d_x, incx, offsetx, beta, d_y, incy, offsety, &ciErrNum);
         if (ciErrNum != CL_SUCCESS)
             exit(EXIT_FAILURE);
 
@@ -164,15 +176,17 @@ int runExGEMV(int m, int n, double alpha, double *a, int lda, double *x, int inc
 
         for(uint iter = 0; iter < NUM_ITER; iter++) {
             ciErrNum = clEnqueueMarker(cqCommandQueue, &startMark);
+            //ciErrNum = clEnqueueMarkerWithWaitList(cqCommandQueue, 0, NULL, &startMark);
             ciErrNum |= clFinish(cqCommandQueue);
             if (ciErrNum != CL_SUCCESS) {
                 printf("Error in clEnqueueMarker, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
                 exit(EXIT_FAILURE);
             }
 
-            ExGEMV(NULL, m, n, alpha, d_a, lda, d_x, incx, beta, d_y, incy, &ciErrNum);
+            ExGEMV(NULL, m, n, alpha, d_a, lda, offseta, d_x, incx, offsetx, beta, d_y, incy, offsety, &ciErrNum);
 
             ciErrNum  = clEnqueueMarker(cqCommandQueue, &endMark);
+            //ciErrNum = clEnqueueMarkerWithWaitList(cqCommandQueue, 0, NULL, &endMark);
             ciErrNum |= clFinish(cqCommandQueue);
             if (ciErrNum != CL_SUCCESS) {
                 printf("Error in clEnqueueMarker, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
@@ -195,11 +209,11 @@ int runExGEMV(int m, int n, double alpha, double *a, int lda, double *x, int inc
         double throughput = (m * n + m + n) * sizeof(double);
         throughput = (throughput / mint) * 1e-9;
         printf("NbFPE = %u \t M = %u \t N = %u \t Time = %.8f s \t Throughput = %.4f GB/s \t Performance = %.4f GFLOPS\n", fpe, m, n, mint, throughput, perf);
-        fprintf(stderr, "%f\n", mint);
+        fprintf(stderr, "%f  ", mint);
 #endif
 
         //Retrieving results...
-            ciErrNum = clEnqueueReadBuffer(cqCommandQueue, d_y, CL_TRUE, 0, n * sizeof(cl_double), y, 0, NULL, NULL);
+            ciErrNum = clEnqueueReadBuffer(cqCommandQueue, d_y, CL_TRUE, 0, m * sizeof(cl_double), y, 0, NULL, NULL);
             if (ciErrNum != CL_SUCCESS) {
                 printf("ciErrNum = %d\n", ciErrNum);
                 printf("Error in clEnqueueReadBuffer Line %u in file %s !!!\n\n", __LINE__, __FILE__);

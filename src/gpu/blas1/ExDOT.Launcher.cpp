@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2013-2015 Inria and University Pierre and Marie Curie 
+ *  Copyright (c) 2016 Inria and University Pierre and Marie Curie 
  *  All rights reserved.
  */
 
@@ -29,7 +29,6 @@ static const uint PARTIAL_SUPERACCS_COUNT = 512;
 static const uint WORKGROUP_SIZE          = 256;
 static const uint MERGE_WORKGROUP_SIZE    = 64;
 static const uint MERGE_SUPERACCS_SIZE    = 128;
-static uint NbElements;
 
 #ifdef AMD
 static char  compileOptions[256] = "-DWARP_COUNT=16 -DWARP_SIZE=16 -DMERGE_WORKGROUP_SIZE=64 -DMERGE_SUPERACCS_SIZE=128 -DUSE_KNUTH";
@@ -46,11 +45,9 @@ extern "C" cl_int initExDOT(
     cl_command_queue cqParamCommandQue,
     cl_device_id cdDevice,
     const char* program_file,
-    const uint NbElems,
     const uint NbFPE
 ){
     cl_int ciErrNum;
-    NbElements = NbElems;
 
     // Read the OpenCL kernel in from source file
     FILE *program_handle;
@@ -129,13 +126,16 @@ extern "C" void closeExDOT(void){
 ////////////////////////////////////////////////////////////////////////////////
 // OpenCL launchers
 ////////////////////////////////////////////////////////////////////////////////
-extern "C" size_t ExDOT(
+extern size_t ExDOT(
+    cl_uint NbElements,
+    cl_mem d_a,
+    const cl_uint inca,
+    const cl_uint offseta,
+    cl_mem d_b,
+    const cl_uint incb,
+    const cl_uint offsetb,
     cl_command_queue cqCommandQueue,
     cl_mem d_Res,
-    cl_mem d_a,
-    cl_uint inca,
-    cl_mem d_b,
-    cl_uint incb,
     cl_int *ciErrNumRes
 ){
     cl_int ciErrNum;
@@ -152,8 +152,10 @@ extern "C" size_t ExDOT(
         ciErrNum  = clSetKernelArg(ckKernel, i++, sizeof(cl_mem),  (void *)&d_PartialSuperaccs);
         ciErrNum |= clSetKernelArg(ckKernel, i++, sizeof(cl_mem),  (void *)&d_a);
         ciErrNum |= clSetKernelArg(ckKernel, i++, sizeof(cl_uint),  (void *)&inca);
+        ciErrNum |= clSetKernelArg(ckKernel, i++, sizeof(cl_uint),  (void *)&offseta);
         ciErrNum |= clSetKernelArg(ckKernel, i++, sizeof(cl_mem),  (void *)&d_b);
         ciErrNum |= clSetKernelArg(ckKernel, i++, sizeof(cl_uint),  (void *)&incb);
+        ciErrNum |= clSetKernelArg(ckKernel, i++, sizeof(cl_uint),  (void *)&offsetb);
         ciErrNum |= clSetKernelArg(ckKernel, i++, sizeof(cl_uint), (void *)&NbElements);
         if (ciErrNum != CL_SUCCESS) {
             printf("Error in clSetKernelArg, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
@@ -196,3 +198,81 @@ extern "C" size_t ExDOT(
     return WORKGROUP_SIZE;
 }
 
+
+extern double ExDOT(
+    cl_uint NbElements,
+    cl_mem d_a,
+    const cl_uint inca,
+    const cl_uint offseta,
+    cl_mem d_b,
+    const cl_uint incb,
+    const cl_uint offsetb,
+    cl_command_queue cqCommandQueue
+){
+    cl_int ciErrNum;
+    size_t NbThreadsPerWorkGroup, TotalNbThreads;
+    double h_Res = 0.0;
+
+    if(!cqCommandQueue)
+        cqCommandQueue = cqDefaultCommandQue;
+
+    {
+        NbThreadsPerWorkGroup  = WORKGROUP_SIZE;
+        TotalNbThreads = PARTIAL_SUPERACCS_COUNT * NbThreadsPerWorkGroup;
+
+        cl_uint i = 0;
+        ciErrNum  = clSetKernelArg(ckKernel, i++, sizeof(cl_mem),  (void *)&d_PartialSuperaccs);
+        ciErrNum |= clSetKernelArg(ckKernel, i++, sizeof(cl_mem),  (void *)&d_a);
+        ciErrNum |= clSetKernelArg(ckKernel, i++, sizeof(cl_uint),  (void *)&inca);
+        ciErrNum |= clSetKernelArg(ckKernel, i++, sizeof(cl_uint),  (void *)&offseta);
+        ciErrNum |= clSetKernelArg(ckKernel, i++, sizeof(cl_mem),  (void *)&d_b);
+        ciErrNum |= clSetKernelArg(ckKernel, i++, sizeof(cl_uint),  (void *)&incb);
+        ciErrNum |= clSetKernelArg(ckKernel, i++, sizeof(cl_uint),  (void *)&offsetb);
+        ciErrNum |= clSetKernelArg(ckKernel, i++, sizeof(cl_uint), (void *)&NbElements);
+        if (ciErrNum != CL_SUCCESS) {
+            printf("Error in clSetKernelArg, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
+            exit(EXIT_FAILURE);
+        }
+
+        ciErrNum = clEnqueueNDRangeKernel(cqCommandQueue, ckKernel, 1, NULL, &TotalNbThreads, &NbThreadsPerWorkGroup, 0, NULL, NULL);
+        if (ciErrNum != CL_SUCCESS) {
+            printf("Error in clEnqueueNDRangeKernel, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
+            exit(EXIT_FAILURE);
+        }
+    }
+
+    {
+        NbThreadsPerWorkGroup = MERGE_WORKGROUP_SIZE;
+        TotalNbThreads = NbThreadsPerWorkGroup;
+        TotalNbThreads *= PARTIAL_SUPERACCS_COUNT / MERGE_SUPERACCS_SIZE;
+
+//        cl_mem d_Res = clCreateBuffer(cxGPUContext, CL_MEM_READ_WRITE, sizeof(cl_double), NULL, &ciErrNum);
+//        if (ciErrNum != CL_SUCCESS) {
+//            printf("Error in clCreateBuffer for d_res, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
+//            exit(EXIT_FAILURE);
+//        }
+//
+//        cl_uint i = 0;
+//        ciErrNum  = clSetKernelArg(ckComplete, i++, sizeof(cl_mem),  (void *)&d_Res);
+//        ciErrNum |= clSetKernelArg(ckComplete, i++, sizeof(cl_mem),  (void *)&d_PartialSuperaccs);
+//        ciErrNum |= clSetKernelArg(ckComplete, i++, sizeof(cl_uint), (void *)&PARTIAL_SUPERACCS_COUNT);
+//        if (ciErrNum != CL_SUCCESS) {
+//            printf("Error in clSetKernelArg, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
+//            exit(EXIT_FAILURE);
+//        }
+//
+//        ciErrNum = clEnqueueNDRangeKernel(cqCommandQueue, ckComplete, 1, NULL, &TotalNbThreads, &NbThreadsPerWorkGroup, 0, NULL, NULL);
+//        if (ciErrNum != CL_SUCCESS) {
+//            printf("Error in clEnqueueNDRangeKernel, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
+//            exit(EXIT_FAILURE);
+//        }
+//
+//        ciErrNum = clEnqueueReadBuffer(cqCommandQueue, d_Res, CL_TRUE, 0, sizeof(cl_double), &h_Res, 0, NULL, NULL);
+//        if (ciErrNum != CL_SUCCESS) {
+//            printf("Error in clEnqueueReadBuffer Line %u in file %s !!!\n\n", __LINE__, __FILE__);
+//            exit(EXIT_FAILURE);
+//        }
+    }
+
+    return h_Res;
+}

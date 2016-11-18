@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2013-2015 Inria and University Pierre and Marie Curie
+ *  Copyright (c) 2016 Inria and University Pierre and Marie Curie
  *  All rights reserved.
  */
 
@@ -22,7 +22,7 @@
  * Otherwise, use floating-point expansions of size FPE with superaccumulators when needed
  * early_exit corresponds to the early-exit technique
  */
-double exsum(int Ng, double *ag, int inca, int fpe, bool early_exit) {
+double exsum(int Ng, double *ag, int inca, int offset, int fpe, bool early_exit) {
 #ifdef EXBLAS_MPI
     int np = 1, p, err;
     MPI_Comm_rank(MPI_COMM_WORLD, &p);
@@ -69,30 +69,30 @@ double exsum(int Ng, double *ag, int inca, int fpe, bool early_exit) {
 
     // with superaccumulators only
     if (fpe < 2)
-        return ExSUMSuperacc(N, a, inca);
+        return ExSUMSuperacc(N, a, inca, offset);
 
     if (early_exit) {
         if (fpe <= 4)
-            return (ExSUMFPE<FPExpansionVect<Vec4d, 4, FPExpansionTraits<true> > >)(N, a, inca);
+            return (ExSUMFPE<FPExpansionVect<Vec4d, 4, FPExpansionTraits<true> > >)(N, a, inca, offset);
         if (fpe <= 6)
-            return (ExSUMFPE<FPExpansionVect<Vec4d, 6, FPExpansionTraits<true> > >)(N, a, inca);
+            return (ExSUMFPE<FPExpansionVect<Vec4d, 6, FPExpansionTraits<true> > >)(N, a, inca, offset);
         if (fpe <= 8)
-            return (ExSUMFPE<FPExpansionVect<Vec4d, 8, FPExpansionTraits<true> > >)(N, a, inca);
+            return (ExSUMFPE<FPExpansionVect<Vec4d, 8, FPExpansionTraits<true> > >)(N, a, inca, offset);
     } else { // ! early_exit
         if (fpe == 2) 
-	    return (ExSUMFPE<FPExpansionVect<Vec4d, 2> >)(N, a, inca);
+	    return (ExSUMFPE<FPExpansionVect<Vec4d, 2> >)(N, a, inca, offset);
         if (fpe == 3) 
-	    return (ExSUMFPE<FPExpansionVect<Vec4d, 3> >)(N, a, inca);
+	    return (ExSUMFPE<FPExpansionVect<Vec4d, 3> >)(N, a, inca, offset);
         if (fpe == 4) 
-	    return (ExSUMFPE<FPExpansionVect<Vec4d, 4> >)(N, a, inca);
+	    return (ExSUMFPE<FPExpansionVect<Vec4d, 4> >)(N, a, inca, offset);
         if (fpe == 5) 
-	    return (ExSUMFPE<FPExpansionVect<Vec4d, 5> >)(N, a, inca);
+	    return (ExSUMFPE<FPExpansionVect<Vec4d, 5> >)(N, a, inca, offset);
         if (fpe == 6) 
-	    return (ExSUMFPE<FPExpansionVect<Vec4d, 6> >)(N, a, inca);
+	    return (ExSUMFPE<FPExpansionVect<Vec4d, 6> >)(N, a, inca, offset);
         if (fpe == 7) 
-	    return (ExSUMFPE<FPExpansionVect<Vec4d, 7> >)(N, a, inca);
+	    return (ExSUMFPE<FPExpansionVect<Vec4d, 7> >)(N, a, inca, offset);
         if (fpe == 8) 
-	    return (ExSUMFPE<FPExpansionVect<Vec4d, 8> >)(N, a, inca);
+	    return (ExSUMFPE<FPExpansionVect<Vec4d, 8> >)(N, a, inca, offset);
     }
 
     return 0.0;
@@ -101,7 +101,7 @@ double exsum(int Ng, double *ag, int inca, int fpe, bool early_exit) {
 /*
  * Our alg with superaccumulators only
  */
-double ExSUMSuperacc(int N, double *a, int inca) {
+double ExSUMSuperacc(int N, double *a, int inca, int offset) {
     double dacc;
 #ifdef EXBLAS_TIMING
     double t, mint = 10000;
@@ -182,7 +182,7 @@ inline static void Reduction(unsigned int tid, unsigned int tnum, std::vector<in
     }
 }
 
-template<typename CACHE> double ExSUMFPE(int N, double *a, int inca) {
+template<typename CACHE> double ExSUMFPE(int N, double *a, int inca, int offset) {
     // OpenMP sum+reduction
     int const linesize = 16;    // * sizeof(int32_t)
     int maxthreads = omp_get_max_threads();

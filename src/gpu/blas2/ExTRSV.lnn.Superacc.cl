@@ -210,10 +210,11 @@ void nextRow(
    __local volatile int *old,
    __global volatile int *address
 ){
-   if(get_local_id(0)==0 && get_local_id(1)==0)
-      *old = atomic_inc(address);
+	if(get_local_id(0)==0 && get_local_id(1)==0) {
+    	*old = atomic_inc(address);
+	}
 
-   barrier(CLK_GLOBAL_MEM_FENCE);
+	barrier(CLK_GLOBAL_MEM_FENCE);
 }
 
 /* Copies a nbi x nbi block of a to provided cache.
@@ -258,35 +259,40 @@ __kernel void trsv_init(
 
 
 __kernel void trsv(
-    __global double *d_x,
+    const uint n,
     __global double *d_a,
+    const uint lda,
+    const uint offseta,
+    __global double *d_x,
+    const uint incx,
+    const uint offsetx,
     __global volatile int *sync,
     __global long *d_Superaccs,
     __local double *cache,
     __local int *row,
-    __local volatile double *xs,
-    const uint n
+    __local volatile double *xs
 ){
     int lidx = get_local_id(0);
     int lidy = get_local_id(1);
     int tid  = threadsx * lidy + lidx;
     int isunit = 0;
-    int lda = threadsx * threadsy;
+    int ntid = threadsx * threadsy;
 
-    //__global long *l_working = d_Superaccs + get_group_id(0) * lda * BIN_COUNT + tid;
-    __global long *l_working = d_Superaccs + (get_group_id(0) * lda + lidx) * BIN_COUNT;
+    //__global long *l_working = d_Superaccs + get_group_id(0) * ntid * BIN_COUNT + tid;
+    __global long *l_working = d_Superaccs + (get_group_id(0) * ntid + lidx) * BIN_COUNT;
+    // Initialize accumulators
+    for (uint i = 0; i < BIN_COUNT; i++) {
+        l_working[i] = 0.0;
+	}
 
     // Get row handled by this block
     nextRow(row, &sync[1]);
 
     // Copy diagonal block to shared memory
-    tocache(&d_a[*row * BLOCK_SIZE * n + *row * BLOCK_SIZE], cache, BLOCK_SIZE, lda, 0, isunit, tid, n);
+    tocache(&d_a[*row * BLOCK_SIZE * n + *row * BLOCK_SIZE], cache, BLOCK_SIZE, ntid, 0, isunit, tid, lda);
     barrier(CLK_LOCAL_MEM_FENCE);
 
     // Loop over blocks as they become available
-    // Initialize accumulators
-    for (uint i = 0; i < BIN_COUNT; i++)
-        l_working[i] = 0.0;
     int col_done = -1;
 
     double x, r;
@@ -300,8 +306,9 @@ __kernel void trsv(
             x = TwoProductFMA(d_a[(col * BLOCK_SIZE + lidy) * n + *row * BLOCK_SIZE + lidx + j * n], xp, &r);
 
             Accumulate(l_working, x);
-            if (r != 0.0)
+            if (r != 0.0) {
                 Accumulate(l_working, r);
+			}
         }
     }
     barrier(CLK_LOCAL_MEM_FENCE);

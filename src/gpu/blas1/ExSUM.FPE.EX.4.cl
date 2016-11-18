@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2013-2015 Inria and University Pierre and Marie Curie 
+ *  Copyright (c) 2016 Inria and University Pierre and Marie Curie 
  *  All rights reserved.
  */
 
@@ -230,6 +230,7 @@ void ExSUM(
     __global long *d_PartialSuperaccs,
     __global double *d_Data,
     const uint inca,
+    const uint offset,
     const uint NbElements
 ) {
     __local long l_sa[WARP_COUNT * BIN_COUNT] __attribute__((aligned(8)));
@@ -245,62 +246,120 @@ void ExSUM(
 
     //Read data from global memory and scatter it to sub-superaccs
     double a[4] = {0.0};
-    for(uint pos = get_global_id(0); pos < NbElements; pos += get_global_size(0)){
-        double x = d_Data[pos];
-        double s;
-        a[0] = KnuthTwoSum(a[0], x, &s);
-        x = s;
-        if (x != 0.0) {
-            a[1] = KnuthTwoSum(a[1], x, &s);
-            x = s;
-            if (x != 0.0) {
-                a[2] = KnuthTwoSum(a[2], x, &s);
-                x = s;
-                if (x != 0.0) {
-                    a[3] = KnuthTwoSum(a[3], x, &s);
-                    x = s;
-                }
-            }
-        }
-        if(x != 0.0) {
-            Accumulate(l_workingBase, x);
-            /*Accumulate(l_workingBase, l_workingBase_check, x);
-            if (*l_workingBase_check) {
-                barrier(CLK_LOCAL_MEM_FENCE);
-                if (get_local_id(0) < WARP_COUNT){
-                    int imin = 0;
-                    int imax = 38;
-                    Normalize_local(l_workingBase, &imin, &imax);
-                }
-                *l_workingBase_check = false;
-                barrier(CLK_LOCAL_MEM_FENCE);
-            }*/
-            //Flush FPEs to superaccs
-            Accumulate(l_workingBase, a[0]);
-            Accumulate(l_workingBase, a[1]);
-            Accumulate(l_workingBase, a[2]);
-            Accumulate(l_workingBase, a[3]);
-            /*Accumulate(l_workingBase, l_workingBase_check, a[0]);
-            Accumulate(l_workingBase, l_workingBase_check, a[1]);
-            Accumulate(l_workingBase, l_workingBase_check, a[2]);
-            Accumulate(l_workingBase, l_workingBase_check, a[3]);
-            if (*l_workingBase_check) {
-                barrier(CLK_LOCAL_MEM_FENCE);
-                if (get_local_id(0) < WARP_COUNT){
-                    int imin = 0;
-                    int imax = 38;
-                    Normalize_local(l_workingBase, &imin, &imax);
-                }
-                *l_workingBase_check = false;
-                barrier(CLK_LOCAL_MEM_FENCE);
-            }*/
-            a[0] = 0.0;
-            a[1] = 0.0;
-            a[2] = 0.0;
-            a[3] = 0.0;
-        }
-    }
-    /*barrier(CLK_LOCAL_MEM_FENCE);
+	if ((offset == 0) && (inca == 1)) {
+		for(uint pos = get_global_id(0); pos < NbElements; pos += get_global_size(0)){
+			double x = d_Data[pos];
+			double s;
+			a[0] = KnuthTwoSum(a[0], x, &s);
+			x = s;
+			if (x != 0.0) {
+				a[1] = KnuthTwoSum(a[1], x, &s);
+				x = s;
+				if (x != 0.0) {
+					a[2] = KnuthTwoSum(a[2], x, &s);
+					x = s;
+					if (x != 0.0) {
+						a[3] = KnuthTwoSum(a[3], x, &s);
+						x = s;
+					}
+				}
+			}
+			if(x != 0.0) {
+				Accumulate(l_workingBase, x);
+				/*Accumulate(l_workingBase, l_workingBase_check, x);
+				if (*l_workingBase_check) {
+					barrier(CLK_LOCAL_MEM_FENCE);
+					if (get_local_id(0) < WARP_COUNT){
+						int imin = 0;
+						int imax = 38;
+						Normalize_local(l_workingBase, &imin, &imax);
+					}
+					*l_workingBase_check = false;
+					barrier(CLK_LOCAL_MEM_FENCE);
+				}*/
+				//Flush FPEs to superaccs
+				Accumulate(l_workingBase, a[0]);
+				Accumulate(l_workingBase, a[1]);
+				Accumulate(l_workingBase, a[2]);
+				Accumulate(l_workingBase, a[3]);
+				/*Accumulate(l_workingBase, l_workingBase_check, a[0]);
+				Accumulate(l_workingBase, l_workingBase_check, a[1]);
+				Accumulate(l_workingBase, l_workingBase_check, a[2]);
+				Accumulate(l_workingBase, l_workingBase_check, a[3]);
+				if (*l_workingBase_check) {
+					barrier(CLK_LOCAL_MEM_FENCE);
+					if (get_local_id(0) < WARP_COUNT){
+						int imin = 0;
+						int imax = 38;
+						Normalize_local(l_workingBase, &imin, &imax);
+					}
+					*l_workingBase_check = false;
+					barrier(CLK_LOCAL_MEM_FENCE);
+				}*/
+				a[0] = 0.0;
+				a[1] = 0.0;
+				a[2] = 0.0;
+				a[3] = 0.0;
+			}
+		}
+	} else {
+		for(uint pos = get_global_id(0); pos < NbElements; pos += get_global_size(0)){
+			double x = d_Data[offset + pos * inca];
+			double s;
+			a[0] = KnuthTwoSum(a[0], x, &s);
+			x = s;
+			if (x != 0.0) {
+				a[1] = KnuthTwoSum(a[1], x, &s);
+				x = s;
+				if (x != 0.0) {
+					a[2] = KnuthTwoSum(a[2], x, &s);
+					x = s;
+					if (x != 0.0) {
+						a[3] = KnuthTwoSum(a[3], x, &s);
+						x = s;
+					}
+				}
+			}
+			if(x != 0.0) {
+				Accumulate(l_workingBase, x);
+				/*Accumulate(l_workingBase, l_workingBase_check, x);
+				if (*l_workingBase_check) {
+					barrier(CLK_LOCAL_MEM_FENCE);
+					if (get_local_id(0) < WARP_COUNT){
+						int imin = 0;
+						int imax = 38;
+						Normalize_local(l_workingBase, &imin, &imax);
+					}
+					*l_workingBase_check = false;
+					barrier(CLK_LOCAL_MEM_FENCE);
+				}*/
+				//Flush FPEs to superaccs
+				Accumulate(l_workingBase, a[0]);
+				Accumulate(l_workingBase, a[1]);
+				Accumulate(l_workingBase, a[2]);
+				Accumulate(l_workingBase, a[3]);
+				/*Accumulate(l_workingBase, l_workingBase_check, a[0]);
+				Accumulate(l_workingBase, l_workingBase_check, a[1]);
+				Accumulate(l_workingBase, l_workingBase_check, a[2]);
+				Accumulate(l_workingBase, l_workingBase_check, a[3]);
+				if (*l_workingBase_check) {
+					barrier(CLK_LOCAL_MEM_FENCE);
+					if (get_local_id(0) < WARP_COUNT){
+						int imin = 0;
+						int imax = 38;
+						Normalize_local(l_workingBase, &imin, &imax);
+					}
+					*l_workingBase_check = false;
+					barrier(CLK_LOCAL_MEM_FENCE);
+				}*/
+				a[0] = 0.0;
+				a[1] = 0.0;
+				a[2] = 0.0;
+				a[3] = 0.0;
+			}
+		}
+	}
+	/*barrier(CLK_LOCAL_MEM_FENCE);
     if (get_local_id(0) < WARP_COUNT){
         int imin = 0;
         int imax = 38;

@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2013-2015 Inria and University Pierre and Marie Curie 
+ *  Copyright (c) 2016 Inria and University Pierre and Marie Curie 
  *  All rights reserved.
  */
 
@@ -74,14 +74,16 @@ extern "C" void closeExTRSV(
 
 /**
  * \ingroup ExTRSV
- * \brief Executes parallel triangular solver on GPU. For internal use
+ * \brief Executes parallel triangular solver (ExTRSV) on GPU. For internal use
  *
  * \param cqCommandQueue Command queue
  * \param n size of matrix A
  * \param d_a matrix A
  * \param lda leading dimension of A
+ * \param offseta from the beginning of the matrix A
  * \param d_x vector
  * \param incx the increment for the elements of a
+ * \param offsetx from the beginning of the vector x
  * \param ciErrNum Error number (output)
  * \return status
  */
@@ -90,14 +92,16 @@ extern "C" size_t ExTRSV(
     const uint n,
     const cl_mem d_a,
     const uint lda,
+    const uint offseta,
     const cl_mem d_x,
     const uint incx,
+    const uint offsetx,
     cl_int *ciErrNum
 );
 
 /**
  * \ingroup ExTRSV
- * \brief Executes parallel triangular solver on GPU in case of iterative refinement.
+ * \brief Executes parallel triangular solver (ExTRSV) on GPU with one iteration of the iterative refinement (ExIR).
  *   For internal use
  *
  * \param cqCommandQueue Command queue
@@ -111,6 +115,32 @@ extern "C" size_t ExTRSV(
  * \return status
  */
 extern "C" size_t ExTRSVIR(
+    cl_command_queue cqCommandQueue,
+    const uint n,
+    const cl_mem d_a,
+    const uint lda,
+    const cl_mem d_x,
+    const uint incx,
+    const cl_mem d_b,
+    cl_int *ciErrNum
+);
+
+/**
+ * \ingroup ExTRSV
+ * \brief Executes parallel triangular solver (DTRSV) on GPU with one iteration of the iterative refinement (ExIR).
+ *   For internal use
+ *
+ * \param cqCommandQueue Command queue
+ * \param n size of matrix A
+ * \param d_a matrix A
+ * \param lda leading dimension of A
+ * \param d_x vector
+ * \param incx the increment for the elements of a
+ * \param d_b vector
+ * \param ciErrNum Error number (output)
+ * \return status
+ */
+extern "C" size_t DTRSVExIR(
     cl_command_queue cqCommandQueue,
     const uint n,
     const cl_mem d_a,

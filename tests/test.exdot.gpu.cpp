@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2013-2015 Inria and University Pierre and Marie Curie 
+ *  Copyright (c) 2016 Inria and University Pierre and Marie Curie 
  *  All rights reserved.
  */
 
@@ -108,13 +108,13 @@ int main(int argc, char *argv[]) {
 
     bool is_pass = true;
     double exdot_acc, exdot_fpe3, exdot_fpe4, exdot_fpe8, exdot_fpe4ee, exdot_fpe6ee, exdot_fpe8ee;
-    exdot_acc = exdot(N, a, 1, b, 1, 0);
-    exdot_fpe3 = exdot(N, a, 1, b, 1, 3);
-    exdot_fpe4 = exdot(N, a, 1, b, 1, 4);
-    exdot_fpe8 = exdot(N, a, 1, b, 1, 8);
-    exdot_fpe4ee = exdot(N, a, 1, b, 1, 4, true);
-    exdot_fpe6ee = exdot(N, a, 1, b, 1, 6, true);
-    exdot_fpe8ee = exdot(N, a, 1, b, 1, 8, true);
+    exdot_acc = exdot(N, a, 1, 0, b, 1, 0, 0);
+    exdot_fpe3 = exdot(N, a, 1, 0, b, 1, 0, 3);
+    exdot_fpe4 = exdot(N, a, 1, 0, b, 1, 0, 4);
+    exdot_fpe8 = exdot(N, a, 1, 0, b, 1, 0, 8);
+    exdot_fpe4ee = exdot(N, a, 1, 0, b, 1, 0, 4, true);
+    exdot_fpe6ee = exdot(N, a, 1, 0, b, 1, 0, 6, true);
+    exdot_fpe8ee = exdot(N, a, 1, 0, b, 1, 0, 8, true);
     printf("  exdot with superacc = %.16g\n", exdot_acc);
     printf("  exdot with FPE3 and superacc = %.16g\n", exdot_fpe3);
     printf("  exdot with FPE4 and superacc = %.16g\n", exdot_fpe4);

@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2013-2015 Inria and University Pierre and Marie Curie
+ *  Copyright (c) 2016 Inria and University Pierre and Marie Curie
  *  All rights reserved.
  */
 
@@ -39,11 +39,12 @@
  * \param Ng vector size
  * \param ag vector
  * \param inca specifies the increment for the elements of a
+ * \param offset specifies position in the vector from its start
  * \param fpe stands for the floating-point expansions size (used in conjuction with superaccumulators)
  * \param early_exit specifies the optimization technique. By default, it is disabled
  * \return Contains the reproducible and accurate sum of elements of a real vector
  */
-double exsum(int Ng, double *ag, int inca, int fpe, bool early_exit = false);
+double exsum(const int Ng, double *ag, const int inca, const int offset, const int fpe, const bool early_exit = false);
 
 /**
  * \defgroup ExDOT Dot Product Functions
@@ -61,13 +62,15 @@ double exsum(int Ng, double *ag, int inca, int fpe, bool early_exit = false);
  * \param Ng vector size
  * \param ag vector
  * \param inca specifies the increment for the elements of a
+ * \param offseta specifies position in the vector a from its start
  * \param bg vector
  * \param incb specifies the increment for the elements of b
+ * \param offsetb specifies position in the vector b from its start
  * \param fpe stands for the floating-point expansions size (used in conjuction with superaccumulators)
  * \param early_exit specifies the optimization technique. By default, it is disabled
  * \return Contains the reproducible and accurate result of the dot product of two real vectors
  */
-double exdot(int Ng, double *ag, int inca, double *bg, int incb, int fpe, bool early_exit = false);
+double exdot(const int Ng, double *ag, const int inca, const int offseta, double *bg, const int incb, const int offsetb, const int fpe, const bool early_exit = false);
 
 #endif // BLAS1_HPP_
 

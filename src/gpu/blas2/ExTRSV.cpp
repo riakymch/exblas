@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2013-2015 Inria and University Pierre and Marie Curie
+ *  Copyright (c) 2016 Inria and University Pierre and Marie Curie
  *  All rights reserved.
  */
 
@@ -26,7 +26,7 @@
 #include "ExTRSV.Launcher.hpp"
 
 
-#define NUM_ITER 20
+#define NUM_ITER 5
 
 
 /**
@@ -37,13 +37,15 @@
  * \param n size of matrix A
  * \param a matrix A
  * \param lda leading dimension of A
+ * \param offseta specifies position in the metrix A from its beginning
  * \param x vector
  * \param incx the increment for the elements of a
+ * \param offsetx specifies position in the vector x from its start
  * \param fpe size of floating-point expansion
  * \param program_file path to the file with kernels
  * \return Contains the reproducible and accurate result of solving triangular system
  */
-int runExTRSV(int n, double *a, int lda, double *x, int incx, int fpe, const char* program_file);
+int runExTRSV(const int n, double *a, const int lda, const int offseta, double *x, const int incx, const int offsetx, const int fpe, const char* program_file);
 
 /**
  * \ingroup ExTRSV
@@ -57,39 +59,71 @@ int runExTRSV(int n, double *a, int lda, double *x, int incx, int fpe, const cha
  * \param n size of matrix A
  * \param a matrix A
  * \param lda leading dimension of A
+ * \param offseta specifies position in the metrix A from its beginning
  * \param x vector
  * \param incx the increment for the elements of a
+ * \param offsetx specifies position in the vector x from its start
  * \param fpe stands for the floating-point expansions size (used in conjuction with superaccumulators)
  * \param early_exit specifies the optimization technique. By default, it is disabled
- * \return Contains the reproducible and accurate sum of elements of a real vector
+ * \return vector x contains the reproducible and accurate result of ExTRSV
  */
-int extrsv(char uplo, char transa, char diag, int n, double *a, int lda, double *x, int incx, int fpe, bool early_exit) {
+int extrsv(const char uplo, const char transa, const char diag, const int n, double *a, const int lda, const int offseta, double *x, const int incx, const int offsetx, const int fpe, const bool early_exit) {
     char path[256];
     strcpy(path, EXBLAS_BINARY_DIR);
     strcat(path, "/include/cl/");
 
-    // with superaccumulators only
+    // ExTRSV
     if (fpe == 0)
-        return runExTRSV(n, a, lda, x, incx, 0, (uplo == 'L') ? strcat(path, "ExTRSV.lnn.Superacc.cl") : strcat(path, "ExTRSV.unn.Superacc.cl"));
+        return runExTRSV(n, a, lda, offseta, x, incx, offsetx, fpe, (uplo == 'L') ? strcat(path, "ExTRSV.lnn.Superacc.cl") : strcat(path, "ExTRSV.unn.Superacc.cl"));
 
-    if (early_exit) {
+    // DTRSV
+    if (fpe == 1)
+        return runExTRSV(n, a, lda, offseta, x, incx, offsetx, fpe, (uplo == 'L') ? strcat(path, "DTRSV.lnn.cl") : strcat(path, "DTRSV.unn.cl"));
+
+    if ((early_exit) && (fpe <= 8)) {
         if (fpe <= 4)
-            //return runExTRSV(n, a, lda, x, incx, 4, strcat(path, "ExTRSV.FPE.EX.4.cl"));
-            return runExTRSV(n, a, lda, x, incx, 4, (uplo == 'L') ? strcat(path, "ExTRSV.lnn.FPE.EX.4.cl") : strcat(path, "ExTRSV.unn.FPE.EX.4.cl"));
+            return runExTRSV(n, a, lda, offseta, x, incx, offsetx, 4, (uplo == 'L') ? strcat(path, "ExTRSV.lnn.FPE.EX.4.cl") : strcat(path, "ExTRSV.unn.FPE.EX.4.cl"));
         if (fpe <= 6)
-            //return runExTRSV(n, a, lda, x, incx, 6, strcat(path, "ExTRSV.FPE.EX.6.cl"));
-            return runExTRSV(n, a, lda, x, incx, 6, (uplo == 'L') ? strcat(path, "ExTRSV.lnn.FPE.EX.6.cl") : strcat(path, "ExTRSV.unn.FPE.EX.6.cl"));
+            return runExTRSV(n, a, lda, offseta, x, incx, offsetx, 6, (uplo == 'L') ? strcat(path, "ExTRSV.lnn.FPE.EX.6.cl") : strcat(path, "ExTRSV.unn.FPE.EX.6.cl"));
         if (fpe <= 8)
-            //return runExTRSV(n, a, lda, x, incx, 8, strcat(path, "ExTRSV.FPE.EX.8.cl"));
-            return runExTRSV(n, a, lda, x, incx, 8, (uplo == 'L') ? strcat(path, "ExTRSV.lnn.FPE.EX.8.cl") : strcat(path, "ExTRSV.unn.FPE.EX.8.cl"));
-    } else // ! early_exit
-        //return runExTRSV(n, a, lda, x, incx, fpe, strcat(path, "ExTRSV.FPE.cl"));
-        return runExTRSV(n, a, lda, x, incx, fpe, (uplo == 'L') ? strcat(path, "ExTRSV.lnn.FPE.cl") : strcat(path, "ExTRSV.unn.FPE.cl"));
+            return runExTRSV(n, a, lda, offseta, x, incx, offsetx, 8, (uplo == 'L') ? strcat(path, "ExTRSV.lnn.FPE.EX.8.cl") : strcat(path, "ExTRSV.unn.FPE.EX.8.cl"));
+    } else if (fpe <= 8) // ! early_exit
+        return runExTRSV(n, a, lda, offseta, x, incx, offsetx, fpe, (uplo == 'L') ? strcat(path, "ExTRSV.lnn.FPE.cl") : strcat(path, "ExTRSV.unn.FPE.cl"));
+
+    // ExTRSV with ExIR
+    if (fpe == 10)
+        return runExTRSV(n, a, lda, offseta, x, incx, offsetx, fpe, (uplo == 'L') ? strcat(path, "ExTRSV.lnn.Superacc.IR.cl") : strcat(path, "ExTRSV.unn.Superacc.IR.cl"));
+
+    if ((early_exit) && (fpe <= 18)) {
+        if (fpe <= 14)
+            return runExTRSV(n, a, lda, offseta, x, incx, offsetx, 14, (uplo == 'L') ? strcat(path, "ExTRSV.lnn.FPE.EX.4.IR.cl") : strcat(path, "ExTRSV.unn.FPE.EX.4.IR.cl"));
+        if (fpe <= 16)
+            return runExTRSV(n, a, lda, offseta, x, incx, offsetx, 16, (uplo == 'L') ? strcat(path, "ExTRSV.lnn.FPE.EX.6.IR.cl") : strcat(path, "ExTRSV.unn.FPE.EX.6.IR.cl"));
+        if (fpe <= 18)
+            return runExTRSV(n, a, lda, offseta, x, incx, offsetx, 18, (uplo == 'L') ? strcat(path, "ExTRSV.lnn.FPE.EX.8.IR.cl") : strcat(path, "ExTRSV.unn.FPE.EX.8.IR.cl"));
+    } else if (fpe <= 18) // ! early_exit
+        return runExTRSV(n, a, lda, offseta, x, incx, offsetx, fpe, (uplo == 'L') ? strcat(path, "ExTRSV.lnn.FPE.IR.cl") : strcat(path, "ExTRSV.unn.FPE.IR.cl"));
+
+    // DTRSV with ExIR
+    if (fpe == 20)
+        return runExTRSV(n, a, lda, offseta, x, incx, offsetx, fpe, (uplo == 'L') ? strcat(path, "DTRSV.lnn.cl") : strcat(path, "DTRSV.unn.cl"));
+    if (fpe == 21)
+        return runExTRSV(n, a, lda, offseta, x, incx, offsetx, fpe, (uplo == 'L') ? strcat(path, "DTRSV.lnn.ExIR.Superacc.cl") : strcat(path, "DTRSV.unn.ExIR.Superacc.cl"));
+
+    if ((early_exit) && (fpe <= 28)) {
+        if (fpe <= 24)
+            return runExTRSV(n, a, lda, offseta, x, incx, offsetx, 24, (uplo == 'L') ? strcat(path, "DTRSV.lnn.ExIR.FPE.EX.4.cl") : strcat(path, "DTRSV.unn.ExIR.FPE.EX.4.cl"));
+        if (fpe <= 26)
+            return runExTRSV(n, a, lda, offseta, x, incx, offsetx, 26, (uplo == 'L') ? strcat(path, "DTRSV.lnn.ExIR.FPE.EX.6.cl") : strcat(path, "DTRSV.unn.ExIR.FPE.EX.6.cl"));
+        if (fpe <= 28)
+            return runExTRSV(n, a, lda, offseta, x, incx, offsetx, 28, (uplo == 'L') ? strcat(path, "DTRSV.lnn.ExIR.FPE.EX.8.cl") : strcat(path, "DTRSV.unn.ExIR.FPE.EX.8.cl"));
+    } else if (fpe <= 28) // ! early_exit
+        return runExTRSV(n, a, lda, offseta, x, incx, offsetx, fpe, (uplo == 'L') ? strcat(path, "DTRSV.lnn.ExIR.FPE.cl") : strcat(path, "DTRSV.unn.ExIR.FPE.cl"));
 
     return 0;
 }
 
-int runExTRSV(int n, double *a, int lda, double *x, int incx, int fpe, const char* program_file){
+int runExTRSV(const int n, double *a, const int lda, const int offseta, double *x, const int incx, const int offsetx, const int fpe, const char* program_file) {
     cl_int ciErrNum;
 
     //printf("Initializing OpenCL...\n");
@@ -138,7 +172,7 @@ int runExTRSV(int n, double *a, int lda, double *x, int incx, int fpe, const cha
             exit(EXIT_FAILURE);
         }
         cl_mem d_b;
-        if (fpe == 1) {
+        if (fpe >= 10) {
             // for IR case
             d_b = clCreateBuffer(cxGPUContext, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, n * sizeof(cl_double), x, &ciErrNum);
             if (ciErrNum != CL_SUCCESS) {
@@ -154,12 +188,15 @@ int runExTRSV(int n, double *a, int lda, double *x, int incx, int fpe, const cha
         if (ciErrNum != CL_SUCCESS)
             exit(EXIT_FAILURE);
 
-        //Running OpenCL dSum with %u elements...
-        if (fpe == 1) {
-            // for IR case
+        if ((fpe >= 10) && (fpe < 20)) {
+            // ExTRSV w ExIR
             ExTRSVIR(NULL, n, d_a, lda, d_x, incx, d_b, &ciErrNum);
+        } else if ((fpe >= 21) && (fpe < 30)) {
+            // DTRSV w ExIR
+            DTRSVExIR(NULL, n, d_a, lda, d_x, incx, d_b, &ciErrNum);
         } else {
-            ExTRSV(NULL, n, d_a, lda, d_x, incx, &ciErrNum);
+            // ExTRSV
+            ExTRSV(NULL, n, d_a, lda, offseta, d_x, incx, offsetx, &ciErrNum);
         }
         if (ciErrNum != CL_SUCCESS)
             exit(EXIT_FAILURE);
@@ -170,20 +207,26 @@ int runExTRSV(int n, double *a, int lda, double *x, int incx, int fpe, const cha
 
         for(uint iter = 0; iter < NUM_ITER; iter++) {
             ciErrNum = clEnqueueMarker(cqCommandQueue, &startMark);
+            //ciErrNum = clEnqueueMarkerWithWaitList(cqCommandQueue, 0, NULL, &startMark);
             ciErrNum |= clFinish(cqCommandQueue);
             if (ciErrNum != CL_SUCCESS) {
                 printf("Error in clEnqueueMarker, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
                 exit(EXIT_FAILURE);
             }
 
-            if (fpe == 1) {
-                // for IR case
+            if ((fpe >= 10) && (fpe < 20)) {
+                // ExTRSV w ExIR
                 ExTRSVIR(NULL, n, d_a, lda, d_x, incx, d_b, &ciErrNum);
+            } else if ((fpe >= 21) && (fpe < 30)) {
+                // DTRSV w ExIR
+                DTRSVExIR(NULL, n, d_a, lda, d_x, incx, d_b, &ciErrNum);
             } else {
-                ExTRSV(NULL, n, d_a, lda, d_x, incx, &ciErrNum);
+                // ExTRSV
+                ExTRSV(NULL, n, d_a, lda, offseta, d_x, incx, offsetx, &ciErrNum);
             }
 
             ciErrNum  = clEnqueueMarker(cqCommandQueue, &endMark);
+            //ciErrNum = clEnqueueMarkerWithWaitList(cqCommandQueue, 0, NULL, &endMark);
             ciErrNum |= clFinish(cqCommandQueue);
             if (ciErrNum != CL_SUCCESS) {
                 printf("Error in clEnqueueMarker, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
@@ -198,13 +241,13 @@ int runExTRSV(int n, double *a, int lda, double *x, int incx, int fpe, const cha
                 exit(EXIT_FAILURE);
             }
             t = 1e-9 * ((unsigned long)endTime - (unsigned long)startTime);
-	    mint = std::min(t, mint);
+            mint = std::min(t, mint);
         }
 
         double perf = n * n;
         perf = (perf / mint) * 1e-9;
         printf("NbFPE = %u \t N = %u \t \t Time = %.8f s \t Performance = %.4f GFLOPS\n", fpe, n, mint, perf);
-	fprintf(stderr, "%f ", mint);
+        fprintf(stderr, "%f  ", mint);
 #endif
 
         //Retrieving results...
@@ -220,8 +263,8 @@ int runExTRSV(int n, double *a, int lda, double *x, int incx, int fpe, const cha
             closeExTRSV();
             clReleaseMemObject(d_a);
             clReleaseMemObject(d_x);
-            if(fpe == 1)
-                clReleaseMemObject(d_b);
+            //if(fpe == 1)
+            //    clReleaseMemObject(d_b);
             clReleaseCommandQueue(cqCommandQueue);
             clReleaseContext(cxGPUContext);
     }

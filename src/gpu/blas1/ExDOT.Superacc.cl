@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2013-2015 Inria and University Pierre and Marie Curie 
+ *  Copyright (c) 2016 Inria and University Pierre and Marie Curie 
  *  All rights reserved.
  */
 
@@ -219,8 +219,10 @@ void ExDOT(
     __global long *d_PartialSuperaccs,
     __global double *d_a,
     const uint inca,
+    const uint offseta,
     __global double *d_b,
     const uint incb,
+    const uint offsetb,
     const uint NbElements
 ) {
     __local long l_sa[WARP_COUNT * BIN_COUNT] __attribute__((aligned(8)));
@@ -235,31 +237,58 @@ void ExDOT(
     barrier(CLK_LOCAL_MEM_FENCE);
 
     //Read data from global memory and scatter it to sub-superaccs
-    #ifdef NVIDIA
-        #pragma unroll
-    #endif
-    for(uint pos = get_global_id(0); pos < NbElements; pos += get_global_size(0)) {
-        double r = 0.0;
-        double x = TwoProductFMA(d_a[pos], d_b[pos], &r);
+	if ((offseta == 0) && (inca == 1) && (offsetb == 0) && (incb == 1)) {
+        #ifdef NVIDIA
+            #pragma unroll
+        #endif
+        for(uint pos = get_global_id(0); pos < NbElements; pos += get_global_size(0)) {
+			double r = 0.0;
+			double x = TwoProductFMA(d_a[pos], d_b[pos], &r);
 
-        Accumulate(l_workingBase, x);
-        //Accumulate(l_workingBase, l_workingBase_check, x);
-        if (r != 0.0) {
-            //Accumulate(l_workingBase, l_workingBase_check, r);
-            Accumulate(l_workingBase, r);
-        }
-        /*if (*l_workingBase_check) {
-            barrier(CLK_LOCAL_MEM_FENCE);
-            if (get_local_id(0) < WARP_COUNT){
-                int imin = 0;
-                int imax = 38;
-                Normalize_local(l_workingBase, &imin, &imax);
-            }
-            *l_workingBase_check = false;
-            barrier(CLK_LOCAL_MEM_FENCE);
-        }*/
-    }
-    barrier(CLK_LOCAL_MEM_FENCE);
+			Accumulate(l_workingBase, x);
+			//Accumulate(l_workingBase, l_workingBase_check, x);
+			if (r != 0.0) {
+				//Accumulate(l_workingBase, l_workingBase_check, r);
+				Accumulate(l_workingBase, r);
+			}
+			/*if (*l_workingBase_check) {
+				barrier(CLK_LOCAL_MEM_FENCE);
+				if (get_local_id(0) < WARP_COUNT){
+					int imin = 0;
+					int imax = 38;
+					Normalize_local(l_workingBase, &imin, &imax);
+				}
+				*l_workingBase_check = false;
+				barrier(CLK_LOCAL_MEM_FENCE);
+			}*/
+		}
+	} else {
+        #ifdef NVIDIA
+            #pragma unroll
+        #endif
+		for(uint pos = get_global_id(0); pos < NbElements; pos += get_global_size(0)) {
+			double r = 0.0;
+			double x = TwoProductFMA(d_a[offseta + pos * inca], d_b[offsetb + pos * incb], &r);
+
+			Accumulate(l_workingBase, x);
+			//Accumulate(l_workingBase, l_workingBase_check, x);
+			if (r != 0.0) {
+				//Accumulate(l_workingBase, l_workingBase_check, r);
+				Accumulate(l_workingBase, r);
+			}
+			/*if (*l_workingBase_check) {
+				barrier(CLK_LOCAL_MEM_FENCE);
+				if (get_local_id(0) < WARP_COUNT){
+					int imin = 0;
+					int imax = 38;
+					Normalize_local(l_workingBase, &imin, &imax);
+				}
+				*l_workingBase_check = false;
+				barrier(CLK_LOCAL_MEM_FENCE);
+			}*/
+		}
+	}
+	barrier(CLK_LOCAL_MEM_FENCE);
     if (get_local_id(0) < WARP_COUNT){
         int imin = 0;
         int imax = 38;

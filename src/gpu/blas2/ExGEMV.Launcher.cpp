@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2013-2015 Inria and University Pierre and Marie Curie 
+ *  Copyright (c) 2016 Inria and University Pierre and Marie Curie 
  *  All rights reserved.
  */
 
@@ -9,6 +9,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 // OpenCL launcher for bitonic sort kernel
 ////////////////////////////////////////////////////////////////////////////////
+#define DGEMV_KERNEL "dgemv"
 #define GEMV_KERNEL "gemv"
 #define GEMV_REDUCE "gemv_reduce"
 
@@ -16,18 +17,19 @@ static size_t szKernelLength;                // Byte size of kernel code
 static char* cSources = NULL;                // Buffer to hold source for compilation
 
 static cl_program       cpProgram;           //OpenCL program
-static cl_kernel        ckGEMV;              //OpenCL kernels
+static cl_kernel        ckGEMV, ckDGEMV;     //OpenCL kernels
 static cl_kernel        ckGEMVReduce;        //OpenCL kernels
 static cl_command_queue cqDefaultCommandQue; //Default command queue
 static cl_mem           d_Superaccs;
 
-static uint mt;
 static uint p;
 
+static const uint WORKGROUP_SIZE = 256;
+
 #ifdef AMD
-static char  compileOptions[256] = "-DUSE_KNUTH";
+static char  compileOptions[256] = "-DUSE_KNUTH -DWORKGROUP_SIZE=256";
 #else
-static char  compileOptions[256] = "-DNVIDIA -DUSE_KNUTH -cl-mad-enable -cl-fast-relaxed-math"; // -cl-nv-verbose";
+static char  compileOptions[256] = "-DNVIDIA -DUSE_KNUTH -DWORKGROUP_SIZE=256 -cl-mad-enable -cl-fast-relaxed-math"; // -cl-nv-verbose";
 #endif
 
 
@@ -40,12 +42,10 @@ extern "C" cl_int initExGEMV(
     cl_device_id cdDevice,
     const char* program_file,
     const uint m,
-    const uint imt,
     const uint ip,
     const uint NbFPE
 ){
     cl_int ciErrNum;
-    mt = imt;
     p = ip;
 
     // Read the OpenCL kernel in from source file
@@ -86,7 +86,14 @@ extern "C" cl_int initExGEMV(
             return EXIT_FAILURE;
         }
 
-    //printf("...creating ExGEMV kernels:\n");
+    if (NbFPE == 1){
+        ckDGEMV = clCreateKernel(cpProgram, DGEMV_KERNEL, &ciErrNum);
+        if (ciErrNum != CL_SUCCESS) {
+            printf("Error in clCreateKernel: dgemv, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
+            return EXIT_FAILURE;
+        }
+    } else {
+        //printf("...creating ExGEMV kernels:\n");
         ckGEMV = clCreateKernel(cpProgram, GEMV_KERNEL, &ciErrNum);
         if (ciErrNum != CL_SUCCESS) {
             printf("Error in clCreateKernel: gemv, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
@@ -98,12 +105,13 @@ extern "C" cl_int initExGEMV(
             return EXIT_FAILURE;
         }
 
-    //printf("...allocating internal buffer\n");
+        //printf("...allocating internal buffer\n");
         d_Superaccs = clCreateBuffer(cxGPUContext, CL_MEM_READ_WRITE, m * p * bin_count * sizeof(cl_long), NULL, &ciErrNum);
         if (ciErrNum != CL_SUCCESS) {
             printf("Error in clCreateBuffer, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
             return EXIT_FAILURE;
         }
+    }
 
     //Save default command queue
     cqDefaultCommandQue = cqParamCommandQue;
@@ -115,9 +123,16 @@ extern "C" cl_int initExGEMV(
 }
 
 extern "C" void closeExGEMV(void){
-    cl_int ciErrNum;
+    cl_int ciErrNum = CL_SUCCESS;
 
-    ciErrNum = clReleaseMemObject(d_Superaccs);
+    if (d_Superaccs){
+        ciErrNum = clReleaseMemObject(d_Superaccs);
+        d_Superaccs = NULL;
+    }
+    if (ckDGEMV) {
+        ciErrNum |= clReleaseKernel(ckDGEMV);
+        ckDGEMV = NULL;
+    }
     if (ckGEMV) {
         ciErrNum |= clReleaseKernel(ckGEMV);
         ckGEMV = NULL;
@@ -134,7 +149,7 @@ extern "C" void closeExGEMV(void){
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// OpenCL launchers for TRSV kernels
+// OpenCL launchers for GEMV kernels
 ////////////////////////////////////////////////////////////////////////////////
 // Non-transpose version
 extern "C" size_t ExGEMV(
@@ -144,11 +159,14 @@ extern "C" size_t ExGEMV(
     const double alpha,
     const cl_mem d_a,
     const uint lda,
+    const uint offseta,
     const cl_mem d_x,
     const uint incx,
+    const uint offsetx,
     const double beta,
-    const cl_mem d_y,
+    cl_mem d_y,
     const uint incy,
+    const uint offsety,
     cl_int *ciErrNumRes
 ){
     cl_int ciErrNum;
@@ -156,9 +174,43 @@ extern "C" size_t ExGEMV(
     if(!cqCommandQueue)
         cqCommandQueue = cqDefaultCommandQue;
 
-    {
-        size_t NbThreadsPerWorkGroup[] = {mt, 1};
-        size_t TotalNbThreads[] = {m, p};
+    if (ckDGEMV) {
+        size_t NbThreadsPerWorkGroup[] = {WORKGROUP_SIZE, 1};
+		//size_t TotalNbThreads[] = {m, p};
+        size_t TotalNbThreads[] = {WORKGROUP_SIZE * ((m + WORKGROUP_SIZE - 1) / WORKGROUP_SIZE), p};
+
+        uint i = 0;
+        ciErrNum  = clSetKernelArg(ckDGEMV, i++, sizeof(cl_uint), (void *)&m);
+        ciErrNum &= clSetKernelArg(ckDGEMV, i++, sizeof(cl_uint), (void *)&n);
+        ciErrNum &= clSetKernelArg(ckDGEMV, i++, sizeof(cl_double), (void *)&alpha);
+        ciErrNum &= clSetKernelArg(ckDGEMV, i++, sizeof(cl_mem),  (void *)&d_a);
+        ciErrNum &= clSetKernelArg(ckDGEMV, i++, sizeof(cl_uint), (void *)&lda);
+        ciErrNum &= clSetKernelArg(ckDGEMV, i++, sizeof(cl_uint), (void *)&offseta);
+        ciErrNum &= clSetKernelArg(ckDGEMV, i++, sizeof(cl_mem),  (void *)&d_x);
+        ciErrNum &= clSetKernelArg(ckDGEMV, i++, sizeof(cl_uint), (void *)&incx);
+        ciErrNum &= clSetKernelArg(ckDGEMV, i++, sizeof(cl_uint), (void *)&offsetx);
+        ciErrNum &= clSetKernelArg(ckDGEMV, i++, sizeof(cl_double), (void *)&beta);
+        ciErrNum &= clSetKernelArg(ckDGEMV, i++, sizeof(cl_mem),  (void *)&d_y);
+        ciErrNum &= clSetKernelArg(ckDGEMV, i++, sizeof(cl_uint), (void *)&incy);
+        ciErrNum &= clSetKernelArg(ckDGEMV, i++, sizeof(cl_uint), (void *)&offsety);
+        ciErrNum &= clSetKernelArg(ckDGEMV, i++, (n / p) * sizeof(cl_double), NULL);
+        if (ciErrNum != CL_SUCCESS) {
+            printf("Error in clSetKernelArg, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
+            *ciErrNumRes = EXIT_FAILURE;
+            return 0;
+        }
+
+        ciErrNum = clEnqueueNDRangeKernel(cqCommandQueue, ckDGEMV, 2, NULL, TotalNbThreads, NbThreadsPerWorkGroup, 0, NULL, NULL);
+        if (ciErrNum != CL_SUCCESS) {
+            printf("ciErrNum = %d\n", ciErrNum);
+            printf("Error in clEnqueueNDRangeKernel, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
+            *ciErrNumRes = EXIT_FAILURE;
+            return 0;
+        }
+    } else {
+        size_t NbThreadsPerWorkGroup[] = {WORKGROUP_SIZE, 1};
+		//size_t TotalNbThreads[] = {m, p};
+        size_t TotalNbThreads[] = {WORKGROUP_SIZE * ((m + WORKGROUP_SIZE - 1) / WORKGROUP_SIZE), p};
 
         uint i = 0;
         ciErrNum  = clSetKernelArg(ckGEMV, i++, sizeof(cl_uint), (void *)&m);
@@ -166,11 +218,14 @@ extern "C" size_t ExGEMV(
         ciErrNum &= clSetKernelArg(ckGEMV, i++, sizeof(cl_double), (void *)&alpha);
         ciErrNum &= clSetKernelArg(ckGEMV, i++, sizeof(cl_mem),  (void *)&d_a);
         ciErrNum &= clSetKernelArg(ckGEMV, i++, sizeof(cl_uint), (void *)&lda);
+        ciErrNum &= clSetKernelArg(ckGEMV, i++, sizeof(cl_uint), (void *)&offseta);
         ciErrNum &= clSetKernelArg(ckGEMV, i++, sizeof(cl_mem),  (void *)&d_x);
         ciErrNum &= clSetKernelArg(ckGEMV, i++, sizeof(cl_uint), (void *)&incx);
+        ciErrNum &= clSetKernelArg(ckGEMV, i++, sizeof(cl_uint), (void *)&offsetx);
         ciErrNum &= clSetKernelArg(ckGEMV, i++, sizeof(cl_double), (void *)&beta);
         ciErrNum &= clSetKernelArg(ckGEMV, i++, sizeof(cl_mem),  (void *)&d_y);
         ciErrNum &= clSetKernelArg(ckGEMV, i++, sizeof(cl_uint), (void *)&incy);
+        ciErrNum &= clSetKernelArg(ckGEMV, i++, sizeof(cl_uint), (void *)&offsety);
         ciErrNum &= clSetKernelArg(ckGEMV, i++, (n / p) * sizeof(cl_double), NULL);
         ciErrNum &= clSetKernelArg(ckGEMV, i++, sizeof(cl_mem),  (void *)&d_Superaccs);
         if (ciErrNum != CL_SUCCESS) {

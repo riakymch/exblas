@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2013-2015 Inria and University Pierre and Marie Curie 
+ *  Copyright (c) 2016 Inria and University Pierre and Marie Curie 
  *  All rights reserved.
  */
 
@@ -62,7 +62,6 @@ extern "C" cl_int initExGEMV(
     cl_device_id cdDevice,
     const char* program_file,
     const uint m,
-    const uint imt,
     const uint ip,
     const uint NbFPE
 );
@@ -86,11 +85,14 @@ extern "C" void closeExGEMV(
  * \param alpha scalar
  * \param d_a matrix A
  * \param lda leading dimension of A
+ * \param offseta from the beginning of the matrix A
  * \param d_x vector
  * \param incx the increment for the elements of a
+ * \param offsetx from the beginning of the vector x
  * \param beta scalar
  * \param d_y vector
  * \param incy the increment for the elements of a
+ * \param offsety from the beginning of the vector y
  * \param ciErrNum Error number (output)
  * \return status
  */
@@ -101,11 +103,14 @@ extern "C" size_t ExGEMV(
     const double alpha,
     const cl_mem d_a,
     const uint lda,
+    const uint offseta,
     const cl_mem d_x,
     const uint incx,
+    const uint offsetx,
     const double beta,
-    const cl_mem d_y,
+    cl_mem d_y,
     const uint incy,
+    const uint offsety,
     cl_int *ciErrNum
 );
 

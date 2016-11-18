@@ -195,42 +195,100 @@ __kernel void gemv(
     const double alpha,
     __global double *a,
     const uint lda,
+    const uint offseta,
     __global double *x,
     const uint incx,
+    const uint offsetx,
     const double beta,
     __global double *y,
     const uint incy,
+    const uint offsety,
     __local double *work,
     __global long *d_Superaccs
 ){
     // Load a slice of X in WORK, using all available threads
     int ncols = n / get_global_size(COL_DIM); // nb values to load
     int col0 = ncols * get_global_id(COL_DIM); // first value to load
-    for (int k = 0; k < ncols; k += get_local_size(ROW_DIM)) {
-        int col = k + get_local_id(ROW_DIM);
-        if (col < ncols)
-            work[col] = x[col0 + col];
-    }
-    barrier(CLK_LOCAL_MEM_FENCE); // sync group
+	if ((offsetx == 0) && (incx == 1)) {  
+		for (int k = 0; k < ncols; k += get_local_size(ROW_DIM)) {
+			int col = k + get_local_id(ROW_DIM);
+			if (col < ncols)
+				work[col] = x[col0 + col];
+		}
+	} else {
+		for (int k = 0; k < ncols; k += get_local_size(ROW_DIM)) {
+			int col = k + get_local_id(ROW_DIM);
+			if (col < ncols)
+				work[col] = x[offsetx + incx * (col0 + col)];
+		}
+	}
+	barrier(CLK_LOCAL_MEM_FENCE); // sync group
 
     __global long *l_working = d_Superaccs + (get_global_id(ROW_DIM) + m * get_global_id(COL_DIM))* BIN_COUNT;
     // Initialize accumulators
-    for (uint i = 0; i < BIN_COUNT; i++)
+    for (uint i = 0; i < BIN_COUNT; i++) {
         l_working[i] = 0.0;
+    }
 
     // Compute partial dot product
-    double xs, r;
-    for (int k = 0; k < ncols; k++) {
-        xs = TwoProductFMA(a[get_global_id(ROW_DIM) + m * (col0 + k)], work[k], &r);
+    if (get_global_id(ROW_DIM) < m) {
+		if (offseta == 0) {  
+			for (int k = 0; k < ncols; k++) {
+                double xs, r;
+			    xs = TwoProductFMA(a[get_global_id(ROW_DIM) + lda * (col0 + k)], alpha * work[k], &r);
 
-        Accumulate(l_working, xs);
-        if (r != 0.0)
-            Accumulate(l_working, r);
+			    Accumulate(l_working, xs);
+			    if (r != 0.0) {
+				    Accumulate(l_working, r);
+                }
+			}
+		} else {
+			for (int k = 0; k < ncols; k++) {
+                double xs, r;
+			    xs = TwoProductFMA(a[offseta + get_global_id(ROW_DIM) + lda * (col0 + k)], alpha * work[k], &r);
+
+			    Accumulate(l_working, xs);
+			    if (r != 0.0) {
+				    Accumulate(l_working, r);
+                }
+			}
+		}
     }
 
     // Store in Y (P columns per row)
-    Accumulate(l_working, y[get_global_id(ROW_DIM) + m * get_global_id(COL_DIM)]);
-    y[get_global_id(ROW_DIM) + m * get_global_id(COL_DIM)] = Round(l_working);
+    if (get_global_id(ROW_DIM) < m) {
+        if ((offsety == 0) && (incy == 1)) {
+			if (beta == 0.0) {
+				y[get_global_id(ROW_DIM) + lda * get_global_id(COL_DIM)] = Round(l_working);
+			} else if (beta == 1.0) {
+                Accumulate(l_working, y[get_global_id(ROW_DIM) + lda * get_global_id(COL_DIM)]);
+				y[get_global_id(ROW_DIM) + lda * get_global_id(COL_DIM)] = Round(l_working);
+			} else {
+                double xs, r;
+                xs = TwoProductFMA(beta, y[get_global_id(ROW_DIM) + lda * get_global_id(COL_DIM)], &r);
+			    Accumulate(l_working, xs);
+			    if (r != 0.0) {
+				    Accumulate(l_working, r);
+                }
+				y[get_global_id(ROW_DIM) + lda * get_global_id(COL_DIM)] = Round(l_working);
+			}
+        } else {
+			if (beta == 0.0) {
+				y[offsety + incy * (get_global_id(ROW_DIM) + lda * get_global_id(COL_DIM))] = Round(l_working);
+			} else if (beta == 1.0) {
+                Accumulate(l_working, y[offsety + incy * (get_global_id(ROW_DIM) + lda * get_global_id(COL_DIM))]);
+				y[offsety + incy * (get_global_id(ROW_DIM) + lda * get_global_id(COL_DIM))] = Round(l_working);
+			} else {
+                double xs, r;
+                xs = TwoProductFMA(beta, y[offsety + incy * (get_global_id(ROW_DIM) + lda * get_global_id(COL_DIM))], &r);
+			    Accumulate(l_working, xs);
+			    if (r != 0.0) {
+				    Accumulate(l_working, r);
+                }
+				y[offsety + incy * (get_global_id(ROW_DIM) + lda * get_global_id(COL_DIM))] = Round(l_working);
+			}
+        }
+    }
 }
 
 // Reduce M = get_global_size(0) rows of P values in matrix Y.
@@ -270,12 +328,4 @@ __kernel void gemv_reduce(
 
     if (lid == 0)
         y[row] = Round(d_Superaccs + row * BIN_COUNT);*/
-
-    /*//Original
-    int row = get_global_id(ROW_DIM);
-
-    double sum = 0.0;
-    for (int col = 0; col < p; col++)
-        sum += y[row + m * col];
-    y[row] = sum;*/
 }

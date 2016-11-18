@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2013-2015 Inria and University Pierre and Marie Curie 
+ *  Copyright (c) 2016 Inria and University Pierre and Marie Curie 
  *  All rights reserved.
  */
 
@@ -50,7 +50,6 @@ typedef long long int bintype;
  * \param cqParamCommandQue Command queue
  * \param cdDevice Device ID
  * \param program_file OpenCL file to execute
- * \param NbElements Nb of elements of two vectors
  * \param NbFPE Size of FPEs
  * \return Status
  */
@@ -59,7 +58,6 @@ extern "C" cl_int initExDOT(
     cl_command_queue cqParamCommandQue,
     cl_device_id cdDevice,
     const char* program_file,
-    const uint NbElements,
     const uint NbFPE
 );
 
@@ -76,23 +74,54 @@ extern "C" void closeExDOT(
  * \ingroup ExDOT
  * \brief Executes parallel dot product on GPUs. For internal use
  *
- * \param cqCommandQueue Command queue
- * \param d_Res Result of summation rounded to the nearest
+ * \param NbElements Nb of elements of two vectors
  * \param d_a vector a
  * \param inca increment of vector a
+ * \param offseta from the beginning of vector a
  * \param d_b vector b
  * \param incb increment of vector b
+ * \param offsetb from the beginning of vector b
+ * \param cqCommandQueue Command queue
+ * \param d_Res Result of summation rounded to the nearest
  * \param ciErrNum Error number (output)
  * \return status
  */
-extern "C" size_t ExDOT(
+extern size_t ExDOT(
+    cl_uint NbElements,
+    cl_mem d_a,
+    const cl_uint inca,
+    const cl_uint offseta,
+    cl_mem d_b,
+    const cl_uint incb,
+    const cl_uint offsetb,
     cl_command_queue cqCommandQueue,
     cl_mem d_Res,
-    cl_mem d_a,
-    cl_uint inca,
-    cl_mem d_b,
-    cl_uint incb,
     cl_int *ciErrNum
+);
+
+/**
+ * \ingroup ExDOT
+ * \brief Executes parallel dot product on GPUs. For internal use
+ *
+ * \param NbElements Nb of elements of two vectors
+ * \param d_a vector a
+ * \param inca increment of vector a
+ * \param offseta from the beginning of vector a
+ * \param d_b vector b
+ * \param incb increment of vector b
+ * \param offsetb from the beginning of vector b
+ * \param cqCommandQueue Command queue
+ * \return result
+ */
+extern double ExDOT(
+    cl_uint NbElements,
+    cl_mem d_a,
+    const cl_uint inca,
+    const cl_uint offseta,
+    cl_mem d_b,
+    const cl_uint incb,
+    const cl_uint offsetb,
+    cl_command_queue cqCommandQueue
 );
 
 #endif // EXDOT_LAUNCHER_HPP_

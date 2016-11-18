@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2013-2015 Inria and University Pierre and Marie Curie
+ *  Copyright (c) 2016 Inria and University Pierre and Marie Curie
  *  All rights reserved.
  */
 
@@ -46,13 +46,15 @@
  * \param n size of matrix A
  * \param a matrix A
  * \param lda leading dimension of A
+ * \param offseta specifies position in the metrix A from its beginning
  * \param x vector
  * \param incx the increment for the elements of a
+ * \param offsetx specifies position in the vector x from its start
  * \param fpe size of floating-point expansion
  * \param early_exit specifies the optimization technique. By default, it is disabled
- * \return matrix C contains the reproducible and accurate result of the matrix product
+ * \return vector x contains the reproducible and accurate result of ExTRSV
  */
-int extrsv(char uplo, char transa, char diag, int n, double *a, int lda, double *x, int incx, int fpe, bool early_exit = false);
+int extrsv(const char uplo, const char transa, const char diag, const int n, double *a, const int lda, const int offseta, double *x, const int incx, const int offsetx, const int fpe, const bool early_exit = false);
 
 
 /**
@@ -78,16 +80,19 @@ int extrsv(char uplo, char transa, char diag, int n, double *a, int lda, double 
  * \param alpha scalar
  * \param a matrix A
  * \param lda leading dimension of A
+ * \param offseta specifies position in the metrix A from its beginning
  * \param x vector
  * \param incx the increment for the elements of a
+ * \param offsetx specifies position in the vector x from its start
  * \param beta scalar
  * \param y vector
  * \param incy the increment for the elements of a
+ * \param offsety specifies position in the vector y from its start
  * \param fpe size of floating-point expansion
  * \param early_exit specifies the optimization technique. By default, it is disabled
  * \return matrix C contains the reproducible and accurate result of the matrix product
  */
-int exgemv(char transa, int m, int n, double alpha, double *a, int lda, double *x, int incx, double beta, double *y, int incy, int fpe, bool early_exit = false);
+int exgemv(const char transa, const int m, const int n, const double alpha, double *a, const int lda, const int offseta, double *x, const int incx, const int offsetx, const double beta, double *y, const int incy, const int offsety, const int fpe, const bool early_exit = false);
 
 #endif // BLAS2_HPP_
 

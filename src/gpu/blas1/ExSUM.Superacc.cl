@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2013-2015 Inria and University Pierre and Marie Curie 
+ *  Copyright (c) 2016 Inria and University Pierre and Marie Curie 
  *  All rights reserved.
  */
 
@@ -213,6 +213,7 @@ void ExSUM(
     __global long *d_PartialSuperaccs,
     __global double *d_Data,
     const uint inca,
+    const uint offset,
     const uint NbElements
 ) {
     __local long l_sa[WARP_COUNT * BIN_COUNT] __attribute__((aligned(8)));
@@ -227,23 +228,42 @@ void ExSUM(
     barrier(CLK_LOCAL_MEM_FENCE);
 
     //Read data from global memory and scatter it to sub-superaccs
-    for(uint pos = get_global_id(0); pos < NbElements; pos += get_global_size(0)) {
-        double x = d_Data[pos];
+	if ((offset == 0) && (inca == 1)) {
+		for(uint pos = get_global_id(0); pos < NbElements; pos += get_global_size(0)) {
+			double x = d_Data[pos];
 
-        //Accumulate(l_workingBase, x);
-        Accumulate(l_workingBase, l_workingBase_check, x);
-        if (*l_workingBase_check) {
-            barrier(CLK_LOCAL_MEM_FENCE);
-            if (get_local_id(0) < WARP_COUNT){
-                int imin = 0;
-                int imax = 38;
-                Normalize_local(l_workingBase, &imin, &imax);
-            }
-            *l_workingBase_check = false;
-            barrier(CLK_LOCAL_MEM_FENCE);
-        }
-    }
-    barrier(CLK_LOCAL_MEM_FENCE);
+			//Accumulate(l_workingBase, x);
+			Accumulate(l_workingBase, l_workingBase_check, x);
+			if (*l_workingBase_check) {
+				barrier(CLK_LOCAL_MEM_FENCE);
+				if (get_local_id(0) < WARP_COUNT){
+					int imin = 0;
+					int imax = 38;
+					Normalize_local(l_workingBase, &imin, &imax);
+				}
+				*l_workingBase_check = false;
+				barrier(CLK_LOCAL_MEM_FENCE);
+			}
+		}
+	} else {
+		for(uint pos = get_global_id(0); pos < NbElements; pos += get_global_size(0)) {
+			double x = d_Data[offset + pos * inca];
+
+			//Accumulate(l_workingBase, x);
+			Accumulate(l_workingBase, l_workingBase_check, x);
+			if (*l_workingBase_check) {
+				barrier(CLK_LOCAL_MEM_FENCE);
+				if (get_local_id(0) < WARP_COUNT){
+					int imin = 0;
+					int imax = 38;
+					Normalize_local(l_workingBase, &imin, &imax);
+				}
+				*l_workingBase_check = false;
+				barrier(CLK_LOCAL_MEM_FENCE);
+			}
+		}
+	}
+	barrier(CLK_LOCAL_MEM_FENCE);
     /*if (get_local_id(0) < WARP_COUNT){
         int imin = 0;
         int imax = 38;

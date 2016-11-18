@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2013-2015 Inria and University Pierre and Marie Curie 
+ *  Copyright (c) 2016 Inria and University Pierre and Marie Curie 
  *  All rights reserved.
  */
 
@@ -286,7 +286,7 @@ __kernel void gemm(
                     }
                     if (x != 0.0) {
                         Accumulate(p_workingBase, x);
-		        //flush FPE to the superacc
+                        //flush FPE to the superacc
                         #ifdef NVIDIA
                             #pragma unroll
                         #endif
@@ -307,7 +307,7 @@ __kernel void gemm(
                         }
                         if (r != 0.0) {
                             Accumulate(p_workingBase, r);
-		            //flush FPE
+                            //flush FPE
                             #ifdef NVIDIA
                                 #ifdef NVIDIA
                                     #pragma unroll
@@ -316,7 +316,7 @@ __kernel void gemm(
                                     Accumulate(p_workingBase, sum[l]);
                                     sum[l] = 0.0;
                                 }
-			    #endif
+                            #endif
                         }
                     //}
                 }

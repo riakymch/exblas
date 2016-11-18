@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2013-2015 Inria and University Pierre and Marie Curie
+ *  Copyright (c) 2016 Inria and University Pierre and Marie Curie
  *  All rights reserved.
  */
 
@@ -75,9 +75,10 @@ public:
  * \param N vector size
  * \param a vector
  * \param inca specifies the increment for the elements of a
+ * \param offset specifies position in the vector to start with 
  * \return Contains the reproducible and accurate sum of elements of a real vector
  */
-double ExSUMSuperaccBack(int N, double *a, int inca);
+double ExSUMSuperaccBack(int N, double *a, int inca, int offset);
 
 /**
  * \ingroup ExSUM
@@ -88,9 +89,11 @@ double ExSUMSuperaccBack(int N, double *a, int inca);
  * \param N vector size
  * \param a vector
  * \param inca specifies the increment for the elements of a
+ * \param offset specifies position in the vector to start with 
+ * TODO: not done for offset
  * \return Contains the reproducible and accurate sum of elements of a real vector
  */
-double ExSUMSuperacc(int N, double *a, int inca);
+double ExSUMSuperacc(int N, double *a, int inca, int offset);
 
 /**
  * \ingroup ExSUM
@@ -101,9 +104,10 @@ double ExSUMSuperacc(int N, double *a, int inca);
  * \param N vector size
  * \param a vector
  * \param inca specifies the increment for the elements of a
- * TODO: not done for inca
+ * \param offset specifies position in the vector to start with 
+ * TODO: not done for inca and offset
  * \return Contains the reproducible and accurate sum of elements of a real vector
  */
-template<typename CACHE> double ExSUMFPE(int N, double *a, int inca);
+template<typename CACHE> double ExSUMFPE(int N, double *a, int inca, int offset);
 
 #endif // EXSUM_H_

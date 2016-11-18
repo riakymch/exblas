@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2013-2015 Inria and University Pierre and Marie Curie
+ *  Copyright (c) 2016 Inria and University Pierre and Marie Curie
  *  All rights reserved.
  */
 
@@ -37,11 +37,12 @@
  * \param N vector size
  * \param a vector
  * \param inca specifies the increment for the elements of a
+ * \param offset specifies position in the vector to start with 
  * \param fpe size of floating-point expansion
  * \param program_file path to the file with kernels
  * \return Contains the reproducible and accurate sum of elements of a real vector
  */
-static double runExSUM(int N, double *a, int inca, int fpe, const char* program_file);
+static double runExSUM(const int N, double *a, const int inca, const int offset, const int fpe, const char* program_file);
 
 /**
  * \ingroup ExSUM
@@ -54,33 +55,34 @@ static double runExSUM(int N, double *a, int inca, int fpe, const char* program_
  * \param Ng vector size
  * \param ag vector
  * \param inca specifies the increment for the elements of a
+ * \param offset specifies position in the vector to start with 
  * \param fpe stands for the floating-point expansions size (used in conjuction with superaccumulators)
  * \param early_exit specifies the optimization technique. By default, it is disabled
  * \return Contains the reproducible and accurate sum of elements of a real vector
  */
-double exsum(int Ng, double *ag, int inca, int fpe, bool early_exit) {
+double exsum(const int Ng, double *ag, const int inca, const int offset, const int fpe, const bool early_exit) {
     char path[256];
     strcpy(path, EXBLAS_BINARY_DIR);
     strcat(path, "/include/cl/");
 
     // with superaccumulators only
     if (fpe < 2)
-        return runExSUM(Ng, ag, inca, 0, strcat(path, "ExSUM.Superacc.cl"));
+        return runExSUM(Ng, ag, inca, offset, 0, strcat(path, "ExSUM.Superacc.cl"));
 
     if (early_exit) {
         if (fpe <= 4)
-            return runExSUM(Ng, ag, inca, 4, strcat(path, "ExSUM.FPE.EX.4.cl"));
+            return runExSUM(Ng, ag, inca, offset, 4, strcat(path, "ExSUM.FPE.EX.4.cl"));
         if (fpe <= 6)
-            return runExSUM(Ng, ag, inca, 6, strcat(path, "ExSUM.FPE.EX.6.cl"));
+            return runExSUM(Ng, ag, inca, offset, 6, strcat(path, "ExSUM.FPE.EX.6.cl"));
         if (fpe <= 8)
-            return runExSUM(Ng, ag, inca, 8, strcat(path, "ExSUM.FPE.EX.8.cl"));
+            return runExSUM(Ng, ag, inca, offset, 8, strcat(path, "ExSUM.FPE.EX.8.cl"));
     } else // ! early_exit
-        return runExSUM(Ng, ag, inca, fpe, strcat(path, "ExSUM.FPE.cl"));
+        return runExSUM(Ng, ag, inca, offset, fpe, strcat(path, "ExSUM.FPE.cl"));
 
     return 0.0;
 }
 
-static double runExSUM(int N, double *h_a, int inca, int fpe, const char* program_file){
+static double runExSUM(const int N, double *h_a, const int inca, const int offset, const int fpe, const char* program_file){
     double h_Res;
     cl_int ciErrNum;
 
@@ -139,7 +141,7 @@ static double runExSUM(int N, double *h_a, int inca, int fpe, const char* progra
 
         //Running OpenCL dSum with %u elements...
             //Just a single launch or a warmup iteration
-            ExSUM(NULL, d_Res, d_a, inca, &ciErrNum);
+            ExSUM(NULL, d_Res, d_a, inca, offset, &ciErrNum);
             if (ciErrNum != CL_SUCCESS)
                 exit(EXIT_FAILURE);
 
@@ -149,15 +151,17 @@ static double runExSUM(int N, double *h_a, int inca, int fpe, const char* progra
 
         for(uint iter = 0; iter < NUM_ITER; iter++) {
             ciErrNum = clEnqueueMarker(cqCommandQueue, &startMark);
+            //ciErrNum = clEnqueueMarkerWithWaitList(cqCommandQueue, 0, NULL, &startMark);
             ciErrNum |= clFinish(cqCommandQueue);
             if (ciErrNum != CL_SUCCESS) {
                 printf("Error in clEnqueueMarker, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
                 exit(EXIT_FAILURE);
             }
 
-            ExSUM(NULL, d_Res, d_a, inca, &ciErrNum);
+            ExSUM(NULL, d_Res, d_a, inca, offset, &ciErrNum);
 
             ciErrNum  = clEnqueueMarker(cqCommandQueue, &endMark);
+            //ciErrNum = clEnqueueMarkerWithWaitList(cqCommandQueue, 0, NULL, &endMark);
             ciErrNum |= clFinish(cqCommandQueue);
             if (ciErrNum != CL_SUCCESS) {
                 printf("Error in clEnqueueMarker, Line %u in file %s !!!\n\n", __LINE__, __FILE__);

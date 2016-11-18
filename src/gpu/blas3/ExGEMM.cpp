@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2013-2015 Inria and University Pierre and Marie Curie
+ *  Copyright (c) 2016 Inria and University Pierre and Marie Curie
  *  All rights reserved.
  */
 
@@ -171,6 +171,7 @@ static int runExGEMM(int m, int n, int k, double alpha, double *h_a, int lda, do
 
         for(uint iter = 0; iter < NUM_ITER; iter++) {
             ciErrNum = clEnqueueMarker(cqCommandQueue, &startMark);
+            //ciErrNum = clEnqueueMarkerWithWaitList(cqCommandQueue, 0, NULL, &startMark);
             ciErrNum |= clFinish(cqCommandQueue);
             if (ciErrNum != CL_SUCCESS) {
                 printf("Error in clEnqueueMarker, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
@@ -180,6 +181,7 @@ static int runExGEMM(int m, int n, int k, double alpha, double *h_a, int lda, do
             ExGEMM(NULL, m, n, k, alpha, d_a, lda, d_b, ldb, beta, d_c, ldc, &ciErrNum);
 
             ciErrNum  = clEnqueueMarker(cqCommandQueue, &endMark);
+            //ciErrNum = clEnqueueMarkerWithWaitList(cqCommandQueue, 0, NULL, &endMark);
             ciErrNum |= clFinish(cqCommandQueue);
             if (ciErrNum != CL_SUCCESS) {
                 printf("Error in clEnqueueMarker, Line %u in file %s !!!\n\n", __LINE__, __FILE__);

@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2013-2015 Inria and University Pierre and Marie Curie 
+ *  Copyright (c) 2016 Inria and University Pierre and Marie Curie 
  *  All rights reserved.
  */
 
@@ -153,7 +153,8 @@ extern "C" size_t ExSUM(
     cl_command_queue cqCommandQueue,
     cl_mem d_Res,
     cl_mem d_a,
-    cl_uint inca,
+    const cl_uint inca,
+    const cl_uint offset,
     cl_int *ciErrNumRes
 ){
     cl_int ciErrNum;
@@ -170,6 +171,7 @@ extern "C" size_t ExSUM(
         ciErrNum  = clSetKernelArg(ckKernel, i++, sizeof(cl_mem),  (void *)&d_PartialSuperaccs);
         ciErrNum |= clSetKernelArg(ckKernel, i++, sizeof(cl_mem),  (void *)&d_a);
         ciErrNum |= clSetKernelArg(ckKernel, i++, sizeof(cl_uint), (void *)&inca);
+        ciErrNum |= clSetKernelArg(ckKernel, i++, sizeof(cl_uint), (void *)&offset);
         ciErrNum |= clSetKernelArg(ckKernel, i++, sizeof(cl_uint), (void *)&NbElements);
         if (ciErrNum != CL_SUCCESS) {
             printf("Error in clSetKernelArg, Line %u in file %s !!!\n\n", __LINE__, __FILE__);

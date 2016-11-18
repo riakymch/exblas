@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2013-2015 Inria and University Pierre and Marie Curie 
+ *  Copyright (c) 2016 Inria and University Pierre and Marie Curie 
  *  All rights reserved.
  */
 
@@ -232,6 +232,7 @@ void ExSUM(
     __global long *d_PartialSuperaccs,
     __global double *d_Data,
     const uint inca,
+    const uint offset,
     const uint NbElements
 ) {
     __local long l_sa[WARP_COUNT * BIN_COUNT] __attribute__((aligned(8)));
@@ -247,52 +248,100 @@ void ExSUM(
 
     //Read data from global memory and scatter it to sub-superaccs
     double a[NBFPE] = {0.0};
-    for(uint pos = get_global_id(0); pos < NbElements; pos += get_global_size(0)) {
-        double x = d_Data[pos];
-        #ifdef NVIDIA
-            #pragma unroll
-        #endif
-        for(uint i = 0; i != NBFPE; ++i) {
-            double s;
-            a[i] = KnuthTwoSum(a[i], x, &s);
-            x = s;
-        }
-        if(x != 0.0) {
-            //TODO: do NOT propagate NaNs
-            Accumulate(l_workingBase, x);
-            /*Accumulate(l_workingBase, l_workingBase_check, x);
-            if (*l_workingBase_check) {
-                barrier(CLK_LOCAL_MEM_FENCE);
-                if (get_local_id(0) < WARP_COUNT){
-                    int imin = 0;
-                    int imax = 38;
-                    Normalize_local(l_workingBase, &imin, &imax);
-                }
-                *l_workingBase_check = false;
-                barrier(CLK_LOCAL_MEM_FENCE);
-            }*/
-            // Flush FPEs to superaccs
-            #ifdef NVIDIA
-                #pragma unroll
-            #endif
-            for(uint i = 0; i != NBFPE; ++i) {
-                Accumulate(l_workingBase, a[i]);
-                /*Accumulate(l_workingBase, l_workingBase_check, a[i]);
-            	if (*l_workingBase_check) {
-                    barrier(CLK_LOCAL_MEM_FENCE);
-                    if (get_local_id(0) < WARP_COUNT){
-                        int imin = 0;
-                        int imax = 38;
-                        Normalize_local(l_workingBase, &imin, &imax);
-                    }
-                    *l_workingBase_check = false;
-            	    barrier(CLK_LOCAL_MEM_FENCE);
-                }*/
-                a[i] = 0.0;
-            }
-        }
-    }
-    /*barrier(CLK_LOCAL_MEM_FENCE);
+	if ((offset == 0) && (inca == 1)) {
+		for(uint pos = get_global_id(0); pos < NbElements; pos += get_global_size(0)) {
+			double x = d_Data[pos];
+			#ifdef NVIDIA
+				#pragma unroll
+			#endif
+			for(uint i = 0; i != NBFPE; ++i) {
+				double s;
+				a[i] = KnuthTwoSum(a[i], x, &s);
+				x = s;
+			}
+			if(x != 0.0) {
+				//TODO: do NOT propagate NaNs
+				Accumulate(l_workingBase, x);
+				/*Accumulate(l_workingBase, l_workingBase_check, x);
+				if (*l_workingBase_check) {
+					barrier(CLK_LOCAL_MEM_FENCE);
+					if (get_local_id(0) < WARP_COUNT){
+						int imin = 0;
+						int imax = 38;
+						Normalize_local(l_workingBase, &imin, &imax);
+					}
+					*l_workingBase_check = false;
+					barrier(CLK_LOCAL_MEM_FENCE);
+				}*/
+				// Flush FPEs to superaccs
+				#ifdef NVIDIA
+					#pragma unroll
+				#endif
+				for(uint i = 0; i != NBFPE; ++i) {
+					Accumulate(l_workingBase, a[i]);
+					/*Accumulate(l_workingBase, l_workingBase_check, a[i]);
+					if (*l_workingBase_check) {
+						barrier(CLK_LOCAL_MEM_FENCE);
+						if (get_local_id(0) < WARP_COUNT){
+							int imin = 0;
+							int imax = 38;
+							Normalize_local(l_workingBase, &imin, &imax);
+						}
+						*l_workingBase_check = false;
+						barrier(CLK_LOCAL_MEM_FENCE);
+					}*/
+					a[i] = 0.0;
+				}
+			}
+		}
+	} else {
+		for(uint pos = get_global_id(0); pos < NbElements; pos += get_global_size(0)) {
+			double x = d_Data[offset + pos * inca];
+			#ifdef NVIDIA
+				#pragma unroll
+			#endif
+			for(uint i = 0; i != NBFPE; ++i) {
+				double s;
+				a[i] = KnuthTwoSum(a[i], x, &s);
+				x = s;
+			}
+			if(x != 0.0) {
+				//TODO: do NOT propagate NaNs
+				Accumulate(l_workingBase, x);
+				/*Accumulate(l_workingBase, l_workingBase_check, x);
+				if (*l_workingBase_check) {
+					barrier(CLK_LOCAL_MEM_FENCE);
+					if (get_local_id(0) < WARP_COUNT){
+						int imin = 0;
+						int imax = 38;
+						Normalize_local(l_workingBase, &imin, &imax);
+					}
+					*l_workingBase_check = false;
+					barrier(CLK_LOCAL_MEM_FENCE);
+				}*/
+				// Flush FPEs to superaccs
+				#ifdef NVIDIA
+					#pragma unroll
+				#endif
+				for(uint i = 0; i != NBFPE; ++i) {
+					Accumulate(l_workingBase, a[i]);
+					/*Accumulate(l_workingBase, l_workingBase_check, a[i]);
+					if (*l_workingBase_check) {
+						barrier(CLK_LOCAL_MEM_FENCE);
+						if (get_local_id(0) < WARP_COUNT){
+							int imin = 0;
+							int imax = 38;
+							Normalize_local(l_workingBase, &imin, &imax);
+						}
+						*l_workingBase_check = false;
+						barrier(CLK_LOCAL_MEM_FENCE);
+					}*/
+					a[i] = 0.0;
+				}
+			}
+		}
+	}
+	/*barrier(CLK_LOCAL_MEM_FENCE);
     if (get_local_id(0) < WARP_COUNT){
         int imin = 0;
         int imax = 38;

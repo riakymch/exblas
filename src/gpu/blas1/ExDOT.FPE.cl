@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2013-2015 Inria and University Pierre and Marie Curie 
+ *  Copyright (c) 2016 Inria and University Pierre and Marie Curie 
  *  All rights reserved.
  */
 
@@ -203,8 +203,10 @@ void ExDOT(
     __global long *d_PartialSuperaccs,
     __global double *d_a,
     const uint inca,
+    const uint offseta,
     __global double *d_b,
     const uint incb,
+    const uint offsetb,
     const uint NbElements
 ) {
     __local long l_sa[WARP_COUNT * BIN_COUNT] __attribute__((aligned(8)));
@@ -220,53 +222,102 @@ void ExDOT(
 
     //Read data from global memory and scatter it to sub-superaccs
     double a[NBFPE] = {0.0};
-    for(uint pos = get_global_id(0); pos < NbElements; pos += get_global_size(0)) {
-        double r = 0.0;
-        double x = TwoProductFMA(d_a[pos], d_b[pos], &r);
+	if ((offseta == 0) && (inca == 1) && (offsetb == 0) && (incb == 1)) {
+		for(uint pos = get_global_id(0); pos < NbElements; pos += get_global_size(0)) {
+			double r = 0.0;
+			double x = TwoProductFMA(d_a[pos], d_b[pos], &r);
 
-        #ifdef NVIDIA
-            #pragma unroll
-        #endif
-        for(uint i = 0; i != NBFPE; ++i) {
-            double s;
-            a[i] = KnuthTwoSum(a[i], x, &s);
-            x = s;
-        }
-        if (x != 0.0) {
-            Accumulate(l_workingBase, x);
-            // Flush FPEs to superaccs
-            #ifdef NVIDIA
-                #pragma unroll
-            #endif
-            for(uint i = 0; i != NBFPE; ++i) {
-                Accumulate(l_workingBase, a[i]);
-                a[i] = 0.0;
-            }
-        }
+			#ifdef NVIDIA
+				#pragma unroll
+			#endif
+			for(uint i = 0; i != NBFPE; ++i) {
+				double s;
+				a[i] = KnuthTwoSum(a[i], x, &s);
+				x = s;
+			}
+			if (x != 0.0) {
+				Accumulate(l_workingBase, x);
+				// Flush FPEs to superaccs
+				#ifdef NVIDIA
+					#pragma unroll
+				#endif
+				for(uint i = 0; i != NBFPE; ++i) {
+					Accumulate(l_workingBase, a[i]);
+					a[i] = 0.0;
+				}
+			}
 
-        if (r != 0.0) {
-            #ifdef NVIDIA
-                #pragma unroll
-            #endif
-            for(uint i = NBFPE-3; i != NBFPE; ++i) {
-                double s;
-                a[i] = KnuthTwoSum(a[i], r, &s);
-                r = s;
-            }
-            if (r != 0.0) {
-                Accumulate(l_workingBase, r);
-                // Flush FPEs to superaccs
-                #ifdef NVIDIA
-                    #pragma unroll
-                #endif
-                for(uint i = 0; i != NBFPE; ++i) {
-                    Accumulate(l_workingBase, a[i]);
-                    a[i] = 0.0;
-                }
-            }
-        }
-    }
-    //Flush FPEs to superaccs
+			if (r != 0.0) {
+				#ifdef NVIDIA
+					#pragma unroll
+				#endif
+				for(uint i = NBFPE-3; i != NBFPE; ++i) {
+					double s;
+					a[i] = KnuthTwoSum(a[i], r, &s);
+					r = s;
+				}
+				if (r != 0.0) {
+					Accumulate(l_workingBase, r);
+					// Flush FPEs to superaccs
+					#ifdef NVIDIA
+						#pragma unroll
+					#endif
+					for(uint i = 0; i != NBFPE; ++i) {
+						Accumulate(l_workingBase, a[i]);
+						a[i] = 0.0;
+					}
+				}
+			}
+		}
+	} else {
+		for(uint pos = get_global_id(0); pos < NbElements; pos += get_global_size(0)) {
+			double r = 0.0;
+			double x = TwoProductFMA(d_a[offseta + pos * inca], d_b[offsetb + pos * incb], &r);
+
+			#ifdef NVIDIA
+				#pragma unroll
+			#endif
+			for(uint i = 0; i != NBFPE; ++i) {
+				double s;
+				a[i] = KnuthTwoSum(a[i], x, &s);
+				x = s;
+			}
+			if (x != 0.0) {
+				Accumulate(l_workingBase, x);
+				// Flush FPEs to superaccs
+				#ifdef NVIDIA
+					#pragma unroll
+				#endif
+				for(uint i = 0; i != NBFPE; ++i) {
+					Accumulate(l_workingBase, a[i]);
+					a[i] = 0.0;
+				}
+			}
+
+			if (r != 0.0) {
+				#ifdef NVIDIA
+					#pragma unroll
+				#endif
+				for(uint i = NBFPE-3; i != NBFPE; ++i) {
+					double s;
+					a[i] = KnuthTwoSum(a[i], r, &s);
+					r = s;
+				}
+				if (r != 0.0) {
+					Accumulate(l_workingBase, r);
+					// Flush FPEs to superaccs
+					#ifdef NVIDIA
+						#pragma unroll
+					#endif
+					for(uint i = 0; i != NBFPE; ++i) {
+						Accumulate(l_workingBase, a[i]);
+						a[i] = 0.0;
+					}
+				}
+			}
+		}
+	}
+	//Flush FPEs to superaccs
     #ifdef NVIDIA
         #pragma unroll
     #endif

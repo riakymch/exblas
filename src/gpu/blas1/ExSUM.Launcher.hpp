@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2013-2015 Inria and University Pierre and Marie Curie 
+ *  Copyright (c) 2016 Inria and University Pierre and Marie Curie 
  *  All rights reserved.
  */
 
@@ -80,6 +80,7 @@ extern "C" void closeExSUM(
  * \param d_Res Result of summation rounded to the nearest
  * \param d_a vector to sum up
  * \param inca incremenet of vector a
+ * \param offset from the beginning of vector a
  * \param ciErrNum Error number (output)
  * \return status
  */
@@ -87,7 +88,8 @@ extern "C" size_t ExSUM(
     cl_command_queue cqCommandQueue,
     cl_mem d_Res,
     cl_mem d_a,
-    cl_uint inca,
+    const cl_uint inca,
+    const cl_uint offset,
     cl_int *ciErrNum
 );
 
