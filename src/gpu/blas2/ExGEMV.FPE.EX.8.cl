@@ -238,8 +238,8 @@ __kernel void gemv(
     }
 
     // Compute partial dot product
-    double al[8] = {0.0};
     if (get_global_id(ROW_DIM) < m) {
+    	double al[8] = {0.0};
         if (offseta == 0) {  
             for (int k = 0; k < ncols; k++) {
                 double xs, r, s;
@@ -419,16 +419,16 @@ __kernel void gemv(
                 }
             }
         }
+		//Flush FPEs to superaccs
+		Accumulate(l_working, al[0]);
+		Accumulate(l_working, al[1]);
+		Accumulate(l_working, al[2]);
+		Accumulate(l_working, al[3]);
+		Accumulate(l_working, al[4]);
+		Accumulate(l_working, al[5]);
+		Accumulate(l_working, al[6]);
+		Accumulate(l_working, al[7]);
     }
-    //Flush FPEs to superaccs
-    Accumulate(l_working, al[0]);
-    Accumulate(l_working, al[1]);
-    Accumulate(l_working, al[2]);
-    Accumulate(l_working, al[3]);
-    Accumulate(l_working, al[4]);
-    Accumulate(l_working, al[5]);
-    Accumulate(l_working, al[6]);
-    Accumulate(l_working, al[7]);
 
     // Store in Y (P columns per row)
     if (get_global_id(ROW_DIM) < m) {
@@ -465,6 +465,275 @@ __kernel void gemv(
         }
     }
 }
+
+
+__kernel void gemvT(
+    const uint m,
+    const uint n,
+    const double alpha,
+    __global double *a,
+    const uint lda,
+    const uint offseta,
+    __global double *x,
+    const uint incx,
+    const uint offsetx,
+    const double beta,
+    __global double *y,
+    const uint incy,
+    const uint offsety,
+    __local double *work,
+    __global long *d_Superaccs
+) {
+    // Load a slice of X in WORK, using all available threads
+	if ((offsetx == 0) && (incx == 1)) {  
+		for (int k = 0; k < m; k += get_local_size(ROW_DIM)) {
+			int col = k + get_local_id(ROW_DIM);
+			if (col < m)
+				work[col] = x[col];
+		}
+	} else {
+		for (int k = 0; k < m; k += get_local_size(ROW_DIM)) {
+			int col = k + get_local_id(ROW_DIM);
+			if (col < m)
+				work[col] = x[offsetx + incx * col];
+		}
+	}
+	barrier(CLK_LOCAL_MEM_FENCE); // sync group
+
+    __global long *l_working = d_Superaccs + (get_global_id(ROW_DIM) + n * get_global_id(COL_DIM))* BIN_COUNT;
+    for (uint i = 0; i < BIN_COUNT; i++) {
+        l_working[i] = 0.0;
+    }
+
+    // Compute partial dot product
+    if (get_global_id(ROW_DIM) < n) {
+    	double al[8] = {0.0};
+		if (offseta == 0) {  
+			for (int k = 0; k < m; k++) {
+                double xs, r, s;
+			    xs = TwoProductFMA(a[lda * get_global_id(ROW_DIM) + k], alpha * work[k], &r);
+
+                al[0] = KnuthTwoSum(al[0], xs, &s);
+                xs = s;
+                if (xs != 0.0) {
+                    al[1] = KnuthTwoSum(al[1], xs, &s);
+                    xs = s;
+                    if (xs != 0.0) {
+                        al[2] = KnuthTwoSum(al[2], xs, &s);
+                        xs = s;
+                        if (xs != 0.0) {
+                            al[3] = KnuthTwoSum(al[3], xs, &s);
+                            xs = s;
+                            if (xs != 0.0) {
+                                al[4] = KnuthTwoSum(al[4], xs, &s);
+                                xs = s;
+                                if (xs != 0.0) {
+                                    al[5] = KnuthTwoSum(al[5], xs, &s);
+                                    xs = s;
+                                    if (xs != 0.0) {
+                                        al[6] = KnuthTwoSum(al[6], xs, &s);
+                                        xs = s;
+                                        if (xs != 0.0) {
+                                            al[7] = KnuthTwoSum(al[7], xs, &s);
+                                            xs = s;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                if (xs != 0.0) {
+                    Accumulate(l_working, xs);
+                    // Flush FPEs to superaccs
+                    Accumulate(l_working, al[0]);
+                    Accumulate(l_working, al[1]);
+                    Accumulate(l_working, al[2]);
+                    Accumulate(l_working, al[3]);
+                    Accumulate(l_working, al[4]);
+                    Accumulate(l_working, al[5]);
+                    Accumulate(l_working, al[6]);
+                    Accumulate(l_working, al[7]);
+                    al[0] = 0.0;
+                    al[1] = 0.0;
+                    al[2] = 0.0;
+                    al[3] = 0.0;
+                    al[4] = 0.0;
+                    al[5] = 0.0;
+                    al[6] = 0.0;
+                    al[7] = 0.0;
+                }
+
+                if (r != 0.0) {
+                    al[5] = KnuthTwoSum(al[5], r, &s);
+                    r = s;
+                    if (r != 0.0) {
+                        al[6] = KnuthTwoSum(al[6], r, &s);
+                        r = s;
+                        if (r != 0.0) {
+                            al[7] = KnuthTwoSum(al[7], r, &s);
+                            r = s;
+                        }
+                    }
+                    if (r != 0.0) {
+                        Accumulate(l_working, r);
+                        // Flush FPEs to superaccs
+                        Accumulate(l_working, al[0]);
+                        Accumulate(l_working, al[1]);
+                        Accumulate(l_working, al[2]);
+                        Accumulate(l_working, al[3]);
+                        Accumulate(l_working, al[4]);
+                        Accumulate(l_working, al[5]);
+                        Accumulate(l_working, al[6]);
+                        Accumulate(l_working, al[7]);
+                        al[0] = 0.0;
+                        al[1] = 0.0;
+                        al[2] = 0.0;
+                        al[3] = 0.0;
+                        al[4] = 0.0;
+                        al[5] = 0.0;
+                        al[6] = 0.0;
+                        al[7] = 0.0;
+                    }
+                }
+			}
+		} else {
+			for (int k = 0; k < m; k++) {
+                double xs, r, s;
+			    xs = TwoProductFMA(a[offseta + lda * get_global_id(ROW_DIM) + k], alpha * work[k], &r);
+
+                al[0] = KnuthTwoSum(al[0], xs, &s);
+                xs = s;
+                if (xs != 0.0) {
+                    al[1] = KnuthTwoSum(al[1], xs, &s);
+                    xs = s;
+                    if (xs != 0.0) {
+                        al[2] = KnuthTwoSum(al[2], xs, &s);
+                        xs = s;
+                        if (xs != 0.0) {
+                            al[3] = KnuthTwoSum(al[3], xs, &s);
+                            xs = s;
+                            if (xs != 0.0) {
+                                al[4] = KnuthTwoSum(al[4], xs, &s);
+                                xs = s;
+                                if (xs != 0.0) {
+                                    al[5] = KnuthTwoSum(al[5], xs, &s);
+                                    xs = s;
+                                    if (xs != 0.0) {
+                                        al[6] = KnuthTwoSum(al[6], xs, &s);
+                                        xs = s;
+                                        if (xs != 0.0) {
+                                            al[7] = KnuthTwoSum(al[7], xs, &s);
+                                            xs = s;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                if (xs != 0.0) {
+                    Accumulate(l_working, xs);
+                    // Flush FPEs to superaccs
+                    Accumulate(l_working, al[0]);
+                    Accumulate(l_working, al[1]);
+                    Accumulate(l_working, al[2]);
+                    Accumulate(l_working, al[3]);
+                    Accumulate(l_working, al[4]);
+                    Accumulate(l_working, al[5]);
+                    Accumulate(l_working, al[6]);
+                    Accumulate(l_working, al[7]);
+                    al[0] = 0.0;
+                    al[1] = 0.0;
+                    al[2] = 0.0;
+                    al[3] = 0.0;
+                    al[4] = 0.0;
+                    al[5] = 0.0;
+                    al[6] = 0.0;
+                    al[7] = 0.0;
+                }
+
+                if (r != 0.0) {
+                    al[5] = KnuthTwoSum(al[5], r, &s);
+                    r = s;
+                    if (r != 0.0) {
+                        al[6] = KnuthTwoSum(al[6], r, &s);
+                        r = s;
+                        if (r != 0.0) {
+                            al[7] = KnuthTwoSum(al[7], r, &s);
+                            r = s;
+                        }
+                    }
+                    if (r != 0.0) {
+                        Accumulate(l_working, r);
+                        // Flush FPEs to superaccs
+                        Accumulate(l_working, al[0]);
+                        Accumulate(l_working, al[1]);
+                        Accumulate(l_working, al[2]);
+                        Accumulate(l_working, al[3]);
+                        Accumulate(l_working, al[4]);
+                        Accumulate(l_working, al[5]);
+                        Accumulate(l_working, al[6]);
+                        Accumulate(l_working, al[7]);
+                        al[0] = 0.0;
+                        al[1] = 0.0;
+                        al[2] = 0.0;
+                        al[3] = 0.0;
+                        al[4] = 0.0;
+                        al[5] = 0.0;
+                        al[6] = 0.0;
+                        al[7] = 0.0;
+                    }
+                }
+			}
+		}
+		//Flush FPEs to superaccs
+		Accumulate(l_working, al[0]);
+		Accumulate(l_working, al[1]);
+		Accumulate(l_working, al[2]);
+		Accumulate(l_working, al[3]);
+		Accumulate(l_working, al[4]);
+		Accumulate(l_working, al[5]);
+		Accumulate(l_working, al[6]);
+		Accumulate(l_working, al[7]);
+	}
+
+    // Store in Y (P columns per row)
+	if (get_global_id(ROW_DIM) < n) {
+		if ((offsety == 0) && (incy == 1)) {  
+			if (beta == 0.0) {
+				y[get_global_id(ROW_DIM)] = Round(l_working);
+			} else if (beta == 1.0) {
+                Accumulate(l_working, y[get_global_id(ROW_DIM)]);
+				y[get_global_id(ROW_DIM)] = Round(l_working);
+			} else {
+                double xs, r;
+                xs = TwoProductFMA(beta, y[get_global_id(ROW_DIM)], &r);
+			    Accumulate(l_working, xs);
+			    if (r != 0.0) {
+				    Accumulate(l_working, r);
+                }
+				y[get_global_id(ROW_DIM)] = Round(l_working);
+			}
+		} else {
+			if (beta == 0.0) {
+				y[offsety + incy * get_global_id(ROW_DIM)] = Round(l_working);
+			} else if (beta == 1.0) {
+                Accumulate(l_working, y[offsety + incy * get_global_id(ROW_DIM)]);
+				y[offsety + incy * get_global_id(ROW_DIM)] = Round(l_working);
+			} else {
+                double xs, r;
+                xs = TwoProductFMA(beta, y[offsety + incy * get_global_id(ROW_DIM)], &r);
+			    Accumulate(l_working, xs);
+			    if (r != 0.0) {
+				    Accumulate(l_working, r);
+                }
+				y[offsety + incy * get_global_id(ROW_DIM)] = Round(l_working);
+			}
+		}
+	}
+}
+
 
 // Reduce M = get_global_size(0) rows of P values in matrix Y.
 // Stores the result in first column of Y.
@@ -503,12 +772,5 @@ __kernel void gemv_reduce(
 
     if (lid == 0)
         y[row] = Round(d_Superaccs + row * BIN_COUNT);*/
-
-    /*//Original
-    int row = get_global_id(ROW_DIM);
-
-    double sum = 0.0;
-    for (int col = 0; col < p; col++)
-        sum += y[row + m * col];
-    y[row] = sum;*/
 }
+

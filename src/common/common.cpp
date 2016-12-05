@@ -80,11 +80,11 @@ void init_lognormal_matrix(const bool iscolumnwise, const int m, const int n, do
     if (iscolumnwise) {
         for(int j = 0; j < n; ++j)
             for(int i = 0; i < m; ++i)
-                a[j * lda + i] = d(gen);
+                a[j * lda + i] = 1.0;//d(gen);
     } else {
         for(int i = 0; i < m; ++i)
             for(int j = 0; j < n; ++j)
-                a[i * lda + j] = d(gen);
+                a[i * lda + j] = 1.0;//d(gen);
     }
 }
 

@@ -34,6 +34,7 @@
  * \brief Executes on GPU parallel matrix-vector operations y := alpha*A*x + beta * y or y := alpha*A**T*x + beta * y.
  *     For internal use
  *
+ * \param transa 'T' or 'N' a transpose or a non-transpose matrix A
  * \param m the number of rows of matrix A
  * \param n the number of columns of matrix A
  * \param alpha scalar
@@ -51,7 +52,7 @@
  * \param program_file path to the file with kernels
  * \return Contains the reproducible and accurate result of the matrix-vector product
  */
-int runExGEMV(const int m, const int n, const double alpha, double *a, const int lda, const int offseta, double *x, const int incx, const int offsetx, const double beta, double *y, const int incy, const int offsety, const int fpe, const char* program_file);
+int runExGEMV(const char transa, const int m, const int n, const double alpha, double *a, const int lda, const int offseta, double *x, const int incx, const int offsetx, const double beta, double *y, const int incy, const int offsety, const int fpe, const char* program_file);
 
 /**
  * \ingroup ExGEMV
@@ -84,28 +85,28 @@ int exgemv(const char transa, const int m, const int n, const double alpha, doub
 
     // with superaccumulators only
     if (fpe == 0) {
-        return runExGEMV(m, n, alpha,  a, lda, offseta, x, incx, offsetx, beta, y, incy, offsety, 0, strcat(path, "ExGEMV.Superacc.cl"));
+        return runExGEMV(transa, m, n, alpha,  a, lda, offseta, x, incx, offsetx, beta, y, incy, offsety, 0, strcat(path, "ExGEMV.Superacc.cl"));
     }
 
     // DGEMV
     if (fpe == 1) {
-        return runExGEMV(m, n, alpha,  a, lda, offseta, x, incx, offsetx, beta, y, incy, offsety, 1, strcat(path, "DGEMV.cl"));
+        return runExGEMV(transa, m, n, alpha,  a, lda, offseta, x, incx, offsetx, beta, y, incy, offsety, 1, strcat(path, "DGEMV.cl"));
     }
 
     if (early_exit) {
         if (fpe <= 4)
-            return runExGEMV(m, n, alpha, a, lda, offseta, x, incx, offsetx, beta, y, incy, offsety, 4, strcat(path, "ExGEMV.FPE.EX.4.cl"));
+            return runExGEMV(transa, m, n, alpha, a, lda, offseta, x, incx, offsetx, beta, y, incy, offsety, 4, strcat(path, "ExGEMV.FPE.EX.4.cl"));
         if (fpe <= 6)
-            return runExGEMV(m, n, alpha, a, lda, offseta, x, incx, offsetx, beta, y, incy, offsety,6, strcat(path, "ExGEMV.FPE.EX.6.cl"));
+            return runExGEMV(transa, m, n, alpha, a, lda, offseta, x, incx, offsetx, beta, y, incy, offsety,6, strcat(path, "ExGEMV.FPE.EX.6.cl"));
         if (fpe <= 8)
-            return runExGEMV(m, n, alpha, a, lda, offseta, x, incx, offsetx, beta, y, incy, offsety, 8, strcat(path, "ExGEMV.FPE.EX.8.cl"));
+            return runExGEMV(transa, m, n, alpha, a, lda, offseta, x, incx, offsetx, beta, y, incy, offsety, 8, strcat(path, "ExGEMV.FPE.EX.8.cl"));
     } else // ! early_exit
-        return runExGEMV(m, n, alpha, a, lda, offseta, x, incx, offsetx, beta, y, incy, offsety, fpe, strcat(path, "ExGEMV.FPE.cl"));
+        return runExGEMV(transa, m, n, alpha, a, lda, offseta, x, incx, offsetx, beta, y, incy, offsety, fpe, strcat(path, "ExGEMV.FPE.cl"));
 
     return 0;
 }
 
-int runExGEMV(const int m, const int n, const double alpha, double *a, const int lda, const int offseta, double *x, const int incx, const int offsetx, const double beta, double *y, const int incy, const int offsety, const int fpe, const char* program_file) {
+int runExGEMV(const char transa, const int m, const int n, const double alpha, double *a, const int lda, const int offseta, double *x, const int incx, const int offsetx, const double beta, double *y, const int incy, const int offsety, const int fpe, const char* program_file) {
     cl_int ciErrNum;
 
     //printf("Initializing OpenCL...\n");
@@ -148,12 +149,12 @@ int runExGEMV(const int m, const int n, const double alpha, double *a, const int
             printf("Error in clCreateBuffer for d_a, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
             exit(EXIT_FAILURE);
         }
-        cl_mem d_x = clCreateBuffer(cxGPUContext, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, n * sizeof(cl_double), x, &ciErrNum);
+        cl_mem d_x = clCreateBuffer(cxGPUContext, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, ((transa == 'T') ? m : n) * sizeof(cl_double), x, &ciErrNum);
         if (ciErrNum != CL_SUCCESS) {
             printf("Error in clCreateBuffer for d_x, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
             exit(EXIT_FAILURE);
         }
-        cl_mem d_y = clCreateBuffer(cxGPUContext, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, m * sizeof(cl_double), y, &ciErrNum);
+        cl_mem d_y = clCreateBuffer(cxGPUContext, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, ((transa == 'T') ? n : m) * sizeof(cl_double), y, &ciErrNum);
         if (ciErrNum != CL_SUCCESS) {
             printf("Error in clCreateBuffer for d_y, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
             exit(EXIT_FAILURE);
@@ -161,12 +162,12 @@ int runExGEMV(const int m, const int n, const double alpha, double *a, const int
 
     {
         //Initializing OpenCL dSum...
-        ciErrNum = initExGEMV(cxGPUContext, cqCommandQueue, cdDevice, program_file, m, 1, fpe);
+        ciErrNum = initExGEMV(cxGPUContext, cqCommandQueue, cdDevice, program_file, transa, (transa == 'T') ? n : m, 1, fpe);
         if (ciErrNum != CL_SUCCESS)
             exit(EXIT_FAILURE);
 
         //Running OpenCL exgemv with %u elements...
-        ExGEMV(NULL, m, n, alpha, d_a, lda, offseta, d_x, incx, offsetx, beta, d_y, incy, offsety, &ciErrNum);
+        ExGEMV(NULL, transa, m, n, alpha, d_a, lda, offseta, d_x, incx, offsetx, beta, d_y, incy, offsety, &ciErrNum);
         if (ciErrNum != CL_SUCCESS)
             exit(EXIT_FAILURE);
 
@@ -183,7 +184,7 @@ int runExGEMV(const int m, const int n, const double alpha, double *a, const int
                 exit(EXIT_FAILURE);
             }
 
-            ExGEMV(NULL, m, n, alpha, d_a, lda, offseta, d_x, incx, offsetx, beta, d_y, incy, offsety, &ciErrNum);
+            ExGEMV(NULL, transa, m, n, alpha, d_a, lda, offseta, d_x, incx, offsetx, beta, d_y, incy, offsety, &ciErrNum);
 
             ciErrNum  = clEnqueueMarker(cqCommandQueue, &endMark);
             //ciErrNum = clEnqueueMarkerWithWaitList(cqCommandQueue, 0, NULL, &endMark);
@@ -213,7 +214,7 @@ int runExGEMV(const int m, const int n, const double alpha, double *a, const int
 #endif
 
         //Retrieving results...
-            ciErrNum = clEnqueueReadBuffer(cqCommandQueue, d_y, CL_TRUE, 0, m * sizeof(cl_double), y, 0, NULL, NULL);
+            ciErrNum = clEnqueueReadBuffer(cqCommandQueue, d_y, CL_TRUE, 0, ((transa == 'T') ? n : m) * sizeof(cl_double), y, 0, NULL, NULL);
             if (ciErrNum != CL_SUCCESS) {
                 printf("ciErrNum = %d\n", ciErrNum);
                 printf("Error in clEnqueueReadBuffer Line %u in file %s !!!\n\n", __LINE__, __FILE__);

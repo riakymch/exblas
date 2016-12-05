@@ -10,7 +10,9 @@
 // OpenCL launcher for bitonic sort kernel
 ////////////////////////////////////////////////////////////////////////////////
 #define DGEMV_KERNEL "dgemv"
+#define DGEMVT_KERNEL "dgemvT"
 #define GEMV_KERNEL "gemv"
+#define GEMVT_KERNEL "gemvT"
 #define GEMV_REDUCE "gemv_reduce"
 
 static size_t szKernelLength;                // Byte size of kernel code
@@ -41,6 +43,7 @@ extern "C" cl_int initExGEMV(
     cl_command_queue cqParamCommandQue,
     cl_device_id cdDevice,
     const char* program_file,
+	const char transa,
     const uint m,
     const uint ip,
     const uint NbFPE
@@ -87,14 +90,14 @@ extern "C" cl_int initExGEMV(
         }
 
     if (NbFPE == 1){
-        ckDGEMV = clCreateKernel(cpProgram, DGEMV_KERNEL, &ciErrNum);
+        ckDGEMV = clCreateKernel(cpProgram, (transa == 'T' ? DGEMVT_KERNEL : DGEMV_KERNEL), &ciErrNum);
         if (ciErrNum != CL_SUCCESS) {
             printf("Error in clCreateKernel: dgemv, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
             return EXIT_FAILURE;
         }
     } else {
         //printf("...creating ExGEMV kernels:\n");
-        ckGEMV = clCreateKernel(cpProgram, GEMV_KERNEL, &ciErrNum);
+        ckGEMV = clCreateKernel(cpProgram, (transa == 'T' ? GEMVT_KERNEL : GEMV_KERNEL), &ciErrNum);
         if (ciErrNum != CL_SUCCESS) {
             printf("Error in clCreateKernel: gemv, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
             return EXIT_FAILURE;
@@ -154,6 +157,7 @@ extern "C" void closeExGEMV(void){
 // Non-transpose version
 extern "C" size_t ExGEMV(
     cl_command_queue cqCommandQueue,
+	const char transa,
     const uint m,
     const uint n,
     const double alpha,
@@ -176,8 +180,7 @@ extern "C" size_t ExGEMV(
 
     if (ckDGEMV) {
         size_t NbThreadsPerWorkGroup[] = {WORKGROUP_SIZE, 1};
-		//size_t TotalNbThreads[] = {m, p};
-        size_t TotalNbThreads[] = {WORKGROUP_SIZE * ((m + WORKGROUP_SIZE - 1) / WORKGROUP_SIZE), p};
+        size_t TotalNbThreads[] = {WORKGROUP_SIZE * (((transa == 'T' ? n : m) + WORKGROUP_SIZE - 1) / WORKGROUP_SIZE), p};
 
         uint i = 0;
         ciErrNum  = clSetKernelArg(ckDGEMV, i++, sizeof(cl_uint), (void *)&m);
@@ -193,7 +196,7 @@ extern "C" size_t ExGEMV(
         ciErrNum &= clSetKernelArg(ckDGEMV, i++, sizeof(cl_mem),  (void *)&d_y);
         ciErrNum &= clSetKernelArg(ckDGEMV, i++, sizeof(cl_uint), (void *)&incy);
         ciErrNum &= clSetKernelArg(ckDGEMV, i++, sizeof(cl_uint), (void *)&offsety);
-        ciErrNum &= clSetKernelArg(ckDGEMV, i++, (n / p) * sizeof(cl_double), NULL);
+        ciErrNum &= clSetKernelArg(ckDGEMV, i++, ((transa == 'T' ? m : n) / p) * sizeof(cl_double), NULL);
         if (ciErrNum != CL_SUCCESS) {
             printf("Error in clSetKernelArg, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
             *ciErrNumRes = EXIT_FAILURE;
@@ -207,10 +210,10 @@ extern "C" size_t ExGEMV(
             *ciErrNumRes = EXIT_FAILURE;
             return 0;
         }
+		return 0;
     } else {
         size_t NbThreadsPerWorkGroup[] = {WORKGROUP_SIZE, 1};
-		//size_t TotalNbThreads[] = {m, p};
-        size_t TotalNbThreads[] = {WORKGROUP_SIZE * ((m + WORKGROUP_SIZE - 1) / WORKGROUP_SIZE), p};
+        size_t TotalNbThreads[] = {WORKGROUP_SIZE * (((transa == 'T' ? n : m) + WORKGROUP_SIZE - 1) / WORKGROUP_SIZE), p};
 
         uint i = 0;
         ciErrNum  = clSetKernelArg(ckGEMV, i++, sizeof(cl_uint), (void *)&m);
@@ -226,7 +229,7 @@ extern "C" size_t ExGEMV(
         ciErrNum &= clSetKernelArg(ckGEMV, i++, sizeof(cl_mem),  (void *)&d_y);
         ciErrNum &= clSetKernelArg(ckGEMV, i++, sizeof(cl_uint), (void *)&incy);
         ciErrNum &= clSetKernelArg(ckGEMV, i++, sizeof(cl_uint), (void *)&offsety);
-        ciErrNum &= clSetKernelArg(ckGEMV, i++, (n / p) * sizeof(cl_double), NULL);
+        ciErrNum &= clSetKernelArg(ckGEMV, i++, ((transa == 'T' ? m : n) / p) * sizeof(cl_double), NULL);
         ciErrNum &= clSetKernelArg(ckGEMV, i++, sizeof(cl_mem),  (void *)&d_Superaccs);
         if (ciErrNum != CL_SUCCESS) {
             printf("Error in clSetKernelArg, Line %u in file %s !!!\n\n", __LINE__, __FILE__);

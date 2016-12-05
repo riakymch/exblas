@@ -50,6 +50,7 @@ typedef long long int bintype;
  * \param cqParamCommandQue Command queue
  * \param cdDevice Device ID
  * \param program_file OpenCL file to execute
+ * \param transa transpose ('T') or non-transpose ('N') matrix A
  * \param m nb of rows of matrix A
  * \param imt nb of threads in row, wg size
  * \param p nb of columns in the resulting matrix
@@ -61,6 +62,7 @@ extern "C" cl_int initExGEMV(
     cl_command_queue cqParamCommandQue,
     cl_device_id cdDevice,
     const char* program_file,
+	const char transa,
     const uint m,
     const uint ip,
     const uint NbFPE
@@ -80,6 +82,7 @@ extern "C" void closeExGEMV(
  * \brief Executes parallel matrix-vector multiplication on GPU. For internal use
  *
  * \param cqCommandQueue Command queue
+ * \param transa transpose ('T') or non-transpose ('N') matrix A
  * \param m nb of rows of matrix A
  * \param n nb of columns of matrix A
  * \param alpha scalar
@@ -98,6 +101,7 @@ extern "C" void closeExGEMV(
  */
 extern "C" size_t ExGEMV(
     cl_command_queue cqCommandQueue,
+	const char transa,
     const uint m,
     const uint n,
     const double alpha,
