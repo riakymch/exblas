@@ -11,9 +11,9 @@ order of computations, thread scheduling, or reduction tree schemes.
 The current version of the ExBLAS library is equipped with 
   * ExSUM -- Reproducible and accurate parallel reduction (parallel summation);
   * ExDOT -- Reproducible and accurate parallel dot product;
-  * ExGEMV -- Reproducible and accurate parallel matrix-vector product;
-  * ExTRSV -- Reproducible and accurate parallel triangular solver;
-  * ExGEMM -- Reproducible and accurate parallel matrix-matrix multiplication.
+  * ExGEMV -- Reproducible and accurate parallel matrix-vector product for various sizes (m = n, m >= n, and m <= n) for both transpose and non-transpose matrices;
+  * ExTRSV -- Reproducible and accurate parallel triangular solver for both transpose and non-transpose, lower and unit triangular matrices with unit and non-unit diagonals;
+  * ExGEMM -- Reproducible and accurate parallel matrix-matrix multiplication for squeare matrices for a moment.
 These routines can be executed on a set of architectures: Intel Core i7 and 
 Sandy Bridge processors; Intel Xeon Phi co-processors; both AMD and NVIDIA 
 GPUs using the OpenCL framework.
