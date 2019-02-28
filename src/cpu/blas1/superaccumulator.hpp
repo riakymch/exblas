@@ -115,7 +115,7 @@ struct Superaccumulator
 private:
     void AccumulateWord(int64_t x, int i);
 
-    static constexpr unsigned int K = 8;    // High-radix carry-save bits
+    static constexpr unsigned int K = 12;    // High-radix carry-save bits
     static constexpr int digits = 64 - K;
     static constexpr double deltaScale = double(1ull << digits); // Assumes K>0
 
