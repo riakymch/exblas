@@ -1,0 +1,9 @@
+// Copyright (c) 2016 Inria and University Pierre and Marie Curie
+// All rights reserved.
+
+// the configured options and settings for ExBLAS
+#define EXBLAS_VERSION_MAJOR @EXBLAS_VERSION_MAJOR@
+#define EXBLAS_VERSION_MINOR @EXBLAS_VERSION_MINOR@
+#define EXBLAS_SOURCE_DIR "@EXBLAS_SOURCE_DIR@"
+#define EXBLAS_BINARY_DIR "@EXBLAS_BINARY_DIR@"
+#cmakedefine USE_EXBLAS
