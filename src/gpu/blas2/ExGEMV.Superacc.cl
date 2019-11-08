@@ -7,9 +7,9 @@
 #endif
 
 #define BIN_COUNT  39
-#define K           8                   //High-radix carry-save bits
-#define digits     56
-#define deltaScale 72057594037927936.0  //Assumes K > 0
+#define K          12                   //High-radix carry-save bits
+#define digits     52
+#define deltaScale 4503599627370496.0  //Assumes K > 0
 #define f_words    20
 #define TSAFE       0
 
